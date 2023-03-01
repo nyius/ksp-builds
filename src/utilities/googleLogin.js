@@ -30,7 +30,7 @@ const googleLogin = async () => {
 				commentNotificationsAllowed: true,
 				bio: '',
 				favorites: [],
-				profilePicture: 'https://firebasestorage.googleapis.com/v0/b/ludwig-7aa98.appspot.com/o/default-profile.png?alt=media&token=2c13690f-bee9-45d4-90d9-92371361c4ff',
+				profilePicture: 'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/logo_light_icon.png?alt=media&token=bbcff4bd-de9e-4d39-b77e-7046f90ed832',
 				siteAdmin: false,
 				dateCreated: createdAt,
 			};

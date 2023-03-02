@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { serverTimestamp, doc, setDoc } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../../firebase.config';
@@ -6,8 +6,10 @@ import KspImage from '../../assets/kspImage.jpg';
 import ShipBuildTest from '../../utilities/shipBuildTest.json';
 import shipBuildTestMedium from '../../utilities/shipBuildTestMedium.json';
 import { toast } from 'react-toastify';
+import AuthContext from '../../context/auth/AuthContext';
 
 function CreateBuildAdmin() {
+	const { user } = useContext(AuthContext);
 	/**
 	 * handles creating a new fully done build
 	 */
@@ -34,10 +36,15 @@ function CreateBuildAdmin() {
 		toast.success('Build created');
 	};
 
+	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="btn btn-error text-white" onClick={createBuild}>
-			Create Build
-		</div>
+		<>
+			{user?.siteAdmin && (
+				<div className="btn btn-error text-white" onClick={createBuild}>
+					Create Build
+				</div>
+			)}
+		</>
 	);
 }
 

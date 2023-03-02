@@ -31,7 +31,7 @@ function NavBar() {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="navbar bg-base-300">
+		<div className="navbar bg-base-300 mb-5">
 			<div className="flex-1">
 				<img src={Logo} className="h-10 btn" alt="" onClick={() => navigate('/')} />
 

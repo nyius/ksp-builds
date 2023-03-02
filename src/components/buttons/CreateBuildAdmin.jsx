@@ -10,6 +10,7 @@ import AuthContext from '../../context/auth/AuthContext';
 
 function CreateBuildAdmin() {
 	const { user } = useContext(AuthContext);
+	const types = ['interplanetary', 'interstellar', 'satellite', 'space station', 'lander', 'rover', 'ssto', 'spaceplane', 'probe'];
 	/**
 	 * handles creating a new fully done build
 	 */
@@ -27,6 +28,8 @@ function CreateBuildAdmin() {
 			tags: ['Interplanetary', 'SpaceX', 'Epic'],
 			upVotes: 1,
 			downVotes: 0,
+			kspVersion: '0.1.0.0',
+			type: types[Math.trunc(Math.random() * 8)],
 		};
 
 		const commentInit = {};

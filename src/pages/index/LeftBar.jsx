@@ -15,7 +15,10 @@ function LeftBar() {
 				<VerticalLink text="SSTO" url="/" />
 				<VerticalLink text="Spaceplane" url="/" />
 				<VerticalLink text="Probe" url="/" />
-				<VerticalLink text="Probe" url="/" />
+			</ul>
+			<p className="text-2xl text-slate-100 font-bold mb-2 mt-6">Version</p>
+			<ul className="menu w-full">
+				<VerticalLink text="1.0.0" url="/" />
 			</ul>
 		</div>
 	);

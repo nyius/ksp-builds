@@ -1,0 +1,29 @@
+import React, { createContext, useReducer } from 'react';
+import BuildReducer from './BuildReducer';
+
+const BuildContext = createContext();
+
+export const BuildProvider = ({ children }) => {
+	const initialState = {
+		loadingBuild: true,
+		editingBuild: false,
+		uploadingBuild: false,
+		savingBuild: false,
+		cancelEdit: false,
+		deletingBuild: false,
+		deletingBuildId: '',
+		deletingCommentId: '',
+		deletingComment: false,
+		editingComment: false,
+		loadedBuild: null,
+		comments: [],
+		commentsLoading: true,
+		comment: '',
+	};
+
+	const [state, dispatchBuild] = useReducer(BuildReducer, initialState);
+
+	return <BuildContext.Provider value={{ ...state, dispatchBuild }}>{children}</BuildContext.Provider>;
+};
+
+export default BuildContext;

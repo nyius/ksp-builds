@@ -1,0 +1,19 @@
+.dot-bg {
+	position: relative;
+	overflow: hidden;
+}
+
+.dot-bg::before {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -100%;
+	width: 1000px;
+	height: 500px;
+	opacity: 1;
+	background-image: radial-gradient(#8c8fbb 1.1px, transparent 1.1px);
+	background-size: 30px 30px;
+	background-position: 0 0, 35px 35px;
+	background-repeat: repeat;
+	transform: rotate(20deg);
+}

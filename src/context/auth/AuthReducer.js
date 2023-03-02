@@ -14,6 +14,13 @@ const AuthReducer = (state, action) => {
 			return {
 				...state,
 				user: null,
+				newUsername: '',
+				newBio: '',
+				editingProfile: false,
+				cancelEditProfile: false,
+				usernameChanged: false,
+				newGoogleSignup: false,
+				verifyChangeUsername: false,
 			};
 		case 'UPDATE_USER':
 			const getUserStateUpdate = { ...state.user };
@@ -71,6 +78,11 @@ const AuthReducer = (state, action) => {
 			return {
 				...state,
 				editingProfile: action.payload,
+			};
+		case 'SET_NEW_GOOGLE_SIGNUP':
+			return {
+				...state,
+				newGoogleSignup: action.payload,
 			};
 		case 'SET_CANCEL_EDIT_PROFILE':
 			return {

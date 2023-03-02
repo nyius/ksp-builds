@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
+import AuthContext from '../context/auth/AuthContext';
 
 /**
  * Handles navigation for private routes
@@ -14,7 +15,7 @@ function PrivateRoute({ children, admin }) {
 
 	// If the user is logged in, display children
 	// Else, take them to login screen (/)
-	return authLoading ? '' : user ? <>{children}</> : <Navigate to="/login" />;
+	return authLoading ? '' : user ? <>{children}</> : <Navigate to="/" />;
 }
 
 export default PrivateRoute;

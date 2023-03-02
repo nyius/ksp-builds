@@ -1,0 +1,16 @@
+.avatar-round {
+	object-fit: cover;
+	border-radius: 999px;
+	width: 4rem;
+	aspect-ratio: 1/1;
+	box-shadow: 0 0 5px 0 rgba($color: #000000, $alpha: 0.5);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	align-self: center;
+
+	&:hover {
+		box-shadow: 0 0 5px 0 rgba($color: #000000, $alpha: 1);
+		cursor: pointer;
+	}
+}

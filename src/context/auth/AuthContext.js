@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 			const docSnapUser = await getDoc(docRefUser);
 
 			// Check if the user exists
-			if (docSnapUser.exists) {
+			if (docSnapUser.exists()) {
 				const user = docSnapUser.data();
 
 				// Fetch their notifications --------------------------------------------//
@@ -68,6 +68,13 @@ export const AuthProvider = ({ children }) => {
 				deleteNotifIds.forEach(async id => {
 					await deleteDoc(doc(db, 'users', auth.currentUser.uid, 'notifications', id));
 				});
+
+				if (!user.username) {
+					console.log('No username!');
+					dispatchAuth({ type: 'SET_NEW_GOOGLE_SIGNUP', payload: true });
+				} else {
+					//
+				}
 			} else {
 				throw new Error('User does not exist');
 			}
@@ -106,6 +113,7 @@ export const AuthProvider = ({ children }) => {
 		cancelEditProfile: false,
 		usernameChanged: false,
 		verifyChangeUsername: false,
+		newGoogleSignup: false,
 	};
 
 	// Set up the reducer

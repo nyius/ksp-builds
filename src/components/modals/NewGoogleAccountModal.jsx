@@ -1,0 +1,164 @@
+import React, { useContext, useState, useEffect } from 'react';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
+import { auth, db, storage } from '../../firebase.config';
+import { toast } from 'react-toastify';
+import LogoIcon from '../../assets/logo_light_icon.png';
+import Spinner1 from '../spinners/Spinner1';
+import AuthContext from '../../context/auth/AuthContext';
+import useAuth from '../../context/auth/AuthActions';
+import { uploadImage } from '../../utilities/uploadImage';
+
+function NewGoogleAccountModal() {
+	const [newUsername, setNewUsername] = useState('');
+	const [uploadingImage, setUploadingImage] = useState(false);
+	const [newProfilePicture, setNewProfilePicture] = useState(LogoIcon);
+
+	const { user, newGoogleSignup } = useContext(AuthContext);
+	const { setNewGoogleSignup, updateUserState } = useAuth();
+	const newGoogleAccountModal = document.querySelector('#new-google-login-modal');
+
+	/**
+	 * handles uploading a profile picture
+	 */
+	const uploadProfilePicture = async e => {
+		// make sure we have a file uploaded
+		if (e.target.files) {
+			const profilePicture = e.target.files[0];
+
+			if (profilePicture.size > 2097152) {
+				toast.error('Image is too big! Must be smaller than 2mb');
+				e.target.value = null;
+				setNewProfilePicture(LogoIcon);
+				return;
+			}
+
+			await uploadImage(profilePicture, setUploadingImage, user.uid, setNewProfilePicture);
+		}
+	};
+
+	/**
+	 * Handles finalizing the account creation for google users
+	 */
+	const finalizeGoogleAccount = e => {
+		e.preventDefault();
+
+		if (!newUsername || newUsername === '') {
+			console.log(`No username entered!`);
+			toast.error('You need a username!');
+			return;
+		}
+
+		// Normalize username
+		const username = newUsername.trim().toLowerCase();
+
+		/**
+		 * Check if the username already exists in the database
+		 */
+		const checkIfUserExists = async () => {
+			try {
+				// Check if the username already exists
+				const docRefUser = doc(db, 'usernames', username);
+				const docSnapUser = await getDoc(docRefUser);
+
+				// Check if the user exists
+				if (docSnapUser.exists()) {
+					toast.error('That username already exists! Try another one.');
+				} else {
+					const updateUser = {
+						username,
+						profilePicture: newProfilePicture ? newProfilePicture : 'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/logo_light_icon.png?alt=media&token=bbcff4bd-de9e-4d39-b77e-7046f90ed832',
+					};
+
+					await updateDoc(doc(db, 'users', user.uid), updateUser)
+						.then(() => {
+							setNewGoogleSignup(false);
+							updateUserState(updateUser);
+							toast.success('Account Created!');
+						})
+						.catch(err => {
+							console.log(err);
+							toast.error('Something went wrong :(');
+							return;
+						});
+
+					const newUsername = {
+						uid: user.uid,
+					};
+
+					await setDoc(doc(db, 'usernames', username), newUsername)
+						.then(() => {
+							console.log('created new usernames entry');
+						})
+						.catch(err => {
+							console.log(err);
+							toast.error('Something went wrong :(');
+						});
+				}
+			} catch (error) {
+				console.log(error);
+				toast.error('Something went wrong :(');
+			}
+		};
+
+		checkIfUserExists();
+	};
+
+	// Check when we get a new google account setup, so we can show/hide the modal to enter a new username ------------------------------------------------------------------------------------//
+	useEffect(() => {
+		if (newGoogleSignup) {
+			if (newGoogleAccountModal) {
+				newGoogleAccountModal.checked = true;
+			}
+		} else {
+			if (newGoogleAccountModal) {
+				newGoogleAccountModal.checked = false;
+			}
+		}
+	}, [newGoogleSignup]);
+
+	//---------------------------------------------------------------------------------------------------//
+	return (
+		<>
+			{/* New Google Account */}
+			<input type="checkbox" id="new-google-login-modal" className="modal-toggle" />
+			<div className="modal">
+				<div className="modal-box">
+					<div className="font-bold alert dot-bg">
+						Almost done...
+						<img className="w-12" src={LogoIcon} alt="" />
+					</div>
+					<p className="py-4 mb-4 text-center">Please take a second to finalize your account.</p>
+					<form action="" className="mb-10">
+						<label htmlFor="username">Choose Username</label>
+						<input
+							className="input bg-base-200 mt-2 mb-6 w-full"
+							type="text"
+							id="username"
+							onChange={e => {
+								setNewUsername(e.target.value);
+							}}
+							required
+						/>
+
+						<label htmlFor="profile-picture" className="w-full flex mb-2">
+							Profile Picture (2mb max size)
+						</label>
+
+						<div className="flex flex-wrap items-center">
+							<div className="mr-4">{uploadingImage ? <Spinner1 /> : <img className="avatar-round" src={newProfilePicture} />}</div>
+							<input type="file" id="profile-picture" max="1" accept=".jpg,.png,.jpeg" className="file-input w-full max-w-xs" onChange={e => uploadProfilePicture(e)} />
+						</div>
+					</form>
+
+					<button className="btn btn-success" onClick={e => finalizeGoogleAccount(e)}>
+						Create
+					</button>
+				</div>
+			</div>
+		</>
+	);
+}
+
+export default NewGoogleAccountModal;

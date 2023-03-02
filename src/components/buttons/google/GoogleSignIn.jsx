@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { GoogleAuthProvider, getAuth } from 'firebase/auth';
+import React, { useState, useContext } from 'react';
 import googleLogin from '../../../utilities/googleLogin';
-import { auth } from '../../../firebase.config';
+import { FcGoogle } from 'react-icons/fc';
+import useAuth from '../../../context/auth/AuthActions';
 
 function GoogleSignIn() {
-	const [isNewUser, setIsNewUser] = useState(false);
+	const { setNewGoogleSignup } = useAuth();
 
 	/**
 	 * Handles signing in
@@ -13,19 +13,21 @@ function GoogleSignIn() {
 		try {
 			const signinStatus = await googleLogin();
 
-			if (signinStatus === 'success') {
-				console.log('Logged in!');
-			} else if (signinStatus === 'newUser') {
-				setIsNewUser(true);
-			} else {
-				//
+			// if we have a new google user, set signUp to true so that we can display the modal to allow them create a username/profile picture
+			if (signinStatus === 'newUser') {
+				setNewGoogleSignup(true);
 			}
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
-	return <div onClick={() => signIn()}>GoogleSignIn</div>;
+	return (
+		<div className="btn" onClick={() => signIn()}>
+			<FcGoogle />
+			<span className="ml-2">Login with Google </span>
+		</div>
+	);
 }
 
 export default GoogleSignIn;

@@ -30,6 +30,11 @@ const BuildsReducer = (state, action) => {
 					}),
 				],
 			};
+		case 'ADD_BUILD':
+			return {
+				...state,
+				fetchedBuilds: [action.payload, ...state.fetchedBuilds],
+			};
 		case `SET_USERS_OWN_BUILDS`:
 			return {
 				...state,

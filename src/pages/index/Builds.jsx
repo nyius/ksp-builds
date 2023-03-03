@@ -1,13 +1,31 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import BuildCard from '../../components/buildCard/BuildCard';
 import BuildsContext from '../../context/builds/BuildsContext';
 import Spinner1 from '../../components/spinners/Spinner1';
+import LoadMoreBuilds from '../../components/buttons/LoadMoreBuilds';
+import Sort from './Sort';
+import { cloneDeep } from 'lodash';
+import FiltersContext from '../../context/filters/FiltersContext';
+import useFilters from '../../context/filters/FiltersActions';
 
 function Builds() {
 	const { loadingBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
+	const { typeFilters, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
+	const [sortedBuilds, setSortedBuilds] = useState([]);
+	const { filterBuilds } = useFilters();
+
+	// Listen for changes to the sorting and filter the decks accordingly
+	useEffect(() => {
+		let newFetchedBuilds = cloneDeep(fetchedBuilds);
+
+		setSortedBuilds(filterBuilds(newFetchedBuilds));
+	}, [fetchedBuilds, sortBy, typeFilters, versionFilters, searchTerm, tagsSearch]);
 
 	return (
-		<div className="col-start-2 col-end-6">
+		<div className="flex flex-wrap col-start-2 col-end-6">
+			<div className="sort flex flex-row w-full place-content-end mb-4">
+				<Sort />
+			</div>
 			<div className="flex flex-row flex-wrap gap-4 w-full justify-center mb-6">
 				{loadingBuilds ? (
 					<div className="flex flex-row w-full justify-center items-center">
@@ -23,8 +41,8 @@ function Builds() {
 							</div>
 						) : (
 							<>
-								{fetchedBuilds.map(build => {
-									return <BuildCard build={build} />;
+								{sortedBuilds.map((build, i) => {
+									return <BuildCard key={i} i={i} build={build} />;
 								})}
 							</>
 						)}
@@ -34,7 +52,7 @@ function Builds() {
 
 			{!loadingBuilds && lastFetchedBuild !== 'end' && (
 				<div className="flex flex-row w-full justify-center items-center">
-					<button className="btn btn-primary">Load More</button>
+					<LoadMoreBuilds />
 				</div>
 			)}
 		</div>

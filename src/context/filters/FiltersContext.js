@@ -9,9 +9,7 @@ export const FiltersProvider = ({ children }) => {
 		versionFilters: [],
 		searchTerm: '',
 		tagsSearch: '',
-		typeFilter: '',
-		formatFilter: 'any',
-		sortBy: 'newest',
+		sortBy: 'date_newest',
 	};
 
 	const [state, dispatchBuildFilters] = useReducer(FiltersReducer, initialState);

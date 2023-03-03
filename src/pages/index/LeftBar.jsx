@@ -1,24 +1,25 @@
 import React from 'react';
-import VerticalLink from './VerticalLink';
+import VerticalTypeLink from './VerticalTypeLink';
+import VerticalVersionLink from './VerticalVersionLink';
 
 function LeftBar() {
 	return (
 		<div className="sidebar-left bg-base-400 rounded-xl p-4">
-			<p className="text-2xl text-slate-100 font-bold mb-2">Type</p>
-			<ul className="menu w-full">
-				<VerticalLink text="Interplanetary" url="/" />
-				<VerticalLink text="Interstellar" url="/" />
-				<VerticalLink text="Satellite" url="/" />
-				<VerticalLink text="Space Station" url="/" />
-				<VerticalLink text="Lander" url="/" />
-				<VerticalLink text="Rover" url="/" />
-				<VerticalLink text="SSTO" url="/" />
-				<VerticalLink text="Spaceplane" url="/" />
-				<VerticalLink text="Probe" url="/" />
+			<p className="text-2xl text-slate-100 font-bold mb-2 text-center">Type</p>
+			<ul className="btn-group btn-group-vertical w-full gap-1">
+				<VerticalTypeLink text="Interplanetary" />
+				<VerticalTypeLink text="Interstellar" />
+				<VerticalTypeLink text="Satellite" />
+				<VerticalTypeLink text="Space Station" />
+				<VerticalTypeLink text="Lander" />
+				<VerticalTypeLink text="Rover" />
+				<VerticalTypeLink text="SSTO" />
+				<VerticalTypeLink text="Spaceplane" />
+				<VerticalTypeLink text="Probe" />
 			</ul>
-			<p className="text-2xl text-slate-100 font-bold mb-2 mt-6">Version</p>
+			<p className="text-2xl text-slate-100 font-bold mb-2 mt-6 text-center">Version</p>
 			<ul className="menu w-full">
-				<VerticalLink text="1.0.0" url="/" />
+				<VerticalVersionLink text="1.0.0" />
 			</ul>
 		</div>
 	);

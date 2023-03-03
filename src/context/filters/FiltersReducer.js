@@ -8,12 +8,10 @@ const FiltersReducer = (state, action) => {
 		case 'RESET_FILTERS':
 			return {
 				...state,
-				colorFilters: [],
-				manaFilters: [],
+				typeFilters: [],
+				versionFilters: [],
 				searchTerm: '',
 				tagsSearch: '',
-				typeFilter: '',
-				formatFilter: 'any',
 				sortBy: 'newest',
 			};
 

@@ -35,7 +35,7 @@ function NavBar() {
 			<div className="flex-1">
 				<img src={Logo} className="h-10 btn" alt="" onClick={() => navigate('/')} />
 
-				<ul class="menu menu-horizontal px-6 gap-3">
+				<ul className="menu menu-horizontal px-6 gap-3">
 					{/* <li>
 						<a className="btn btn-ghost text-white" onClick={() => navigate('/builds')}>
 							Builds

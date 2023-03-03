@@ -7,7 +7,7 @@ import AuthContext from '../auth/AuthContext';
 import { toast } from 'react-toastify';
 
 const useBuilds = () => {
-	const { dispatchBuilds, fetchedBuilds } = useContext(BuildsContext);
+	const { dispatchBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const { deletingDeckId } = useContext(BuildContext);
 	const { user } = useContext(AuthContext);
 
@@ -29,6 +29,7 @@ const useBuilds = () => {
 			buildsSnap.forEach(doc => {
 				const build = doc.data();
 				build.id = doc.id;
+				delete build.build;
 				builds.push(build);
 			});
 
@@ -78,9 +79,8 @@ const useBuilds = () => {
 
 	/**
 	 * @param {*} fetchNum
-	 * @param {*} lastFetchedBuild
 	 */
-	const fetchMoreBuilds = async (fetchNum, lastFetchedBuild) => {
+	const fetchMoreBuilds = async fetchNum => {
 		try {
 			dispatchBuilds({ type: 'FETCHING_MORE_BUILDS', payload: true });
 			const builds = [];
@@ -88,17 +88,19 @@ const useBuilds = () => {
 			const buildsRef = collection(db, 'builds');
 
 			// Create a query
-			const q = query(buildsRef, orderBy('dateCreated', 'desc', limit(fetchNum)), startAfter(lastFetchedBuild), limit(fetchNum));
+			const q = query(buildsRef, orderBy('timestamp', 'desc', limit(fetchNum)), startAfter(lastFetchedBuild), limit(fetchNum));
 
 			const buildsSnap = await getDocs(q);
 
 			buildsSnap.forEach(doc => {
 				const build = doc.data();
+				delete build.build;
+				build.id = doc.id;
 				builds.push(build);
 			});
 
 			dispatchBuilds({
-				type: 'SET_FETCHED_DECKS',
+				type: 'SET_FETCHED_BUILDS',
 				payload: {
 					fetchedBuilds: [...fetchedBuilds, ...builds],
 					loadingBuilds: false,

@@ -1,9 +1,11 @@
 import React, { createContext, useReducer } from 'react';
+import BuildsReducer from '../builds/BuildsReducer';
 import BuildReducer from './BuildReducer';
 
 const BuildContext = createContext();
 
 export const BuildProvider = ({ children }) => {
+	// Initial state
 	const initialState = {
 		loadingBuild: true,
 		editingBuild: false,

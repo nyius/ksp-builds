@@ -42,7 +42,7 @@ function CreateBuildAdmin() {
 		build.downVotes = 0;
 		build.kspVersion = `1.0.0`;
 		build.type = [types[Math.round(Math.random() * 8)], types[Math.round(Math.random() * 8)], types[Math.round(Math.random() * 8)]];
-		build.comments = Math.round(Math.random() * 1000);
+		build.commentCount = Math.round(Math.random() * 1000);
 		build.views = Math.round(Math.random() * 100000);
 
 		await uploadBuild(dispatchBuilds, build);

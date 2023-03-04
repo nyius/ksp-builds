@@ -13,8 +13,9 @@ export const standardBuild = {
 	kspVersion: `1.0.0`,
 	type: [],
 	tags: [],
-	comments: 0,
+	commentCount: 0,
 	id: '',
 	views: 0,
 	modsUsed: false,
+	video: '',
 };

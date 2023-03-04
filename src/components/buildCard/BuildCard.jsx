@@ -20,7 +20,7 @@ function BuildCard({ build, i }) {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div key={i} className="card card-compact w-full bg-base-400 shadow-lg hover:shadow-xl cursor-pointer h-100">
+		<div key={i} className="card card-compact w-full bg-base-400 shadow-lg hover:shadow-xl cursor-pointer h-104">
 			<DeleteBuildAdmin style="circle" id={build.id} />
 
 			<div className="flex flex-col h-full place-content-between rounded-2xl hover:bg-zinc-900 hover:rounded-2xl" onClick={handleNavigate}>
@@ -32,12 +32,12 @@ function BuildCard({ build, i }) {
 						<img src={build.image} alt={build.name} />
 					</div>
 				</figure>
-				<div className="card-body">
+				<div className="card-body place-content-between">
 					<div className="flex flex-row place-content-between">
 						<h2 className="card-title text-white">{build.name}</h2>
 						<h3 className="text-slate-400">{build.kspVersion}</h3>
 					</div>
-					<p className="tr-uncate mb-4">{build.description}</p>
+					<p className="multi-line-truncate max-h-10 mb-4">{build.description}</p>
 
 					<div className="flex flex-row flex-wrap gap-2">
 						{build.type.map((type, i) => {
@@ -52,7 +52,7 @@ function BuildCard({ build, i }) {
 								<span className="text-2xl">
 									<BiComment />
 								</span>
-								<span className="text-lg">{build.comments}</span>
+								<span className="text-lg">{build.commentCount}</span>
 							</div>
 						</div>
 						<h3 className="text-slate-400">{date}</h3>

@@ -12,10 +12,10 @@ import './app.css';
 import backgroundplanet from './assets/planet.png';
 import Stars from './components/stars/Stars';
 import RightBar from './pages/index/RightBar';
-import LeftBar from './pages/index/LeftBar';
+import LeftBar from './components/leftBar/LeftBar';
 /*TODO
 Build page
-Commenting
+Edit a build
 Profile
 responsive
 uploading a build should add it to the users profile

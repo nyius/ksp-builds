@@ -18,7 +18,7 @@ function Create() {
 	//---------------------------------------------------------------------------------------------------//
 	const [newBuild, setNewBuild] = useState(standardBuild);
 	const [nameLength, setNameLength] = useState(50);
-	const [descLength, setDescLength] = useState(1000);
+	const [descLength, setDescLength] = useState(3000);
 	const [uploadingImage, setUploadingImage] = useState(false);
 	const [newBuildImage, setNewBuildImage] = useState(LogoBackground);
 	const [submittingBuild, setSubmittingBuild] = useState(false);
@@ -212,7 +212,7 @@ function Create() {
 
 			{/* Description */}
 			<div className="flex flex-row gap-2 items-center w-full">
-				<textarea onChange={setDesc} className="textarea textarea-bordered mb-6 w-3/4" placeholder="Description" maxLength="1000" rows="4"></textarea>
+				<textarea onChange={setDesc} className="textarea textarea-bordered mb-6 w-3/4" placeholder="Description" maxLength="3000" rows="4"></textarea>
 				<p className="text-slate-400 italic">{descLength}</p>
 			</div>
 

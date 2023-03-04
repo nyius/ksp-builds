@@ -30,6 +30,19 @@ function NavBar() {
 		});
 	};
 
+	/**
+	 * Checks if the user is logged in before navigating to the create page, so we can display an erorr if they aren't
+	 */
+	const handleCreateNavigate = () => {
+		if (!authLoading) {
+			if (user?.username) {
+				navigate('/create');
+			} else {
+				toast.error('You must be signed in to create a new build!');
+			}
+		}
+	};
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="navbar bg-base-300 mb-5 fixed z-101">
@@ -44,7 +57,7 @@ function NavBar() {
 					</li> */}
 					{/* <div className="divider divider-horizontal"></div> */}
 					<li>
-						<a onClick={() => navigate('/create')} className="btn btn-accent text-white">
+						<a onClick={handleCreateNavigate} className="btn btn-accent text-white">
 							Create{' '}
 							<span className="text-xl">
 								<TiPlusOutline />

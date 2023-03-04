@@ -5,7 +5,7 @@ import { GoArrowUp, GoArrowDown } from 'react-icons/go';
 
 function VoteArrows({ build }) {
 	const { handleVoting } = useAuth();
-	const { user } = useContext(AuthContext);
+	const { user, authLoading } = useContext(AuthContext);
 
 	/**
 	 * Checks if the current user has voted on the build. Takes in a vote type to check and the id of the build. Returns the tailwind syntax to color the vote arrow
@@ -14,7 +14,7 @@ function VoteArrows({ build }) {
 	 * @returns
 	 */
 	const checkIfVoted = (type, buildId) => {
-		if (user.upVotes) {
+		if (!authLoading && user?.upVotes) {
 			if (type === `upVote`) {
 				if (user?.upVotes.includes(buildId)) {
 					return 'text-orange-600';

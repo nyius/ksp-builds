@@ -23,11 +23,25 @@ const useBuild = () => {
 		dispatchBuild({ type: 'LOADING_BUILD', payload: true });
 
 		try {
-			const ref = doc(db, 'builds', id);
-			const data = await getDoc(ref);
+			const buildRef = doc(db, 'builds', id);
+			const rawBuildRef = doc(db, 'buildsRaw', id);
 
-			if (data.exists()) {
-				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: data.data(), loadingBuild: false } });
+			const fetchedBuild = await getDoc(buildRef);
+			const fetchedRawBuild = await getDoc(rawBuildRef);
+
+			if (fetchedBuild.exists()) {
+				let build = fetchedBuild.data();
+
+				if (fetchedRawBuild.exists()) {
+					const rawBuild = fetchedRawBuild.data();
+
+					build.build = rawBuild.build;
+				}
+
+				await fetchComments(id);
+				await updateViewCount(build, id);
+
+				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: build, loadingBuild: false } });
 			} else {
 				toast.error("Couldn't find that build!");
 				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: '', loadingBuild: false } });
@@ -252,16 +266,17 @@ const useBuild = () => {
 	};
 
 	/**
-	 * handles deleting a build
-	 * @param {*} buildId
+	 * handles deleting a comment
+	 * @param {*} commentId
 	 */
-	const deleteComment = async buildId => {
+	const deleteComment = async commentId => {
 		try {
 			// Delete the comments
-			await deleteDoc(doc(db, 'builds', buildId, 'comments', deletingCommentId))
+			await deleteDoc(doc(db, 'builds', loadedBuild.id, 'comments', commentId));
+			await updateDoc(doc(db, 'builds', loadedBuild.id), { commentCount: (loadedBuild.commentCount -= 1) })
 				.then(() => {
 					//Filter the deleted comment from the comments array
-					const newComments = comments.filter(comment => comment.id !== deletingCommentId);
+					const newComments = comments.filter(comment => comment.id !== commentId);
 
 					dispatchBuild({
 						type: 'SET_BUILD',
@@ -301,24 +316,22 @@ const useBuild = () => {
 	 * Fetches a builds comments
 	 * @param {*} id a builds Id
 	 */
-	const fetchComments = async () => {
+	const fetchComments = async id => {
 		try {
-			if (loadedBuild?.id) {
-				const commentsRef = collection(db, 'builds', loadedBuild.id, 'comments');
-				const commentsSnapshot = await getDocs(commentsRef);
-				const commentsList = commentsSnapshot.docs.map(doc => {
-					const comment = doc.data();
-					comment.id = doc.id;
-					return comment;
-				});
+			const commentsRef = collection(db, 'builds', id, 'comments');
+			const commentsSnapshot = await getDocs(commentsRef);
+			const commentsList = commentsSnapshot.docs.map(doc => {
+				const comment = doc.data();
+				comment.id = doc.id;
+				return comment;
+			});
 
-				if (commentsList) commentsList.sort((a, b) => b.timestamp - a.timestamp);
+			if (commentsList) commentsList.sort((a, b) => b.timestamp - a.timestamp);
 
-				dispatchBuild({
-					type: 'SET_BUILD',
-					payload: { comments: commentsList, commentsLoading: false },
-				});
-			}
+			dispatchBuild({
+				type: 'SET_BUILD',
+				payload: { comments: commentsList, commentsLoading: false },
+			});
 		} catch (error) {
 			console.log(error);
 			dispatchBuild({
@@ -409,7 +422,7 @@ const useBuild = () => {
 			// Update the comment count on the build list
 			const update = doc(db, 'builds', loadedBuild.id);
 			await updateDoc(update, {
-				comments: (loadedBuild.comments += 1),
+				commentCount: (loadedBuild.comments += 1),
 			});
 
 			// Send a notification to the build author
@@ -430,6 +443,14 @@ const useBuild = () => {
 				};
 
 				await addDoc(authorRef, newNotification);
+			}
+
+			// now fetch the comment so we can get its timestamp
+			const fetchComment = await getDoc(doc(db, 'builds', loadedBuild.id, 'comments', newId.id));
+
+			if (fetchComment.exists()) {
+				const data = fetchComment.data();
+				newComment.timestamp = data.timestamp;
 			}
 
 			toast.success('Commented!');
@@ -461,16 +482,31 @@ const useBuild = () => {
 	};
 
 	/**
-	 * Handles a user editing a comment
-	 * @param {*} value
+	 * Handles upading the comment on the DB
 	 */
-	const setEditingComment = value => {
-		dispatchBuild({
-			type: 'SET_BUILD',
-			payload: {
-				editingComment: value,
-			},
-		});
+	const updateComment = async (comment, commentId) => {
+		try {
+			const ref = doc(db, 'builds', loadedBuild.id, 'comments', commentId);
+
+			await updateDoc(ref, { comment });
+
+			toast.success('Comment Edited');
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong with editing your comment. Please try again');
+		}
+	};
+
+	/**
+	 * handles updating the builds view count
+	 */
+	const updateViewCount = async (build, id) => {
+		try {
+			const ref = doc(db, 'builds', id);
+			await updateDoc(ref, { views: (build.views += 1) });
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	return {
@@ -489,7 +525,8 @@ const useBuild = () => {
 		fetchBuild,
 		addComment,
 		setComment,
-		setEditingComment,
+		updateComment,
+		updateViewCount,
 	};
 };
 

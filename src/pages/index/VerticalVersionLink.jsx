@@ -5,11 +5,11 @@ import FiltersContext from '../../context/filters/FiltersContext';
 
 function VerticalVersionLink({ text }) {
 	const navigate = useNavigate();
-	const { versionFilters } = useContext(FiltersContext);
+	const { versionFilter } = useContext(FiltersContext);
 
 	const { setVersionFilter } = useFilters();
 
-	if (versionFilters.includes(text)) {
+	if (versionFilter === text) {
 		return (
 			<li
 				id={text}
@@ -17,7 +17,7 @@ function VerticalVersionLink({ text }) {
 					setVersionFilter(e);
 				}}
 			>
-				<a id={text} className="btn btn-block bg-secondary hover:bg-fuchsia-900 text-slate-300">
+				<a id={text} className="btn btn-block bg-accent text-slate-900 rounded-lg hover:bg-teal-700 text-slate-300">
 					{text}
 				</a>
 			</li>

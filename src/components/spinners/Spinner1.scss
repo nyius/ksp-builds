@@ -1,6 +1,7 @@
 .lds-dual-ring {
 	display: inline-block;
 	width: 100%;
+	max-width: 5rem;
 	aspect-ratio: 1/1;
 }
 .lds-dual-ring:after {

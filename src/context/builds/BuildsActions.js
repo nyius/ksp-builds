@@ -1,36 +1,41 @@
-import { getDocs, collection, getDoc, doc, startAfter, orderBy, limit, query } from 'firebase/firestore';
+import { useContext, useEffect } from 'react';
+import { getDocs, collection, getDoc, doc, startAfter, orderBy, limit, query, where } from 'firebase/firestore';
 import { db } from '../../firebase.config';
-import { useContext } from 'react';
 import BuildsContext from './BuildsContext';
 import BuildContext from '../build/BuildContext';
 import AuthContext from '../auth/AuthContext';
 import { toast } from 'react-toastify';
+import FiltersContext from '../filters/FiltersContext';
+import { buildsFetchNum } from '../../config';
 
 const useBuilds = () => {
 	const { dispatchBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const { deletingDeckId } = useContext(BuildContext);
 	const { user } = useContext(AuthContext);
+	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
 
 	/**
 	 * Fetches X builds from the databse
-	 * @param {*} fetchNum
 	 */
-	const fetchBuilds = async fetchNum => {
+	const fetchBuilds = async () => {
 		try {
 			dispatchBuilds({ type: 'SET_FETCHED_BUILDS_LOADING', payload: true });
 			const builds = [];
 
 			const buildsRef = collection(db, 'builds');
+			let q;
+
 			// Create a query
-			const q = query(buildsRef, orderBy('timestamp', 'desc', limit(fetchNum)), limit(fetchNum));
+			if (typeFilter !== '') {
+				q = query(buildsRef, where('type', 'array-contains', typeFilter), where('kspVersion', '==', versionFilter), orderBy('timestamp', 'desc', limit(buildsFetchNum)), limit(buildsFetchNum));
+			} else {
+				q = query(buildsRef, orderBy('timestamp', 'desc', limit(buildsFetchNum)), limit(buildsFetchNum));
+			}
 
 			const buildsSnap = await getDocs(q);
 
 			buildsSnap.forEach(doc => {
-				const build = doc.data();
-				build.id = doc.id;
-				delete build.build;
-				builds.push(build);
+				builds.push(doc.data());
 			});
 
 			dispatchBuilds({
@@ -38,7 +43,7 @@ const useBuilds = () => {
 				payload: {
 					fetchedBuilds: builds,
 					loadingBuilds: false,
-					lastFetchedBuild: buildsSnap.docs.length < fetchNum ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1],
+					lastFetchedBuild: buildsSnap.docs.length < buildsFetchNum ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1],
 				},
 			});
 		} catch (error) {
@@ -78,9 +83,9 @@ const useBuilds = () => {
 	};
 
 	/**
-	 * @param {*} fetchNum
+	 * @param {*}
 	 */
-	const fetchMoreBuilds = async fetchNum => {
+	const fetchMoreBuilds = async () => {
 		try {
 			dispatchBuilds({ type: 'FETCHING_MORE_BUILDS', payload: true });
 			const builds = [];
@@ -88,14 +93,12 @@ const useBuilds = () => {
 			const buildsRef = collection(db, 'builds');
 
 			// Create a query
-			const q = query(buildsRef, orderBy('timestamp', 'desc', limit(fetchNum)), startAfter(lastFetchedBuild), limit(fetchNum));
+			const q = query(buildsRef, orderBy('timestamp', 'desc', limit(buildsFetchNum)), startAfter(lastFetchedBuild), limit(buildsFetchNum));
 
 			const buildsSnap = await getDocs(q);
 
 			buildsSnap.forEach(doc => {
 				const build = doc.data();
-				delete build.build;
-				build.id = doc.id;
 				builds.push(build);
 			});
 
@@ -104,7 +107,7 @@ const useBuilds = () => {
 				payload: {
 					fetchedBuilds: [...fetchedBuilds, ...builds],
 					loadingBuilds: false,
-					lastFetchedBuild: buildsSnap.docs.length < fetchNum ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1],
+					lastFetchedBuild: buildsSnap.docs.length < buildsFetchNum ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1],
 				},
 			});
 		} catch (error) {

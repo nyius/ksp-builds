@@ -30,6 +30,8 @@ const useBuild = () => {
 				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: data.data(), loadingBuild: false } });
 			} else {
 				toast.error("Couldn't find that build!");
+				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: '', loadingBuild: false } });
+
 				throw new Error("Couldn't find that build!");
 			}
 		} catch (error) {
@@ -68,7 +70,7 @@ const useBuild = () => {
 				throw new Error('Not logged in');
 			}
 
-			// Check if theres cards in the build
+			// Check if theres types in the build
 			if (loadedBuild.type === '') {
 				toast.error('You forgot to give your build a type!');
 				dispatchBuild({
@@ -79,7 +81,7 @@ const useBuild = () => {
 			}
 
 			// Check description length
-			if (loadedBuild.description.length > 500) {
+			if (loadedBuild.description.length > 1000) {
 				toast.error('Description too long');
 				dispatchBuild({
 					type: 'UPLOADING_BUILD',
@@ -89,7 +91,7 @@ const useBuild = () => {
 			}
 
 			// Check name length
-			if (loadedBuild.name.length > 100) {
+			if (loadedBuild.name.length > 50) {
 				toast.error('Build name too long');
 				dispatchBuild({
 					type: 'UPLOADING_BUILD',
@@ -200,7 +202,6 @@ const useBuild = () => {
 	const deleteBuild = async id => {
 		try {
 			if (!id) return;
-			console.log(id);
 			// Delete the comments
 			const commentsQuery = query(collection(db, 'builds', id, 'comments'));
 			const commentsQuerySnapshot = await getDocs(commentsQuery);
@@ -209,24 +210,19 @@ const useBuild = () => {
 			});
 
 			// Delete the build
-			await deleteDoc(doc(db, 'builds', id))
-				.then(() => {
-					// Filter the deleted build out of the loaded builds
-					dispatchBuilds({
-						type: 'DELETE_BUILD',
-						payload: id,
-					});
+			await deleteDoc(doc(db, 'builds', id));
+			await deleteDoc(doc(db, 'buildsRaw', id));
+			// Filter the deleted build out of the loaded builds
+			dispatchBuilds({
+				type: 'DELETE_BUILD',
+				payload: id,
+			});
 
-					setDeletingBuild(dispatchBuild);
-					toast.success(`Build Deleted!`);
-				})
-				.catch(err => {
-					setDeletingBuild(dispatchBuild);
-					toast.error(`Something went wrong deleting the build`);
-					throw new Error(err);
-				});
+			setDeletingBuild(dispatchBuild);
+			toast.success(`Build Deleted!`);
 		} catch (error) {
 			setDeletingBuild(dispatchBuild);
+			toast.error('Something went wrong deleting this build');
 			throw new Error(error);
 		}
 	};

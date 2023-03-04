@@ -5,10 +5,10 @@ import FiltersContext from '../../context/filters/FiltersContext';
 
 function VerticalTypeLink({ text }) {
 	const navigate = useNavigate();
-	const { typeFilters } = useContext(FiltersContext);
+	const { typeFilter } = useContext(FiltersContext);
 
 	const { setTypeFilter } = useFilters();
-	if (typeFilters.includes(text)) {
+	if (typeFilter === text) {
 		return (
 			<li
 				id={text}

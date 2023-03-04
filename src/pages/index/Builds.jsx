@@ -7,26 +7,36 @@ import Sort from './Sort';
 import { cloneDeep } from 'lodash';
 import FiltersContext from '../../context/filters/FiltersContext';
 import useFilters from '../../context/filters/FiltersActions';
+import useBuilds from '../../context/builds/BuildsActions';
+import SearchBar from '../../components/search/SearchBar';
 
 function Builds() {
 	const { loadingBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
-	const { typeFilters, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
+	const { typeFilter, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const { filterBuilds } = useFilters();
+	const { fetchBuilds } = useBuilds();
 
-	// Listen for changes to the sorting and filter the decks accordingly
+	// Listen for changes to the sorting and filter the builds accordingly
 	useEffect(() => {
 		let newFetchedBuilds = cloneDeep(fetchedBuilds);
 
 		setSortedBuilds(filterBuilds(newFetchedBuilds));
-	}, [fetchedBuilds, sortBy, typeFilters, versionFilters, searchTerm, tagsSearch]);
+	}, [fetchedBuilds, sortBy]);
 
+	// listens for filters and fetches builds based on filter
+	useEffect(() => {
+		fetchBuilds();
+	}, [typeFilter, versionFilters, searchTerm, tagsSearch]);
+
+	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="flex flex-wrap col-start-2 col-end-6">
-			<div className="sort flex flex-row w-full place-content-end mb-4">
+		<>
+			<div className="flex flex-row w-full place-content-end mb-4">
+				<SearchBar />
 				<Sort />
 			</div>
-			<div className="flex flex-row flex-wrap gap-4 w-full justify-center mb-6">
+			<div className="grid grid-cols-3 gap-4 w-full items-center justify-items-center mb-6">
 				{loadingBuilds ? (
 					<div className="flex flex-row w-full justify-center items-center">
 						<div className="w-20">
@@ -55,7 +65,7 @@ function Builds() {
 					<LoadMoreBuilds />
 				</div>
 			)}
-		</div>
+		</>
 	);
 }
 

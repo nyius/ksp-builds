@@ -33,6 +33,9 @@ const googleLogin = async () => {
 				profilePicture: '',
 				siteAdmin: false,
 				dateCreated: createdAt,
+				upVotes: [],
+				downVotes: [],
+				builds: [],
 			};
 
 			const notifications = {

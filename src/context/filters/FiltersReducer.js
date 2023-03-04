@@ -8,11 +8,11 @@ const FiltersReducer = (state, action) => {
 		case 'RESET_FILTERS':
 			return {
 				...state,
-				typeFilters: [],
-				versionFilters: [],
+				typeFilter: '',
+				versionFilter: '1.0.0',
 				searchTerm: '',
 				tagsSearch: '',
-				sortBy: 'newest',
+				sortBy: 'date_newest',
 			};
 
 		default:

@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import FiltersContext from './FiltersContext';
 
 const useFilters = () => {
-	const { sortBy, typeFilters, versionFilters, searchTerm, tagsSearch, dispatchBuildFilters } = useContext(FiltersContext);
+	const { sortBy, typeFilter, versionFilter, searchTerm, tagsSearch, dispatchBuildFilters } = useContext(FiltersContext);
 
 	/**
 	 * Handles setting search term
@@ -37,46 +37,26 @@ const useFilters = () => {
 	 * @param {*} e
 	 */
 	const setTypeFilter = e => {
-		if (typeFilters.includes(e.target.id)) {
-			dispatchBuildFilters({
-				type: 'SET_FILTERS',
-				payload: {
-					filter: 'typeFilters',
-					value: typeFilters.filter(x => x !== e.target.id),
-				},
-			});
-		} else {
-			dispatchBuildFilters({
-				type: 'SET_FILTERS',
-				payload: {
-					filter: 'typeFilters',
-					value: [...typeFilters, e.target.id],
-				},
-			});
-		}
+		dispatchBuildFilters({
+			type: 'SET_FILTERS',
+			payload: {
+				filter: 'typeFilter',
+				value: typeFilter === e.target.id ? '' : e.target.id,
+			},
+		});
 	};
 	/**
 	 * Handles setting the filter for build version
 	 * @param {*} e
 	 */
 	const setVersionFilter = e => {
-		if (versionFilters.includes(e.target.id)) {
-			dispatchBuildFilters({
-				type: 'SET_FILTERS',
-				payload: {
-					filter: 'versionFilters',
-					value: versionFilters.filter(x => x !== e.target.id),
-				},
-			});
-		} else {
-			dispatchBuildFilters({
-				type: 'SET_FILTERS',
-				payload: {
-					filter: 'versionFilters',
-					value: [...versionFilters, e.target.id],
-				},
-			});
-		}
+		dispatchBuildFilters({
+			type: 'SET_FILTERS',
+			payload: {
+				filter: 'versionFilter',
+				value: e.target.id,
+			},
+		});
 	};
 
 	/**
@@ -117,22 +97,6 @@ const useFilters = () => {
 				}
 			})
 			.filter(build => {
-				if (typeFilters.length === 0) return build;
-
-				//  check that the build has the same amount of colors as the filter
-				if (typeFilters.includes(build.type)) {
-					return build;
-				}
-			})
-			.filter(build => {
-				if (versionFilters.length === 0) return build;
-
-				//  check that the build has the same amount of colors as the filter
-				if (versionFilters.includes(build.kspVersion)) {
-					return build;
-				}
-			})
-			.filter(build => {
 				if (searchTerm === '') return build;
 				if (build.name.toLowerCase().includes(searchTerm.toLowerCase())) return build;
 			})
@@ -144,7 +108,16 @@ const useFilters = () => {
 			});
 	};
 
-	return { setSearchFilter, setTagSearchFilter, filterBuilds, setSortFilter, setTypeFilter, setVersionFilter };
+	/**
+	 * Handles reseting the filter
+	 */
+	const resetFilters = () => {
+		dispatchBuildFilters({
+			type: 'RESET_FILTERS',
+		});
+	};
+
+	return { setSearchFilter, setTagSearchFilter, filterBuilds, setSortFilter, setTypeFilter, setVersionFilter, resetFilters };
 };
 
 export default useFilters;

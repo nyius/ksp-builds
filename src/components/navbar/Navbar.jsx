@@ -13,6 +13,7 @@ import AuthContext from '../../context/auth/AuthContext';
 import Logo from '../../assets/logo_light_full.png';
 import LogoIcon from '../../assets/logo_light_icon.png';
 import { TiPlusOutline } from 'react-icons/ti';
+import SearchBar from '../search/SearchBar';
 
 function NavBar() {
 	const { user, dispatchAuth, authLoading } = useContext(AuthContext);
@@ -31,7 +32,7 @@ function NavBar() {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="navbar bg-base-300 mb-5">
+		<div className="navbar bg-base-300 mb-5 fixed z-101">
 			<div className="flex-1">
 				<img src={Logo} className="h-10 btn" alt="" onClick={() => navigate('/')} />
 
@@ -57,10 +58,6 @@ function NavBar() {
 			</div>
 
 			<div className="flex-none gap-3">
-				<div className="form-control">
-					<input type="text" placeholder="Search" className="input input-bordered mr-4" />
-				</div>
-
 				{authLoading ? (
 					''
 				) : (

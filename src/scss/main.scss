@@ -21,4 +21,18 @@ body {
 
 #root {
 	@import './imports';
+	min-height: 100vh;
+}
+
+.planet {
+	background-repeat: no-repeat;
+	background-position: bottom;
+	background-position-y: 70vh;
+	background-attachment: fixed;
+}
+
+.gradient {
+	// background: rgb(0, 212, 255);
+	// background: linear-gradient(0deg, rgba(112, 178, 191, 1) 0%, rgba(27, 39, 70, 1) 52%, rgba(12, 14, 19, 1) 100%);
+	z-index: -100;
 }

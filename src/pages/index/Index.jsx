@@ -11,15 +11,7 @@ function Index() {
 		fetchBuilds(10);
 	}, []);
 
-	return (
-		<div className="flex w-full justify-center mb-6">
-			<div className="grid grid-cols-6 gap-4 justify-center w-3/4">
-				<LeftBar />
-				<Builds />
-				<RightBar />
-			</div>
-		</div>
-	);
+	return <Builds />;
 }
 
 export default Index;

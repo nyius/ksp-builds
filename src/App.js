@@ -8,11 +8,11 @@ import PrivateRoute from './routes/PrivateRoute';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './app.css';
 import backgroundplanet from './assets/planet.png';
 import Stars from './components/stars/Stars';
 import RightBar from './pages/index/RightBar';
 import LeftBar from './components/leftBar/LeftBar';
+import './App.css';
 /*TODO
 Build page
 Edit a build

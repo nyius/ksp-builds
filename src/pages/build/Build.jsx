@@ -14,6 +14,7 @@ import Spinner1 from '../../components/spinners/Spinner1';
 import TypeBadge from '../../components/typeBadge/TypeBadge';
 import HowToPasteBuildModal from '../../components/modals/HowToPasteModal';
 import Comment from '../../components/comments/Comment';
+import DeleteBuildModal from '../../components/modals/DeleteBuildModal';
 //---------------------------------------------------------------------------------------------------//
 
 function Build() {
@@ -27,7 +28,10 @@ function Build() {
 		fetchBuild(id);
 	}, []);
 
-	const copyDeckToClipboard = () => {
+	/**
+	 * Handles copying the build to the clipboard
+	 */
+	const copyBuildToClipboard = () => {
 		navigator.clipboard.writeText(loadedBuild.build);
 		toast.success('Build coped to clipboard!');
 	};
@@ -73,7 +77,7 @@ function Build() {
 							{/* Buttons */}
 							<div className="flex flex-row place-content-between">
 								<div className="flex flex-row gap-4 mb-10">
-									<button className="btn btn-primary w-fit items-center" onClick={copyDeckToClipboard}>
+									<button className="btn btn-primary w-fit items-center" onClick={copyBuildToClipboard}>
 										<span className="mr-2 text-2xl">
 											<TiExport />
 										</span>
@@ -91,12 +95,12 @@ function Build() {
 											</span>
 											Edit Build
 										</button>
-										<button className="btn btn-error gap-2">
+										<label htmlFor="delete-build-modal" className="btn btn-error gap-2">
 											<span className="text-2xl">
 												<RiDeleteBin2Fill />
 											</span>
 											Delete Build
-										</button>
+										</label>
 									</div>
 								)}
 							</div>
@@ -136,6 +140,7 @@ function Build() {
 				</>
 			)}
 			<HowToPasteBuildModal />
+			{loadedBuild && <DeleteBuildModal id={loadedBuild.id} />}
 		</div>
 	);
 }

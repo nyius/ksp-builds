@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore';
+import { serverTimestamp, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase.config';
 import { toast } from 'react-toastify';
 
@@ -13,13 +13,10 @@ const uploadBuild = async (dispatchBuilds, build) => {
 		const buildId = uuidv4().slice(0, 30);
 		build.id = buildId;
 
-		const commentInit = {};
-
 		const rawBuild = { build: build.build };
 		delete build.build;
 
 		await setDoc(doc(db, 'builds', buildId), build);
-		await setDoc(doc(db, 'builds', buildId, 'comments', uuidv4().slice(0, 20)), commentInit);
 
 		// now get the document so we can grab its timestamp
 		const ref = doc(db, 'builds', buildId);

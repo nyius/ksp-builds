@@ -1,17 +1,18 @@
 import { useContext } from 'react';
 import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase.config';
+import { useNavigate } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from './BuildContext';
 import BuildsContext from '../builds/BuildsContext';
 import AuthContext from '../auth/AuthContext';
-import FiltersContext from '../filters/FiltersContext';
 import { clonedeep } from 'lodash';
 //---------------------------------------------------------------------------------------------------//
 import { toast } from 'react-toastify';
 
 const useBuild = () => {
-	const { dispatchBuild, deletingBuild, deletingBuildId, deletingCommentId, comments, loadedBuild, comment } = useContext(BuildContext);
+	const navigate = useNavigate();
+	const { dispatchBuild, deletingCommentId, comments, loadedBuild, comment } = useContext(BuildContext);
 	const { fetchedBuilds, dispatchBuilds } = useContext(BuildsContext);
 	const { user } = useContext(AuthContext);
 
@@ -95,7 +96,7 @@ const useBuild = () => {
 			}
 
 			// Check description length
-			if (loadedBuild.description.length > 1000) {
+			if (loadedBuild.description.length > 3000) {
 				toast.error('Description too long');
 				dispatchBuild({
 					type: 'UPLOADING_BUILD',
@@ -117,53 +118,6 @@ const useBuild = () => {
 			return loadedBuild;
 		} catch (error) {
 			throw new Error(`Error in makeBuildReadyToUpload: ${error}`);
-		}
-	};
-
-	/**
-	 * Handles adding the build to the database
-	 * @param {*}
-	 */
-	const addBuildToDb = async () => {
-		try {
-			const buildToUpload = await makeBuildReadyToUpload(loadedBuild);
-
-			await addDoc(collection(db, 'builds'), buildToUpload)
-				.then(newBuildLink => {
-					dispatchBuild({
-						type: 'UPLOADING_BUILD',
-						payload: false,
-					});
-
-					const addIdToBuild = async () => {
-						await updateDoc(doc(db, 'builds', newBuildLink.id), {
-							id: newBuildLink.id,
-						});
-					};
-
-					addIdToBuild();
-					let newId;
-					newId = newBuildLink.id;
-					buildToUpload.id = newBuildLink.id;
-
-					// handleFavorite(buildToUpload.id);
-
-					return newBuildLink.id;
-				})
-				.catch(err => {
-					dispatchBuild({
-						type: 'UPLOADING_BUILD',
-						payload: false,
-					});
-					throw Error(err);
-				});
-			return buildToUpload;
-		} catch (error) {
-			dispatchBuild({
-				type: 'UPLOADING_BUILD',
-				payload: false,
-			});
-			throw new Error(`error in addBuildToDb: ${error}`);
 		}
 	};
 
@@ -200,22 +154,10 @@ const useBuild = () => {
 	};
 
 	/**
-	 * Handles setting deleting a build
-	 * @param {*} id
-	 */
-	const setDeletingBuild = id => {
-		dispatchBuild({
-			type: 'SET_BUILD',
-			payload: { deletingBuild: !deletingBuild, deletingBuildId: id },
-		});
-	};
-
-	/**
 	 * handles deleting a build
 	 */
 	const deleteBuild = async id => {
 		try {
-			if (!id) return;
 			// Delete the comments
 			const commentsQuery = query(collection(db, 'builds', id, 'comments'));
 			const commentsQuerySnapshot = await getDocs(commentsQuery);
@@ -226,16 +168,17 @@ const useBuild = () => {
 			// Delete the build
 			await deleteDoc(doc(db, 'builds', id));
 			await deleteDoc(doc(db, 'buildsRaw', id));
+
+			navigate('/');
+
 			// Filter the deleted build out of the loaded builds
 			dispatchBuilds({
 				type: 'DELETE_BUILD',
 				payload: id,
 			});
 
-			setDeletingBuild(dispatchBuild);
 			toast.success(`Build Deleted!`);
 		} catch (error) {
-			setDeletingBuild(dispatchBuild);
 			toast.error('Something went wrong deleting this build');
 			throw new Error(error);
 		}
@@ -518,9 +461,7 @@ const useBuild = () => {
 		deleteComment,
 		setDeletingComment,
 		deleteBuild,
-		setDeletingBuild,
 		updateBuild,
-		addBuildToDb,
 		makeBuildReadyToUpload,
 		fetchBuild,
 		addComment,

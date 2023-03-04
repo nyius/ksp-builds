@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { getDocs, collection, getDoc, doc, startAfter, orderBy, limit, query, where } from 'firebase/firestore';
+import { getDocs, collection, getDoc, doc, startAfter, orderBy, limit, query, where, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import BuildsContext from './BuildsContext';
 import BuildContext from '../build/BuildContext';
@@ -9,7 +9,7 @@ import FiltersContext from '../filters/FiltersContext';
 
 const useBuilds = () => {
 	const { dispatchBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
-	const { deletingDeckId } = useContext(BuildContext);
+	const { deletingDeckId, loadedBuild } = useContext(BuildContext);
 	const { user } = useContext(AuthContext);
 	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
 

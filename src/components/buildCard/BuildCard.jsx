@@ -6,7 +6,7 @@ import TypeBadge from '../typeBadge/TypeBadge';
 import VoteArrows from '../buttons/VoteArrows';
 import { AiFillEye } from 'react-icons/ai';
 
-function BuildCard({ build, i }) {
+function BuildCard({ build }) {
 	const navigate = useNavigate();
 	const date = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(build.timestamp.seconds * 1000);
 
@@ -20,7 +20,7 @@ function BuildCard({ build, i }) {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div key={i} className="card card-compact w-full bg-base-400 shadow-lg hover:shadow-xl cursor-pointer h-104">
+		<div className="card card-compact w-full bg-base-400 shadow-lg hover:shadow-xl cursor-pointer h-104">
 			<DeleteBuildAdmin style="circle" id={build.id} />
 
 			<div className="flex flex-col h-full place-content-between rounded-2xl hover:bg-zinc-900 hover:rounded-2xl" onClick={handleNavigate}>

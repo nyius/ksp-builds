@@ -6,7 +6,6 @@ import BuildContext from '../build/BuildContext';
 import AuthContext from '../auth/AuthContext';
 import { toast } from 'react-toastify';
 import FiltersContext from '../filters/FiltersContext';
-import { buildsFetchNum } from '../../config';
 
 const useBuilds = () => {
 	const { dispatchBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
@@ -27,9 +26,9 @@ const useBuilds = () => {
 
 			// Create a query
 			if (typeFilter !== '') {
-				q = query(buildsRef, where('type', 'array-contains', typeFilter), where('kspVersion', '==', versionFilter), orderBy('timestamp', 'desc', limit(buildsFetchNum)), limit(buildsFetchNum));
+				q = query(buildsRef, where('type', 'array-contains', typeFilter), where('kspVersion', '==', versionFilter), orderBy('timestamp', 'desc', limit(process.env.buildsFetchNum)), limit(process.env.buildsFetchNum));
 			} else {
-				q = query(buildsRef, orderBy('timestamp', 'desc', limit(buildsFetchNum)), limit(buildsFetchNum));
+				q = query(buildsRef, orderBy('timestamp', 'desc', limit(process.env.buildsFetchNum)), limit(process.env.buildsFetchNum));
 			}
 
 			const buildsSnap = await getDocs(q);
@@ -43,7 +42,7 @@ const useBuilds = () => {
 				payload: {
 					fetchedBuilds: builds,
 					loadingBuilds: false,
-					lastFetchedBuild: buildsSnap.docs.length < buildsFetchNum ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1],
+					lastFetchedBuild: buildsSnap.docs.length < process.env.buildsFetchNum ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1],
 				},
 			});
 		} catch (error) {
@@ -93,7 +92,7 @@ const useBuilds = () => {
 			const buildsRef = collection(db, 'builds');
 
 			// Create a query
-			const q = query(buildsRef, orderBy('timestamp', 'desc', limit(buildsFetchNum)), startAfter(lastFetchedBuild), limit(buildsFetchNum));
+			const q = query(buildsRef, orderBy('timestamp', 'desc', limit(process.env.buildsFetchNum)), startAfter(lastFetchedBuild), limit(process.env.buildsFetchNum));
 
 			const buildsSnap = await getDocs(q);
 
@@ -107,7 +106,7 @@ const useBuilds = () => {
 				payload: {
 					fetchedBuilds: [...fetchedBuilds, ...builds],
 					loadingBuilds: false,
-					lastFetchedBuild: buildsSnap.docs.length < buildsFetchNum ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1],
+					lastFetchedBuild: buildsSnap.docs.length < process.env.buildsFetchNum ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1],
 				},
 			});
 		} catch (error) {

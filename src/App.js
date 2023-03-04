@@ -1,17 +1,18 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 
 import ContextsProvider from './context/ContextProvider';
-
-import { Index, SignUp, Build, NotFound, Create, Profile, Privacy, Terms } from './pages';
-import { Navbar, Footer } from './components';
 import PrivateRoute from './routes/PrivateRoute';
-
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import backgroundplanet from './assets/planet.png';
-import Stars from './components/stars/Stars';
+//---------------------------------------------------------------------------------------------------//
+import { Index, SignUp, Build, NotFound, Create, Profile, Privacy, Terms } from './pages';
 import RightBar from './pages/index/RightBar';
+//---------------------------------------------------------------------------------------------------//
+import { Navbar, Footer } from './components';
+import Stars from './components/stars/Stars';
 import LeftBar from './components/leftBar/LeftBar';
+//---------------------------------------------------------------------------------------------------//
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 /*TODO
 Build page

@@ -1,14 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
-import BuildCard from '../../components/buildCard/BuildCard';
-import BuildsContext from '../../context/builds/BuildsContext';
-import Spinner1 from '../../components/spinners/Spinner1';
-import LoadMoreBuilds from '../../components/buttons/LoadMoreBuilds';
-import Sort from './Sort';
 import { cloneDeep } from 'lodash';
+//---------------------------------------------------------------------------------------------------//
+import BuildsContext from '../../context/builds/BuildsContext';
 import FiltersContext from '../../context/filters/FiltersContext';
 import useFilters from '../../context/filters/FiltersActions';
 import useBuilds from '../../context/builds/BuildsActions';
+//---------------------------------------------------------------------------------------------------//
+import Sort from './Sort';
+import LoadMoreBuilds from '../../components/buttons/LoadMoreBuilds';
+import Spinner1 from '../../components/spinners/Spinner1';
+import BuildCard from '../../components/buildCard/BuildCard';
 import SearchBar from '../../components/search/SearchBar';
+import Filter from '../../components/filters/Filter';
 
 function Builds() {
 	const { loadingBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
@@ -32,7 +35,8 @@ function Builds() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<div className="flex flex-row w-full place-content-end sm:mb-4">
+			<div className="flex flex-row gap-4 w-full place-content-end sm:mb-4">
+				<Filter />
 				<SearchBar />
 				<Sort />
 			</div>

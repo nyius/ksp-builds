@@ -7,19 +7,12 @@ import IndexLeftBar from './IndexLeftBar';
 function LeftBar() {
 	const currentPage = useLocation();
 
-	if (currentPage.pathname.includes('build')) {
-		return (
-			<div className="sidebar-left hidden md:block bg-base-400 rounded-xl p-4">
-				<BuildLeftBarContent />
-			</div>
-		);
-	} else {
-		return (
-			<div className="sidebar-left hidden md:block bg-base-400 rounded-xl p-4">
-				<IndexLeftBar />
-			</div>
-		);
-	}
+	return (
+		<div className="hidden md:block sidebar-left bg-base-400 rounded-xl p-4">
+			{currentPage.pathname.includes('build') && <BuildLeftBarContent />}
+			{currentPage.pathname === '/' && <IndexLeftBar />}
+		</div>
+	);
 }
 
 export default LeftBar;

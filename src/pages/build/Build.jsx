@@ -53,7 +53,7 @@ function Build() {
 								<h1 className="text-slate-200 text-2xl font-bold">{loadedBuild.name}</h1>
 								<p className="flex flex-row text-2xl items-center gap-4">
 									<AiFillEye />
-									<span className="text-lg self-end"> {loadedBuild.views}</span>
+									<span className="text-lg self-end"> {loadedBuild.views}</span>+
 								</p>
 							</div>
 
@@ -75,8 +75,8 @@ function Build() {
 							<p className="mb-4">{loadedBuild.description}</p>
 
 							{/* Buttons */}
-							<div className="flex flex-row place-content-between">
-								<div className="flex flex-row gap-4 mb-10">
+							<div className="flex flex-col md:flex-row place-content-between">
+								<div className="flex flex-ro flex-wrap gap-4 mb-10">
 									<button className="btn btn-primary w-fit items-center" onClick={copyBuildToClipboard}>
 										<span className="mr-2 text-2xl">
 											<TiExport />
@@ -84,11 +84,11 @@ function Build() {
 										Export to KSP 2
 									</button>
 									<label className="btn bg-base-900" htmlFor="how-to-paste-build-modal">
-										How ?
+										How to import into KSP
 									</label>
 								</div>
 								{!authLoading && (user?.uid === loadedBuild.uid || user?.siteAdmin) && (
-									<div className="flex flex-row gap-4">
+									<div className="flex flex-row flex-wrap gap-4">
 										<button className="btn btn-info gap-2">
 											<span className="text-2xl">
 												<RiEditFill />

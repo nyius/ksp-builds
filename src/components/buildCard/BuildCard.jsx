@@ -20,7 +20,7 @@ function BuildCard({ build }) {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="card card-compact w-full bg-base-400 shadow-lg hover:shadow-xl cursor-pointer h-104">
+		<div className="card card-compact w-full sm:w-96 md:w-full bg-base-400 shadow-lg hover:shadow-xl cursor-pointer h-104">
 			<DeleteBuildAdmin style="circle" id={build.id} />
 
 			<div className="flex flex-col h-full place-content-between rounded-2xl hover:bg-zinc-900 hover:rounded-2xl" onClick={handleNavigate}>
@@ -35,17 +35,17 @@ function BuildCard({ build }) {
 				<div className="card-body place-content-between">
 					<div className="flex flex-row place-content-between">
 						<h2 className="card-title text-white">{build.name}</h2>
-						<h3 className="text-slate-400">{build.kspVersion}</h3>
 					</div>
-					<p className="multi-line-truncate max-h-10 mb-4">{build.description}</p>
+					<p className="multi-line-truncate max-h-10  sm:mb-4">{build.description}</p>
 
 					<div className="flex flex-row flex-wrap gap-2">
 						{build.type.map((type, i) => {
 							return <TypeBadge key={i} type={type} />;
 						})}
 					</div>
+					<h3 className="text-slate-400 text-xl sm:text-lg sm:mb-4">Version {build.kspVersion}</h3>
 
-					<div className="flex flex-row flex-wrap place-content-between items-end mt-4">
+					<div className="flex flex-row flex-wrap place-content-between items-end">
 						<div className="votes flex flex-row gap-8">
 							<VoteArrows build={build} />
 							<div className="flex flex-row items-end gap-2">

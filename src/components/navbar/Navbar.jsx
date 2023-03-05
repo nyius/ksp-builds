@@ -47,17 +47,28 @@ function NavBar() {
 	return (
 		<div className="navbar bg-base-300 mb-5 fixed z-101">
 			<div className="flex-1">
-				<img src={Logo} className="h-10 btn" alt="" onClick={() => navigate('/')} />
+				{/* Logo  */}
+				<img src={Logo} className="h-10 btn hidden sm:block" alt="" onClick={() => navigate('/')} />
+
+				{/* Mobile Hamburger */}
+				<div className="dropdown">
+					<label tabIndex={1} class="btn btn-square btn-ghost sm:hidden">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+						</svg>
+					</label>
+					<ul tabIndex={1} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-200 rounded-box w-52">
+						<li>
+							<a className=" text-2xl" onClick={handleCreateNavigate}>
+								Create <TiPlusOutline />
+							</a>
+						</li>
+					</ul>
+				</div>
 
 				<ul className="menu menu-horizontal px-6 gap-3">
-					{/* <li>
-						<a className="btn btn-ghost text-white" onClick={() => navigate('/builds')}>
-							Builds
-						</a>
-					</li> */}
-					{/* <div className="divider divider-horizontal"></div> */}
 					<li>
-						<a onClick={handleCreateNavigate} className="btn btn-accent text-white">
+						<a onClick={handleCreateNavigate} className="btn btn-accent text-white hidden sm:flex">
 							Create{' '}
 							<span className="text-xl">
 								<TiPlusOutline />
@@ -90,15 +101,15 @@ function NavBar() {
 									</label>
 									<ul tabIndex={0} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-200 rounded-box w-52">
 										<li>
-											<a className="justify-between" onClick={() => navigate('/profile')}>
+											<a className="justify-between text-2xl md:text-lg" onClick={() => navigate('/profile')}>
 												Profile
 											</a>
 										</li>
 										<li>
-											<a>Settings</a>
+											<a className="text-2xl md:text-lg">Settings</a>
 										</li>
 										<li onClick={() => signOut()}>
-											<a>Logout</a>
+											<a className="text-2xl md:text-lg">Logout</a>
 										</li>
 									</ul>
 								</>

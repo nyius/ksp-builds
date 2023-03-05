@@ -45,10 +45,10 @@ function App() {
 						{/* Main layout sizing */}
 						<div className="main-container flex w-full justify-center mb-6 min-h-screen">
 							{/* Content Layout*/}
-							<div className="grid grid-cols-6 gap-4 justify-center w-3/4 mt-20">
+							<div className="grid grid-cols-6 gap-4 justify-center w-full lg:w-3/4 mt-20">
 								<LeftBar />
 								{/* Center Content */}
-								<div className="col-start-2 col-end-6">
+								<div className="col-start-1 col-end-7 md:col-start-2 md:col-end-6">
 									<Routes>
 										<Route exact path="/" element={<Index />} />
 										<Route exact path="/sign-up" element={<SignUp />} />

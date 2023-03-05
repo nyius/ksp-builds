@@ -14,8 +14,8 @@ import SearchBar from '../../components/search/SearchBar';
 import Filter from '../../components/filters/Filter';
 
 function Builds() {
-	const { loadingBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const { typeFilter, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
+	const { loadingBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const { filterBuilds } = useFilters();
 	const { fetchBuilds } = useBuilds();

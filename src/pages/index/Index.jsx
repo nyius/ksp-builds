@@ -8,7 +8,7 @@ function Index() {
 	const { fetchBuilds } = useBuilds();
 
 	useEffect(() => {
-		fetchBuilds(10);
+		fetchBuilds();
 	}, []);
 
 	return <Builds />;

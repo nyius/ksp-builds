@@ -9,14 +9,6 @@ const useAuth = () => {
 	const { dispatchAuth, user, newUsername, newBio, editingProfile, verifyChangeUsername } = useContext(AuthContext);
 
 	/**
-	 * handles dispatching the new username to the context
-	 * @param {*} newValue
-	 */
-	const setNewUsername = newValue => {
-		dispatchAuth({ type: 'SET_NEW_USERNAME', payload: newValue });
-	};
-
-	/**
 	 * Handles when a user signs up with google and neeeds to enter a username
 	 * @param {*} value
 	 */
@@ -126,7 +118,18 @@ const useAuth = () => {
 		dispatchAuth({ type: 'ADD_BUILD', payload: buildId });
 	};
 
-	return { setNewGoogleSignup, updateUserState, handleVoting, addbuildToUser };
+	/**
+	 * Handles setting if the user is editing their profile
+	 * @param {*} editing
+	 */
+	const setEditingProfile = editing => {
+		dispatchAuth({
+			type: 'SET_EDITING_PROFILE',
+			payload: editing,
+		});
+	};
+
+	return { setNewGoogleSignup, updateUserState, handleVoting, addbuildToUser, setEditingProfile };
 };
 
 export default useAuth;

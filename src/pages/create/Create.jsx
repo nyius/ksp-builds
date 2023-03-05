@@ -175,7 +175,7 @@ function Create() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="flex flex-col gap-4 bg-base-400 w-full rounded-xl p-6">
-			<h1 className="text-4xl font-bold text-slate-100 mb-4">Create Build</h1>
+			<h1 className="text-2xl 2k:text-4xl font-bold text-slate-100 mb-4">Create Build</h1>
 
 			{/* Build Image */}
 			<div className="mr-4">{uploadingImage ? <Spinner1 /> : <div className="build-img rounded-xl w-full bg-cover bg-center bg-no-repeat bg-base-900" style={{ backgroundImage: `url('${newBuildImage}')` }}></div>}</div>

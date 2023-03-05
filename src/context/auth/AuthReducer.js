@@ -50,7 +50,7 @@ const AuthReducer = (state, action) => {
 				...state,
 				user: getClearNotificationsState,
 			};
-		case 'SET_DECK_NOTIFICATIONS':
+		case 'SET_BUILD_NOTIFICATIONS':
 			const getSetDeckNotifications = [...state.user.disabledNotifications];
 			if (getSetDeckNotifications.includes(action.payload)) {
 				getSetDeckNotifications.splice(getSetDeckNotifications.indexOf(action.payload), 1);

@@ -19,7 +19,7 @@ import './App.css';
 Edit a build
 Profile
 responsive
-uploading a build should add it to the users profile
+notifications
 search that searches the database, not just loaded builds
 email account
 privary policy

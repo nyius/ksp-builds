@@ -14,8 +14,8 @@ import LeftBar from './components/leftBar/LeftBar';
 //---------------------------------------------------------------------------------------------------//
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
+
 /*TODO
-Build page
 Edit a build
 Profile
 responsive

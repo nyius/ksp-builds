@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'react-toastify';
 import { serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebase.config';
+import { cloneDeep } from 'lodash';
 //---------------------------------------------------------------------------------------------------//
 import KspImage from '../../assets/kspImage.jpg';
 import KspImage2 from '../../assets/kspimage-2.jpg';
@@ -16,11 +17,12 @@ import BuildsContext from '../../context/builds/BuildsContext';
 import ShipBuildTest from '../../utilities/shipBuildTest.json';
 import shipBuildTestMedium from '../../utilities/shipBuildTestMedium.json';
 import { standardBuild } from '../../utilities/standardBuild';
-import uploadBuild from '../../utilities/uploadBuild';
+import useBuild from '../../context/build/BuildActions';
 
 function CreateBuildAdmin() {
 	const { user } = useContext(AuthContext);
 	const { dispatchBuilds } = useContext(BuildsContext);
+	const { uploadBuild } = useBuild();
 	const types = ['Interplanetary', 'Interstellar', 'Satellite', 'Space Station', 'Lander', 'Rover', 'SSTO', 'Spaceplane', 'Probe'];
 	/**
 	 * handles creating a new fully done build
@@ -28,7 +30,7 @@ function CreateBuildAdmin() {
 	const createBuild = async () => {
 		const images = [KspImage, KspImage2, KspImage3, KspImage4, KspImage5];
 
-		const build = standardBuild;
+		const build = cloneDeep(standardBuild);
 
 		build.name = 'test-' + uuidv4().slice(0, 4);
 		build.timestamp = serverTimestamp();
@@ -45,7 +47,7 @@ function CreateBuildAdmin() {
 		build.commentCount = Math.round(Math.random() * 1000);
 		build.views = Math.round(Math.random() * 100000);
 
-		await uploadBuild(dispatchBuilds, build);
+		await uploadBuild(build);
 	};
 
 	//---------------------------------------------------------------------------------------------------//
@@ -53,7 +55,7 @@ function CreateBuildAdmin() {
 		<>
 			{user?.siteAdmin && (
 				<div className="btn btn-error text-white" onClick={createBuild}>
-					Create Build
+					Create Build (ADMIN)
 				</div>
 			)}
 		</>

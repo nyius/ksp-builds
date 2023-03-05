@@ -118,7 +118,15 @@ const useAuth = () => {
 		}
 	};
 
-	return { setNewGoogleSignup, updateUserState, handleVoting };
+	/**
+	 * Handles adding a new build to the current users state. takes in a build id
+	 * @param {*} buildId
+	 */
+	const addbuildToUser = buildId => {
+		dispatchAuth({ type: 'ADD_BUILD', payload: buildId });
+	};
+
+	return { setNewGoogleSignup, updateUserState, handleVoting, addbuildToUser };
 };
 
 export default useAuth;

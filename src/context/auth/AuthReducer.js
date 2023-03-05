@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 const AuthReducer = (state, action) => {
 	switch (action.type) {
 		case 'SET_AUTH':
@@ -98,6 +99,14 @@ const AuthReducer = (state, action) => {
 			return {
 				...state,
 				verifyChangeUsername: action.payload,
+			};
+		case 'ADD_BUILD':
+			const newUser = cloneDeep(state.user);
+			newUser.builds.push(action.payload);
+
+			return {
+				...state,
+				user: newUser,
 			};
 		default:
 			return state;

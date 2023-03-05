@@ -1,12 +1,14 @@
 import { useContext } from 'react';
-import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, getDocs } from 'firebase/firestore';
+import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
+import { clonedeep } from 'lodash';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from './BuildContext';
 import BuildsContext from '../builds/BuildsContext';
 import AuthContext from '../auth/AuthContext';
-import { clonedeep } from 'lodash';
+import useAuth from '../auth/AuthActions';
 //---------------------------------------------------------------------------------------------------//
 import { toast } from 'react-toastify';
 
@@ -15,6 +17,7 @@ const useBuild = () => {
 	const { dispatchBuild, deletingCommentId, comments, loadedBuild, comment } = useContext(BuildContext);
 	const { fetchedBuilds, dispatchBuilds } = useContext(BuildsContext);
 	const { user } = useContext(AuthContext);
+	const { updateUserState, addbuildToUser } = useAuth();
 
 	/**
 	 * Fetches the build from the server and dispatches the result.
@@ -452,7 +455,51 @@ const useBuild = () => {
 		}
 	};
 
+	/**
+	 * Handles uploading a build to the server. Takes in a build, and a dispatch function to add the newly created build to
+	 * @param {*} build
+	 */
+	const uploadBuild = async build => {
+		try {
+			const buildId = uuidv4().slice(0, 30);
+			build.id = buildId;
+
+			const rawBuild = { build: build.build };
+			delete build.build;
+
+			await setDoc(doc(db, 'builds', buildId), build);
+
+			// Add it to the users 'builds'
+			await updateDoc(doc(db, 'users', user.uid), { builds: [...user.builds, buildId] });
+			addbuildToUser(buildId);
+
+			// now get the document so we can grab its timestamp
+			const ref = doc(db, 'builds', buildId);
+			const data = await getDoc(ref);
+
+			if (data.exists()) {
+				const loadedBuild = data.data();
+				const newId = data.id;
+				build.timestamp = loadedBuild.timestamp;
+
+				// add the build to the list of fetched builds
+				dispatchBuilds({
+					type: 'ADD_BUILD',
+					payload: build,
+				});
+
+				await setDoc(doc(db, 'buildsRaw', buildId), rawBuild);
+
+				toast.success('Build created!');
+				return newId;
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	return {
+		uploadBuild,
 		setBaseBuild,
 		setCancelEdit,
 		cancelBuilEdit,

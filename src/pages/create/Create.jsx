@@ -1,27 +1,28 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { uploadImage } from '../../utilities/uploadImage';
-import AuthContext from '../../context/auth/AuthContext';
-import Spinner1 from '../../components/spinners/Spinner1';
-import LogoBackground from '../../assets/logo_bg_dark.png';
-import HowToCopyBuildModal from '../../components/modals/HowToCopyBuildModal';
-import { standardBuild } from '../../utilities/standardBuild';
-import uploadBuild from '../../utilities/uploadBuild';
-import BuildsContext from '../../context/builds/BuildsContext';
 import { cloneDeep } from 'lodash';
+//---------------------------------------------------------------------------------------------------//
+import { uploadImage } from '../../utilities/uploadImage';
+import { standardBuild } from '../../utilities/standardBuild';
+//---------------------------------------------------------------------------------------------------//
+import AuthContext from '../../context/auth/AuthContext';
+import useBuild from '../../context/build/BuildActions';
+//---------------------------------------------------------------------------------------------------//
+import Spinner1 from '../../components/spinners/Spinner1';
+import HowToCopyBuildModal from '../../components/modals/HowToCopyBuildModal';
+import LogoBackground from '../../assets/logo_bg_dark.png';
 
 function Create() {
 	const { user } = useContext(AuthContext);
-	const { dispatchBuilds } = useContext(BuildsContext);
+	const { uploadBuild } = useBuild();
 
 	//---------------------------------------------------------------------------------------------------//
-	const [newBuild, setNewBuild] = useState(standardBuild);
+	const [newBuild, setNewBuild] = useState(cloneDeep(standardBuild));
 	const [nameLength, setNameLength] = useState(50);
 	const [descLength, setDescLength] = useState(3000);
 	const [uploadingImage, setUploadingImage] = useState(false);
 	const [newBuildImage, setNewBuildImage] = useState(LogoBackground);
-	const [submittingBuild, setSubmittingBuild] = useState(false);
 	//---------------------------------------------------------------------------------------------------//
 
 	const navigate = useNavigate();
@@ -69,7 +70,7 @@ function Create() {
 	};
 
 	/**
-	 * Handles setting the new description
+	 * Handles setting build
 	 * @param {*} e
 	 */
 	const setBuild = e => {
@@ -135,7 +136,7 @@ function Create() {
 			buildToUpload.author = user.username;
 			buildToUpload.uid = user.uid;
 
-			await uploadBuild(dispatchBuilds, buildToUpload).then(newId => navigate(`/build/${newId}`));
+			await uploadBuild(buildToUpload).then(newId => navigate(`/build/${newId}`));
 		} catch (error) {
 			toast.error('Something went wrong!');
 			console.log(error);

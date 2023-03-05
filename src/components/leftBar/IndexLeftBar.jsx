@@ -12,7 +12,7 @@ function IndexLeftBar({ text }) {
 			<div className="hidden md:block">
 				{/* Type */}
 				<LeftBarTitle text="Type" />
-				<ul className="btn-group btn-group-vertical w-full gap-1 mb-6">
+				<ul className="btn-group btn-group-vertical w-full gap-1 mb-6 2k:mb-10">
 					<VerticalTypeLink text="Interplanetary" />
 					<VerticalTypeLink text="Interstellar" />
 					<VerticalTypeLink text="Satellite" />
@@ -29,7 +29,7 @@ function IndexLeftBar({ text }) {
 				<ul className="menu w-full mb-6">
 					<VerticalVersionLink text="1.0.0" />
 				</ul>
-				<button onClick={resetFilters} className="btn w-full bg-base-600">
+				<button onClick={resetFilters} className="btn w-full bg-base-600 2k:text-2xl 2k:btn-lg">
 					Reset
 				</button>
 			</div>

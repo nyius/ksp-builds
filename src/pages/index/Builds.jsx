@@ -35,12 +35,12 @@ function Builds() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<div className="flex flex-row gap-4 w-full place-content-end sm:mb-4">
+			<div className="flex flex-row gap-4 w-full place-content-between md:place-content-end sm:mb-4">
 				<Filter />
 				<SearchBar />
 				<Sort />
 			</div>
-			<div className="flex flex-wrap md:grid md:grid-cols-3 gap-4 w-full items-center justify-center md:justify-items-center mb-6 p-6 md:p-0">
+			<div className="flex flex-wrap md:grid md:grid-cols-3 2k:grid-cols-4 gap-4 w-full items-center justify-center md:justify-items-center mb-6 p-6 md:p-0">
 				{loadingBuilds ? (
 					<div className="flex flex-row w-full justify-center items-center">
 						<div className="w-20">

@@ -16,7 +16,7 @@ function VerticalTypeLink({ text }) {
 					setTypeFilter(e);
 				}}
 			>
-				<a id={text} className="text-2xl md:text-lg btn btn-block bg-primary hover:bg-violet-900 text-slate-300">
+				<a id={text} className="text-2xl md:text-lg 2k:text-2xl 2k:font-light btn btn-block 2k:h-20 bg-primary hover:bg-violet-900 text-slate-300">
 					{text}
 				</a>
 			</li>
@@ -29,7 +29,7 @@ function VerticalTypeLink({ text }) {
 					setTypeFilter(e);
 				}}
 			>
-				<a id={text} className="text-2xl md:text-lg btn btn-block text-slate-300">
+				<a id={text} className="text-2xl md:text-lg 2k:text-2xl 2k:font-light btn btn-block 2k:h-20 text-slate-300">
 					{text}
 				</a>
 			</li>

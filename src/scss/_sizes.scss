@@ -17,6 +17,21 @@
 .h-110 {
 	height: 38rem;
 }
+.h-112 {
+	height: 40rem;
+}
+.h-114 {
+	height: 42rem;
+}
+.h-116 {
+	height: 44rem;
+}
+.h-118 {
+	height: 46rem;
+}
+.h-120 {
+	height: 48rem;
+}
 
 .z-100 {
 	z-index: 100;
@@ -24,4 +39,10 @@
 
 .z-101 {
 	z-index: 101;
+}
+
+@media (min-width: 1921px) {
+	.h-104 {
+		height: 42rem;
+	}
 }

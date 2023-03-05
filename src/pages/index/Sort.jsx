@@ -6,7 +6,7 @@ function Sort() {
 	const { setSortFilter } = useFilters();
 
 	return (
-		<select onChange={e => setSortFilter(e)} className="select select-bordered max-w-xs bg-base-900 mr-6 md:mr-0">
+		<select onChange={e => setSortFilter(e)} className="select select-bordered 2k:select-lg max-w-xs bg-base-900 mr-6 md:mr-0">
 			<optgroup>
 				<option value="date_newest">Date (newest)</option>
 				<option value="date_oldest">Date (oldest)</option>

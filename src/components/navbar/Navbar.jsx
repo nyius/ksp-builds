@@ -48,7 +48,7 @@ function NavBar() {
 		<div className="navbar bg-base-300 mb-5 fixed z-101">
 			<div className="flex-1">
 				{/* Logo  */}
-				<img src={Logo} className="h-10 btn hidden sm:block" alt="" onClick={() => navigate('/')} />
+				<img src={Logo} className="h-10 2k:h-20 btn hidden sm:block" alt="" onClick={() => navigate('/')} />
 
 				{/* Mobile Hamburger */}
 				<div className="dropdown">
@@ -66,11 +66,11 @@ function NavBar() {
 					</ul>
 				</div>
 
-				<ul className="menu menu-horizontal px-6 gap-3">
+				<ul className="menu menu-horizontal px-6 gap-3 2k:gap-6">
 					<li>
-						<a onClick={handleCreateNavigate} className="btn btn-accent text-white hidden sm:flex">
+						<a onClick={handleCreateNavigate} className="btn btn-accent 2k:btn-lg text-white 2k:text-2xl hidden sm:flex">
 							Create{' '}
-							<span className="text-xl">
+							<span className="text-xl 2k:text-2xl">
 								<TiPlusOutline />
 							</span>
 						</a>
@@ -87,29 +87,31 @@ function NavBar() {
 				) : (
 					<>
 						{user?.displayName && (
-							<div className="text-3xl btn btn-circle avatar">
-								<MdOutlineNotificationsNone />
+							<div className="btn btn-circle 2k:btn-lg avatar">
+								<p className="text-4xl">
+									<MdOutlineNotificationsNone />
+								</p>
 							</div>
 						)}
 						<div className="dropdown dropdown-end">
 							{user?.displayName ? (
 								<>
-									<label tabIndex={0} className="btn btn-circle avatar">
-										<div className="w-10 rounded-full">
+									<label tabIndex={0} className="btn btn-circle 2k:btn-lg avatar">
+										<div className="w-10 2k:w-20 rounded-full">
 											<img src={user.profilePicture ? user.profilePicture : LogoIcon} />
 										</div>
 									</label>
-									<ul tabIndex={0} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-200 rounded-box w-52">
+									<ul tabIndex={0} className="mt-3 p-2 2k:p-6 shadow menu menu-compact dropdown-content bg-base-200 rounded-box w-52 2k:w-96">
 										<li>
-											<a className="justify-between text-2xl md:text-lg" onClick={() => navigate('/profile')}>
+											<a className="justify-between text-2xl md:text-lg 2k:text-4xl" onClick={() => navigate('/profile')}>
 												Profile
 											</a>
 										</li>
 										<li>
-											<a className="text-2xl md:text-lg">Settings</a>
+											<a className="text-2xl md:text-lg 2k:text-4xl">Settings</a>
 										</li>
 										<li onClick={() => signOut()}>
-											<a className="text-2xl md:text-lg">Logout</a>
+											<a className="text-2xl md:text-lg 2k:text-4xl">Logout</a>
 										</li>
 									</ul>
 								</>

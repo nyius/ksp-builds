@@ -32,13 +32,13 @@ function VoteArrows({ build }) {
 				<span id="upVote" onClick={() => handleVoting('upVote', build)} className={`text-4xl hover:text-orange-600 ${checkIfVoted('upVote', build.id)}`}>
 					<GoArrowUp id="upVote" />
 				</span>
-				<span className="text-lg">{build.upVotes}</span>
+				<span className="text-lg 2k:text-2xl">{build.upVotes}</span>
 			</div>
 			<div className="flex flex-row gap-2 text-2xl cursor-pointer items-end">
 				<span id="downVote" onClick={() => handleVoting('downVote', build)} className={`text-4xl hover:text-sky-500 ${checkIfVoted('downVote', build.id)}`}>
 					<GoArrowDown id="downVote" />
 				</span>
-				<span className="text-lg">{build.downVotes}</span>
+				<span className="text-lg 2k:text-2xl">{build.downVotes}</span>
 			</div>
 		</div>
 	);

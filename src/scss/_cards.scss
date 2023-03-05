@@ -5,3 +5,11 @@ figure {
 		max-height: 15rem;
 	}
 }
+
+@media (min-width: 1921px) {
+	figure {
+		img {
+			max-height: 25rem;
+		}
+	}
+}

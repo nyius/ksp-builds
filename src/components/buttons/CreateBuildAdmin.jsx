@@ -54,7 +54,7 @@ function CreateBuildAdmin() {
 	return (
 		<>
 			{user?.siteAdmin && (
-				<div className="btn btn-error text-white hidden md:flex" onClick={createBuild}>
+				<div className="btn btn-error 2k:btn-lg 2k:text-2xl text-white hidden md:flex" onClick={createBuild}>
 					Create Build (ADMIN)
 				</div>
 			)}

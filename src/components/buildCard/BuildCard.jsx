@@ -23,10 +23,10 @@ function BuildCard({ build }) {
 		<div className="card card-compact w-full sm:w-96 md:w-full bg-base-400 shadow-lg hover:shadow-xl cursor-pointer h-104">
 			<DeleteBuildAdmin style="circle" id={build.id} />
 
-			<div className="flex flex-col h-full place-content-between rounded-2xl hover:bg-zinc-900 hover:rounded-2xl" onClick={handleNavigate}>
+			<div className="flex flex-col h-full place-content-between rounded-2xl buildCardHover hover:rounded-2xl" onClick={handleNavigate}>
 				<figure className="bg-base-900">
 					<div className="flex relative w-full items-center justify-center">
-						<p className="flex flex-row gap-2 p-3 text-white badge absolute bottom-1 right-1 text-lg">
+						<p className="flex flex-row gap-2 p-3 2k:p-5 text-white badge absolute bottom-1 right-1 text-lg 2k:text-2xl">
 							<AiFillEye /> {build.views}
 						</p>
 						<img src={build.image} alt={build.name} />
@@ -34,28 +34,28 @@ function BuildCard({ build }) {
 				</figure>
 				<div className="card-body place-content-between">
 					<div className="flex flex-row place-content-between">
-						<h2 className="card-title text-white">{build.name}</h2>
+						<h2 className="card-title text-white 2k:text-3xl">{build.name}</h2>
 					</div>
-					<p className="multi-line-truncate max-h-10  sm:mb-4">{build.description}</p>
+					<p className="multi-line-truncate max-h-10 sm:mb-4 2k:text-2xl">{build.description}</p>
 
 					<div className="flex flex-row flex-wrap gap-2">
 						{build.type.map((type, i) => {
 							return <TypeBadge key={i} type={type} />;
 						})}
 					</div>
-					<h3 className="text-slate-400 text-xl sm:text-lg sm:mb-4">Version {build.kspVersion}</h3>
+					<h3 className="text-slate-400 text-xl 2k:text-2xl sm:text-lg sm:mb-4">Version {build.kspVersion}</h3>
 
 					<div className="flex flex-row flex-wrap place-content-between items-end">
 						<div className="votes flex flex-row gap-8">
 							<VoteArrows build={build} />
 							<div className="flex flex-row items-end gap-2">
-								<span className="text-2xl">
+								<span className="text-2xl 2k:text-4xl">
 									<BiComment />
 								</span>
-								<span className="text-lg">{build.commentCount}</span>
+								<span className="text-lg 2k:text-2xl">{build.commentCount}</span>
 							</div>
 						</div>
-						<h3 className="text-slate-400">{date}</h3>
+						<h3 className="text-slate-400 2k:text-xl">{date}</h3>
 					</div>
 				</div>
 			</div>

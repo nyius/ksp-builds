@@ -18,26 +18,26 @@ function BuildLeftBarContent() {
 	} else {
 	}
 	return (
-		<div className="flex flex-col gap-2">
+		<div className="flex flex-col gap-2 2k:gap-6">
 			<LeftBarTitle text="Details" />
 			{/* Author */}
-			<div className="flex flex-row gap-2 items-center place-content-between text-lg">
-				Author <span className="badge p-3">{loadedBuild.author}</span>
+			<div className="flex flex-row gap-2 items-center place-content-between text-lg 2k:text-3xl">
+				Author <span className="badge 2k:badge-lg 2k:text-3xl p-3 2k:p-5">{loadedBuild.author}</span>
 			</div>
 
 			{/* Date */}
-			<div className="flex flex-row gap-2 items-center place-content-between text-lg">
-				Uploaded <span className="badge p-3">{date}</span>
+			<div className="flex flex-row gap-2 items-center place-content-between text-lg 2k:text-3xl">
+				Uploaded <span className="badge 2k:badge-lg 2k:text-3xl p-3 2k:p-5">{date}</span>
 			</div>
 
 			{/* Version */}
-			<div className="flex flex-row gap-2 items-center place-content-between text-lg">
-				KSP Version <span className="badge p-3">{loadedBuild.kspVersion}</span>
+			<div className="flex flex-row gap-2 items-center place-content-between text-lg 2k:text-3xl">
+				KSP Version <span className="badge 2k:badge-lg 2k:text-3xl p-3 2k:p-5">{loadedBuild.kspVersion}</span>
 			</div>
 
 			{/* Mods */}
-			<div className="flex flex-row gap-2 items-center place-content-between text-lg">
-				Has Mods <span className="badge p-3">{loadedBuild.modsUsed ? 'Yes' : 'None'}</span>
+			<div className="flex flex-row gap-2 items-center place-content-between text-lg 2k:text-3xl">
+				Has Mods <span className="badge 2k:badge-lg 2k:text-3xl p-3 2k:p-5">{loadedBuild.modsUsed ? 'Yes' : 'None'}</span>
 			</div>
 		</div>
 	);

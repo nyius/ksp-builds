@@ -3,6 +3,8 @@ figure {
 	img {
 		width: max-content;
 		max-height: 15rem;
+		min-height: 8rem;
+		object-fit: scale-down;
 	}
 }
 

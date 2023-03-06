@@ -53,10 +53,10 @@ function Build() {
 
 							<div className="flex flex-row place-content-between">
 								{/* Name */}
-								<h1 className="text-slate-200 text-2xl font-bold">{loadedBuild.name}</h1>
-								<p className="flex flex-row text-2xl items-center gap-4">
+								<h1 className="text-slate-200 text-2xl font-bold 2k:text-4xl">{loadedBuild.name}</h1>
+								<p className="flex flex-row text-2xl items-center gap-4 2k:text-4xl">
 									<AiFillEye />
-									<span className="text-lg self-end"> {loadedBuild.views}</span>+
+									<span className="text-lg self-end 2k:text-3xl"> {loadedBuild.views}</span>
 								</p>
 							</div>
 
@@ -75,30 +75,30 @@ function Build() {
 							</div>
 
 							{/* Description */}
-							<p className="mb-4">{loadedBuild.description}</p>
+							<p className="mb-4 2k:text-3xl">{loadedBuild.description}</p>
 
 							{/* Buttons */}
 							<div className="flex flex-col md:flex-row place-content-between">
 								<div className="flex flex-ro flex-wrap gap-4 mb-10">
-									<button className="btn btn-primary w-fit items-center" onClick={copyBuildToClipboard}>
-										<span className="mr-2 text-2xl">
+									<button className="btn 2k:btn-lg 2k:text-2xl btn-primary w-fit items-center" onClick={copyBuildToClipboard}>
+										<span className="mr-2 text-2xl 2k:text-4xl">
 											<TiExport />
 										</span>
 										Export to KSP 2
 									</button>
-									<label className="btn bg-base-900" htmlFor="how-to-paste-build-modal">
+									<label className="btn 2k:btn-lg 2k:text-2xl bg-base-900" htmlFor="how-to-paste-build-modal">
 										How to import into KSP
 									</label>
 								</div>
 								{!authLoading && (user?.uid === loadedBuild.uid || user?.siteAdmin) && (
 									<div className="flex flex-row flex-wrap gap-4">
-										<button className="btn btn-info gap-2">
+										<button className="btn 2k:btn-lg 2k:text-2xl btn-info gap-2">
 											<span className="text-2xl">
 												<RiEditFill />
 											</span>
 											Edit Build
 										</button>
-										<label htmlFor="delete-build-modal" className="btn btn-error gap-2">
+										<label htmlFor="delete-build-modal" className="btn 2k:btn-lg 2k:text-2xl btn-error gap-2">
 											<span className="text-2xl">
 												<RiDeleteBin2Fill />
 											</span>
@@ -109,11 +109,11 @@ function Build() {
 							</div>
 
 							{/* ----------------- Comments ---------------------- */}
-							<p className="text-2xl">Comments</p>
+							<p className="text-2xl 2k:text-3xl">Comments</p>
 							{!authLoading && user?.username && (
 								<>
-									<textarea onChange={e => setComment(e.target.value)} maxLength="3000" name="" id="" placeholder="Leave a comment" rows="2" className="textarea"></textarea>
-									<button onClick={addComment} className="btn bg-base-900 w-fit">
+									<textarea onChange={e => setComment(e.target.value)} maxLength="3000" name="" id="" placeholder="Leave a comment" rows="2" className="textarea 2k:text-2xl"></textarea>
+									<button onClick={addComment} className="btn 2k:btn-lg 2k:text-2xl bg-base-900 w-fit 2k:mb-8">
 										Save
 									</button>
 								</>
@@ -123,7 +123,7 @@ function Build() {
 							) : (
 								<>
 									{comments.length === 0 ? (
-										<p>No comments yet! Be the first to leave one</p>
+										<p className="2k:btn-lg 2k:text-2xl">No comments yet! Be the first to leave one</p>
 									) : (
 										<div className="flex flex-col gap-4">
 											{comments.map((comment, i) => {

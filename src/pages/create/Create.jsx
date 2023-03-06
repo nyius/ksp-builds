@@ -24,6 +24,7 @@ function Create() {
 	const [descLength, setDescLength] = useState(3000);
 	const [uploadingImage, setUploadingImage] = useState(false);
 	const [buildImages, setBuildImages] = useState([]);
+	const [hoverImage, setHoverImage] = useState(false);
 	//---------------------------------------------------------------------------------------------------//
 
 	const navigate = useNavigate();
@@ -113,7 +114,9 @@ function Create() {
 		// make sure we have a file uploaded
 		if (e.target.files) {
 			const newBuildImages = await uploadImages(e.target.files, setUploadingImage);
-			setBuildImages(newBuildImages);
+			setBuildImages(prevState => {
+				return [...prevState, ...newBuildImages];
+			});
 		}
 	};
 
@@ -142,7 +145,7 @@ function Create() {
 			// Upload the images to the DB
 
 			const buildToUpload = cloneDeep(newBuild);
-			buildToUpload.images = buildImages;
+			buildToUpload.images = buildImages.length === 0 ? [LogoBackground] : buildImages;
 			buildToUpload.author = user.username;
 			buildToUpload.uid = user.uid;
 
@@ -195,6 +198,69 @@ function Create() {
 		});
 	};
 
+	// Allows an image to be dropped on (for rearranging images)
+	const allowDrop = e => {
+		e.preventDefault();
+		if (e.target.id.includes('square')) {
+			setHoverImage(e.target.id.split('-')[1]);
+		} else {
+			setHoverImage(Number(e.target.parentElement.id.split('-')[1]));
+		}
+	};
+
+	/**
+	 * Stop highlighting a image square when not dragging over it
+	 * @param {*} e
+	 */
+	const dragExit = e => {
+		setHoverImage(false);
+	};
+
+	/**
+	 * Handles dropping a image after dragging it
+	 * @param {*} e
+	 */
+	const drop = e => {
+		e.preventDefault();
+		let droppedImage = Number(e.dataTransfer.getData('text'));
+
+		let newSquare, opponentPiece;
+
+		// when dragging and dropping, when we release on a 'image', sometimes the target id isn't the square but the image itself
+		// so we need to go up and get the parent square to find its id
+		if (e.target.id.includes('square')) {
+			newSquare = Number(e.target.id.split('-')[1]);
+			setBuildImages(prevState => {
+				const newArr = [...prevState];
+				newArr[droppedImage] = newArr[newSquare];
+				newArr[newSquare] = prevState[droppedImage];
+
+				return newArr;
+			});
+		} else {
+			newSquare = Number(e.target.parentElement.id.split('-')[1]);
+			setBuildImages(prevState => {
+				const newArr = [...prevState];
+				newArr[droppedImage] = newArr[newSquare];
+				newArr[newSquare] = prevState[droppedImage];
+
+				return newArr;
+			});
+		}
+
+		// Reset hover colors
+		setHoverImage(false);
+	};
+
+	// Handles dragging a piece
+	const drag = e => {
+		e.dataTransfer.setData('text', e.target.id);
+	};
+
+	const squareStyle = i => {
+		if (hoverImage === i) return { backgroundColor: '#171b21' };
+	};
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="flex flex-col gap-4 bg-base-400 w-full rounded-xl p-6">
@@ -208,115 +274,125 @@ function Create() {
 				</div>
 			)}
 
-			{uploadingImage ? (
-				<Spinner1 />
-			) : (
-				<div className="flex flex-row gap-2">
-					{buildImages.length > 0 &&
-						buildImages.map((image, i) => {
-							return (
-								<div key={i} className="relative flex items-center justify-center w-36 h-36 rounded-xl bg-base-300 border-dashed border-2 border-slate-700">
-									<button onClick={() => removeImage(i)} className="btn btn-circle btn-error btn-sm hover:bg-red-500 right-0 top-0 absolute z-50">
-										X
-									</button>
-									<img src={image} className="w-36 object-scale-down" alt="" />
-								</div>
-							);
-						})}
+			<div className="flex flex-row flex-wrap gap-2 2k:gap-4">
+				{buildImages.length > 0 &&
+					buildImages.map((image, i) => {
+						return (
+							<div
+								key={i}
+								className="relative flex items-center justify-center w-36 h-36 2k:w-52 2k:h-52 rounded-xl bg-base-300 border-dashed border-2 border-slate-700"
+								onDrop={e => drop(e)}
+								onDragOver={e => allowDrop(e)}
+								onDragLeave={e => dragExit(e)}
+								id={`square-` + i}
+								style={squareStyle(i)}
+							>
+								<button onClick={() => removeImage(i)} className="btn btn-circle btn-error btn-sm hover:bg-red-500 right-0 top-0 absolute z-50">
+									X
+								</button>
+								<img id={i} src={image} className="w-full object-scale-down cursor-pointer" alt="" draggable={true} onDragStart={e => drag(e)} />
+							</div>
+						);
+					})}
+				{uploadingImage && <Spinner1 />}
+			</div>
+
+			{/* Upload build iage */}
+			{buildImages.length < 6 && (
+				<div className="flex flex-row gap-4 w-full">
+					<input type="file" id="build-image" max="6" accept=".jpg,.png,.jpeg" multiple className="file-input w-full max-w-xs mb-6 2k:file-input-lg" onChange={e => handleAddBuildImages(e)} />
+					<div className="flex flex-col">
+						<p className="text-slate-500 font-bold 2k:text-2xl">{buildImages.length > 6 && <span className="text-red-400 font-bold">Too many images!</span>} 6 Images max. Max size per image 5mb.</p>
+						<p className="text-slate-500 2k:text-2xl">For best results images should be 16/9</p>
+					</div>
 				</div>
 			)}
 
-			{/* Upload build iage */}
-			<div className="flex flex-row gap-4 w-full">
-				<input type="file" id="build-image" max="6" accept=".jpg,.png,.jpeg" multiple className="file-input w-full max-w-xs mb-6" onChange={e => handleAddBuildImages(e)} />
-				<div className="flex flex-col">
-					<p className="text-slate-500 font-bold">{buildImages.length > 6 && <span className="text-red-400 font-bold">Too many images!</span>} 6 Images max. Max size per image 5mb.</p>
-					<p className="text-slate-500">For best results images should be 16/9</p>
-				</div>
-			</div>
-
-			<div className="flex flex-row gap-20">
+			<div className="flex flex-row gap-20 2k:mb-6">
 				{/* Name */}
 				<div className="flex flex-row gap-2 items-center">
-					<input onChange={setName} type="text" placeholder="Build Name" className="input input-bordered w-96 max-w-lg" maxLength="50" />
-					<p className="text-slate-400 italic">{nameLength}</p>
+					<input onChange={setName} type="text" placeholder="Build Name" className="input input-bordered w-96 max-w-lg 2k:input-lg 2k:text-2xl" maxLength="50" />
+					<p className="text-slate-400 italic 2k:text-2xl">{nameLength}</p>
 				</div>
 
 				{/* KSP Version */}
 				<div className="flex flex-row items-center gap-6 text-slate-400">
-					<p>KSP Version</p>
-					<select onChange={setVersion} className="select select-bordered max-w-xs">
+					<p className="2k:text-2xl">KSP Version</p>
+					<select onChange={setVersion} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
 						<optgroup>
-							<option value="1.0.0">1.0.0</option>
+							<option className="text-2xl" value="1.0.0">
+								1.0.0
+							</option>
 						</optgroup>
 					</select>
 				</div>
 
 				{/* Used Mods */}
 				<div className="flex flex-row items-center gap-6 text-slate-400">
-					<p>Uses Mods</p>
-					<input onChange={setModsUsed} type="checkbox" className="checkbox" />
+					<p className="2k:text-2xl">Uses Mods</p>
+					<input onChange={setModsUsed} type="checkbox" className="checkbox 2k:checkbox-lg" />
 				</div>
 			</div>
 
 			{/* Description */}
 			<div className="flex flex-row gap-2 items-center w-full">
-				<textarea onChange={setDesc} className="textarea textarea-bordered w-3/4" placeholder="Description" maxLength="3000" rows="4"></textarea>
-				<p className="text-slate-400 italic">{descLength}</p>
+				<textarea onChange={setDesc} className="textarea textarea-bordered w-3/4 2k:text-2xl 2k:mb-4" placeholder="Description" maxLength="3000" rows="4"></textarea>
+				<p className="text-slate-400 italic 2k:text-2xl">{descLength}</p>
 			</div>
 
 			{/* Video */}
-			<div className="flex flex-row gap-2 items-center">
-				<input onChange={setVideo} type="text" placeholder="Youtube Link (optional)" className="input input-bordered w-96 max-w-lg mg-6" />
-				<p className="italic text-slate-500">Eg. https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>
+			<div className="flex flex-row gap-2 items-center 2k:mb-8">
+				<input onChange={setVideo} type="text" placeholder="Youtube Link (optional)" className="input 2k:input-lg input-bordered w-96 max-w-lg mb-6 2k:text-2xl" />
+				<p className="italic text-slate-500 2k:text-2xl">Eg. https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>
 			</div>
 
 			{/* Build Types */}
-			<h3 className="text-slate-400 text-xl ">Build Type (3 max)</h3>
-			<div className="btn-group mb-6">
-				<button onClick={e => setTypes(`Interplanetary`)} className={`btn ${newBuild.type.includes('Interplanetary') && 'btn-active'}`}>
+			<h3 className="text-slate-400 text-xl 2k:text-3xl">Build Type (3 max)</h3>
+			<div className="btn-group mb-6 2k:mb-10">
+				<button onClick={e => setTypes(`Interplanetary`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Interplanetary') && 'btn-active'}`}>
 					Interplanetary
 				</button>
-				<button onClick={e => setTypes(`Interstellar`)} className={`btn ${newBuild.type.includes('Interstellar') && 'btn-active'}`}>
+				<button onClick={e => setTypes(`Interstellar`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Interstellar') && 'btn-active'}`}>
 					Interstellar
 				</button>
-				<button onClick={e => setTypes(`Satellite`)} className={`btn ${newBuild.type.includes('Satellite') && 'btn-active'}`}>
+				<button onClick={e => setTypes(`Satellite`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Satellite') && 'btn-active'}`}>
 					Satellite
 				</button>
-				<button onClick={e => setTypes(`Space Station`)} className={`btn ${newBuild.type.includes('Space Station') && 'btn-active'}`}>
+				<button onClick={e => setTypes(`Space Station`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Space Station') && 'btn-active'}`}>
 					Space Station
 				</button>
-				<button onClick={e => setTypes(`Lander`)} className={`btn ${newBuild.type.includes('Lander') && 'btn-active'}`}>
+				<button onClick={e => setTypes(`Lander`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Lander') && 'btn-active'}`}>
 					Lander
 				</button>
-				<button onClick={e => setTypes(`Rover`)} className={`btn ${newBuild.type.includes('Rover') && 'btn-active'}`}>
+				<button onClick={e => setTypes(`Rover`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Rover') && 'btn-active'}`}>
 					Rover
 				</button>
-				<button onClick={e => setTypes(`SSTO`)} className={`btn ${newBuild.type.includes('SSTO') && 'btn-active'}`}>
+				<button onClick={e => setTypes(`SSTO`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('SSTO') && 'btn-active'}`}>
 					SSTO
 				</button>
-				<button onClick={e => setTypes(`Spaceplane`)} className={`btn ${newBuild.type.includes('Spaceplane') && 'btn-active'}`}>
+				<button onClick={e => setTypes(`Spaceplane`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Spaceplane') && 'btn-active'}`}>
 					Spaceplane
 				</button>
-				<button onClick={e => setTypes(`Probe`)} className={`btn ${newBuild.type.includes('Probe') && 'btn-active'}`}>
+				<button onClick={e => setTypes(`Probe`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Probe') && 'btn-active'}`}>
 					Probe
 				</button>
 			</div>
 
 			{/* Tags */}
-			<div className="flex flex-row gap-4">
-				<h3 className="text-slate-400 text-xl">Tags (3 max)</h3>
-				<h4 className="text-slate-500 text-lg italic">Press ',' to add a new tag</h4>
+			<div className="flex flex-row gap-4 items-center">
+				<h3 className="text-slate-400 text-xl 2k:text-3xl">Tags (3 max)</h3>
+				<h4 className="text-slate-500 text-lg italic 2k:text-2xl">Press ',' to add a new tag</h4>
 			</div>
-			<input id="tagsField" disabled={newBuild.tags.length === 3} onChange={setTags} type="text" placeholder="Tags" className="input input-bordered w-96 max-w-lg" maxLength="30" />
-			<div className="flex flex-row gap-10">
+			<input id="tagsField" disabled={newBuild.tags.length === 3} onChange={setTags} type="text" placeholder="Tags" className="input 2k:input-lg 2k:text-2xl 2k:mb-6 input-bordered w-96 max-w-lg" maxLength="30" />
+
+			<div className="flex flex-row gap-10 2k:mb-10">
 				{newBuild.tags.map((tag, i) => {
 					return (
 						<div className="indicator" key={i}>
-							<span onClick={removeTag} id={i} className="indicator-item badge badge-error cursor-pointer">
+							<span onClick={removeTag} id={i} className="indicator-item 2k:text-2xl badge badge-error cursor-pointer">
 								x
 							</span>
-							<div className="badge badge-lg badge-info">{tag}</div>
+							<div className="badge badge-lg 2k:text-2xl 2k:p-4 badge-info">{tag}</div>
 						</div>
 					);
 				})}
@@ -324,14 +400,14 @@ function Create() {
 
 			{/* Build */}
 			<div className="flex flex-row items-center gap-4">
-				<h3 className="text-slate-400 text-xl">Paste build here</h3>
-				<label className="btn" htmlFor="how-to-copy-build-modal">
+				<h3 className="text-slate-400 text-xl 2k:text-3xl">Paste build here</h3>
+				<label className="btn 2k:btn-lg 2k:text-2xl" htmlFor="how-to-copy-build-modal">
 					How?
 				</label>
 			</div>
-			<textarea onChange={setBuild} className="textarea textarea-bordered mb-6 w-full" placeholder="Paste..." rows="4"></textarea>
+			<textarea onChange={setBuild} className="textarea textarea-bordered 2k:text-2xl mb-6 w-full" placeholder="Paste..." rows="4"></textarea>
 
-			<button className="btn btn-primary" onClick={submitBuild}>
+			<button className="btn btn-primary 2k:btn-lg 2k:text-2xl" onClick={submitBuild}>
 				Submit
 			</button>
 

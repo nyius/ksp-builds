@@ -267,7 +267,6 @@ function Create() {
 			<h1 className="text-2xl 2k:text-4xl font-bold text-slate-100 mb-4">Create Build</h1>
 
 			{/* Build Image */}
-			{/* <div className="mr-4">{uploadingImage ? <Spinner1 /> : <div className="build-img rounded-xl w-full bg-cover bg-center bg-no-repeat bg-base-900" style={{ backgroundImage: `url('${buildImages[0]}')` }}></div>}</div> */}
 			{buildImages.length === 0 && (
 				<div className="flex items-center justify-center w-36 h-36 rounded-xl bg-base-300 border-dashed border-2 border-slate-400">
 					<p className="text-4xl">{<FiCameraOff />}</p>
@@ -280,7 +279,7 @@ function Create() {
 						return (
 							<div
 								key={i}
-								className="relative flex items-center justify-center w-36 h-36 2k:w-52 2k:h-52 rounded-xl bg-base-300 border-dashed border-2 border-slate-700"
+								className="relative flex items-center justify-center w-36 h-36 2k:w-52 2k:h-52 overflow-hidden rounded-xl bg-base-300 border-dashed border-2 border-slate-700"
 								onDrop={e => drop(e)}
 								onDragOver={e => allowDrop(e)}
 								onDragLeave={e => dragExit(e)}

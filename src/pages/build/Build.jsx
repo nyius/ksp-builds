@@ -28,7 +28,6 @@ function Build() {
 
 	useEffect(() => {
 		fetchBuild(id);
-		console.log(`first`);
 	}, []);
 
 	/**

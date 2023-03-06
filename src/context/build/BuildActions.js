@@ -492,7 +492,7 @@ const useBuild = () => {
 			await setDoc(doc(db, 'builds', buildId), build);
 
 			// add it to the users 'userProfile' db
-			await updateDoc(doc(db, 'users', user.uid), { builds: [...user.builds, buildId] });
+			await updateDoc(doc(db, 'userProfiles', user.uid), { builds: [...user.builds, buildId] });
 
 			// Add it to the users 'builds'
 			await updateDoc(doc(db, 'users', user.uid), { builds: [...user.builds, buildId] });

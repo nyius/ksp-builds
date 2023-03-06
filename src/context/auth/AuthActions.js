@@ -33,6 +33,25 @@ const useAuth = () => {
 			await updateDoc(doc(db, 'users', user.uid), update);
 		} catch (error) {
 			console.log(error);
+			toast.error('Something went wrong. Please try again');
+		}
+	};
+
+	/**
+	 * Handles updating the users bio on the server
+	 * @param {*} bio
+	 */
+	const updateUserDbBio = async bio => {
+		try {
+			await updateDoc(doc(db, 'users', user.uid), { bio });
+			toast.success('Bio updated!');
+			dispatchAuth({
+				type: 'UPDATE_USER',
+				payload: { bio },
+			});
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong. Please try again');
 		}
 	};
 
@@ -129,7 +148,7 @@ const useAuth = () => {
 		});
 	};
 
-	return { setNewGoogleSignup, updateUserState, handleVoting, addbuildToUser, setEditingProfile };
+	return { setNewGoogleSignup, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio };
 };
 
 export default useAuth;

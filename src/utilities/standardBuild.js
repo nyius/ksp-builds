@@ -4,7 +4,7 @@ export const standardBuild = {
 	name: '',
 	timestamp: serverTimestamp(),
 	description: '',
-	image: null,
+	images: [],
 	build: '',
 	author: '',
 	uid: '',

@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { AiFillEye } from 'react-icons/ai';
 import { TiExport } from 'react-icons/ti';
 import { RiDeleteBin2Fill, RiEditFill } from 'react-icons/ri';
+import youtubeLinkConverter from '../../utilities/youtubeLinkConverter';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from '../../context/build/BuildContext';
 import AuthContext from '../../context/auth/AuthContext';
@@ -15,6 +16,7 @@ import TypeBadge from '../../components/typeBadge/TypeBadge';
 import HowToPasteBuildModal from '../../components/modals/HowToPasteModal';
 import Comment from '../../components/comments/Comment';
 import DeleteBuildModal from '../../components/modals/DeleteBuildModal';
+import Carousel from '../../components/carousel/Carousel';
 //---------------------------------------------------------------------------------------------------//
 
 function Build() {
@@ -26,6 +28,7 @@ function Build() {
 
 	useEffect(() => {
 		fetchBuild(id);
+		console.log(`first`);
 	}, []);
 
 	/**
@@ -45,8 +48,8 @@ function Build() {
 				<>
 					{loadedBuild ? (
 						<div className="flex flex-col gap-4 w-full">
-							{/* Image */}
-							<div className="build-img rounded-xl w-full bg-cover bg-center bg-no-repeat bg-base-900" style={{ backgroundImage: `url('${loadedBuild.image}')` }}></div>
+							{/* Images */}
+							<Carousel images={loadedBuild.images} />
 
 							<div className="flex flex-row place-content-between">
 								{/* Name */}

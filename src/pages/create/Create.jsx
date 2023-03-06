@@ -2,8 +2,9 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { cloneDeep } from 'lodash';
+import { FiCameraOff } from 'react-icons/fi';
 //---------------------------------------------------------------------------------------------------//
-import { uploadImage } from '../../utilities/uploadImage';
+import { uploadImage, uploadImages } from '../../utilities/uploadImage';
 import { standardBuild } from '../../utilities/standardBuild';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
@@ -22,7 +23,7 @@ function Create() {
 	const [nameLength, setNameLength] = useState(50);
 	const [descLength, setDescLength] = useState(3000);
 	const [uploadingImage, setUploadingImage] = useState(false);
-	const [newBuildImage, setNewBuildImage] = useState(LogoBackground);
+	const [buildImages, setBuildImages] = useState([]);
 	//---------------------------------------------------------------------------------------------------//
 
 	const navigate = useNavigate();
@@ -36,6 +37,16 @@ function Create() {
 			return { ...prevState, name: e.target.value };
 		});
 		setNameLength(prevState => 50 - e.target.value.length);
+	};
+
+	/**
+	 * Handles setting the video
+	 * @param {*} e
+	 */
+	const setVideo = e => {
+		setNewBuild(prevState => {
+			return { ...prevState, video: e.target.value };
+		});
 	};
 
 	/**
@@ -98,18 +109,11 @@ function Create() {
 	/**
 	 * handles uploading a build image
 	 */
-	const uploadBuildImage = async e => {
+	const handleAddBuildImages = async e => {
 		// make sure we have a file uploaded
 		if (e.target.files) {
-			const buildImage = e.target.files[0];
-
-			if (buildImage.size > 5242880) {
-				toast.error('Image is too big! Must be smaller than 5mb');
-				e.target.value = null;
-				return;
-			}
-
-			await uploadImage(buildImage, setUploadingImage, user.uid, setNewBuildImage);
+			const newBuildImages = await uploadImages(e.target.files, setUploadingImage);
+			setBuildImages(newBuildImages);
 		}
 	};
 
@@ -130,9 +134,15 @@ function Create() {
 				toast.error('You forgot to include the build!');
 				return;
 			}
+			if (buildImages.length > 6) {
+				toast.error('Too many build images! Max 6');
+				return;
+			}
+
+			// Upload the images to the DB
 
 			const buildToUpload = cloneDeep(newBuild);
-			buildToUpload.image = newBuildImage;
+			buildToUpload.images = buildImages;
 			buildToUpload.author = user.username;
 			buildToUpload.uid = user.uid;
 
@@ -172,17 +182,55 @@ function Create() {
 		});
 	};
 
+	/**
+	 * Handles removing an image that the user uploaded
+	 * @param {*} i
+	 */
+	const removeImage = i => {
+		console.log(i);
+		setBuildImages(prevState => {
+			const newArr = [...prevState];
+			newArr.splice(i, 1);
+			return newArr;
+		});
+	};
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="flex flex-col gap-4 bg-base-400 w-full rounded-xl p-6">
 			<h1 className="text-2xl 2k:text-4xl font-bold text-slate-100 mb-4">Create Build</h1>
 
 			{/* Build Image */}
-			<div className="mr-4">{uploadingImage ? <Spinner1 /> : <div className="build-img rounded-xl w-full bg-cover bg-center bg-no-repeat bg-base-900" style={{ backgroundImage: `url('${newBuildImage}')` }}></div>}</div>
+			{/* <div className="mr-4">{uploadingImage ? <Spinner1 /> : <div className="build-img rounded-xl w-full bg-cover bg-center bg-no-repeat bg-base-900" style={{ backgroundImage: `url('${buildImages[0]}')` }}></div>}</div> */}
+			{buildImages.length === 0 && (
+				<div className="flex items-center justify-center w-36 h-36 rounded-xl bg-base-300 border-dashed border-2 border-slate-400">
+					<p className="text-4xl">{<FiCameraOff />}</p>
+				</div>
+			)}
+
+			{uploadingImage ? (
+				<Spinner1 />
+			) : (
+				<div className="flex flex-row gap-2">
+					{buildImages.length > 0 &&
+						buildImages.map((image, i) => {
+							return (
+								<div key={i} className="relative flex items-center justify-center w-36 h-36 rounded-xl bg-base-300 border-dashed border-2 border-slate-700">
+									<button onClick={() => removeImage(i)} className="btn btn-circle btn-error btn-sm hover:bg-red-500 right-0 top-0 absolute z-50">
+										X
+									</button>
+									<img src={image} className="w-36 object-scale-down" alt="" />
+								</div>
+							);
+						})}
+				</div>
+			)}
+
+			{/* Upload build iage */}
 			<div className="flex flex-row gap-4 w-full">
-				<input type="file" id="build-image" max="1" accept=".jpg,.png,.jpeg" className="file-input w-full max-w-xs mb-6" onChange={e => uploadBuildImage(e)} />
+				<input type="file" id="build-image" max="6" accept=".jpg,.png,.jpeg" multiple className="file-input w-full max-w-xs mb-6" onChange={e => handleAddBuildImages(e)} />
 				<div className="flex flex-col">
-					<p className="text-slate-500 font-bold">Max size 5mb.</p>
+					<p className="text-slate-500 font-bold">{buildImages.length > 6 && <span className="text-red-400 font-bold">Too many images!</span>} 6 Images max. Max size per image 5mb.</p>
 					<p className="text-slate-500">For best results images should be 16/9</p>
 				</div>
 			</div>
@@ -213,8 +261,14 @@ function Create() {
 
 			{/* Description */}
 			<div className="flex flex-row gap-2 items-center w-full">
-				<textarea onChange={setDesc} className="textarea textarea-bordered mb-6 w-3/4" placeholder="Description" maxLength="3000" rows="4"></textarea>
+				<textarea onChange={setDesc} className="textarea textarea-bordered w-3/4" placeholder="Description" maxLength="3000" rows="4"></textarea>
 				<p className="text-slate-400 italic">{descLength}</p>
+			</div>
+
+			{/* Video */}
+			<div className="flex flex-row gap-2 items-center">
+				<input onChange={setVideo} type="text" placeholder="Youtube Link (optional)" className="input input-bordered w-96 max-w-lg mg-6" />
+				<p className="italic text-slate-500">Eg. https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>
 			</div>
 
 			{/* Build Types */}

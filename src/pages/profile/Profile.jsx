@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { cloneDeep } from 'lodash';
+import { toast } from 'react-toastify';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import BuildsContext from '../../context/builds/BuildsContext';
@@ -16,11 +17,12 @@ import LoadMoreBuilds from '../../components/buttons/LoadMoreBuilds';
 function Profile() {
 	const { typeFilter, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
 	const { fetchedBuilds, loadingBuilds, lastFetchedBuild } = useContext(BuildsContext);
-	const { user, authLoading } = useContext(AuthContext);
+	const { user, authLoading, editingProfile } = useContext(AuthContext);
 	const { fetchBuilds } = useBuilds();
-	const { setEditingProfile } = useAuth();
+	const { setEditingProfile, updateUserDbBio } = useAuth();
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const { filterBuilds, resetFilters } = useFilters();
+	const [bio, setBio] = useState('');
 
 	useEffect(() => {
 		resetFilters();
@@ -39,6 +41,14 @@ function Profile() {
 		setSortedBuilds(filterBuilds(newFetchedBuilds));
 	}, [fetchedBuilds, sortBy]);
 
+	/**
+	 * Handles updating the users bio
+	 */
+	const handleSubmitBioUpdate = async () => {
+		await updateUserDbBio(bio);
+		setEditingProfile(false);
+	};
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="flex flex-col gap-4  w-full rounded-xl p-6">
@@ -51,16 +61,28 @@ function Profile() {
 								<img src={user.profilePicture} alt="" />
 							</div>
 						</div>
-						<div className="flex flex-col gap-3">
-							<p className="text-xl">
-								<span className="text-slate-500">Username:</span> {user.username}
-							</p>
-							<p className="text-xl">
-								<span className="text-slate-500">Bio:</span> {user.bio === '' ? <span className="italic text-slate-500">No bio yet</span> : <> {user.bio} </>}
-							</p>
-							<button onClick={() => setEditingProfile(true)} className="btn btn-sm w-fit">
-								Edit Bio
-							</button>
+						<div className="flex flex-col gap-3 w-full">
+							<p className="text-xl font-bold">{user.username}</p>
+							{editingProfile ? (
+								<>
+									<textarea onChange={e => setBio(e.target.value)} defaultValue={user.bio} name="" id="" rows="4" className="textarea w-full text-xl"></textarea>
+									<div className="flex flex-row gap-4">
+										<button onClick={handleSubmitBioUpdate} className="btn w-fit">
+											Save
+										</button>
+										<button onClick={() => setEditingProfile(false)} className="btn w-fit">
+											Cancel
+										</button>
+									</div>
+								</>
+							) : (
+								<>
+									{user.bio === '' ? <p className="italic text-slate-500 text-xl">No bio yet</p> : <p className="text-xl"> {user.bio} </p>}
+									<button onClick={() => setEditingProfile(true)} className="btn btn-sm w-fit mt-3 mb-4">
+										Edit Bio
+									</button>
+								</>
+							)}
 							<p className="text-xl">
 								<span className="text-slate-500">Email:</span> {user.email}
 							</p>

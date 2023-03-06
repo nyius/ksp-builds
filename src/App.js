@@ -17,8 +17,7 @@ import './App.css';
 
 /*TODO
 Edit a build
-Profile
-responsive
+visiting Profile
 notifications
 search that searches the database, not just loaded builds
 email account

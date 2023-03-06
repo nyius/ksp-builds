@@ -89,7 +89,7 @@ const useFilters = () => {
 				} else if (sortBy === 'upVotes') {
 					return a.upVotes < b.upVotes ? 1 : -1;
 				} else if (sortBy === 'comments') {
-					return a.comments < b.comments ? 1 : -1;
+					return a.commentCount < b.commentCount ? 1 : -1;
 				} else if (sortBy === 'views_most') {
 					return a.views < b.views ? 1 : -1;
 				} else if (sortBy === 'views_least') {

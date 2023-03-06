@@ -35,7 +35,7 @@ function CreateBuildAdmin() {
 		build.name = 'test-' + uuidv4().slice(0, 4);
 		build.timestamp = serverTimestamp();
 		build.description = 'Here is a random description!';
-		build.image = images[Math.round(Math.random() * 4)];
+		build.images = [images[Math.round(Math.random() * 4)]];
 		build.build = JSON.stringify(shipBuildTestMedium);
 		build.author = 'nyius';
 		build.uid = auth.currentUser.uid;

@@ -29,7 +29,7 @@ function BuildCard({ build }) {
 						<p className="flex flex-row gap-2 p-3 2k:p-5 text-white badge absolute bottom-1 right-1 text-lg 2k:text-2xl">
 							<AiFillEye /> {build.views}
 						</p>
-						<img src={build.image} alt={build.name} />
+						<img src={build.images[0]} alt={build.name} />
 					</div>
 				</figure>
 				<div className="card-body place-content-between">
@@ -46,7 +46,7 @@ function BuildCard({ build }) {
 					<h3 className="text-slate-400 text-xl 2k:text-2xl sm:text-lg sm:mb-4">Version {build.kspVersion}</h3>
 
 					<div className="flex flex-row flex-wrap place-content-between items-end">
-						<div className="votes flex flex-row gap-8">
+						<div className="votes flex flex-row flex-wrap gap-8">
 							<VoteArrows build={build} />
 							<div className="flex flex-row items-end gap-2">
 								<span className="text-2xl 2k:text-4xl">

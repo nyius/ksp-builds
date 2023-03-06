@@ -32,7 +32,7 @@ function Comment({ comment }) {
 			{editingComment ? (
 				<textarea onChange={e => setEditedComment(e.target.value)} defaultValue={comment.comment} maxLength="3000" name="" id="" placeholder="Leave a comment" rows="4" className="textarea 2k:text-2xl"></textarea>
 			) : (
-				<p className="text-slate-200 2k:text-3xl">{comment.comment}</p>
+				<p className="text-slate-300 font-thin 2k:text-3xl">{comment.comment}</p>
 			)}
 
 			{!authLoading && (user?.uid === comment.uid || user?.siteAdmin) && (

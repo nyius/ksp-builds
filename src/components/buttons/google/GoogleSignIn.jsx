@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import googleLogin from '../../../utilities/googleLogin';
 import { FcGoogle } from 'react-icons/fc';
 import useAuth from '../../../context/auth/AuthActions';
+import { toast } from 'react-toastify';
 
 function GoogleSignIn() {
 	const { setNewGoogleSignup } = useAuth();
@@ -19,6 +20,7 @@ function GoogleSignIn() {
 			}
 		} catch (error) {
 			console.log(error);
+			toast.error('Something went wrong. Please try again');
 		}
 	};
 

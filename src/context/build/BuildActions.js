@@ -172,6 +172,28 @@ const useBuild = () => {
 			await deleteDoc(doc(db, 'builds', id));
 			await deleteDoc(doc(db, 'buildsRaw', id));
 
+			// remove it from the user
+			await updateDoc(doc(db, 'users', user.uid), {
+				builds: [
+					[
+						...user.builds.filter(build => {
+							return build.id !== id;
+						}),
+					],
+				],
+			});
+
+			// remove it from the users userProfile
+			await updateDoc(doc(db, 'userProfiles', user.uid), {
+				builds: [
+					[
+						...user.builds.filter(build => {
+							return build.id !== id;
+						}),
+					],
+				],
+			});
+
 			navigate('/');
 
 			// Filter the deleted build out of the loaded builds
@@ -468,6 +490,9 @@ const useBuild = () => {
 			delete build.build;
 
 			await setDoc(doc(db, 'builds', buildId), build);
+
+			// add it to the users 'userProfile' db
+			await updateDoc(doc(db, 'users', user.uid), { builds: [...user.builds, buildId] });
 
 			// Add it to the users 'builds'
 			await updateDoc(doc(db, 'users', user.uid), { builds: [...user.builds, buildId] });

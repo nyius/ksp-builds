@@ -38,12 +38,34 @@ const useAuth = () => {
 	};
 
 	/**
+	 * Handles updating the users profile picture on the server
+	 * @param {*} picture
+	 */
+	const updateUserProfilePicture = async profilePicture => {
+		try {
+			await updateDoc(doc(db, 'users', user.uid), { profilePicture });
+			await updateDoc(doc(db, 'userProfiles', user.uid), { profilePicture });
+
+			toast.success('Profile Picture updated!');
+			dispatchAuth({
+				type: 'UPDATE_USER',
+				payload: { profilePicture },
+			});
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong. Please try again');
+		}
+	};
+
+	/**
 	 * Handles updating the users bio on the server
 	 * @param {*} bio
 	 */
 	const updateUserDbBio = async bio => {
 		try {
 			await updateDoc(doc(db, 'users', user.uid), { bio });
+			await updateDoc(doc(db, 'userProfiles', user.uid), { bio });
+
 			toast.success('Bio updated!');
 			dispatchAuth({
 				type: 'UPDATE_USER',
@@ -148,7 +170,7 @@ const useAuth = () => {
 		});
 	};
 
-	return { setNewGoogleSignup, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio };
+	return { setNewGoogleSignup, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio, updateUserProfilePicture };
 };
 
 export default useAuth;

@@ -87,6 +87,7 @@ function NewGoogleAccountModal() {
 						uid: user.uid,
 					};
 
+					// this adds the user to the 'usernames' db. This is so we can check if a username is already taken or not, quickly and simply
 					await setDoc(doc(db, 'usernames', username), newUsername)
 						.then(() => {
 							console.log('created new usernames entry');
@@ -95,6 +96,9 @@ function NewGoogleAccountModal() {
 							console.log(err);
 							toast.error('Something went wrong :(');
 						});
+
+					// Update the userProfiles DB. This is for visiting a users page so we don't have to pull all sensitive data
+					await updateDoc(doc(db, 'userProfiles', user.uid), updateUser);
 				}
 			} catch (error) {
 				console.log(error);

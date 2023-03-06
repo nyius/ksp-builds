@@ -48,8 +48,17 @@ const googleLogin = async () => {
 				message: 'Welcome to KSP Builds! Please feel free to reach out with any questions/comments/ideas, and fly safe!',
 			};
 
+			const userProfile = {
+				username: '',
+				profilePicture: '',
+				dateCreated: createdAt,
+				builds: [],
+				bio: '',
+			};
+
 			await setDoc(doc(db, 'users', uid), user);
 			await setDoc(doc(db, 'users', uid, 'notifications', uuidv4().slice(0, 20)), notifications);
+			await setDoc(doc(db, 'userProfiles', uid), userProfile);
 
 			return 'newUser';
 		}

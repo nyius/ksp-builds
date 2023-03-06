@@ -5,7 +5,7 @@ import ContextsProvider from './context/ContextProvider';
 import PrivateRoute from './routes/PrivateRoute';
 import backgroundplanet from './assets/planet.png';
 //---------------------------------------------------------------------------------------------------//
-import { Index, SignUp, Build, NotFound, Create, Profile, Privacy, Terms } from './pages';
+import { Index, SignUp, Build, NotFound, Create, Profile, Privacy, Terms, VisitProfile } from './pages';
 import RightBar from './pages/index/RightBar';
 //---------------------------------------------------------------------------------------------------//
 import { Navbar, Footer } from './components';
@@ -24,8 +24,6 @@ email account
 privary policy
 terms and conditions
 News feed
-Builds should get a gallery
-youtube upload
  */
 
 //---------------------------------------------------------------------------------------------------//
@@ -62,7 +60,7 @@ function App() {
 										/>
 										<Route exact path="/privacy" element={<Privacy />} />
 										<Route exact path="/terms" element={<Terms />} />
-										<Route exact path="/profile/:id" element={<Profile />} />
+										<Route exact path="/profile/:id" element={<VisitProfile />} />
 										<Route exact path="/build/:id" element={<Build />} />
 										<Route
 											exact

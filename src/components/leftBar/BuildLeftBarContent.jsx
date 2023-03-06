@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import BuildContext from '../../context/build/BuildContext';
 import Spinner1 from '../spinners/Spinner1';
 import LeftBarTitle from './LeftBarTitle';
+import VideoModal from '../modals/VideoModal';
+import youtubeLinkConverter from '../../utilities/youtubeLinkConverter';
 
 function BuildLeftBarContent() {
 	const { loadingBuild, loadedBuild } = useContext(BuildContext);
@@ -39,6 +41,8 @@ function BuildLeftBarContent() {
 			<div className="flex flex-row gap-2 items-center place-content-between text-lg 2k:text-3xl">
 				Has Mods <span className="badge 2k:badge-lg 2k:text-3xl p-3 2k:p-5">{loadedBuild.modsUsed ? 'Yes' : 'None'}</span>
 			</div>
+
+			<VideoModal video={loadedBuild.video} />
 		</div>
 	);
 }

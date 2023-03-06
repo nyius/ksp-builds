@@ -51,7 +51,7 @@ function Profile() {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="flex flex-col gap-4  w-full rounded-xl p-6">
+		<div className="flex flex-col gap-4 w-full rounded-xl p-6">
 			<h1 className="text-2xl 2k:text-4xl font-bold text-slate-100 mb-4">Profile</h1>
 			{!authLoading && user.username && (
 				<>

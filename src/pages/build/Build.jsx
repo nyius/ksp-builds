@@ -75,7 +75,7 @@ function Build() {
 							</div>
 
 							{/* Description */}
-							<p className="mb-4 2k:text-3xl">{loadedBuild.description}</p>
+							<p className="mb-4 2k:mb-10 2k:text-3xl">{loadedBuild.description}</p>
 
 							{/* Buttons */}
 							<div className="flex flex-col md:flex-row place-content-between">
@@ -107,6 +107,8 @@ function Build() {
 									</div>
 								)}
 							</div>
+
+							<div className="mb-6">{loadedBuild.video && <iframe src={youtubeLinkConverter(loadedBuild.video)}></iframe>}</div>
 
 							{/* ----------------- Comments ---------------------- */}
 							<p className="text-2xl 2k:text-3xl">Comments</p>

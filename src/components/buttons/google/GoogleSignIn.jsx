@@ -25,7 +25,7 @@ function GoogleSignIn() {
 	};
 
 	return (
-		<div className="btn" onClick={() => signIn()}>
+		<div className="btn 2k:btn-lg 2k:text-2xl" onClick={() => signIn()}>
 			<FcGoogle />
 			<span className="ml-2">Login with Google </span>
 		</div>

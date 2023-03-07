@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { cloneDeep } from 'lodash';
+import { useNavigate } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
 import BuildsContext from '../../context/builds/BuildsContext';
 import FiltersContext from '../../context/filters/FiltersContext';
@@ -12,6 +13,7 @@ import Spinner1 from '../../components/spinners/Spinner1';
 import BuildCard from '../../components/buildCard/BuildCard';
 import SearchBar from '../../components/search/SearchBar';
 import Filter from '../../components/filters/Filter';
+import PlanetExplosion from '../../assets/planet_explosion.png';
 
 function Builds() {
 	const { typeFilter, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
@@ -19,6 +21,7 @@ function Builds() {
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const { filterBuilds } = useFilters();
 	const { fetchBuilds } = useBuilds();
+	const navigate = useNavigate();
 
 	// Listen for changes to the sorting and filter the builds accordingly
 	useEffect(() => {
@@ -50,8 +53,9 @@ function Builds() {
 				) : (
 					<>
 						{fetchedBuilds.length === 0 ? (
-							<div className="flex flex-row w-full justify-center items-center">
-								<p>No builds found :(</p>
+							<div className="col-start-1 col-end-4 flex flex-col gap-4 w-full h-fit rounded-xl p-12 2k:p-12 bg-base-900 justify-center items-center">
+								<h1 className="text-2xl 2k:text-4xl font-bold">No builds found :(</h1>
+								<img className="w-1/2" src={PlanetExplosion} alt="Crashed Spaceship" />
 							</div>
 						) : (
 							<>

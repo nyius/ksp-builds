@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import BuildContext from '../../context/build/BuildContext';
 import Spinner1 from '../spinners/Spinner1';
 import LeftBarTitle from './LeftBarTitle';
+import UsernameLink from '../buttons/UsernameLink';
 
 function BuildLeftBarContent() {
 	const { loadingBuild, loadedBuild } = useContext(BuildContext);
@@ -22,7 +23,10 @@ function BuildLeftBarContent() {
 			<LeftBarTitle text="Details" />
 			{/* Author */}
 			<div className="flex flex-row gap-2 items-center place-content-between text-lg 2k:text-3xl">
-				Author <span className="badge 2k:badge-lg 2k:text-3xl p-3 2k:p-5">{loadedBuild.author}</span>
+				Author{' '}
+				<span className="badge 2k:badge-lg 2k:text-3xl p-3 2k:p-5">
+					<UsernameLink username={loadedBuild.author} uid={loadedBuild.uid} />
+				</span>
 			</div>
 
 			{/* Date */}
@@ -38,6 +42,11 @@ function BuildLeftBarContent() {
 			{/* Mods */}
 			<div className="flex flex-row gap-2 items-center place-content-between text-lg 2k:text-3xl">
 				Has Mods <span className="badge 2k:badge-lg 2k:text-3xl p-3 2k:p-5">{loadedBuild.modsUsed ? 'Yes' : 'None'}</span>
+			</div>
+
+			{/* Downloads */}
+			<div className="flex flex-row gap-2 items-center place-content-between text-lg 2k:text-3xl">
+				Downloads <span className="badge 2k:badge-lg 2k:text-3xl p-3 2k:p-5">{loadedBuild.downloads}</span>
 			</div>
 		</div>
 	);

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { cloneDeep } from 'lodash';
 import { toast } from 'react-toastify';
+import { AiFillCamera } from 'react-icons/ai';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import BuildsContext from '../../context/builds/BuildsContext';
@@ -17,12 +18,16 @@ function Profile() {
 	const { typeFilter, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
 	const { fetchedBuilds, loadingBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const { user, authLoading, editingProfile } = useContext(AuthContext);
+	//---------------------------------------------------------------------------------------------------//
 	const { fetchBuilds } = useBuilds();
-	const { setEditingProfile, updateUserDbBio } = useAuth();
-	const [sortedBuilds, setSortedBuilds] = useState([]);
+	const { setEditingProfile, updateUserDbBio, uploadProfilePicture, updateUserDbProfilePic } = useAuth();
 	const { filterBuilds, resetFilters } = useFilters();
+	//---------------------------------------------------------------------------------------------------//
+	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const [bio, setBio] = useState('');
 	const [bioLength, setBioLength] = useState(1000);
+	const [uploadingProfilePhoto, setUploadingProfilePhoto] = useState(false);
+	const [newProfilePhoto, setNewProfilePhoto] = useState(null);
 
 	const dateCreated = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(user.dateCreated.seconds * 1000);
 
@@ -61,17 +66,35 @@ function Profile() {
 		setEditingProfile(false);
 	};
 
+	/**
+	 * Gets te new uploaded profile photo and updates the used DB
+	 * @param {*} e
+	 */
+	const handleNewProfilePhoto = async e => {
+		console.log(`handling it!`);
+		const newUrl = await uploadProfilePicture(e, setUploadingProfilePhoto);
+		console.log(`got the url`, newUrl);
+		await updateUserDbProfilePic(newUrl);
+	};
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="flex flex-col gap-4 w-full rounded-xl p-6">
 			<h1 className="text-2xl 2k:text-4xl font-bold text-slate-100 mb-4">Profile</h1>
+			{uploadingProfilePhoto && <Spinner1 />}
 			{!authLoading && user.username && (
 				<>
 					<div className="flex flex-row gap-20 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
-						{/* Profile Pictire */}
-						<div className="avatar">
-							<div className="rounded-full w-44 ring ring-primary ring-offset-base-100 ring-offset-4">
-								<img src={user.profilePicture} alt="" />
+						{/* Profile Picture */}
+						<div className="indicator">
+							<div className="avatar">
+								<div className="rounded-full w-44 ring ring-primary ring-offset-base-100 ring-offset-4">{uploadingProfilePhoto ? <Spinner1 /> : <img src={user.profilePicture} alt="" />}</div>
+							</div>
+							<div className="tooltip" data-tip="Edit Profile Picture">
+								<label htmlFor="profile-picture" className="indicator-item indicator-bottom text-3xl cursor-pointer rounded-full p-4 bg-base-600">
+									<AiFillCamera />
+								</label>
+								<input type="file" id="profile-picture" max="1" accept=".jpg,.png,.jpeg" className="hidden-file-input file-input 2k:file-input-lg 2k:text-3xl" onChange={handleNewProfilePhoto} />
 							</div>
 						</div>
 

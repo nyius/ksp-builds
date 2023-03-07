@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import AuthContext from '../../context/auth/AuthContext';
 import useBuild from '../../context/build/BuildActions';
 import BuildContext from '../../context/build/BuildContext';
+import UsernameLink from '../buttons/UsernameLink';
 
 function Comment({ comment }) {
 	const { user, authLoading } = useContext(AuthContext);
@@ -9,7 +10,7 @@ function Comment({ comment }) {
 	const [editingComment, setEditingComment] = useState(false);
 	const [editedComment, setEditedComment] = useState('');
 	const { deleteComment, updateComment, fetchComments } = useBuild();
-	const date = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(comment.timestamp.seconds * 1000);
+	const date = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(comment.timestamp.seconds * 1000);
 
 	/**
 	 * Handles when a user saves changes to their comment
@@ -26,7 +27,9 @@ function Comment({ comment }) {
 	return (
 		<div className="flex flex-col gap-4 2k:gap-8 w-full bg-base-500 rounded-xl p-4">
 			<div className="flex flex-row w-full gap-4 place-content-between">
-				<p className="font-bold text-lg text-slate-300 2k:text-3xl">{comment.username}</p>
+				<p className="font-bold text-lg text-slate-300 2k:text-3xl">
+					<UsernameLink username={comment.username} uid={comment.uid} />
+				</p>
 				<p className="2k:text-2xl">{date}</p>
 			</div>
 			{editingComment ? (

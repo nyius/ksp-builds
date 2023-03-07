@@ -4,6 +4,8 @@ import { useContext } from 'react';
 import AuthContext from './AuthContext';
 import { cloneDeep } from 'lodash';
 import { toast } from 'react-toastify';
+import LogoIcon from '../../assets/logo_light_icon.png';
+import { uploadImage } from '../../utilities/uploadImage';
 
 const useAuth = () => {
 	const { dispatchAuth, user, newUsername, newBio, editingProfile, verifyChangeUsername } = useContext(AuthContext);
@@ -74,6 +76,26 @@ const useAuth = () => {
 			dispatchAuth({
 				type: 'UPDATE_USER',
 				payload: { bio },
+			});
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong. Please try again');
+		}
+	};
+
+	/**
+	 * Handles updating the users bio on the server
+	 * @param {*} bio
+	 */
+	const updateUserDbProfilePic = async profilePicture => {
+		try {
+			await updateDoc(doc(db, 'users', user.uid), { profilePicture });
+			await updateDoc(doc(db, 'userProfiles', user.uid), { profilePicture });
+
+			toast.success('Profile Picture updated!');
+			dispatchAuth({
+				type: 'UPDATE_USER',
+				payload: { profilePicture },
 			});
 		} catch (error) {
 			console.log(error);
@@ -211,7 +233,32 @@ const useAuth = () => {
 		}
 	};
 
-	return { setNewGoogleSignup, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio, updateUserProfilePicture, fetchUsersProfile };
+	/**
+	 * Handles uploading a profile picture. Adds the URL to a state when its down
+	 * @param {*} e
+	 * @param {*} setState
+	 * @returns
+	 */
+	const uploadProfilePicture = async (e, setUploadingState) => {
+		console.log(`Inside upload profile pic!`);
+		// make sure we have a file uploaded
+		if (e.target.files) {
+			console.log(`we have files!`);
+			const profilePicture = e.target.files[0];
+
+			if (profilePicture.size > 2097152) {
+				toast.error('Image is too big! Must be smaller than 2mb');
+				e.target.value = null;
+				return;
+			}
+			console.log(`before resolve!`);
+			const newImageUrl = await uploadImage(profilePicture, setUploadingState, user.uid);
+			console.log(`resolved!`);
+			return newImageUrl;
+		}
+	};
+
+	return { setNewGoogleSignup, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio, updateUserDbProfilePic, updateUserProfilePicture, fetchUsersProfile, uploadProfilePicture };
 };
 
 export default useAuth;

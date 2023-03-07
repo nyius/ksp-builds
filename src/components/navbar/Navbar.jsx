@@ -120,7 +120,7 @@ function NavBar() {
 									</ul>
 								</>
 							) : (
-								<label htmlFor="login-modal" className="btn">
+								<label htmlFor="login-modal" className="btn 2k:btn-lg 2k:text-2xl">
 									Login
 								</label>
 							)}

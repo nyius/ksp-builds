@@ -1,10 +1,12 @@
 import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+//---------------------------------------------------------------------------------------------------//
 import { BiComment } from 'react-icons/bi';
+import { AiFillEye } from 'react-icons/ai';
+//---------------------------------------------------------------------------------------------------//
 import DeleteBuildAdmin from '../buttons/DeleteBuildAdmin';
 import TypeBadge from '../typeBadge/TypeBadge';
 import VoteArrows from '../buttons/VoteArrows';
-import { AiFillEye } from 'react-icons/ai';
 import UsernameLink from '../buttons/UsernameLink';
 
 function BuildCard({ build }) {
@@ -25,16 +27,20 @@ function BuildCard({ build }) {
 			<DeleteBuildAdmin style="circle" id={build.id} userID={build.uid} />
 
 			<div className="flex flex-col h-full place-content-between rounded-2xl buildCardHover hover:rounded-2xl" onClick={handleNavigate}>
-				<figure className="bg-base-900">
+				<figure className="bg-base-900 relative">
+					<p className="flex flex-row gap-2 p-4 2k:p-6 text-white badge absolute bottom-1 right-1 text-lg 2k:text-2xl">
+						<span className="view-count">
+							<AiFillEye />
+						</span>
+						{build.views}
+					</p>
 					<div className="flex relative w-full items-center justify-center">
-						<p className="flex flex-row gap-2 p-3 2k:p-5 text-white badge absolute bottom-1 right-1 text-lg 2k:text-2xl">
-							<AiFillEye /> {build.views}
-						</p>
 						<img src={build.images[0]} alt={build.name} />
 					</div>
 				</figure>
 				<div className="card-body relative">
 					<div className="2k:p-4">
+						{/* Name */}
 						<div className="flex flex-row place-content-between mb-2 2k:mb-4">
 							<h2 className="card-title text-white 2k:text-4xl">{build.name}</h2>
 						</div>
@@ -47,9 +53,9 @@ function BuildCard({ build }) {
 						</div>
 
 						<div className="flex flex-col 2k:gap-4 mb-3 2k:mb-6">
-							{/* Date */}
+							{/* Uploaded */}
 							<h3 className="text-slate-400 text-xl 2k:text-2xl sm:text-lg">
-								<span className="text-slate-500"> uploaded:</span> {date}
+								<span className="text-slate-500">uploaded:</span> {date}
 							</h3>
 
 							{/* Build Author */}
@@ -68,9 +74,10 @@ function BuildCard({ build }) {
 					</div>
 				</div>
 			</div>
+
 			{/* Voting/comments */}
-			<div className="flex flex-row flex-wrap absolute bottom-0 rounded-b-xl left-0 bg-base-900 w-full p-2">
-				<div className="flex flex-row flex-wrap gap-8">
+			<div className="flex flex-row flex-wrap absolute bottom-0 rounded-b-xl left-0 bg-base-900 w-full p-2 2k:p-4">
+				<div className="flex flex-row flex-wrap gap-8 items-center">
 					<VoteArrows build={build} />
 					<div className="flex flex-row items-end gap-2">
 						<span className="text-2xl 2k:text-4xl">

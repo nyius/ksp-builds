@@ -28,11 +28,11 @@ function VoteArrows({ build }) {
 
 	return (
 		<div className="flex flex-row gap-5 items-center">
-			<span className="text-lg 2k:text-2xl">{build.upVotes - build.downVotes}</span>
-			<span id="upVote" onClick={() => handleVoting('upVote', build)} className={`text-4xl hover:text-orange-600 ${checkIfVoted('upVote', build.id)}`}>
+			<span className="text-lg 2k:text-3xl">{build.upVotes - build.downVotes}</span>
+			<span id="upVote" onClick={() => handleVoting('upVote', build)} className={`vote-arrow cursor-pointer hover:text-orange-600 ${checkIfVoted('upVote', build.id)}`}>
 				<GoArrowUp id="upVote" />
 			</span>
-			<span id="downVote" onClick={() => handleVoting('downVote', build)} className={`text-4xl hover:text-sky-500 ${checkIfVoted('downVote', build.id)}`}>
+			<span id="downVote" onClick={() => handleVoting('downVote', build)} className={`vote-arrow cursor-pointer hover:text-sky-500 ${checkIfVoted('downVote', build.id)}`}>
 				<GoArrowDown id="downVote" />
 			</span>
 		</div>

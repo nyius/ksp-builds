@@ -34,7 +34,8 @@ function NewGoogleAccountModal() {
 				return;
 			}
 
-			await uploadImage(profilePicture, setUploadingImage, user.uid, setNewProfilePicture);
+			const newPic = await uploadImage(profilePicture, setUploadingImage, user.uid);
+			setNewProfilePicture(newPic);
 		}
 	};
 
@@ -129,15 +130,17 @@ function NewGoogleAccountModal() {
 			<input type="checkbox" id="new-google-login-modal" className="modal-toggle" />
 			<div className="modal">
 				<div className="modal-box">
-					<div className="font-bold alert dot-bg">
+					<div className="font-bold alert dot-bg text-xl 2k:text-3xl mb-4">
 						Almost done...
-						<img className="w-12" src={LogoIcon} alt="" />
+						<img className="w-12 2k:w-24" src={LogoIcon} alt="" />
 					</div>
-					<p className="py-4 mb-4 text-center">Please take a second to finalize your account.</p>
+					<p className="py-4 mb-4 2k:mb-8 text-center text-xl 2k:text-3xl">Please take a second to finalize your account.</p>
 					<form action="" className="mb-10">
-						<label htmlFor="username">Choose Username</label>
+						<label htmlFor="usernam" className="text-xl 2k:text-2xl text-slate-400 italic">
+							Username
+						</label>
 						<input
-							className="input bg-base-200 mt-2 mb-6 w-full"
+							className="input 2k:input-lg 2k:text-2xl bg-base-200 mt-2 mb-6 2k:mb-10 w-full"
 							type="text"
 							id="username"
 							onChange={e => {
@@ -146,17 +149,17 @@ function NewGoogleAccountModal() {
 							required
 						/>
 
-						<label htmlFor="profile-picture" className="w-full flex mb-2">
+						<label htmlFor="profile-picture" className="w-full flex mb-2 text-xl 2k:text-2xl text-slate-400 italic">
 							Profile Picture (2mb max size)
 						</label>
 
-						<div className="flex flex-wrap items-center">
-							<div className="mr-4">{uploadingImage ? <Spinner1 /> : <img className="avatar-round" src={newProfilePicture} />}</div>
-							<input type="file" id="profile-picture" max="1" accept=".jpg,.png,.jpeg" className="file-input w-full max-w-xs" onChange={e => uploadProfilePicture(e)} />
+						<div className="flex flex-row flex-wrap items-center">
+							<div className="mr-4">{uploadingImage ? <Spinner1 /> : <img className="avatar-round 2k:w-18" src={newProfilePicture} />}</div>
+							<input type="file" id="profile-picture" max="1" accept=".jpg,.png,.jpeg" className="file-input 2k:file-input-lg 2k:text-3xl" onChange={e => uploadProfilePicture(e)} />
 						</div>
 					</form>
 
-					<button className="btn btn-success" onClick={e => finalizeGoogleAccount(e)}>
+					<button className="btn 2k:btn-lg 2k:text-2xl btn-primary mt-6" onClick={e => finalizeGoogleAccount(e)}>
 						Create
 					</button>
 				</div>

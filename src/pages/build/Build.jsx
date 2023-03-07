@@ -77,7 +77,8 @@ function Build() {
 							</div>
 
 							{/* Description */}
-							<p className="mb-4 2k:mb-10 2k:text-3xl">{loadedBuild.description}</p>
+							<p className="text-2xl 2k:text-4xl text-slate-500">ABOUT THIS BUILD</p>
+							<p className="mb-16 2k:mb-20 text-xl 2k:text-3xl">{loadedBuild.description}</p>
 
 							{/* Buttons */}
 							<div className="flex flex-col md:flex-row place-content-between">
@@ -127,9 +128,9 @@ function Build() {
 							) : (
 								<>
 									{comments.length === 0 ? (
-										<p className="2k:btn-lg 2k:text-2xl">No comments yet! Be the first to leave one</p>
+										<p className="2k:btn-lg 2k:text-2xl mb-20">No comments yet! Be the first to leave one</p>
 									) : (
-										<div className="flex flex-col gap-4">
+										<div className="flex flex-col gap-4 mb-20">
 											{comments.map((comment, i) => {
 												return <Comment key={i} comment={comment} />;
 											})}

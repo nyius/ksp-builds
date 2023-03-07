@@ -373,7 +373,8 @@ const useBuild = () => {
 	const addComment = async () => {
 		try {
 			if (!comment || comment?.length === 0) {
-				throw new Error('Comment cannot be empty');
+				toast.error('Comment cant be empty');
+				return;
 			}
 
 			const postRef = collection(db, 'builds', loadedBuild.id, 'comments');
@@ -395,7 +396,7 @@ const useBuild = () => {
 			// Update the comment count on the build list
 			const update = doc(db, 'builds', loadedBuild.id);
 			await updateDoc(update, {
-				commentCount: (loadedBuild.comments += 1),
+				commentCount: (loadedBuild.commentCount += 1),
 			});
 
 			// Send a notification to the build author

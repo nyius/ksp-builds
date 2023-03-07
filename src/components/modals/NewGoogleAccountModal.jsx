@@ -125,7 +125,7 @@ function NewGoogleAccountModal() {
 	return (
 		<>
 			{/* New Google Account */}
-			<input type="checkbox" checked={true} id="1new-google-login-modal" className="modal-toggle" />
+			<input type="checkbox" id="new-google-login-modal" className="modal-toggle" />
 			<div className="modal">
 				<div className="modal-box">
 					<div className="font-bold alert dot-bg text-xl 2k:text-3xl mb-4">

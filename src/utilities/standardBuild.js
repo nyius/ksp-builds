@@ -18,4 +18,5 @@ export const standardBuild = {
 	views: 0,
 	modsUsed: false,
 	video: '',
+	downloads: 0,
 };

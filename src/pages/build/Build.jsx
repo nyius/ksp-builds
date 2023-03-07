@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { AiFillEye } from 'react-icons/ai';
 import { TiExport } from 'react-icons/ti';
 import { RiDeleteBin2Fill, RiEditFill } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
 import youtubeLinkConverter from '../../utilities/youtubeLinkConverter';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from '../../context/build/BuildContext';
@@ -17,12 +18,14 @@ import HowToPasteBuildModal from '../../components/modals/HowToPasteModal';
 import Comment from '../../components/comments/Comment';
 import DeleteBuildModal from '../../components/modals/DeleteBuildModal';
 import Carousel from '../../components/carousel/Carousel';
+import PlanetExplosion from '../../assets/planet_explosion.png';
 //---------------------------------------------------------------------------------------------------//
 
 function Build() {
 	const { loadingBuild, loadedBuild, commentsLoading, comments } = useContext(BuildContext);
 	const { user, authLoading } = useContext(AuthContext);
 	const { fetchBuild, setComment, addComment } = useBuild();
+	const navigate = useNavigate();
 
 	const { id } = useParams();
 
@@ -136,15 +139,18 @@ function Build() {
 							)}
 						</div>
 					) : (
-						<div className="flex flex-col gap-4">
-							<h1 className="text-slate-200 text-2xl font-bold">Build not found! :(</h1>
-							<h1 className="text-slate-200 text-xl">Check the URL to see if something was typed wrong, or maybe this build was deleted</h1>
+						<div className="flex flex-col gap-4 w-full h-fit rounded-xl p-12 2k:p-12 bg-base-900 justify-center items-center">
+							<h1 className="text-2xl 2k:text-4xl font-bold">Oops.. build not found</h1>
+							<button className="btn 2k:text-2xl" onClick={() => navigate('/')}>
+								Return Home
+							</button>
+							<img className="w-1/2" src={PlanetExplosion} alt="Crashed Spaceship" />
 						</div>
 					)}
 				</>
 			)}
 			<HowToPasteBuildModal />
-			{loadedBuild && <DeleteBuildModal id={loadedBuild.id} />}
+			{loadedBuild && <DeleteBuildModal id={loadedBuild.id} userID={loadedBuild.uid} />}
 		</div>
 	);
 }

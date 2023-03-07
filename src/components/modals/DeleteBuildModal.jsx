@@ -1,7 +1,7 @@
 import React from 'react';
 import useBuild from '../../context/build/BuildActions';
 
-function DeleteBuildModal({ id }) {
+function DeleteBuildModal({ id, userID }) {
 	const { deleteBuild } = useBuild();
 
 	return (
@@ -18,7 +18,7 @@ function DeleteBuildModal({ id }) {
 						<label htmlFor="delete-build-modal" className="btn btn-success">
 							Cancel
 						</label>
-						<label onClick={() => deleteBuild(id)} htmlFor="delete-build-modal" className="btn btn-error">
+						<label onClick={() => deleteBuild(id, userID)} htmlFor="delete-build-modal" className="btn btn-error">
 							Delete
 						</label>
 					</div>

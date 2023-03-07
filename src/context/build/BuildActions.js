@@ -47,7 +47,6 @@ const useBuild = () => {
 
 				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: build, loadingBuild: false } });
 			} else {
-				toast.error("Couldn't find that build!");
 				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: '', loadingBuild: false } });
 
 				throw new Error("Couldn't find that build!");
@@ -159,7 +158,7 @@ const useBuild = () => {
 	/**
 	 * handles deleting a build
 	 */
-	const deleteBuild = async id => {
+	const deleteBuild = async (id, userId) => {
 		try {
 			// Delete the comments
 			const commentsQuery = query(collection(db, 'builds', id, 'comments'));
@@ -172,35 +171,41 @@ const useBuild = () => {
 			await deleteDoc(doc(db, 'builds', id));
 			await deleteDoc(doc(db, 'buildsRaw', id));
 
-			// remove it from the user
-			await updateDoc(doc(db, 'users', user.uid), {
-				builds: [
-					[
-						...user.builds.filter(build => {
-							return build.id !== id;
-						}),
-					],
-				],
-			});
+			// If the build being delete belongs to the current user, remove it
+			if (userId === user.uid) {
+				const newBuildsArr = [
+					...user.builds.filter(build => {
+						return build !== id;
+					}),
+				];
+				// remove it from the user
+				await updateDoc(doc(db, 'users', userId), { builds: newBuildsArr });
 
-			// remove it from the users userProfile
-			await updateDoc(doc(db, 'userProfiles', user.uid), {
-				builds: [
-					[
-						...user.builds.filter(build => {
-							return build.id !== id;
-						}),
-					],
-				],
-			});
+				// remove it from the users userProfile
+				await updateDoc(doc(db, 'userProfiles', userId), { builds: newBuildsArr });
+			} else {
+				// if its not we have to fetch that users profile first, and then remove it from their builds
+				const fetchedProfile = await getDoc(doc(db, 'users', userId));
+				const userData = fetchedProfile.data();
+
+				const newBuildsArr = [
+					...userData.builds.filter(build => {
+						return build !== id;
+					}),
+				];
+				console.log(newBuildsArr);
+
+				await updateDoc(doc(db, 'users', userId), { builds: newBuildsArr });
+				await updateDoc(doc(db, 'userProfiles', userId), { builds: newBuildsArr });
+			}
 
 			navigate('/');
 
 			// Filter the deleted build out of the loaded builds
-			dispatchBuilds({
-				type: 'DELETE_BUILD',
-				payload: id,
-			});
+			// dispatchBuilds({
+			// 	type: 'DELETE_BUILD',
+			// 	payload: id,
+			// });
 
 			toast.success(`Build Deleted!`);
 		} catch (error) {

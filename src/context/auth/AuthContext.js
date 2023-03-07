@@ -114,6 +114,8 @@ export const AuthProvider = ({ children }) => {
 		usernameChanged: false,
 		verifyChangeUsername: false,
 		newGoogleSignup: false,
+		fetchingProfile: false,
+		fetchedUserProfile: null,
 	};
 
 	// Set up the reducer

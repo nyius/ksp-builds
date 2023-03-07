@@ -41,6 +41,16 @@ const AuthReducer = (state, action) => {
 				newUsername: updatedUserState?.username,
 				newBio: updatedUserState?.bio,
 			};
+		case 'SET_FETCHING_PROFILE':
+			return {
+				...state,
+				fetchingProfile: action.payload,
+			};
+		case 'FETCH_USERS_PROFILE':
+			return {
+				...state,
+				fetchedUserProfile: action.payload,
+			};
 		case 'CLEAR_NOTIFICATIONS':
 			const getClearNotificationsState = { ...state.user };
 			getClearNotificationsState.notificationsCount = 0;

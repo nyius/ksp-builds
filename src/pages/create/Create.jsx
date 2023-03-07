@@ -78,7 +78,7 @@ function Create() {
 		setNewBuild(prevState => {
 			return { ...prevState, description: e.target.value };
 		});
-		setDescLength(prevState => 1000 - e.target.value.length);
+		setDescLength(prevState => 3000 - e.target.value.length);
 	};
 
 	/**
@@ -273,6 +273,7 @@ function Create() {
 				</div>
 			)}
 
+			{/* Image Carousel */}
 			<div className="flex flex-row flex-wrap gap-2 2k:gap-4">
 				{buildImages.length > 0 &&
 					buildImages.map((image, i) => {

@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import AuthContext from '../../context/auth/AuthContext';
 import useBuild from '../../context/build/BuildActions';
 
-function DeleteBuildAdmin({ style, id }) {
+function DeleteBuildAdmin({ style, id, userID }) {
 	const { user, authLoading } = useContext(AuthContext);
 
 	const { deleteBuild } = useBuild();
@@ -13,7 +13,7 @@ function DeleteBuildAdmin({ style, id }) {
 			if (style === 'circle') {
 				return (
 					<div className="tooltip tooltip-right" data-tip="Delete Build">
-						<button onClick={() => deleteBuild(id)} className="btn btn-circle btn-error btn-sm hover:bg-red-500 right-0 top-0 absolute z-50">
+						<button onClick={() => deleteBuild(id, userID)} className="btn btn-circle btn-error btn-sm hover:bg-red-500 right-0 top-0 absolute z-50">
 							X
 						</button>
 					</div>

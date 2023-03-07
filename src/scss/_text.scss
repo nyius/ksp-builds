@@ -4,3 +4,9 @@
 	-webkit-box-orient: vertical;
 	overflow: hidden;
 }
+
+@media (max-width: 639px) {
+	.multi-line-truncate {
+		-webkit-line-clamp: 1;
+	}
+}

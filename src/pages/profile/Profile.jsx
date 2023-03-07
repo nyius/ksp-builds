@@ -12,7 +12,6 @@ import useAuth from '../../context/auth/AuthActions';
 import BuildCard from '../../components/buildCard/BuildCard';
 import Spinner1 from '../../components/spinners/Spinner1';
 import Sort from '../index/Sort';
-import LoadMoreBuilds from '../../components/buttons/LoadMoreBuilds';
 
 function Profile() {
 	const { typeFilter, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
@@ -23,6 +22,9 @@ function Profile() {
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const { filterBuilds, resetFilters } = useFilters();
 	const [bio, setBio] = useState('');
+	const [bioLength, setBioLength] = useState(1000);
+
+	const dateCreated = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(user.dateCreated.seconds * 1000);
 
 	useEffect(() => {
 		resetFilters();
@@ -30,6 +32,7 @@ function Profile() {
 		if (!authLoading) {
 			if (user?.username && user?.builds.length > 0) {
 				fetchBuilds(user.builds);
+				setBioLength(user.bio.length);
 			}
 		}
 	}, []);
@@ -40,6 +43,15 @@ function Profile() {
 
 		setSortedBuilds(filterBuilds(newFetchedBuilds));
 	}, [fetchedBuilds, sortBy]);
+
+	/**
+	 * handles setting the bio and updating the total length
+	 * @param {*} e
+	 */
+	const handleSetBio = e => {
+		setBio(e.target.value);
+		setBioLength(prevState => 1000 - e.target.value.length);
+	};
 
 	/**
 	 * Handles updating the users bio
@@ -55,17 +67,32 @@ function Profile() {
 			<h1 className="text-2xl 2k:text-4xl font-bold text-slate-100 mb-4">Profile</h1>
 			{!authLoading && user.username && (
 				<>
-					<div className="flex flex-row gap-20 items-center mb-10 bg-base-400 rounded-xl p-6">
+					<div className="flex flex-row gap-20 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
+						{/* Profile Pictire */}
 						<div className="avatar">
 							<div className="rounded-full w-44 ring ring-primary ring-offset-base-100 ring-offset-4">
 								<img src={user.profilePicture} alt="" />
 							</div>
 						</div>
-						<div className="flex flex-col gap-3 w-full">
-							<p className="text-xl font-bold">{user.username}</p>
+
+						<div className="flex flex-col gap-3 2k:gap-6 w-full">
+							{/* Username */}
+							<p className="text-xl 2k:text-3xl font-thin">
+								<span className="text-slate-500 text-xl 2k:text-2xl italic">username: </span> {user.username}
+							</p>
+
+							{/* Created */}
+							<p className="text-xl 2k:text-3xl">
+								<span className="text-slate-500 2k:text-2xl italic">Date Created: </span> {dateCreated}
+							</p>
+
 							{editingProfile ? (
 								<>
-									<textarea onChange={e => setBio(e.target.value)} defaultValue={user.bio} name="" id="" rows="4" className="textarea w-full text-xl"></textarea>
+									{/* Bio Edit */}
+									<textarea onChange={handleSetBio} defaultValue={user.bio} maxLength="1000" rows="4" className="textarea w-full text-xl"></textarea>
+									<p className="text-slate-400 italic 2k:text-2xl">{bioLength}</p>
+
+									{/* Buttons */}
 									<div className="flex flex-row gap-4">
 										<button onClick={handleSubmitBioUpdate} className="btn w-fit">
 											Save
@@ -76,19 +103,23 @@ function Profile() {
 									</div>
 								</>
 							) : (
-								<>
-									{user.bio === '' ? <p className="italic text-slate-500 text-xl">No bio yet</p> : <p className="text-xl"> {user.bio} </p>}
-									<button onClick={() => setEditingProfile(true)} className="btn btn-sm w-fit mt-3 mb-4">
+								<div>
+									<div className="flex flex-row gap-2">
+										{/* Bio */}
+										<p className="text-slate-500 text-xl 2k:text-2xl italic">Bio: </p>
+										{user.bio === '' ? <p className="italic text-slate-500 text-xl 2k:text-3xl">No bio yet</p> : <p className="text-xl 2k:text-3xl"> {user.bio} </p>}
+									</div>
+									<button onClick={() => setEditingProfile(true)} className="btn btn-sm 2k:btn-md 2k:text-2xl w-fit mt-3 2k:mt-6 mb-4">
 										Edit Bio
 									</button>
-								</>
+								</div>
 							)}
-							<p className="text-xl">
-								<span className="text-slate-500">Email:</span> {user.email}
+							<p className="text-xl 2k:text-3xl">
+								<span className="text-slate-500 text-xl 2k:text-2xl italic">Email:</span> {user.email}
 							</p>
 						</div>
 					</div>
-					<h2 className="text-xl 2k:text-2xl font-bold text-slate-100 mb-4">Your Builds</h2>
+					<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4">Your Builds</h2>
 
 					{/* Builds */}
 					<Sort />

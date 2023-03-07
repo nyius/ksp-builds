@@ -1,17 +1,11 @@
 // Change the default image for daisyUI cards
 figure {
-	img {
-		width: max-content;
-		max-height: 15rem;
-		min-height: 8rem;
-		object-fit: scale-down;
-	}
-}
+	width: 100%;
+	aspect-ratio: 16/9;
+	overflow: hidden;
 
-@media (min-width: 1921px) {
-	figure {
-		img {
-			max-height: 25rem;
-		}
+	img {
+		width: 100%;
+		object-fit: fill;
 	}
 }

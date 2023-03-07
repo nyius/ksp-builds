@@ -1,5 +1,5 @@
 import { db } from '../../firebase.config';
-import { updateDoc, doc, collection } from 'firebase/firestore';
+import { updateDoc, doc, getDoc, collection } from 'firebase/firestore';
 import { useContext } from 'react';
 import AuthContext from './AuthContext';
 import { cloneDeep } from 'lodash';
@@ -63,6 +63,10 @@ const useAuth = () => {
 	 */
 	const updateUserDbBio = async bio => {
 		try {
+			if (bio.length > 1000) {
+				toast.error('Your bio is too long! Must be less than 1000 characters');
+				return;
+			}
 			await updateDoc(doc(db, 'users', user.uid), { bio });
 			await updateDoc(doc(db, 'userProfiles', user.uid), { bio });
 
@@ -170,7 +174,44 @@ const useAuth = () => {
 		});
 	};
 
-	return { setNewGoogleSignup, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio, updateUserProfilePicture };
+	/**
+	 * Updates the context if we are fetching a users profile
+	 * @param {*} bool
+	 */
+	const setFetchingProfile = bool => {
+		dispatchAuth({
+			type: 'SET_FETCHING_PROFILE',
+			payload: bool,
+		});
+	};
+
+	/**
+	 * Handles fetching a profile from the userProfiles DB.
+	 * @param {*} id
+	 */
+	const fetchUsersProfile = async id => {
+		try {
+			setFetchingProfile(true);
+			const fetchedProfile = await getDoc(doc(db, 'userProfiles', id));
+
+			if (fetchedProfile.exists()) {
+				const profile = fetchedProfile.data();
+				dispatchAuth({
+					type: 'FETCH_USERS_PROFILE',
+					payload: profile,
+				});
+
+				setFetchingProfile(false);
+			} else {
+				setFetchingProfile(false);
+				throw new Error(`Couldn't find profile!`);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	return { setNewGoogleSignup, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio, updateUserProfilePicture, fetchUsersProfile };
 };
 
 export default useAuth;

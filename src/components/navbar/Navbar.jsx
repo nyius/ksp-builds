@@ -58,6 +58,11 @@ function NavBar() {
 					</label>
 					<ul tabIndex={1} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-200 rounded-box w-52">
 						<li>
+							<a className=" text-2xl" onClick={() => navigate('/')}>
+								Home
+							</a>
+						</li>
+						<li>
 							<a className=" text-2xl" onClick={handleCreateNavigate}>
 								Create <TiPlusOutline />
 							</a>

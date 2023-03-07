@@ -60,7 +60,6 @@ export const uploadImage = async (image, setLoadingState, uid) => {
 			() => {
 				// Upload completed successfully, now we can get the download URL
 				getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
-					console.log(downloadURL);
 					resolve(downloadURL);
 				});
 			}

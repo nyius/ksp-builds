@@ -16,28 +16,8 @@ function NewGoogleAccountModal() {
 	const [newProfilePicture, setNewProfilePicture] = useState(LogoIcon);
 
 	const { user, newGoogleSignup } = useContext(AuthContext);
-	const { setNewGoogleSignup, updateUserState } = useAuth();
+	const { setNewGoogleSignup, updateUserState, uploadProfilePicture, updateUserDbProfilePic } = useAuth();
 	const newGoogleAccountModal = document.querySelector('#new-google-login-modal');
-
-	/**
-	 * handles uploading a profile picture
-	 */
-	const uploadProfilePicture = async e => {
-		// make sure we have a file uploaded
-		if (e.target.files) {
-			const profilePicture = e.target.files[0];
-
-			if (profilePicture.size > 2097152) {
-				toast.error('Image is too big! Must be smaller than 2mb');
-				e.target.value = null;
-				setNewProfilePicture(LogoIcon);
-				return;
-			}
-
-			const newPic = await uploadImage(profilePicture, setUploadingImage, user.uid);
-			setNewProfilePicture(newPic);
-		}
-	};
 
 	/**
 	 * Handles finalizing the account creation for google users
@@ -110,6 +90,24 @@ function NewGoogleAccountModal() {
 		checkIfUserExists();
 	};
 
+	/**
+	 * Gets te new uploaded profile photo and updates the used DB
+	 * @param {*} e
+	 */
+	const handleNewProfilePhoto = async e => {
+		await uploadProfilePicture(e, setUploadingImage)
+			.then(url => {
+				setNewProfilePicture(url);
+				updateUserDbProfilePic(url);
+				setUploadingImage(false);
+			})
+			.catch(err => {
+				console.log(err);
+				toast.error('Something went wrong');
+				setUploadingImage(false);
+			});
+	};
+
 	// Check when we get a new google account setup, so we can show/hide the modal to enter a new username ------------------------------------------------------------------------------------//
 	useEffect(() => {
 		if (newGoogleSignup) {
@@ -127,7 +125,7 @@ function NewGoogleAccountModal() {
 	return (
 		<>
 			{/* New Google Account */}
-			<input type="checkbox" id="new-google-login-modal" className="modal-toggle" />
+			<input type="checkbox" checked={true} id="1new-google-login-modal" className="modal-toggle" />
 			<div className="modal">
 				<div className="modal-box">
 					<div className="font-bold alert dot-bg text-xl 2k:text-3xl mb-4">
@@ -155,7 +153,7 @@ function NewGoogleAccountModal() {
 
 						<div className="flex flex-row flex-wrap items-center">
 							<div className="mr-4">{uploadingImage ? <Spinner1 /> : <img className="avatar-round 2k:w-18" src={newProfilePicture} />}</div>
-							<input type="file" id="profile-picture" max="1" accept=".jpg,.png,.jpeg" className="file-input 2k:file-input-lg 2k:text-3xl" onChange={e => uploadProfilePicture(e)} />
+							<input type="file" id="profile-picture" max="1" accept=".jpg,.png,.jpeg" className="file-input 2k:file-input-lg 2k:text-3xl" onChange={handleNewProfilePhoto} />
 						</div>
 					</form>
 

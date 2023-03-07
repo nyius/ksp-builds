@@ -240,22 +240,21 @@ const useAuth = () => {
 	 * @returns
 	 */
 	const uploadProfilePicture = async (e, setUploadingState) => {
-		console.log(`Inside upload profile pic!`);
-		// make sure we have a file uploaded
-		if (e.target.files) {
-			console.log(`we have files!`);
-			const profilePicture = e.target.files[0];
+		return new Promise((resolve, reject) => {
+			// make sure we have a file uploaded
+			if (e.target.files) {
+				const profilePicture = e.target.files[0];
 
-			if (profilePicture.size > 2097152) {
-				toast.error('Image is too big! Must be smaller than 2mb');
-				e.target.value = null;
-				return;
+				if (profilePicture.size > 2097152) {
+					toast.error('Image is too big! Must be smaller than 2mb');
+					e.target.value = null;
+					return;
+				}
+				uploadImage(profilePicture, setUploadingState, user.uid).then(url => {
+					resolve(url);
+				});
 			}
-			console.log(`before resolve!`);
-			const newImageUrl = await uploadImage(profilePicture, setUploadingState, user.uid);
-			console.log(`resolved!`);
-			return newImageUrl;
-		}
+		});
 	};
 
 	return { setNewGoogleSignup, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio, updateUserDbProfilePic, updateUserProfilePicture, fetchUsersProfile, uploadProfilePicture };

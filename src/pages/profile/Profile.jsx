@@ -71,17 +71,22 @@ function Profile() {
 	 * @param {*} e
 	 */
 	const handleNewProfilePhoto = async e => {
-		console.log(`handling it!`);
-		const newUrl = await uploadProfilePicture(e, setUploadingProfilePhoto);
-		console.log(`got the url`, newUrl);
-		await updateUserDbProfilePic(newUrl);
+		await uploadProfilePicture(e, setUploadingProfilePhoto)
+			.then(url => {
+				updateUserDbProfilePic(url);
+				setUploadingProfilePhoto(false);
+			})
+			.catch(err => {
+				console.log(err);
+				toast.error('Something went wrong');
+				setUploadingProfilePhoto(false);
+			});
 	};
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="flex flex-col gap-4 w-full rounded-xl p-6">
 			<h1 className="text-2xl 2k:text-4xl font-bold text-slate-100 mb-4">Profile</h1>
-			{uploadingProfilePhoto && <Spinner1 />}
 			{!authLoading && user.username && (
 				<>
 					<div className="flex flex-row gap-20 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
@@ -91,10 +96,11 @@ function Profile() {
 								<div className="rounded-full w-44 ring ring-primary ring-offset-base-100 ring-offset-4">{uploadingProfilePhoto ? <Spinner1 /> : <img src={user.profilePicture} alt="" />}</div>
 							</div>
 							<div className="tooltip" data-tip="Edit Profile Picture">
-								<label htmlFor="profile-picture" className="indicator-item indicator-bottom text-3xl cursor-pointer rounded-full p-4 bg-base-600">
+								<label htmlFor="profile-picture-upload" className="indicator-item indicator-bottom text-3xl cursor-pointer rounded-full p-4 bg-base-600">
 									<AiFillCamera />
 								</label>
-								<input type="file" id="profile-picture" max="1" accept=".jpg,.png,.jpeg" className="hidden-file-input file-input 2k:file-input-lg 2k:text-3xl" onChange={handleNewProfilePhoto} />
+
+								<input type="file" id="profile-picture-upload" max="1" accept=".jpg,.png,.jpeg" className="hidden-file-input file-input 2k:file-input-lg 2k:text-3xl" onChange={handleNewProfilePhoto} />
 							</div>
 						</div>
 

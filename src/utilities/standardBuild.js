@@ -8,7 +8,7 @@ export const standardBuild = {
 	build: '',
 	author: '',
 	uid: '',
-	upVotes: 1,
+	upVotes: 0,
 	downVotes: 0,
 	kspVersion: `1.0.0`,
 	type: [],

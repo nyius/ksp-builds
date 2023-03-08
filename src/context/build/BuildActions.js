@@ -17,7 +17,7 @@ const useBuild = () => {
 	const { dispatchBuild, deletingCommentId, comments, loadedBuild, comment } = useContext(BuildContext);
 	const { fetchedBuilds, dispatchBuilds } = useContext(BuildsContext);
 	const { user } = useContext(AuthContext);
-	const { updateUserState, addbuildToUser } = useAuth();
+	const { updateUserState, addbuildToUser, handleVoting } = useAuth();
 
 	/**
 	 * Fetches the build from the server and dispatches the result.
@@ -557,6 +557,9 @@ const useBuild = () => {
 				});
 
 				await setDoc(doc(db, 'buildsRaw', buildId), rawBuild);
+
+				// Add it to the users 'Upvoted'
+				await handleVoting('upVote', build);
 
 				toast.success('Build created!');
 				return newId;

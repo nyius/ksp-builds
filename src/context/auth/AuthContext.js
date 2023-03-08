@@ -14,7 +14,9 @@ export const AuthProvider = ({ children }) => {
 		try {
 			// Get the user from the db
 			const docRefUser = doc(db, 'users', auth.currentUser.uid);
-			const docSnapUser = await getDoc(docRefUser);
+			const docSnapUser = await getDoc(docRefUser).catch(err => {
+				throw new Error(err);
+			});
 
 			// Check if the user exists
 			if (docSnapUser.exists()) {

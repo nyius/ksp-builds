@@ -20,9 +20,11 @@ import './App.css';
 /*TODO
 youtube video bug???
 notifications
-user can upvote their own build
 login check if account exists (email vs google signup)
 login modal closing after signin with email
+make type search prettier
+make avatar menu prettier
+email verification?
 proper text edior for comments/bio/build desc/etc
 something breaks when going to your profile after just making an account (something to do with seconds)
 search that searches the database, not just loaded builds

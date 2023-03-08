@@ -22,6 +22,7 @@ function VerticalTypeLink({ text }) {
 			id={text}
 			onClick={e => {
 				setTypeFilter(e);
+				navigate(`builds/${e.target.id}`);
 			}}
 			className=""
 		>

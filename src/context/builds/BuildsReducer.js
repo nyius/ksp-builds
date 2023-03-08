@@ -35,6 +35,11 @@ const BuildsReducer = (state, action) => {
 				...state,
 				fetchedBuilds: [action.payload, ...state.fetchedBuilds],
 			};
+		case 'CLEAR_BUILDS':
+			return {
+				...state,
+				fetchedBuilds: [],
+			};
 		case `SET_USERS_OWN_BUILDS`:
 			return {
 				...state,

@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { toast } from 'react-toastify';
-import { serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore';
+import { serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../../firebase.config';
 import { cloneDeep } from 'lodash';
 //---------------------------------------------------------------------------------------------------//
@@ -10,6 +9,7 @@ import KspImage2 from '../../assets/kspimage-2.jpg';
 import KspImage3 from '../../assets/kspimage-3.jpg';
 import KspImage4 from '../../assets/kspimage-4.jpg';
 import KspImage5 from '../../assets/kspimage-5.jpg';
+import Button from './Button';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import BuildsContext from '../../context/builds/BuildsContext';
@@ -51,15 +51,7 @@ function CreateBuildAdmin() {
 	};
 
 	//---------------------------------------------------------------------------------------------------//
-	return (
-		<>
-			{user?.siteAdmin && (
-				<div className="btn btn-error 2k:btn-lg 2k:text-2xl text-white hidden md:flex" onClick={createBuild}>
-					Create Build (ADMIN)
-				</div>
-			)}
-		</>
-	);
+	return <>{user?.siteAdmin && <Button color="btn-error" text="Create Build (admin)" icon="plus" css="text-white hidden md:flex" onClick={createBuild} />}</>;
 }
 
 export default CreateBuildAdmin;

@@ -60,7 +60,7 @@ const useBuild = () => {
 	/**
 	 * Hadles saving the new build to the server
 	 */
-	const makeBuildReadyToUpload = async () => {
+	const makeBuildReadyToUpload = async build => {
 		try {
 			dispatchBuild({
 				type: 'UPLOADING_BUILD',
@@ -68,7 +68,7 @@ const useBuild = () => {
 			});
 
 			// Check if we have a build name
-			if (loadedBuild.name.length === 0) {
+			if (build.name.length === 0) {
 				dispatchBuild({
 					type: 'UPLOADING_BUILD',
 					payload: false,
@@ -88,7 +88,7 @@ const useBuild = () => {
 			}
 
 			// Check if theres types in the build
-			if (loadedBuild.type === '') {
+			if (build.type.length === 0) {
 				toast.error('You forgot to give your build a type!');
 				dispatchBuild({
 					type: 'UPLOADING_BUILD',
@@ -98,7 +98,7 @@ const useBuild = () => {
 			}
 
 			// Check description length
-			if (loadedBuild.description.length > 3000) {
+			if (build.description.length > 3000) {
 				toast.error('Description too long');
 				dispatchBuild({
 					type: 'UPLOADING_BUILD',
@@ -108,7 +108,7 @@ const useBuild = () => {
 			}
 
 			// Check name length
-			if (loadedBuild.name.length > 50) {
+			if (build.name.length > 50) {
 				toast.error('Build name too long');
 				dispatchBuild({
 					type: 'UPLOADING_BUILD',
@@ -117,7 +117,17 @@ const useBuild = () => {
 				throw new Error('Build name too long');
 			}
 
-			return loadedBuild;
+			if (build.build.length === 0) {
+				toast.error('You forgot to enter a build!');
+
+				dispatchBuild({
+					type: 'UPLOADING_BUILD',
+					payload: false,
+				});
+				throw new Error('You forgot to enter a build!');
+			}
+
+			return build;
 		} catch (error) {
 			throw new Error(`Error in makeBuildReadyToUpload: ${error}`);
 		}
@@ -127,28 +137,37 @@ const useBuild = () => {
 	 * Handles updating the build in the database
 	 * @param {*} ()
 	 */
-	const updateBuild = async () => {
+	const updateBuild = async build => {
 		try {
-			const newBuild = await makeBuildReadyToUpload(loadedBuild);
+			const newBuild = await makeBuildReadyToUpload(build);
+
+			const rawBuild = { build: newBuild.build };
+			delete build.build;
 
 			await updateDoc(doc(db, 'builds', newBuild.id), {
 				...newBuild,
-			})
-				.then(() => {
-					dispatchBuild({
-						type: 'SET_BUILD',
-						payload: {
-							savingBuild: false,
-							editingBuild: false,
-						},
-					});
+			}).catch(err => {
+				setSavingBuild(false);
+				throw new Error(err);
+			});
 
-					toast.success('Build updated');
-				})
-				.catch(err => {
-					setSavingBuild(false);
-					throw new Error(err);
-				});
+			await updateDoc(doc(db, 'buildsRaw', newBuild.id), rawBuild).catch(err => {
+				setSavingBuild(false);
+				throw new Error(err);
+			});
+
+			newBuild.build = rawBuild.build;
+
+			dispatchBuild({
+				type: 'SET_BUILD',
+				payload: {
+					savingBuild: false,
+					editingBuild: false,
+					loadedBuild: newBuild,
+				},
+			});
+
+			toast.success('Build updated');
 		} catch (error) {
 			setSavingBuild(false);
 			throw new Error(error);
@@ -335,21 +354,20 @@ const useBuild = () => {
 			type: 'SET_BUILD',
 			payload: {
 				editingBuild: false,
-				cancelEdit: false,
-				loadedBuild: clonedeep(backupBuild),
+				loadedBuild: backupBuild,
 			},
 		});
 	};
 
 	/**
-	 * Handles setting cancelling a build edit
-	 * @param {*} value
+	 * Handles cancelling a build edit. Reverts it to prev state
+	 * @param {*} build
 	 */
-	const setCancelEdit = value => {
+	const setEditingBuild = bool => {
 		dispatchBuild({
-			type: 'SET_BUILD',
+			type: 'EDITING_BUILD',
 			payload: {
-				cancelEdit: value,
+				editingBuild: bool,
 			},
 		});
 	};
@@ -484,6 +502,18 @@ const useBuild = () => {
 	};
 
 	/**
+	 * handles updating the builds view count
+	 */
+	const updateDownloadCount = async (build, id) => {
+		try {
+			const ref = doc(db, 'builds', id);
+			await updateDoc(ref, { downloads: (build.downloads += 1) });
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
 	 * Handles uploading a build to the server. Takes in a build, and a dispatch function to add the newly created build to
 	 * @param {*} build
 	 */
@@ -495,13 +525,20 @@ const useBuild = () => {
 			const rawBuild = { build: build.build };
 			delete build.build;
 
-			await setDoc(doc(db, 'builds', buildId), build);
+			await setDoc(doc(db, 'builds', buildId), build).catch(err => {
+				throw new Error(err);
+			});
 
 			// add it to the users 'userProfile' db
-			await updateDoc(doc(db, 'userProfiles', user.uid), { builds: [...user.builds, buildId] });
+			await updateDoc(doc(db, 'userProfiles', user.uid), { builds: [...user.builds, buildId] }).catch(err => {
+				throw new Error(err);
+			});
 
 			// Add it to the users 'builds'
-			await updateDoc(doc(db, 'users', user.uid), { builds: [...user.builds, buildId] });
+			await updateDoc(doc(db, 'users', user.uid), { builds: [...user.builds, buildId] }).catch(err => {
+				throw new Error(err);
+			});
+
 			addbuildToUser(buildId);
 
 			// now get the document so we can grab its timestamp
@@ -532,7 +569,7 @@ const useBuild = () => {
 	return {
 		uploadBuild,
 		setBaseBuild,
-		setCancelEdit,
+		setEditingBuild,
 		cancelBuilEdit,
 		setSavingBuild,
 		fetchComments,
@@ -546,6 +583,7 @@ const useBuild = () => {
 		setComment,
 		updateComment,
 		updateViewCount,
+		updateDownloadCount,
 	};
 };
 

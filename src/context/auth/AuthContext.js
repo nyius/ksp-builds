@@ -113,7 +113,7 @@ export const AuthProvider = ({ children }) => {
 		cancelEditProfile: false,
 		usernameChanged: false,
 		verifyChangeUsername: false,
-		newGoogleSignup: false,
+		newSignup: false,
 		fetchingProfile: false,
 		fetchedUserProfile: null,
 	};

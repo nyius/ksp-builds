@@ -158,7 +158,28 @@ const useBuilds = () => {
 		});
 	};
 
-	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchFavorites, fetchMoreBuilds };
+	/**
+	 * Handles setting the loading state for fetching builds
+	 * @param {bool}
+	 */
+	const setBuildsLoading = bool => {
+		dispatchBuilds({
+			type: 'SET_FETCHED_BUILDS',
+			payload: { loadingBuilds: bool },
+		});
+	};
+
+	/**
+	 * Clears the fetched builds
+	 */
+	const clearFetchedBuilds = () => {
+		dispatchBuilds({
+			type: 'CLEAR_BUILDS',
+			payload: null,
+		});
+	};
+
+	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchFavorites, fetchMoreBuilds, setBuildsLoading, clearFetchedBuilds };
 };
 
 export default useBuilds;

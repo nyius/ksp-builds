@@ -14,8 +14,8 @@ const useAuth = () => {
 	 * Handles when a user signs up with google and neeeds to enter a username
 	 * @param {*} value
 	 */
-	const setNewGoogleSignup = value => {
-		dispatchAuth({ type: 'SET_NEW_GOOGLE_SIGNUP', payload: value });
+	const setNewSignup = value => {
+		dispatchAuth({ type: 'SET_NEW_SIGNUP', payload: value });
 	};
 
 	/**
@@ -48,7 +48,6 @@ const useAuth = () => {
 			await updateDoc(doc(db, 'users', user.uid), { profilePicture });
 			await updateDoc(doc(db, 'userProfiles', user.uid), { profilePicture });
 
-			toast.success('Profile Picture updated!');
 			dispatchAuth({
 				type: 'UPDATE_USER',
 				payload: { profilePicture },
@@ -257,7 +256,7 @@ const useAuth = () => {
 		});
 	};
 
-	return { setNewGoogleSignup, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio, updateUserDbProfilePic, updateUserProfilePicture, fetchUsersProfile, uploadProfilePicture };
+	return { setNewSignup, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio, updateUserDbProfilePic, updateUserProfilePicture, fetchUsersProfile, uploadProfilePicture };
 };
 
 export default useAuth;

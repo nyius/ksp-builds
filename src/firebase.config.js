@@ -22,3 +22,7 @@ export const googleProvider = new GoogleAuthProvider();
 export const auth = getAuth();
 export const functions = getFunctions(app);
 export const storage = getStorage();
+
+googleProvider.setCustomParameters({
+	prompt: 'select_account',
+});

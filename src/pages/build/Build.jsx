@@ -1,10 +1,10 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { AiFillEye } from 'react-icons/ai';
-import { TiExport } from 'react-icons/ti';
-import { RiDeleteBin2Fill, RiEditFill } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+//---------------------------------------------------------------------------------------------------//
+import { AiFillEye } from 'react-icons/ai';
+//---------------------------------------------------------------------------------------------------//
 import youtubeLinkConverter from '../../utilities/youtubeLinkConverter';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from '../../context/build/BuildContext';
@@ -18,13 +18,17 @@ import HowToPasteBuildModal from '../../components/modals/HowToPasteModal';
 import Comment from '../../components/comments/Comment';
 import DeleteBuildModal from '../../components/modals/DeleteBuildModal';
 import Carousel from '../../components/carousel/Carousel';
-import PlanetExplosion from '../../assets/planet_explosion.png';
+import Create from '../create/Create';
+import Button from '../../components/buttons/Button';
+import CantFind from '../../components/cantFind/CantFind';
+import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 //---------------------------------------------------------------------------------------------------//
 
 function Build() {
-	const { loadingBuild, loadedBuild, commentsLoading, comments } = useContext(BuildContext);
+	//---------------------------------------------------------------------------------------------------//
+	const { loadingBuild, loadedBuild, commentsLoading, comments, editingBuild } = useContext(BuildContext);
 	const { user, authLoading } = useContext(AuthContext);
-	const { fetchBuild, setComment, addComment } = useBuild();
+	const { fetchBuild, setComment, addComment, updateDownloadCount, setEditingBuild, updateBuild } = useBuild();
 	const navigate = useNavigate();
 
 	const { id } = useParams();
@@ -36,14 +40,17 @@ function Build() {
 	/**
 	 * Handles copying the build to the clipboard
 	 */
-	const copyBuildToClipboard = () => {
+	const copyBuildToClipboard = async () => {
 		navigator.clipboard.writeText(loadedBuild.build);
+		await updateDownloadCount(loadedBuild, loadedBuild.id);
 		toast.success('Build coped to clipboard!');
 	};
 
+	if (editingBuild) return <Create buildToEdit={loadedBuild} />;
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="flex flex-row bg-base-400 w-full rounded-xl p-6">
+		<MiddleContainer>
 			{loadingBuild ? (
 				<Spinner1 />
 			) : (
@@ -62,8 +69,8 @@ function Build() {
 								</p>
 							</div>
 
+							{/* Voting/Views/Types */}
 							<div className="flex flex-row place-content-between mb-4">
-								{/* Voting/Views */}
 								<div className="flex flex-row gap-8">
 									<VoteArrows build={loadedBuild} />
 								</div>
@@ -83,30 +90,13 @@ function Build() {
 							{/* Buttons */}
 							<div className="flex flex-col md:flex-row place-content-between">
 								<div className="flex flex-ro flex-wrap gap-4 mb-10">
-									<button className="btn 2k:btn-lg 2k:text-2xl btn-primary w-fit items-center" onClick={copyBuildToClipboard}>
-										<span className="mr-2 text-2xl 2k:text-4xl">
-											<TiExport />
-										</span>
-										Export to KSP 2
-									</button>
-									<label className="btn 2k:btn-lg 2k:text-2xl bg-base-900" htmlFor="how-to-paste-build-modal">
-										How to import into KSP
-									</label>
+									<Button color="btn-primary" icon="export" onClick={copyBuildToClipboard} text="Export to KSP 2" />
+									<Button text="How to import into KSP" color="bg-base-900" htmlFor="how-to-paste-build-modal" icon="help" />
 								</div>
 								{!authLoading && (user?.uid === loadedBuild.uid || user?.siteAdmin) && (
 									<div className="flex flex-row flex-wrap gap-4">
-										<button className="btn 2k:btn-lg 2k:text-2xl btn-info gap-2">
-											<span className="text-2xl">
-												<RiEditFill />
-											</span>
-											Edit Build
-										</button>
-										<label htmlFor="delete-build-modal" className="btn 2k:btn-lg 2k:text-2xl btn-error gap-2">
-											<span className="text-2xl">
-												<RiDeleteBin2Fill />
-											</span>
-											Delete Build
-										</label>
+										<Button text="Edit Build" icon="edit" color="btn-info" onClick={() => setEditingBuild(true)} />
+										<Button htmlFor="delete-build-modal" color="btn-error" icon="delete" text="Delete Build" />
 									</div>
 								)}
 							</div>
@@ -118,9 +108,7 @@ function Build() {
 							{!authLoading && user?.username && (
 								<>
 									<textarea onChange={e => setComment(e.target.value)} maxLength="3000" name="" id="" placeholder="Leave a comment" rows="2" className="textarea 2k:text-2xl"></textarea>
-									<button onClick={addComment} className="btn 2k:btn-lg 2k:text-2xl bg-base-900 w-fit 2k:mb-8">
-										Save
-									</button>
+									<Button onClick={addComment} color="bg-base-900" text="Save" size="w-fit" css="2k:mb-10" icon="comment" />
 								</>
 							)}
 							{commentsLoading ? (
@@ -140,19 +128,14 @@ function Build() {
 							)}
 						</div>
 					) : (
-						<div className="flex flex-col gap-4 w-full h-fit rounded-xl p-12 2k:p-12 bg-base-900 justify-center items-center">
-							<h1 className="text-2xl 2k:text-4xl font-bold">Oops.. build not found</h1>
-							<button className="btn 2k:text-2xl" onClick={() => navigate('/')}>
-								Return Home
-							</button>
-							<img className="w-1/2" src={PlanetExplosion} alt="Crashed Spaceship" />
-						</div>
+						<CantFind text="Oops.. Build not found">
+							<Button color="btn-primary" onClick={() => navigate('/')} text="Return Home" icon="left" />
+						</CantFind>
 					)}
 				</>
 			)}
-			<HowToPasteBuildModal />
 			{loadedBuild && <DeleteBuildModal id={loadedBuild.id} userID={loadedBuild.uid} />}
-		</div>
+		</MiddleContainer>
 	);
 }
 

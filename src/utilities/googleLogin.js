@@ -2,11 +2,20 @@ import { signInWithPopup } from 'firebase/auth';
 import { auth, db, googleProvider } from '../firebase.config';
 import { serverTimestamp, doc, getDoc, setDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'react-toastify';
+import { cloneDeep } from 'lodash';
+import standardNotifications from './standardNotifications';
+import standardUser from './standardUser';
+import standardUserProfile from './standardUserProfile';
 
 // Handles logging in with a google account
 const googleLogin = async () => {
 	try {
-		const userCredential = await signInWithPopup(auth, googleProvider);
+		const userCredential = await signInWithPopup(auth, googleProvider).catch(err => {
+			console.log(err);
+			toast.error('Something went wrong. Please try again');
+			return;
+		});
 
 		// Get user information.
 		const uid = userCredential.user.uid;
@@ -22,39 +31,23 @@ const googleLogin = async () => {
 			return 'success';
 		} else {
 			// If the user doesn't exist, create them in the DB
-			const user = {
-				name,
-				email,
-				username: '',
-				notificationsAllowed: true,
-				commentNotificationsAllowed: true,
-				bio: '',
-				favorites: [],
-				profilePicture: '',
-				siteAdmin: false,
-				dateCreated: createdAt,
-				upVotes: [],
-				downVotes: [],
-				builds: [],
-			};
+			let user = cloneDeep(standardUser);
+			let notifications = cloneDeep(standardNotifications);
+			let userProfile = cloneDeep(standardUserProfile);
 
-			const notifications = {
-				type: 'welcome',
-				username: 'KSP_Builds',
-				uid: 123,
-				timestamp: createdAt,
-				read: false,
-				profilePicture: 'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/logo_light_icon.png?alt=media&token=bbcff4bd-de9e-4d39-b77e-7046f90ed832',
-				message: 'Welcome to KSP Builds! Please feel free to reach out with any questions/comments/ideas, and fly safe!',
-			};
+			user.name = name;
+			user.email = email;
+			user.dateCreated = createdAt;
 
-			const userProfile = {
-				username: '',
-				profilePicture: '',
-				dateCreated: createdAt,
-				builds: [],
-				bio: '',
-			};
+			notifications.type = 'welcome';
+			notifications.username = 'nyius';
+			notifications.uid = 'MMWg1Vzq4EWE0mmaqFI8NHf50Hy2';
+			notifications.timestamp = createdAt;
+			notifications.read = false;
+			notifications.profilePicture = 'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/selfie.png?alt=media&token=031dfd32-5038-4c84-96c3-40b09c0e4529';
+			notifications.message = 'Welcome to KSP Builds! Please feel free to reach out with any questions/comments/ideas, and fly safe!';
+
+			userProfile.dateCreated = createdAt;
 
 			await setDoc(doc(db, 'users', uid), user);
 			await setDoc(doc(db, 'users', uid, 'notifications', uuidv4().slice(0, 20)), notifications);

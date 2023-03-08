@@ -2,7 +2,9 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { cloneDeep } from 'lodash';
+//---------------------------------------------------------------------------------------------------//
 import { FiCameraOff } from 'react-icons/fi';
+import { GiCancel } from 'react-icons/gi';
 //---------------------------------------------------------------------------------------------------//
 import { uploadImage, uploadImages } from '../../utilities/uploadImage';
 import { standardBuild } from '../../utilities/standardBuild';
@@ -11,19 +13,27 @@ import AuthContext from '../../context/auth/AuthContext';
 import useBuild from '../../context/build/BuildActions';
 //---------------------------------------------------------------------------------------------------//
 import Spinner1 from '../../components/spinners/Spinner1';
-import HowToCopyBuildModal from '../../components/modals/HowToCopyBuildModal';
 import LogoBackground from '../../assets/logo_bg_dark.png';
+import BuildTypes from '../../components/create/BuildTypes';
+import Button from '../../components/buttons/Button';
+import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
+import CancelBuildEditModal from '../../components/modals/CancelBuildEditModal';
+import PlanetHeader from '../../components/header/PlanetHeader';
 
-function Create() {
+/**
+ * Handles displaying the container for creating & editing a build.
+ * @param {*} param0
+ * @returns
+ */
+function Create({ buildToEdit }) {
 	const { user } = useContext(AuthContext);
-	const { uploadBuild } = useBuild();
+	const { uploadBuild, updateBuild } = useBuild();
 
 	//---------------------------------------------------------------------------------------------------//
-	const [newBuild, setNewBuild] = useState(cloneDeep(standardBuild));
+	const [newBuild, setNewBuild] = useState(buildToEdit ? cloneDeep(buildToEdit) : cloneDeep(standardBuild));
 	const [nameLength, setNameLength] = useState(50);
 	const [descLength, setDescLength] = useState(3000);
 	const [uploadingImage, setUploadingImage] = useState(false);
-	const [buildImages, setBuildImages] = useState([]);
 	const [hoverImage, setHoverImage] = useState(false);
 	//---------------------------------------------------------------------------------------------------//
 
@@ -92,30 +102,15 @@ function Create() {
 	};
 
 	/**
-	 * Handles setting the build type
-	 * @param {*} newType
-	 */
-	const setTypes = newType => {
-		if (newBuild.type.includes(newType)) {
-			setNewBuild(prevState => {
-				return { ...prevState, type: prevState.type.filter(type => type !== newType) };
-			});
-		} else if (newBuild.type.length < 3) {
-			setNewBuild(prevState => {
-				return { ...prevState, type: [...prevState.type, newType] };
-			});
-		}
-	};
-
-	/**
 	 * handles uploading a build image
 	 */
 	const handleAddBuildImages = async e => {
 		// make sure we have a file uploaded
 		if (e.target.files) {
 			const newBuildImages = await uploadImages(e.target.files, setUploadingImage);
-			setBuildImages(prevState => {
-				return [...prevState, ...newBuildImages];
+
+			setNewBuild(prevState => {
+				return { ...prevState, images: [...newBuild.images, ...newBuildImages] };
 			});
 		}
 	};
@@ -137,15 +132,19 @@ function Create() {
 				toast.error('You forgot to include the build!');
 				return;
 			}
-			if (buildImages.length > 6) {
+			if (newBuild.images.length > 6) {
 				toast.error('Too many build images! Max 6');
+				return;
+			}
+			if (newBuild.video && !newBuild.video.includes('youtube')) {
+				toast.error('Invalid youtube link!');
 				return;
 			}
 
 			// Upload the images to the DB
 
 			const buildToUpload = cloneDeep(newBuild);
-			buildToUpload.images = buildImages.length === 0 ? [LogoBackground] : buildImages;
+			buildToUpload.images.length === 0 ? (buildToUpload.images = [LogoBackground]) : (buildToUpload.images = newBuild.images);
 			buildToUpload.author = user.username;
 			buildToUpload.uid = user.uid;
 
@@ -190,11 +189,10 @@ function Create() {
 	 * @param {*} i
 	 */
 	const removeImage = i => {
-		console.log(i);
-		setBuildImages(prevState => {
-			const newArr = [...prevState];
+		setNewBuild(prevState => {
+			const newArr = [...newBuild.images];
 			newArr.splice(i, 1);
-			return newArr;
+			return { ...prevState, images: newArr };
 		});
 	};
 
@@ -224,27 +222,28 @@ function Create() {
 		e.preventDefault();
 		let droppedImage = Number(e.dataTransfer.getData('text'));
 
-		let newSquare, opponentPiece;
+		let newSquare;
 
 		// when dragging and dropping, when we release on a 'image', sometimes the target id isn't the square but the image itself
 		// so we need to go up and get the parent square to find its id
 		if (e.target.id.includes('square')) {
 			newSquare = Number(e.target.id.split('-')[1]);
-			setBuildImages(prevState => {
-				const newArr = [...prevState];
-				newArr[droppedImage] = newArr[newSquare];
-				newArr[newSquare] = prevState[droppedImage];
 
-				return newArr;
+			setNewBuild(prevState => {
+				const newArr = [...newBuild.images];
+				newArr[droppedImage] = newArr[newSquare];
+				newArr[newSquare] = newBuild.images[droppedImage];
+
+				return { ...prevState, images: newArr };
 			});
 		} else {
 			newSquare = Number(e.target.parentElement.id.split('-')[1]);
-			setBuildImages(prevState => {
-				const newArr = [...prevState];
+			setNewBuild(prevState => {
+				const newArr = [...newBuild.images];
 				newArr[droppedImage] = newArr[newSquare];
-				newArr[newSquare] = prevState[droppedImage];
+				newArr[newSquare] = newBuild.images[droppedImage];
 
-				return newArr;
+				return { ...prevState, images: newArr };
 			});
 		}
 
@@ -263,11 +262,11 @@ function Create() {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="flex flex-col gap-4 bg-base-400 w-full rounded-xl p-6">
-			<h1 className="text-2xl 2k:text-4xl font-bold text-slate-100 mb-4">Create Build</h1>
+		<MiddleContainer>
+			<PlanetHeader text={buildToEdit ? 'Edit Build' : 'Create Build'} />
 
 			{/* Build Image */}
-			{buildImages.length === 0 && (
+			{newBuild.images.length === 0 && (
 				<div className="flex items-center justify-center w-36 h-36 rounded-xl bg-base-300 border-dashed border-2 border-slate-400">
 					<p className="text-4xl">{<FiCameraOff />}</p>
 				</div>
@@ -275,21 +274,20 @@ function Create() {
 
 			{/* Image Carousel */}
 			<div className="flex flex-row flex-wrap gap-2 2k:gap-4">
-				{buildImages.length > 0 &&
-					buildImages.map((image, i) => {
+				{newBuild.images.length > 0 &&
+					newBuild.images.map((image, i) => {
 						return (
 							<div
 								key={i}
-								className="relative flex items-center justify-center w-36 h-36 2k:w-52 2k:h-52 overflow-hidden rounded-xl bg-base-300 border-dashed border-2 border-slate-700"
+								className="relative flex items-center justify-center w-36 h-36 2k:w-52 2k:h-52 hover:bg-base-100 overflow-hidden rounded-xl bg-base-300 border-dashed border-2 border-slate-700"
 								onDrop={e => drop(e)}
 								onDragOver={e => allowDrop(e)}
 								onDragLeave={e => dragExit(e)}
 								id={`square-` + i}
 								style={squareStyle(i)}
 							>
-								<button onClick={() => removeImage(i)} className="btn btn-circle btn-error btn-sm hover:bg-red-500 right-0 top-0 absolute z-50">
-									X
-								</button>
+								<Button onClick={() => removeImage(i)} text="X" css="hover:bg-red-500" color="btn-error" size="btn-sm" style="btn-circle" position="right-0 top-0 absolute z-50" />
+
 								<img id={i} src={image} className="w-full object-scale-down cursor-pointer" alt="" draggable={true} onDragStart={e => drag(e)} />
 							</div>
 						);
@@ -297,21 +295,21 @@ function Create() {
 				{uploadingImage && <Spinner1 />}
 			</div>
 
-			{/* Upload build iage */}
-			{buildImages.length < 6 && (
+			{/* Upload build image */}
+			{newBuild.images.length < 6 && (
 				<div className="flex flex-row gap-4 w-full">
 					<input type="file" id="build-image" max="6" accept=".jpg,.png,.jpeg" multiple className="file-input w-full max-w-xs mb-6 2k:file-input-lg" onChange={e => handleAddBuildImages(e)} />
 					<div className="flex flex-col">
-						<p className="text-slate-500 font-bold 2k:text-2xl">{buildImages.length > 6 && <span className="text-red-400 font-bold">Too many images!</span>} 6 Images max. Max size per image 5mb.</p>
+						<p className="text-slate-500 font-bold 2k:text-2xl">{newBuild.images.length > 6 && <span className="text-red-400 font-bold">Too many images!</span>} 6 Images max. Max size per image 5mb.</p>
 						<p className="text-slate-500 2k:text-2xl">For best results images should be 16/9</p>
 					</div>
 				</div>
 			)}
 
+			{/* Name */}
 			<div className="flex flex-row gap-20 2k:mb-6">
-				{/* Name */}
 				<div className="flex flex-row gap-2 items-center">
-					<input onChange={setName} type="text" placeholder="Build Name" className="input input-bordered w-96 max-w-lg 2k:input-lg 2k:text-2xl" maxLength="50" />
+					<input onChange={setName} type="text" placeholder="Build Name" defaultValue={buildToEdit && buildToEdit.name} className="input input-bordered w-96 max-w-lg 2k:input-lg 2k:text-2xl" maxLength="50" />
 					<p className="text-slate-400 italic 2k:text-2xl">{nameLength}</p>
 				</div>
 
@@ -330,53 +328,25 @@ function Create() {
 				{/* Used Mods */}
 				<div className="flex flex-row items-center gap-6 text-slate-400">
 					<p className="2k:text-2xl">Uses Mods</p>
-					<input onChange={setModsUsed} type="checkbox" className="checkbox 2k:checkbox-lg" />
+					<input onChange={setModsUsed} checked={buildToEdit ? buildToEdit.modsUsed : false} type="checkbox" className="checkbox 2k:checkbox-lg" />
 				</div>
 			</div>
 
 			{/* Description */}
 			<div className="flex flex-row gap-2 items-center w-full">
-				<textarea onChange={setDesc} className="textarea textarea-bordered w-3/4 2k:text-2xl 2k:mb-4" placeholder="Description" maxLength="3000" rows="4"></textarea>
+				<textarea onChange={setDesc} className="textarea textarea-bordered w-3/4 2k:text-2xl 2k:mb-4" defaultValue={buildToEdit && buildToEdit.description} placeholder="Description" maxLength="3000" rows="4"></textarea>
 				<p className="text-slate-400 italic 2k:text-2xl">{descLength}</p>
 			</div>
 
 			{/* Video */}
 			<div className="flex flex-row gap-2 items-center 2k:mb-8">
-				<input onChange={setVideo} type="text" placeholder="Youtube Link (optional)" className="input 2k:input-lg input-bordered w-96 max-w-lg mb-6 2k:text-2xl" />
+				<input onChange={setVideo} type="text" defaultValue={buildToEdit && buildToEdit.video} placeholder="Youtube Link (optional)" className="input 2k:input-lg input-bordered w-96 max-w-lg mb-6 2k:text-2xl" />
 				<p className="italic text-slate-500 2k:text-2xl">Eg. https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>
 			</div>
 
 			{/* Build Types */}
 			<h3 className="text-slate-400 text-xl 2k:text-3xl">Build Type (3 max)</h3>
-			<div className="btn-group mb-6 2k:mb-10">
-				<button onClick={e => setTypes(`Interplanetary`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Interplanetary') && 'btn-active'}`}>
-					Interplanetary
-				</button>
-				<button onClick={e => setTypes(`Interstellar`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Interstellar') && 'btn-active'}`}>
-					Interstellar
-				</button>
-				<button onClick={e => setTypes(`Satellite`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Satellite') && 'btn-active'}`}>
-					Satellite
-				</button>
-				<button onClick={e => setTypes(`Space Station`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Space Station') && 'btn-active'}`}>
-					Space Station
-				</button>
-				<button onClick={e => setTypes(`Lander`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Lander') && 'btn-active'}`}>
-					Lander
-				</button>
-				<button onClick={e => setTypes(`Rover`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Rover') && 'btn-active'}`}>
-					Rover
-				</button>
-				<button onClick={e => setTypes(`SSTO`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('SSTO') && 'btn-active'}`}>
-					SSTO
-				</button>
-				<button onClick={e => setTypes(`Spaceplane`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Spaceplane') && 'btn-active'}`}>
-					Spaceplane
-				</button>
-				<button onClick={e => setTypes(`Probe`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${newBuild.type.includes('Probe') && 'btn-active'}`}>
-					Probe
-				</button>
-			</div>
+			<BuildTypes typesArr={newBuild.type} setBuildState={setNewBuild} />
 
 			{/* Tags */}
 			<div className="flex flex-row gap-4 items-center">
@@ -405,14 +375,18 @@ function Create() {
 					How?
 				</label>
 			</div>
-			<textarea onChange={setBuild} className="textarea textarea-bordered 2k:text-2xl mb-6 w-full" placeholder="Paste..." rows="4"></textarea>
+			<textarea onChange={setBuild} defaultValue={buildToEdit && buildToEdit.build} className="textarea textarea-bordered 2k:text-2xl mb-6 w-full" placeholder="Paste..." rows="4"></textarea>
 
-			<button className="btn btn-primary 2k:btn-lg 2k:text-2xl" onClick={submitBuild}>
-				Submit
-			</button>
-
-			<HowToCopyBuildModal />
-		</div>
+			{buildToEdit ? (
+				<div className="flex flex-row gap-4 2k:gap-10">
+					<Button text="Save" icon="save" color="btn-success" onClick={() => updateBuild(newBuild)} />
+					<Button htmlFor="cancel-build-edit" text="Cancel" icon="cancel" color="btn-warning" />
+				</div>
+			) : (
+				<Button text="Submit" color="btn-primary" onClick={submitBuild} icon="upload" />
+			)}
+			<CancelBuildEditModal />
+		</MiddleContainer>
 	);
 }
 

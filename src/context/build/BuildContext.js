@@ -11,7 +11,6 @@ export const BuildProvider = ({ children }) => {
 		editingBuild: false,
 		uploadingBuild: false,
 		savingBuild: false,
-		cancelEdit: false,
 		deletingCommentId: '',
 		deletingComment: false,
 		loadedBuild: null,

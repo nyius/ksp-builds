@@ -1,8 +1,9 @@
 import React from 'react';
-import VerticalTypeLink from '../../pages/index/VerticalTypeLink';
-import VerticalVersionLink from '../../pages/index/VerticalVersionLink';
+import VerticalTypeLink from '../../../pages/index/VerticalTypeLink';
+import VerticalVersionLink from '../../../pages/index/VerticalVersionLink';
 import LeftBarTitle from './LeftBarTitle';
-import useFilters from '../../context/filters/FiltersActions';
+import useFilters from '../../../context/filters/FiltersActions';
+import Button from '../../buttons/Button';
 
 function IndexLeftBar({ text }) {
 	const { resetFilters } = useFilters();
@@ -29,9 +30,7 @@ function IndexLeftBar({ text }) {
 				<ul className="menu w-full mb-6">
 					<VerticalVersionLink text="1.0.0" />
 				</ul>
-				<button onClick={resetFilters} className="btn w-full bg-base-600 2k:text-2xl 2k:btn-lg">
-					Reset
-				</button>
+				<Button icon="reset" text="Reset" onClick={resetFilters} color="bg-base-600" size="w-full" />
 			</div>
 		</>
 	);

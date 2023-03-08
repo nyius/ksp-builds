@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { cloneDeep } from 'lodash';
 import { toast } from 'react-toastify';
 import { AiFillCamera } from 'react-icons/ai';
+import { useNavigate } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import BuildsContext from '../../context/builds/BuildsContext';
@@ -12,14 +13,23 @@ import useAuth from '../../context/auth/AuthActions';
 //---------------------------------------------------------------------------------------------------//
 import BuildCard from '../../components/buildCard/BuildCard';
 import Spinner1 from '../../components/spinners/Spinner1';
-import Sort from '../index/Sort';
+import Sort from '../../components/sort/Sort';
+import Button from '../../components/buttons/Button';
+import CantFind from '../../components/cantFind/CantFind';
+import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
+import PlanetHeader from '../../components/header/PlanetHeader';
 
+/**
+ * Displays the users own profile
+ * @returns
+ */
 function Profile() {
+	const navigate = useNavigate();
 	const { typeFilter, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
 	const { fetchedBuilds, loadingBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const { user, authLoading, editingProfile } = useContext(AuthContext);
 	//---------------------------------------------------------------------------------------------------//
-	const { fetchBuilds } = useBuilds();
+	const { fetchBuilds, setBuildsLoading, clearFetchedBuilds } = useBuilds();
 	const { setEditingProfile, updateUserDbBio, uploadProfilePicture, updateUserDbProfilePic } = useAuth();
 	const { filterBuilds, resetFilters } = useFilters();
 	//---------------------------------------------------------------------------------------------------//
@@ -33,11 +43,14 @@ function Profile() {
 
 	useEffect(() => {
 		resetFilters();
+		clearFetchedBuilds();
 
 		if (!authLoading) {
 			if (user?.username && user?.builds.length > 0) {
 				fetchBuilds(user.builds);
 				setBioLength(user.bio.length);
+			} else {
+				setBuildsLoading(false);
 			}
 		}
 	}, []);
@@ -85,11 +98,11 @@ function Profile() {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="flex flex-col gap-4 w-full rounded-xl p-6">
-			<h1 className="text-2xl 2k:text-4xl font-bold text-slate-100 mb-4">Profile</h1>
+		<MiddleContainer color="none">
+			<PlanetHeader text="Profile" />
 			{!authLoading && user.username && (
 				<>
-					<div className="flex flex-row gap-20 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
+					<div className="flex flex-row gap-20 items-center mb-10 bg-base-400 border-2 border-dashed border-slate-700 rounded-xl p-6 2k:p-12">
 						{/* Profile Picture */}
 						<div className="indicator">
 							<div className="avatar">
@@ -107,7 +120,7 @@ function Profile() {
 						<div className="flex flex-col gap-3 2k:gap-6 w-full">
 							{/* Username */}
 							<p className="text-xl 2k:text-3xl font-thin">
-								<span className="text-slate-500 text-xl 2k:text-2xl italic">username: </span> {user.username}
+								<span className="text-slate-500 text-xl 2k:text-2xl italic">Username: </span> {user.username}
 							</p>
 
 							{/* Created */}
@@ -123,12 +136,8 @@ function Profile() {
 
 									{/* Buttons */}
 									<div className="flex flex-row gap-4">
-										<button onClick={handleSubmitBioUpdate} className="btn w-fit">
-											Save
-										</button>
-										<button onClick={() => setEditingProfile(false)} className="btn w-fit">
-											Cancel
-										</button>
+										<Button text="Save" icon="save" onClick={handleSubmitBioUpdate} size="w-fit" />
+										<Button text="Cancel" icon="cancel" onClick={() => setEditingProfile(false)} size="w-fit" />
 									</div>
 								</>
 							) : (
@@ -138,9 +147,7 @@ function Profile() {
 										<p className="text-slate-500 text-xl 2k:text-2xl italic">Bio: </p>
 										{user.bio === '' ? <p className="italic text-slate-500 text-xl 2k:text-3xl">No bio yet</p> : <p className="text-xl 2k:text-3xl"> {user.bio} </p>}
 									</div>
-									<button onClick={() => setEditingProfile(true)} className="btn btn-sm 2k:btn-md 2k:text-2xl w-fit mt-3 2k:mt-6 mb-4">
-										Edit Bio
-									</button>
+									<Button text="Edit Bio" icon="edit" onClick={() => setEditingProfile(true)} size="btn-sm 2k:btn-md w-fit" margin="mt-3 2k:mt-6 mb-4" />
 								</div>
 							)}
 							<p className="text-xl 2k:text-3xl">
@@ -162,9 +169,9 @@ function Profile() {
 						) : (
 							<>
 								{fetchedBuilds.length === 0 ? (
-									<div className="flex flex-row w-full justify-center items-center">
-										<p>No builds found :(</p>
-									</div>
+									<CantFind text="You have no builds yet!">
+										<Button text="Create your first" icon="plus" onClick={() => navigate('/create')} color="btn-primary" />
+									</CantFind>
 								) : (
 									<>
 										{sortedBuilds.map((build, i) => {
@@ -177,7 +184,7 @@ function Profile() {
 					</div>
 				</>
 			)}
-		</div>
+		</MiddleContainer>
 	);
 }
 

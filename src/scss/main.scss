@@ -19,6 +19,12 @@ body {
 	// }
 }
 
+:root {
+	--toastify-color-success: #36d399 !important;
+	--toastify-color-error: #f87272 !important;
+	--toastify-color-dark: #0c0e12 !important;
+}
+
 #root {
 	@import './imports';
 	min-height: 100vh;

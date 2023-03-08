@@ -3,16 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { MdOutlineNotificationsNone } from 'react-icons/md';
 import { auth } from '../../firebase.config';
 import { toast } from 'react-toastify';
+import { TiPlusOutline } from 'react-icons/ti';
 //---------------------------------------------------------------------------------------------------//
-import NewGoogleAccountModal from '../modals/NewGoogleAccountModal';
+import NewGoogleAccountModal from '../modals/NewAccountModal';
 import LoginModal from '../modals/LoginModal';
 import CreateBuildAdmin from '../buttons/CreateBuildAdmin';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 //---------------------------------------------------------------------------------------------------//
 import Logo from '../../assets/logo_light_full.png';
+import Button from '../buttons/Button';
 import LogoIcon from '../../assets/logo_light_icon.png';
-import { TiPlusOutline } from 'react-icons/ti';
 
 function NavBar() {
 	const { user, dispatchAuth, authLoading } = useContext(AuthContext);
@@ -72,12 +73,7 @@ function NavBar() {
 
 				<ul className="menu menu-horizontal px-6 gap-3 2k:gap-6">
 					<li>
-						<a onClick={handleCreateNavigate} className="btn btn-accent 2k:btn-lg text-white 2k:text-2xl hidden sm:flex">
-							Create{' '}
-							<span className="text-xl 2k:text-2xl">
-								<TiPlusOutline />
-							</span>
-						</a>
+						<Button onClick={handleCreateNavigate} color="btn-accent" css="text-white hidden sm:flex" text="Create" icon="plus" />
 					</li>
 					<li>
 						<CreateBuildAdmin />
@@ -90,7 +86,7 @@ function NavBar() {
 					''
 				) : (
 					<>
-						{user?.displayName && (
+						{user?.username && (
 							<div className="btn btn-circle 2k:btn-lg avatar">
 								<p className="text-4xl">
 									<MdOutlineNotificationsNone />
@@ -98,7 +94,7 @@ function NavBar() {
 							</div>
 						)}
 						<div className="dropdown dropdown-end">
-							{user?.displayName ? (
+							{user?.username ? (
 								<>
 									<label tabIndex={0} className="btn btn-circle 2k:btn-lg avatar">
 										<div className="w-10 2k:w-20 rounded-full">
@@ -120,21 +116,12 @@ function NavBar() {
 									</ul>
 								</>
 							) : (
-								<label htmlFor="login-modal" className="btn 2k:btn-lg 2k:text-2xl">
-									Login
-								</label>
+								<Button htmlFor="login-modal" icon="login" text="login" />
 							)}
 						</div>
 					</>
 				)}
 			</div>
-
-			{/* ------------------ Modals ----------------- */}
-			{/* Login */}
-			<LoginModal />
-
-			{/* New Google Account */}
-			<NewGoogleAccountModal />
 		</div>
 	);
 }

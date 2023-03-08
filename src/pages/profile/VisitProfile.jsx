@@ -12,8 +12,10 @@ import useBuilds from '../../context/builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
 import Spinner1 from '../../components/spinners/Spinner1';
 import BuildCard from '../../components/buildCard/BuildCard';
-import Sort from '../index/Sort';
-import PlanetExplosion from '../../assets/planet_explosion.png';
+import Sort from '../../components/sort/Sort';
+import CantFind from '../../components/cantFind/CantFind';
+import Button from '../../components/buttons/Button';
+import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 
 function VisitProfile() {
 	const usersId = useParams().id;
@@ -57,7 +59,7 @@ function VisitProfile() {
 		// If we find a profile
 		if (fetchedUserProfile) {
 			return (
-				<div className="flex flex-col gap-4 w-full rounded-xl p-6">
+				<MiddleContainer color="none">
 					<div className="flex flex-row gap-14 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
 						{/* Profile Picture */}
 						<div className="avatar">
@@ -109,17 +111,13 @@ function VisitProfile() {
 							</>
 						)}
 					</div>
-				</div>
+				</MiddleContainer>
 			);
 		} else {
 			return (
-				<div className="flex flex-col gap-4 w-full h-fit rounded-xl p-12 2k:p-12 bg-base-900 justify-center items-center">
-					<h1 className="text-2xl 2k:text-4xl font-bold">Oops.. user not found</h1>
-					<button className="btn 2k:text-2xl" onClick={() => navigate('/')}>
-						Return Home
-					</button>
-					<img className="w-1/2" src={PlanetExplosion} alt="Crashed Spaceship" />
-				</div>
+				<CantFind text="Oops.. user not found">
+					<Button color="btn-primary" text="Return home" icon="left" onClick={() => navigate('/')} />
+				</CantFind>
 			);
 		}
 	}

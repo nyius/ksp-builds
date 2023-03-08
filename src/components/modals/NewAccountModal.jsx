@@ -1,33 +1,40 @@
 import React, { useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { v4 as uuidv4 } from 'uuid';
-import { auth, db, storage } from '../../firebase.config';
+import { db } from '../../firebase.config';
 import { toast } from 'react-toastify';
-import LogoIcon from '../../assets/logo_light_icon.png';
+import Astrobiff from '../../assets/astrobiff.png';
 import Spinner1 from '../spinners/Spinner1';
 import AuthContext from '../../context/auth/AuthContext';
 import useAuth from '../../context/auth/AuthActions';
-import { uploadImage } from '../../utilities/uploadImage';
+import Button from '../buttons/Button';
+import TextInput from '../input/TextInput';
 
-function NewGoogleAccountModal() {
+function NewAccountModal() {
+	const navigate = useNavigate();
 	const [newUsername, setNewUsername] = useState('');
 	const [uploadingImage, setUploadingImage] = useState(false);
-	const [newProfilePicture, setNewProfilePicture] = useState(LogoIcon);
+	const [newProfilePicture, setNewProfilePicture] = useState(Astrobiff);
 
-	const { user, newGoogleSignup } = useContext(AuthContext);
-	const { setNewGoogleSignup, updateUserState, uploadProfilePicture, updateUserDbProfilePic } = useAuth();
-	const newGoogleAccountModal = document.querySelector('#new-google-login-modal');
+	const { user, newSignup } = useContext(AuthContext);
+	const { setNewSignup, updateUserState, uploadProfilePicture, updateUserDbProfilePic } = useAuth();
+	const newAccountModal = document.querySelector('#new-account-modal');
 
 	/**
-	 * Handles finalizing the account creation for google users
+	 * Handles finalizing the account creation
 	 */
-	const finalizeGoogleAccount = e => {
+	const finalizeAccount = e => {
 		e.preventDefault();
 
 		if (!newUsername || newUsername === '') {
 			console.log(`No username entered!`);
 			toast.error('You need a username!');
+			return;
+		}
+
+		if (newUsername.length > 50) {
+			toast.error('Username is too long! Must be less than 50 characters');
+			console.log(`Username too long`);
 			return;
 		}
 
@@ -54,7 +61,7 @@ function NewGoogleAccountModal() {
 
 					await updateDoc(doc(db, 'users', user.uid), updateUser)
 						.then(() => {
-							setNewGoogleSignup(false);
+							setNewSignup(false);
 							updateUserState(updateUser);
 							toast.success('Account Created!');
 						})
@@ -69,17 +76,15 @@ function NewGoogleAccountModal() {
 					};
 
 					// this adds the user to the 'usernames' db. This is so we can check if a username is already taken or not, quickly and simply
-					await setDoc(doc(db, 'usernames', username), newUsername)
-						.then(() => {
-							console.log('created new usernames entry');
-						})
-						.catch(err => {
-							console.log(err);
-							toast.error('Something went wrong :(');
-						});
+					await setDoc(doc(db, 'usernames', username), newUsername).catch(err => {
+						console.log(err);
+						toast.error('Something went wrong :(');
+					});
 
 					// Update the userProfiles DB. This is for visiting a users page so we don't have to pull all sensitive data
 					await updateDoc(doc(db, 'userProfiles', user.uid), updateUser);
+
+					navigate('/');
 				}
 			} catch (error) {
 				console.log(error);
@@ -108,43 +113,45 @@ function NewGoogleAccountModal() {
 			});
 	};
 
-	// Check when we get a new google account setup, so we can show/hide the modal to enter a new username ------------------------------------------------------------------------------------//
+	// Check when we get a new account setup, so we can show/hide the modal to enter a new username ------------------------------------------------------------------------------------//
 	useEffect(() => {
-		if (newGoogleSignup) {
-			if (newGoogleAccountModal) {
-				newGoogleAccountModal.checked = true;
+		if (newSignup) {
+			if (newAccountModal) {
+				newAccountModal.checked = true;
 			}
 		} else {
-			if (newGoogleAccountModal) {
-				newGoogleAccountModal.checked = false;
+			if (newAccountModal) {
+				newAccountModal.checked = false;
 			}
 		}
-	}, [newGoogleSignup]);
+	}, [newSignup]);
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			{/* New Google Account */}
-			<input type="checkbox" id="new-google-login-modal" className="modal-toggle" />
+			{/* New  Account */}
+			<input type="checkbox" id="new-account-modal" className="modal-toggle" />
 			<div className="modal">
 				<div className="modal-box">
 					<div className="font-bold alert dot-bg text-xl 2k:text-3xl mb-4">
 						Almost done...
-						<img className="w-12 2k:w-24" src={LogoIcon} alt="" />
+						<img className="w-12 2k:w-24" src={Astrobiff} alt="" />
 					</div>
 					<p className="py-4 mb-4 2k:mb-8 text-center text-xl 2k:text-3xl">Please take a second to finalize your account.</p>
 					<form action="" className="mb-10">
 						<label htmlFor="usernam" className="text-xl 2k:text-2xl text-slate-400 italic">
 							Username
 						</label>
-						<input
-							className="input 2k:input-lg 2k:text-2xl bg-base-200 mt-2 mb-6 2k:mb-10 w-full"
-							type="text"
+						<TextInput
 							id="username"
+							maxLength="50"
+							size="w-full"
+							margin="mt-2 mb-6 2k:mb-10"
+							color="bg-base-200"
 							onChange={e => {
 								setNewUsername(e.target.value);
 							}}
-							required
+							required={true}
 						/>
 
 						<label htmlFor="profile-picture" className="w-full flex mb-2 text-xl 2k:text-2xl text-slate-400 italic">
@@ -157,13 +164,11 @@ function NewGoogleAccountModal() {
 						</div>
 					</form>
 
-					<button className="btn 2k:btn-lg 2k:text-2xl btn-primary mt-6" onClick={e => finalizeGoogleAccount(e)}>
-						Create
-					</button>
+					<Button icon="save" text="Create" onClick={e => finalizeAccount(e)} color="btn-primary" margin="mt-6" />
 				</div>
 			</div>
 		</>
 	);
 }
 
-export default NewGoogleAccountModal;
+export default NewAccountModal;

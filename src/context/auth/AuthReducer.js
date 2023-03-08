@@ -90,10 +90,10 @@ const AuthReducer = (state, action) => {
 				...state,
 				editingProfile: action.payload,
 			};
-		case 'SET_NEW_GOOGLE_SIGNUP':
+		case 'SET_NEW_SIGNUP':
 			return {
 				...state,
-				newGoogleSignup: action.payload,
+				newSignup: action.payload,
 			};
 		case 'SET_CANCEL_EDIT_PROFILE':
 			return {

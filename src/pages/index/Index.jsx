@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import LeftBar from '../../components/leftBar/LeftBar';
-import RightBar from './RightBar';
+import LeftBar from '../../components/containers/leftBar/LeftBar';
+import RightBar from '../../components/containers/rightBar/RightBar';
 import useBuilds from '../../context/builds/BuildsActions';
 import Builds from './Builds';
 

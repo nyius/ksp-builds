@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
-import BuildContext from '../../context/build/BuildContext';
-import Spinner1 from '../spinners/Spinner1';
+import BuildContext from '../../../context/build/BuildContext';
+import Spinner1 from '../../spinners/Spinner1';
 import LeftBarTitle from './LeftBarTitle';
-import UsernameLink from '../buttons/UsernameLink';
+import UsernameLink from '../../buttons/UsernameLink';
 
 function BuildLeftBarContent() {
 	const { loadingBuild, loadedBuild } = useContext(BuildContext);

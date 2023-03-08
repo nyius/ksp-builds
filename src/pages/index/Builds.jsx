@@ -7,13 +7,14 @@ import FiltersContext from '../../context/filters/FiltersContext';
 import useFilters from '../../context/filters/FiltersActions';
 import useBuilds from '../../context/builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
-import Sort from './Sort';
+import Sort from '../../components/sort/Sort';
 import LoadMoreBuilds from '../../components/buttons/LoadMoreBuilds';
 import Spinner1 from '../../components/spinners/Spinner1';
 import BuildCard from '../../components/buildCard/BuildCard';
 import SearchBar from '../../components/search/SearchBar';
 import Filter from '../../components/filters/Filter';
 import PlanetExplosion from '../../assets/planet_explosion.png';
+import CantFind from '../../components/cantFind/CantFind';
 
 function Builds() {
 	const { typeFilter, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
@@ -53,10 +54,7 @@ function Builds() {
 				) : (
 					<>
 						{fetchedBuilds.length === 0 ? (
-							<div className="col-start-1 col-end-4 flex flex-col gap-4 w-full h-fit rounded-xl p-12 2k:p-12 bg-base-900 justify-center items-center">
-								<h1 className="text-2xl 2k:text-4xl font-bold">No builds found :(</h1>
-								<img className="w-1/2" src={PlanetExplosion} alt="Crashed Spaceship" />
-							</div>
+							<CantFind text="No builds found :("></CantFind>
 						) : (
 							<>
 								{sortedBuilds.map((build, i) => {

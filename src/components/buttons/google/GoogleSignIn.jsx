@@ -3,9 +3,10 @@ import googleLogin from '../../../utilities/googleLogin';
 import { FcGoogle } from 'react-icons/fc';
 import useAuth from '../../../context/auth/AuthActions';
 import { toast } from 'react-toastify';
+import Button from '../Button';
 
 function GoogleSignIn() {
-	const { setNewGoogleSignup } = useAuth();
+	const { setNewSignup } = useAuth();
 
 	/**
 	 * Handles signing in
@@ -16,7 +17,7 @@ function GoogleSignIn() {
 
 			// if we have a new google user, set signUp to true so that we can display the modal to allow them create a username/profile picture
 			if (signinStatus === 'newUser') {
-				setNewGoogleSignup(true);
+				setNewSignup(true);
 			}
 		} catch (error) {
 			console.log(error);
@@ -24,12 +25,7 @@ function GoogleSignIn() {
 		}
 	};
 
-	return (
-		<div className="btn 2k:btn-lg 2k:text-2xl" onClick={() => signIn()}>
-			<FcGoogle />
-			<span className="ml-2">Login with Google </span>
-		</div>
-	);
+	return <Button htmlFor="login-modal" icon="google" text="Login with Google" onClick={() => signIn()} />;
 }
 
 export default GoogleSignIn;

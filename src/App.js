@@ -3,24 +3,29 @@ import { ToastContainer } from 'react-toastify';
 
 import ContextsProvider from './context/ContextProvider';
 import PrivateRoute from './routes/PrivateRoute';
+import PublicRoute from './routes/PublicRoute';
 import backgroundplanet from './assets/planet.png';
 //---------------------------------------------------------------------------------------------------//
 import { Index, SignUp, Build, NotFound, Create, Profile, Privacy, Terms, VisitProfile } from './pages';
-import RightBar from './pages/index/RightBar';
+import RightBar from './components/containers/rightBar/RightBar';
 //---------------------------------------------------------------------------------------------------//
 import { Navbar, Footer } from './components';
 import Stars from './components/stars/Stars';
-import LeftBar from './components/leftBar/LeftBar';
+import LeftBar from './components/containers/leftBar/LeftBar';
+import Modals from './components/modals/Modals';
 //---------------------------------------------------------------------------------------------------//
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
-Edit a build
+youtube video bug???
 notifications
-update profile picture
+user can upvote their own build
+login check if account exists (email vs google signup)
+login modal closing after signin with email
+proper text edior for comments/bio/build desc/etc
+something breaks when going to your profile after just making an account (something to do with seconds)
 search that searches the database, not just loaded builds
-email account
 privary policy
 terms and conditions
 News feed
@@ -48,7 +53,16 @@ function App() {
 								<div className="col-start-1 col-end-7 md:col-start-2 lg:col-end-6">
 									<Routes>
 										<Route exact path="/" element={<Index />} />
-										<Route exact path="/sign-up" element={<SignUp />} />
+										<Route exact path="/builds/:id" element={<Index />} />
+										<Route
+											exact
+											path="/sign-up"
+											element={
+												<PublicRoute>
+													<SignUp />
+												</PublicRoute>
+											}
+										/>
 										<Route
 											exact
 											path="/create"
@@ -77,6 +91,7 @@ function App() {
 								<RightBar />
 							</div>
 						</div>
+						<Modals />
 						<Footer />
 					</div>
 				</div>

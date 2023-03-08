@@ -7,3 +7,4 @@ export { default as Profile } from './profile/Profile.jsx';
 export { default as Privacy } from './privacy/Privacy.jsx';
 export { default as Terms } from './terms/Terms.jsx';
 export { default as VisitProfile } from './profile/VisitProfile.jsx';
+export { default as Settings } from './settings/Settings.jsx';

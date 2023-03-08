@@ -102,7 +102,7 @@ function Profile() {
 			<PlanetHeader text="Profile" />
 			{!authLoading && user.username && (
 				<>
-					<div className="flex flex-row gap-20 items-center mb-10 bg-base-400 border-2 border-dashed border-slate-700 rounded-xl p-6 2k:p-12">
+					<div className="flex flex-col md:flex-row gap-20 items-center mb-10 bg-base-400 border-2 border-dashed border-slate-700 rounded-xl p-6 2k:p-12">
 						{/* Profile Picture */}
 						<div className="indicator">
 							<div className="avatar">

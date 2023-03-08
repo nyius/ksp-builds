@@ -4,6 +4,7 @@ import DeleteBuildModal from './DeleteBuildModal';
 import HowToCopyBuildModal from './HowToCopyBuildModal';
 import HowToPasteBuildModal from './HowToPasteModal';
 import LoginModal from './LoginModal';
+import ResetPassword from './ResetPassword';
 import NewAccountModal from './NewAccountModal';
 
 function Modals() {
@@ -14,6 +15,7 @@ function Modals() {
 			<HowToPasteBuildModal />
 			<LoginModal />
 			<NewAccountModal />
+			<ResetPassword />
 		</>
 	);
 }

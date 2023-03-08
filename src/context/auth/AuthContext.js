@@ -118,6 +118,7 @@ export const AuthProvider = ({ children }) => {
 		newSignup: false,
 		fetchingProfile: false,
 		fetchedUserProfile: null,
+		resetPasswordState: false,
 	};
 
 	// Set up the reducer

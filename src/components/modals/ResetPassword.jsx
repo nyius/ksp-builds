@@ -1,0 +1,58 @@
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Button from '../buttons/Button';
+import PlanetHeader from '../header/PlanetHeader';
+import TextInput from '../input/TextInput';
+import { toast } from 'react-toastify';
+import resetPassword from '../../utilities/resetPassword';
+import AuthContext from '../../context/auth/AuthContext';
+import useAuth from '../../context/auth/AuthActions';
+
+function ResetPassword() {
+	const navigate = useNavigate();
+	const [email, setEmail] = useState('');
+	const [emailSent, setEmailSent] = useState('');
+	const { resetPasswordState } = useContext(AuthContext);
+	const { setResetPassword } = useAuth();
+
+	/**
+	 * Handles a user starting the login process
+	 * @returns
+	 */
+	const handleResetPassword = async () => {
+		if (!email) {
+			console.log(`No email`);
+			toast.error('You forgot to enter a email');
+			return;
+		}
+
+		const status = await resetPassword(email);
+		setEmailSent(true);
+		setResetPassword(false);
+	};
+
+	if (resetPasswordState) {
+		return (
+			<>
+				{/* Login */}
+				<input type="checkbox" checked={resetPasswordState} id="reset-password" className="modal-toggle" />
+				<div className="modal">
+					<div className="modal-box relative">
+						<Button htmlFor="reset-password" onClick={() => setResetPassword(false)} style="btn-circle" size="absolute right-2 top-2 z-50" text="X" />
+						<PlanetHeader text="Reset Password" />
+
+						{/* Email Login */}
+						<form onSubmit={handleResetPassword} className="mb-4">
+							<p className="text-xl 2k:text-3xl">Email</p>
+							<TextInput onChange={e => setEmail(e.target.value)} id="username" size="w-full" margin="mt-2 mb-2 2k:mb-4" color="bg-base-200" required={true} type="email" />
+
+							<Button htmlFor="login-modal" onClick={handleResetPassword} text="Send" icon="email" margin="mt-4 2k:mt-10 mb-5 2k:mb-10" />
+						</form>
+					</div>
+				</div>
+			</>
+		);
+	}
+}
+
+export default ResetPassword;

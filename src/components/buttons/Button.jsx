@@ -1,12 +1,13 @@
 import React from 'react';
 import { GiCancel } from 'react-icons/gi';
 import { ImCloudUpload } from 'react-icons/im';
-import { FaSave } from 'react-icons/fa';
+import { FaSave, FaUserAstronaut, FaCogs, FaHome } from 'react-icons/fa';
+import { FiLogOut } from 'react-icons/fi';
 import { TiExport, TiPlusOutline } from 'react-icons/ti';
 import { RiDeleteBin2Fill, RiEditFill, RiLoginCircleLine } from 'react-icons/ri';
 import { BsFillPatchQuestionFill, BsFillArrowDownSquareFill, BsFillArrowLeftSquareFill } from 'react-icons/bs';
 import { BiCommentAdd, BiReset } from 'react-icons/bi';
-import { MdOutlineDoneOutline } from 'react-icons/md';
+import { MdOutlineDoneOutline, MdEmail, MdSettingsInputComponent } from 'react-icons/md';
 import { FcGoogle } from 'react-icons/fc';
 
 /**
@@ -40,10 +41,15 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 					{icon === 'plus' && <TiPlusOutline />}
 					{icon === 'done' && <MdOutlineDoneOutline />}
 					{icon === 'login' && <RiLoginCircleLine />}
+					{icon === 'logout' && <FiLogOut />}
 					{icon === 'google' && <FcGoogle />}
 					{icon === 'reset' && <BiReset />}
 					{icon === 'down' && <BsFillArrowDownSquareFill />}
 					{icon === 'left' && <BsFillArrowLeftSquareFill />}
+					{icon === 'email' && <MdEmail />}
+					{icon === 'head' && <FaUserAstronaut />}
+					{icon === 'settings' && <MdSettingsInputComponent />}
+					{icon === 'home' && <FaHome />}
 				</span>
 			)}
 			{text}

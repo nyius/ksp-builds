@@ -5,8 +5,6 @@ import { auth } from '../../firebase.config';
 import { toast } from 'react-toastify';
 import { TiPlusOutline } from 'react-icons/ti';
 //---------------------------------------------------------------------------------------------------//
-import NewGoogleAccountModal from '../modals/NewAccountModal';
-import LoginModal from '../modals/LoginModal';
 import CreateBuildAdmin from '../buttons/CreateBuildAdmin';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
@@ -45,7 +43,7 @@ function NavBar() {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="navbar bg-base-300 mb-5 fixed z-101">
+		<div className="navbar bg-base-300 mb-5 w-full fixed z-101">
 			<div className="flex-1">
 				{/* Logo  */}
 				<img src={Logo} className="h-10 2k:h-20 btn hidden sm:block" alt="" onClick={() => navigate('/')} />
@@ -57,27 +55,15 @@ function NavBar() {
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
 						</svg>
 					</label>
-					<ul tabIndex={1} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-200 rounded-box w-52">
-						<li>
-							<a className=" text-2xl" onClick={() => navigate('/')}>
-								Home
-							</a>
-						</li>
-						<li>
-							<a className=" text-2xl" onClick={handleCreateNavigate}>
-								Create <TiPlusOutline />
-							</a>
-						</li>
+					<ul tabIndex={1} className="mt-3 p-2 gap-2 shadow menu menu-compact dropdown-content bg-base-500 rounded-box w-96">
+						<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="home" text="Home" onClick={() => navigate('/')} />
+						<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="plus" text="Create" onClick={handleCreateNavigate} />
 					</ul>
 				</div>
 
 				<ul className="menu menu-horizontal px-6 gap-3 2k:gap-6">
-					<li>
-						<Button onClick={handleCreateNavigate} color="btn-accent" css="text-white hidden sm:flex" text="Create" icon="plus" />
-					</li>
-					<li>
-						<CreateBuildAdmin />
-					</li>
+					<Button onClick={handleCreateNavigate} color="btn-accent" css="text-white hidden sm:flex" text="Create" icon="plus" />
+					<CreateBuildAdmin />
 				</ul>
 			</div>
 
@@ -87,7 +73,7 @@ function NavBar() {
 				) : (
 					<>
 						{user?.username && (
-							<div className="btn btn-circle 2k:btn-lg avatar">
+							<div className="btn btn-circle w-14 h-14 2k:w-20 2k:h-20 2k:btn-lg avatar">
 								<p className="text-4xl">
 									<MdOutlineNotificationsNone />
 								</p>
@@ -96,23 +82,15 @@ function NavBar() {
 						<div className="dropdown dropdown-end">
 							{user?.username ? (
 								<>
-									<label tabIndex={0} className="btn btn-circle 2k:btn-lg avatar">
+									<label tabIndex={0} className="btn btn-circle w-14 h-14 2k:w-20 2k:h-20 2k:btn-lg avatar">
 										<div className="w-10 2k:w-20 rounded-full">
 											<img src={user.profilePicture ? user.profilePicture : LogoIcon} />
 										</div>
 									</label>
-									<ul tabIndex={0} className="mt-3 p-2 2k:p-6 shadow menu menu-compact dropdown-content bg-base-200 rounded-box w-52 2k:w-96">
-										<li>
-											<a className="justify-between text-2xl md:text-lg 2k:text-4xl" onClick={() => navigate('/profile')}>
-												Profile
-											</a>
-										</li>
-										<li>
-											<a className="text-2xl md:text-lg 2k:text-4xl">Settings</a>
-										</li>
-										<li onClick={() => signOut()}>
-											<a className="text-2xl md:text-lg 2k:text-4xl">Logout</a>
-										</li>
+									<ul tabIndex={0} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box w-96">
+										<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Profile" onClick={() => navigate('/profile')} />
+										<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Settings" onClick={() => navigate('/settings')} />
+										<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="logout" text="Logout" onClick={() => signOut()} />
 									</ul>
 								</>
 							) : (

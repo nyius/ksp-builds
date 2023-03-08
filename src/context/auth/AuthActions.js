@@ -256,7 +256,18 @@ const useAuth = () => {
 		});
 	};
 
-	return { setNewSignup, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio, updateUserDbProfilePic, updateUserProfilePicture, fetchUsersProfile, uploadProfilePicture };
+	/**
+	 * Handles a user requesting to reset their password. Shows the reset password modal
+	 * @param {*} bool
+	 */
+	const setResetPassword = bool => {
+		dispatchAuth({
+			type: 'SET_RESET_PASSWORD',
+			payload: bool,
+		});
+	};
+
+	return { setNewSignup, setResetPassword, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio, updateUserDbProfilePic, updateUserProfilePicture, fetchUsersProfile, uploadProfilePicture };
 };
 
 export default useAuth;

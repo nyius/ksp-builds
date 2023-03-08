@@ -18,7 +18,8 @@ function SignUp() {
 		emailVerify: '',
 		password: '',
 	});
-	const { setNewSignup } = useAuth();
+	const [accountExists, setAccountExists] = useState(false);
+	const { setNewSignup, setResetPassword } = useAuth();
 
 	/**
 	 * Handles setting the newUser state to a changing field
@@ -75,8 +76,9 @@ function SignUp() {
 		if (signinStatus === 'newUser') {
 			setNewSignup(true);
 		}
-
-		toast.success('Account created!');
+		if (signinStatus.message === 'exists') {
+			setAccountExists(true);
+		}
 	};
 
 	//---------------------------------------------------------------------------------------------------//
@@ -96,6 +98,15 @@ function SignUp() {
 				<TextInput onChange={handleFieldChange} type="password" id="password" placeholder="Enter password" required={true} margin="mb-2" />
 				{newUser.password && newUser.password.length < 6 && <p className="text-xl 2k:text-2xl italic text-red-500">Password must be more than 6 characters</p>}
 
+				{accountExists && (
+					<div className="flex flex-col flex-wrap items-center gap-3 mt-4 2k:mt-8">
+						<p className="text-xl 2k:text-2xl text-red-300">Account already exists! Try signing in, or reset your password</p>
+						<div className="flex flex-row gap-4 2k:gap-6">
+							<Button htmlFor="login-modal" text="Login" color="btn-primary" icon="login" />
+							<Button onClick={() => setResetPassword(true)} text="Reset Password" color="btn-accent" icon="reset" />
+						</div>
+					</div>
+				)}
 				<Button text="Submit" margin="mb-10 2k:mb-16 mt-10 2k:mt-16" icon="save" color="btn-primary" onClick={() => signUp()} />
 			</form>
 		</MiddleContainer>

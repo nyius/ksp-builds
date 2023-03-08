@@ -8,7 +8,7 @@ function LeftBar() {
 	const currentPage = useLocation();
 
 	return (
-		<div className="hidden md:block sidebar-left bg-base-400 rounded-xl p-4 2k:p-10">
+		<div className="hidden md:block sidebar-left bg-base-400 rounded-xl p-4 2k:p-10 h-full">
 			{/* {currentPage.pathname.includes('build') && <BuildLeftBarContent />} */}
 			{/* {currentPage.pathname === '/' && <IndexLeftBar />} */}
 			<IndexLeftBar />

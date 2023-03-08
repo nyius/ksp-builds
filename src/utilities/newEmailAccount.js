@@ -17,8 +17,10 @@ import standardUserProfile from './standardUserProfile';
 const newEmailAccount = async newUser => {
 	try {
 		const userCredential = await createUserWithEmailAndPassword(auth, newUser.email, newUser.password).catch(err => {
-			console.log(err);
-			toast.error('Something went wrong with creating your account. Please try again');
+			if (err.code.includes('already-in-use')) {
+				toast.error('Account already exists!');
+				throw new Error('exists');
+			}
 			return;
 		});
 		const email = userCredential.user.email;
@@ -50,6 +52,7 @@ const newEmailAccount = async newUser => {
 		return 'newUser';
 	} catch (error) {
 		console.log(error);
+		return error;
 	}
 };
 

@@ -3,13 +3,18 @@ import { auth } from '../firebase.config';
 
 /**
  * Handles logging in with email
- * @param {*} username
+ * @param {*} email
  * @param {*} password
  */
-const emailLogin = async (username, password) => {
-	await signInWithEmailAndPassword(auth, username, password).catch(err => {
-		console.log(err);
-	});
+const emailLogin = async (email, password) => {
+	try {
+		await signInWithEmailAndPassword(auth, email, password).catch(err => {
+			console.log(err);
+			throw new Error(err.code);
+		});
+	} catch (error) {
+		return error.message;
+	}
 };
 
 export default emailLogin;

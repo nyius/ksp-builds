@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../buttons/Button';
 import useAuth from '../../context/auth/AuthActions';
+import UsernameLink from '../buttons/UsernameLink';
 
 function Notification({ i, notif }) {
 	const navigate = useNavigate();
@@ -11,9 +12,11 @@ function Notification({ i, notif }) {
 	/**
 	 * handles navigating to a notification
 	 */
-	const handleNavigate = () => {
-		if (notif.type === 'comment') {
-			navigate(`/build/${notif.buildId}`);
+	const handleNavigate = e => {
+		if (e.target.id !== 'userlink') {
+			if (notif.type === 'comment') {
+				navigate(`/build/${notif.buildId}`);
+			}
 		}
 	};
 
@@ -22,7 +25,7 @@ function Notification({ i, notif }) {
 		<div onClick={handleNavigate} className={`flex flex-col p-4 2k:p-6 rounded-xl border-2 border-solid border-slate-700 cursor-pointer relative hover:bg-slate-800`}>
 			<Button onClick={() => handleDeleteNotification(i, notif.id)} id="deleteBtn" icon="delete" style="btn-circle" size="absolute right-0 top-0 z-50 btn-sm" color="bg-error text-white" />
 			<div className="flex flex-row flex-wrap place-content-between mb-4 2k:mb-8">
-				<p className="text-xl 2k:text-2xl font-bold text-white">{notif.username}</p>
+				<UsernameLink username={notif.username} uid={notif.uid} />
 				<p className="italic text-lg 2k:text-xl text-slate-400">{timestamp}</p>
 			</div>
 			{notif.type === 'comment' && (

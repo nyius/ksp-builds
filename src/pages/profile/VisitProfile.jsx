@@ -98,9 +98,7 @@ function VisitProfile() {
 						) : (
 							<>
 								{fetchedBuilds.length === 0 ? (
-									<div className="flex flex-row w-full justify-center items-center">
-										<p>No builds found :(</p>
-									</div>
+									<CantFind text="This user has no builds yet :(" />
 								) : (
 									<>
 										{sortedBuilds.map((build, i) => {

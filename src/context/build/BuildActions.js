@@ -190,7 +190,7 @@ const useBuild = () => {
 			await deleteDoc(doc(db, 'builds', id));
 			await deleteDoc(doc(db, 'buildsRaw', id));
 
-			// If the build being delete belongs to the current user, remove it
+			// If the build being deleted belongs to the current user, remove it
 			if (userId === user.uid) {
 				const newBuildsArr = [
 					...user.builds.filter(build => {

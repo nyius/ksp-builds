@@ -49,9 +49,11 @@ function VoteArrows({ build }) {
 			<span id="upVote" onClick={() => handleVoting('upVote', build)} className={`vote-arrow cursor-pointer hover:text-orange-600 ${checkIfVoted('upVote', build.id)}`}>
 				<GoArrowUp id="upVote" />
 			</span>
-			<span id="downVote" onClick={() => handleVoting('downVote', build)} className={`vote-arrow cursor-pointer hover:text-sky-500 ${checkIfVoted('downVote', build.id)}`}>
-				<GoArrowDown id="downVote" />
-			</span>
+			{!authLoading && user?.username && (
+				<span id="downVote" onClick={() => handleVoting('downVote', build)} className={`vote-arrow cursor-pointer hover:text-sky-500 ${checkIfVoted('downVote', build.id)}`}>
+					<GoArrowDown id="downVote" />
+				</span>
+			)}
 		</div>
 	);
 }

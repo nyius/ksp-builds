@@ -33,7 +33,7 @@ function Notifications() {
 			{!authLoading && user?.username && (
 				<>
 					<div className="indicator">
-						{totalUnread > 0 && <span className="indicator-item indicator-bottom indicator-start badge badge-secondary">{totalUnread}</span>}
+						{totalUnread > 0 && <span className="indicator-item indicator-bottom indicator-start badge badge-secondary 2k:text-2xl 2k:p-4">{totalUnread > 99 ? '99+' : totalUnread}</span>}
 						<label onClick={setNotificationsRead} tabIndex={4} className="btn btn-circle w-14 h-14 2k:w-20 2k:h-20 2k:btn-lg avatar">
 							<p className="text-4xl">
 								<MdOutlineNotificationsNone />

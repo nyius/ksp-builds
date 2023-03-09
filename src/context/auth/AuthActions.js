@@ -109,6 +109,7 @@ const useAuth = () => {
 	 */
 	const handleVoting = async (type, build) => {
 		try {
+			if (!user?.username) return;
 			let newUpVotes = cloneDeep(user.upVotes);
 			let newDownVotes = cloneDeep(user.downVotes);
 

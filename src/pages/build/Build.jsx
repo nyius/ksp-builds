@@ -125,7 +125,9 @@ function Build() {
 							<div className="mb-6">{loadedBuild.video && <iframe src={youtubeLinkConverter(loadedBuild.video)}></iframe>}</div>
 
 							{/* ----------------- Comments ---------------------- */}
-							<p className="text-2xl 2k:text-3xl">Comments</p>
+							<p id="comments" className="text-2xl 2k:text-3xl">
+								Comments
+							</p>
 							{!authLoading && user?.username && (
 								<>
 									<textarea onChange={e => setComment(e.target.value)} maxLength="3000" name="" id="" placeholder="Leave a comment" rows="2" className="textarea 2k:text-2xl"></textarea>

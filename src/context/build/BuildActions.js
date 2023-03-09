@@ -363,12 +363,10 @@ const useBuild = () => {
 	 * Handles cancelling a build edit. Reverts it to prev state
 	 * @param {*} build
 	 */
-	const setEditingBuild = bool => {
+	const setEditingBuild = build => {
 		dispatchBuild({
 			type: 'EDITING_BUILD',
-			payload: {
-				editingBuild: bool,
-			},
+			payload: build,
 		});
 	};
 

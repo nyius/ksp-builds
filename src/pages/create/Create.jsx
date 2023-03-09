@@ -1,16 +1,16 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, update } from 'lodash';
 //---------------------------------------------------------------------------------------------------//
 import { FiCameraOff } from 'react-icons/fi';
-import { GiCancel } from 'react-icons/gi';
 //---------------------------------------------------------------------------------------------------//
-import { uploadImage, uploadImages } from '../../utilities/uploadImage';
+import { uploadImages } from '../../utilities/uploadImage';
 import { standardBuild } from '../../utilities/standardBuild';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import useBuild from '../../context/build/BuildActions';
+import BuildContext from '../../context/build/BuildContext';
 //---------------------------------------------------------------------------------------------------//
 import Spinner1 from '../../components/spinners/Spinner1';
 import LogoBackground from '../../assets/logo_bg_dark.png';
@@ -19,24 +19,26 @@ import Button from '../../components/buttons/Button';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import CancelBuildEditModal from '../../components/modals/CancelBuildEditModal';
 import PlanetHeader from '../../components/header/PlanetHeader';
+import TextEditor from '../../components/textEditor/TextEditor';
 
 /**
  * Handles displaying the container for creating & editing a build.
  * @param {*} param0
  * @returns
  */
-function Create({ buildToEdit }) {
+function Create() {
 	const { user } = useContext(AuthContext);
 	const { uploadBuild, updateBuild } = useBuild();
+	const { editingBuild } = useContext(BuildContext);
 
 	//---------------------------------------------------------------------------------------------------//
-	const [newBuild, setNewBuild] = useState(buildToEdit ? cloneDeep(buildToEdit) : cloneDeep(standardBuild));
+	const [newBuild, setNewBuild] = useState(editingBuild ? cloneDeep(editingBuild) : cloneDeep(standardBuild));
 	const [nameLength, setNameLength] = useState(50);
-	const [descLength, setDescLength] = useState(3000);
 	const [uploadingImage, setUploadingImage] = useState(false);
 	const [hoverImage, setHoverImage] = useState(false);
-	//---------------------------------------------------------------------------------------------------//
 
+	const [description, setDescription] = useState(`{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`);
+	//---------------------------------------------------------------------------------------------------//
 	const navigate = useNavigate();
 
 	/**
@@ -78,17 +80,6 @@ function Create({ buildToEdit }) {
 		setNewBuild(prevState => {
 			return { ...prevState, modsUsed: e.target.checked };
 		});
-	};
-
-	/**
-	 * Handles setting the new description
-	 * @param {*} e
-	 */
-	const setDesc = e => {
-		setNewBuild(prevState => {
-			return { ...prevState, description: e.target.value };
-		});
-		setDescLength(prevState => 3000 - e.target.value.length);
 	};
 
 	/**
@@ -145,12 +136,21 @@ function Create({ buildToEdit }) {
 			buildToUpload.images.length === 0 ? (buildToUpload.images = [LogoBackground]) : (buildToUpload.images = newBuild.images);
 			buildToUpload.author = user.username;
 			buildToUpload.uid = user.uid;
+			buildToUpload.description = description;
 
 			await uploadBuild(buildToUpload).then(newId => navigate(`/build/${newId}`));
 		} catch (error) {
 			toast.error('Something went wrong!');
 			console.log(error);
 		}
+	};
+
+	/**
+	 * Handles a user updatin a build
+	 */
+	const handleUpdateBuild = async () => {
+		newBuild.description = description;
+		await updateBuild(newBuild);
 	};
 
 	/**
@@ -261,129 +261,132 @@ function Create({ buildToEdit }) {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<MiddleContainer>
-			<PlanetHeader text={buildToEdit ? 'Edit Build' : 'Create Build'} />
+			{newBuild && (
+				<>
+					<PlanetHeader text={editingBuild ? 'Edit Build' : 'Create Build'} />
 
-			{/* Build Image */}
-			{newBuild.images.length === 0 && (
-				<div className="flex items-center justify-center w-36 h-36 rounded-xl bg-base-300 border-dashed border-2 border-slate-400">
-					<p className="text-4xl">{<FiCameraOff />}</p>
-				</div>
-			)}
-
-			{/* Image Carousel */}
-			<div className="flex flex-row flex-wrap gap-2 2k:gap-4">
-				{newBuild.images.length > 0 &&
-					newBuild.images.map((image, i) => {
-						return (
-							<div
-								key={i}
-								className="relative flex items-center justify-center w-36 h-36 2k:w-52 2k:h-52 hover:bg-base-100 overflow-hidden rounded-xl bg-base-300 border-dashed border-2 border-slate-700"
-								onDrop={e => drop(e)}
-								onDragOver={e => allowDrop(e)}
-								onDragLeave={e => dragExit(e)}
-								id={`square-` + i}
-								style={squareStyle(i)}
-							>
-								<Button onClick={() => removeImage(i)} text="X" css="hover:bg-red-500" color="btn-error" size="btn-sm" style="btn-circle" position="right-0 top-0 absolute z-50" />
-
-								<img id={i} src={image} className="w-full object-scale-down cursor-pointer" alt="" draggable={true} onDragStart={e => drag(e)} />
-							</div>
-						);
-					})}
-				{uploadingImage && <Spinner1 />}
-			</div>
-
-			{/* Upload build image */}
-			{newBuild.images.length < 6 && (
-				<div className="flex flex-row gap-4 w-full">
-					<input type="file" id="build-image" max="6" accept=".jpg,.png,.jpeg" multiple className="file-input w-full max-w-xs mb-6 2k:file-input-lg" onChange={e => handleAddBuildImages(e)} />
-					<div className="flex flex-col">
-						<p className="text-slate-500 font-bold 2k:text-2xl">{newBuild.images.length > 6 && <span className="text-red-400 font-bold">Too many images!</span>} 6 Images max. Max size per image 5mb.</p>
-						<p className="text-slate-500 2k:text-2xl">For best results images should be 16/9</p>
-					</div>
-				</div>
-			)}
-
-			{/* Name */}
-			<div className="flex flex-row gap-20 2k:mb-6">
-				<div className="flex flex-row gap-2 items-center">
-					<input onChange={setName} type="text" placeholder="Build Name" defaultValue={buildToEdit && buildToEdit.name} className="input input-bordered w-96 max-w-lg 2k:input-lg 2k:text-2xl" maxLength="50" />
-					<p className="text-slate-400 italic 2k:text-2xl">{nameLength}</p>
-				</div>
-
-				{/* KSP Version */}
-				<div className="flex flex-row items-center gap-6 text-slate-400">
-					<p className="2k:text-2xl">KSP Version</p>
-					<select onChange={setVersion} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
-						<optgroup>
-							<option className="text-2xl" value="1.0.0">
-								1.0.0
-							</option>
-						</optgroup>
-					</select>
-				</div>
-
-				{/* Used Mods */}
-				<div className="flex flex-row items-center gap-6 text-slate-400">
-					<p className="2k:text-2xl">Uses Mods</p>
-					<input onChange={setModsUsed} checked={buildToEdit ? buildToEdit.modsUsed : false} type="checkbox" className="checkbox 2k:checkbox-lg" />
-				</div>
-			</div>
-
-			{/* Description */}
-			<div className="flex flex-row gap-2 items-center w-full">
-				<textarea onChange={setDesc} className="textarea textarea-bordered w-3/4 2k:text-2xl 2k:mb-4" defaultValue={buildToEdit && buildToEdit.description} placeholder="Description" maxLength="3000" rows="4"></textarea>
-				<p className="text-slate-400 italic 2k:text-2xl">{descLength}</p>
-			</div>
-
-			{/* Video */}
-			<div className="flex flex-row gap-2 items-center 2k:mb-8">
-				<input onChange={setVideo} type="text" defaultValue={buildToEdit && buildToEdit.video} placeholder="Youtube video ID (optional)" className="input 2k:input-lg input-bordered w-96 max-w-lg mb-6 2k:text-2xl" />
-				<p className="italic text-slate-500 2k:text-2xl">Eg. dQw4w9WgXcQ, this comes after "youtube.com'watch?v=" in the URL </p>
-			</div>
-
-			{/* Build Types */}
-			<h3 className="text-slate-400 text-xl 2k:text-3xl">Build Type (3 max)</h3>
-			<BuildTypes typesArr={newBuild.type} setBuildState={setNewBuild} />
-
-			{/* Tags */}
-			<div className="flex flex-row gap-4 items-center">
-				<h3 className="text-slate-400 text-xl 2k:text-3xl">Tags (3 max)</h3>
-				<h4 className="text-slate-500 text-lg italic 2k:text-2xl">Press ',' to add a new tag</h4>
-			</div>
-			<input id="tagsField" disabled={newBuild.tags.length === 3} onChange={setTags} type="text" placeholder="Tags" className="input 2k:input-lg 2k:text-2xl 2k:mb-6 input-bordered w-96 max-w-lg" maxLength="30" />
-
-			<div className="flex flex-row gap-10 2k:mb-10">
-				{newBuild.tags.map((tag, i) => {
-					return (
-						<div className="indicator" key={i}>
-							<span onClick={removeTag} id={i} className="indicator-item 2k:text-2xl badge badge-error cursor-pointer">
-								x
-							</span>
-							<div className="badge badge-lg 2k:text-2xl 2k:p-4 badge-info">{tag}</div>
+					{/* Build Image */}
+					{newBuild.images.length === 0 && (
+						<div className="flex items-center justify-center w-36 h-36 rounded-xl bg-base-300 border-dashed border-2 border-slate-400">
+							<p className="text-4xl">{<FiCameraOff />}</p>
 						</div>
-					);
-				})}
-			</div>
+					)}
 
-			{/* Build */}
-			<div className="flex flex-row items-center gap-4">
-				<h3 className="text-slate-400 text-xl 2k:text-3xl">Paste build here</h3>
-				<label className="btn 2k:btn-lg 2k:text-2xl" htmlFor="how-to-copy-build-modal">
-					How?
-				</label>
-			</div>
-			<textarea onChange={setBuild} defaultValue={buildToEdit && buildToEdit.build} className="textarea textarea-bordered 2k:text-2xl mb-6 w-full" placeholder="Paste..." rows="4"></textarea>
+					{/* Image Carousel */}
+					<div className="flex flex-row flex-wrap gap-2 2k:gap-4">
+						{newBuild.images.length > 0 &&
+							newBuild.images.map((image, i) => {
+								return (
+									<div
+										key={i}
+										className="relative flex items-center justify-center w-36 h-36 2k:w-52 2k:h-52 hover:bg-base-100 overflow-hidden rounded-xl bg-base-300 border-dashed border-2 border-slate-700"
+										onDrop={e => drop(e)}
+										onDragOver={e => allowDrop(e)}
+										onDragLeave={e => dragExit(e)}
+										id={`square-` + i}
+										style={squareStyle(i)}
+									>
+										<Button onClick={() => removeImage(i)} text="X" css="hover:bg-red-500" color="btn-error" size="btn-sm" style="btn-circle" position="right-0 top-0 absolute z-50" />
 
-			{buildToEdit ? (
-				<div className="flex flex-row gap-4 2k:gap-10">
-					<Button text="Save" icon="save" color="btn-success" onClick={() => updateBuild(newBuild)} />
-					<Button htmlFor="cancel-build-edit" text="Cancel" icon="cancel" color="btn-warning" />
-				</div>
-			) : (
-				<Button text="Submit" color="btn-primary" onClick={submitBuild} icon="upload" />
+										<img id={i} src={image} className="w-full object-scale-down cursor-pointer" alt="" draggable={true} onDragStart={e => drag(e)} />
+									</div>
+								);
+							})}
+						{uploadingImage && <Spinner1 />}
+					</div>
+
+					{/* Upload build image */}
+					{newBuild.images.length < 6 && (
+						<div className="flex flex-row gap-4 w-full">
+							<input type="file" id="build-image" max="6" accept=".jpg,.png,.jpeg" multiple className="file-input w-full max-w-xs mb-6 2k:file-input-lg" onChange={e => handleAddBuildImages(e)} />
+							<div className="flex flex-col">
+								<p className="text-slate-500 font-bold 2k:text-2xl">{newBuild.images.length > 6 && <span className="text-red-400 font-bold">Too many images!</span>} 6 Images max. Max size per image 5mb.</p>
+								<p className="text-slate-500 2k:text-2xl">For best results images should be 16/9</p>
+							</div>
+						</div>
+					)}
+
+					{/* Name */}
+					<div className="flex flex-row gap-20 mb-8 2k:mb-15">
+						<div className="flex flex-row gap-2 items-center">
+							<input onChange={setName} type="text" placeholder="Build Name" defaultValue={editingBuild && editingBuild.name} className="input input-bordered w-96 max-w-lg 2k:input-lg 2k:text-2xl" maxLength="50" />
+							<p className="text-slate-400 italic 2k:text-2xl">{nameLength}</p>
+						</div>
+
+						{/* KSP Version */}
+						<div className="flex flex-row items-center gap-6 text-slate-400">
+							<p className="2k:text-2xl">KSP Version</p>
+							<select onChange={setVersion} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
+								<optgroup>
+									<option className="text-2xl" value="1.0.0">
+										1.0.0
+									</option>
+								</optgroup>
+							</select>
+						</div>
+
+						{/* Used Mods */}
+						<div className="flex flex-row items-center gap-6 text-slate-400">
+							<p className="2k:text-2xl">Uses Mods</p>
+							<input onChange={setModsUsed} checked={editingBuild ? editingBuild.modsUsed : false} type="checkbox" className="checkbox 2k:checkbox-lg" />
+						</div>
+					</div>
+
+					{/* Description */}
+					<div className="flex flex-row gap-2 items-center w-full mb-10 2k:mb-15">
+						<TextEditor text={description} setState={setDescription} />
+					</div>
+
+					{/* Video */}
+					<div className="flex flex-row gap-2 items-center 2k:mb-8">
+						<input onChange={setVideo} type="text" defaultValue={editingBuild && editingBuild.video} placeholder="Youtube video ID (optional)" className="input 2k:input-lg input-bordered w-96 max-w-lg mb-6 2k:text-2xl" />
+						<p className="italic text-slate-500 2k:text-2xl">Eg. dQw4w9WgXcQ, this comes after "youtube.com'watch?v=" in the URL </p>
+					</div>
+
+					{/* Build Types */}
+					<h3 className="text-slate-400 text-xl 2k:text-3xl">Build Type (3 max)</h3>
+					<BuildTypes typesArr={newBuild.type} setBuildState={setNewBuild} />
+
+					{/* Tags */}
+					<div className="flex flex-row gap-4 items-center">
+						<h3 className="text-slate-400 text-xl 2k:text-3xl">Tags (3 max)</h3>
+						<h4 className="text-slate-500 text-lg italic 2k:text-2xl">Press ',' to add a new tag</h4>
+					</div>
+					<input id="tagsField" disabled={newBuild.tags.length === 3} onChange={setTags} type="text" placeholder="Tags" className="input 2k:input-lg 2k:text-2xl 2k:mb-6 input-bordered w-96 max-w-lg" maxLength="30" />
+
+					<div className="flex flex-row gap-10 2k:mb-10">
+						{newBuild.tags.map((tag, i) => {
+							return (
+								<div className="indicator" key={i}>
+									<span onClick={removeTag} id={i} className="indicator-item 2k:text-2xl badge badge-error cursor-pointer">
+										x
+									</span>
+									<div className="badge badge-lg 2k:text-2xl 2k:p-4 badge-info">{tag}</div>
+								</div>
+							);
+						})}
+					</div>
+
+					{/* Build */}
+					<div className="flex flex-row items-center gap-4">
+						<h3 className="text-slate-400 text-xl 2k:text-3xl">Paste build here</h3>
+						<label className="btn 2k:btn-lg 2k:text-2xl" htmlFor="how-to-copy-build-modal">
+							How?
+						</label>
+					</div>
+					<textarea onChange={setBuild} defaultValue={editingBuild && editingBuild.build} className="textarea textarea-bordered 2k:text-2xl mb-6 w-full" placeholder="Paste..." rows="4"></textarea>
+
+					{editingBuild ? (
+						<div className="flex flex-row gap-4 2k:gap-10">
+							<Button text="Save" icon="save" color="btn-success" onClick={handleUpdateBuild} />
+							<Button htmlFor="cancel-build-edit" text="Cancel" icon="cancel" color="btn-warning" />
+						</div>
+					) : (
+						<Button text="Submit" color="btn-primary" onClick={submitBuild} icon="upload" />
+					)}
+					<CancelBuildEditModal />
+				</>
 			)}
-			<CancelBuildEditModal />
 		</MiddleContainer>
 	);
 }

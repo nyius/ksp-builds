@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { AiFillEye } from 'react-icons/ai';
 //---------------------------------------------------------------------------------------------------//
 import youtubeLinkConverter from '../../utilities/youtubeLinkConverter';
+import createMarkup from '../../utilities/createMarkup';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from '../../context/build/BuildContext';
 import AuthContext from '../../context/auth/AuthContext';
@@ -14,7 +15,6 @@ import useBuild from '../../context/build/BuildActions';
 import VoteArrows from '../../components/buttons/VoteArrows';
 import Spinner1 from '../../components/spinners/Spinner1';
 import TypeBadge from '../../components/typeBadge/TypeBadge';
-import HowToPasteBuildModal from '../../components/modals/HowToPasteModal';
 import Comment from '../../components/comments/Comment';
 import DeleteBuildModal from '../../components/modals/DeleteBuildModal';
 import Carousel from '../../components/carousel/Carousel';
@@ -34,6 +34,7 @@ function Build() {
 
 	const { id } = useParams();
 
+	// Fetch the buil
 	useEffect(() => {
 		fetchBuild(id);
 	}, [id]);
@@ -47,7 +48,7 @@ function Build() {
 		toast.success('Build coped to clipboard!');
 	};
 
-	if (editingBuild) return <Create buildToEdit={loadedBuild} />;
+	if (editingBuild) return <Create />;
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
@@ -109,8 +110,8 @@ function Build() {
 							</div>
 
 							{/* Description */}
-							<p className="text-2xl 2k:text-4xl text-slate-500">ABOUT THIS BUILD</p>
-							<p className="mb-20 2k:mb-32 text-xl 2k:text-3xl">{loadedBuild.description}</p>
+							<p className="text-2xl 2k:text-4xl text-slate-500 mb-5">ABOUT THIS BUILD</p>
+							<div className="mb-20 2k:mb-32 text-xl 2k:text-3xl" dangerouslySetInnerHTML={createMarkup(loadedBuild.description)}></div>
 
 							{/* Buttons */}
 							<div className="flex flex-col md:flex-row place-content-between">
@@ -120,7 +121,7 @@ function Build() {
 								</div>
 								{!authLoading && (user?.uid === loadedBuild.uid || user?.siteAdmin) && (
 									<div className="flex flex-row flex-wrap gap-4">
-										<Button text="Edit Build" icon="edit" color="btn-info" onClick={() => setEditingBuild(true)} />
+										<Button text="Edit Build" icon="edit" color="btn-info" onClick={() => setEditingBuild(loadedBuild)} />
 										<Button htmlFor="delete-build-modal" color="btn-error" icon="delete" text="Delete Build" />
 									</div>
 								)}

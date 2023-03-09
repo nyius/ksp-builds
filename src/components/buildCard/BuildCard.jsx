@@ -9,6 +9,8 @@ import DeleteBuildAdmin from '../buttons/DeleteBuildAdmin';
 import TypeBadge from '../typeBadge/TypeBadge';
 import VoteArrows from '../buttons/VoteArrows';
 import UsernameLink from '../buttons/UsernameLink';
+//---------------------------------------------------------------------------------------------------//
+import draftJsToPlainText from '../../utilities/draftJsToPlainText';
 
 function BuildCard({ build }) {
 	const navigate = useNavigate();
@@ -71,7 +73,7 @@ function BuildCard({ build }) {
 						</div>
 
 						{/* Description */}
-						<p className="multi-line-truncate mb-14 sm:mb-4 text-xl 2k:text-2xl">{build.description}</p>
+						<p className="multi-line-truncate mb-14 sm:mb-4 text-xl 2k:text-2xl">{draftJsToPlainText(build.description)}</p>
 					</div>
 				</div>
 			</div>

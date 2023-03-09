@@ -3,7 +3,7 @@ import { serverTimestamp } from 'firebase/firestore';
 export const standardBuild = {
 	name: '',
 	timestamp: serverTimestamp(),
-	description: '',
+	description: '{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}',
 	images: [],
 	build: '',
 	author: '',

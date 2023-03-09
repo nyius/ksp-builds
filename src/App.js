@@ -21,6 +21,8 @@ import './App.css';
 make type search prettier
 email verification?
 google tracking
+favoriting
+downloads
 voting bug (when voting on main page, it doesnt update the build in the builds object even though the db is updated)
 proper text edior for comments/bio/build desc/etc
 something breaks when going to your profile after just making an account (something to do with seconds)

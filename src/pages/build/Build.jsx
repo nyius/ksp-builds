@@ -79,6 +79,10 @@ function Build() {
 									<p className="text-2xl 2k:text-4xl font-bold">Uses Mods</p>
 									<p className="text-xl 2k:text-3xl ">{loadedBuild.modsUsed ? 'Yes' : 'None'}</p>
 								</div>
+								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-5 items-center justify-center rounded-lg">
+									<p className="text-2xl 2k:text-4xl font-bold">Downloads</p>
+									<p className="text-xl 2k:text-3xl ">{loadedBuild.downloads}</p>
+								</div>
 							</div>
 
 							{/* Build Name */}

@@ -1,9 +1,11 @@
 /**
- * Converts a regular youtube URL to one that can be played in an Iframe
- * @param {*} url
+ * Takes in a video ID and returns a formatted URL
+ * @param {*} id
  */
-const youtubeLinkConverter = url => {
-	return url.replace('https://www.youtube.com/watch?v=', 'https://www.youtube.com/embed/');
+const youtubeLinkConverter = id => {
+	//https://www.youtube.com/watch?v=aegUUtkvkoY&ab_channel=Ludwig
+	const newUrl = `https://www.youtube.com/embed/${id}`;
+	return newUrl;
 };
 
 export default youtubeLinkConverter;

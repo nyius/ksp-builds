@@ -109,9 +109,11 @@ function Create({ buildToEdit }) {
 		if (e.target.files) {
 			const newBuildImages = await uploadImages(e.target.files, setUploadingImage);
 
-			setNewBuild(prevState => {
-				return { ...prevState, images: [...newBuild.images, ...newBuildImages] };
-			});
+			if (newBuildImages) {
+				setNewBuild(prevState => {
+					return { ...prevState, images: [...newBuild.images, ...newBuildImages] };
+				});
+			}
 		}
 	};
 
@@ -134,10 +136,6 @@ function Create({ buildToEdit }) {
 			}
 			if (newBuild.images.length > 6) {
 				toast.error('Too many build images! Max 6');
-				return;
-			}
-			if (newBuild.video && !newBuild.video.includes('youtube')) {
-				toast.error('Invalid youtube link!');
 				return;
 			}
 
@@ -340,8 +338,8 @@ function Create({ buildToEdit }) {
 
 			{/* Video */}
 			<div className="flex flex-row gap-2 items-center 2k:mb-8">
-				<input onChange={setVideo} type="text" defaultValue={buildToEdit && buildToEdit.video} placeholder="Youtube Link (optional)" className="input 2k:input-lg input-bordered w-96 max-w-lg mb-6 2k:text-2xl" />
-				<p className="italic text-slate-500 2k:text-2xl">Eg. https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>
+				<input onChange={setVideo} type="text" defaultValue={buildToEdit && buildToEdit.video} placeholder="Youtube video ID (optional)" className="input 2k:input-lg input-bordered w-96 max-w-lg mb-6 2k:text-2xl" />
+				<p className="italic text-slate-500 2k:text-2xl">Eg. dQw4w9WgXcQ, this comes after "youtube.com'watch?v=" in the URL </p>
 			</div>
 
 			{/* Build Types */}

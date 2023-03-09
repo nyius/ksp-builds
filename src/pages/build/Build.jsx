@@ -22,6 +22,7 @@ import Create from '../create/Create';
 import Button from '../../components/buttons/Button';
 import CantFind from '../../components/cantFind/CantFind';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
+import UsernameLink from '../../components/buttons/UsernameLink';
 //---------------------------------------------------------------------------------------------------//
 
 function Build() {
@@ -60,9 +61,29 @@ function Build() {
 							{/* Images */}
 							<Carousel images={loadedBuild.images} />
 
+							{/* Author/Uploaded/version */}
+							<div className="flex flex-row flex-wrap gap-2 2k:gap-4 bg-base-900 w-full justify-center p-2 2k:p-4 mb-6 2k:mb-12 rounded-xl">
+								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-4 2k:p-6 items-center justify-center rounded-lg">
+									<p className="text-2xl 2k:text-4xl font-bold">Author</p>
+									<UsernameLink username={loadedBuild.author} uid={loadedBuild.uid} />
+								</div>
+								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-5 items-center justify-center rounded-lg">
+									<p className="text-2xl 2k:text-4xl font-bold">Date Created</p>
+									<p className="text-xl 2k:text-3xl ">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.timestamp.seconds * 1000)}</p>
+								</div>
+								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-5 items-center justify-center rounded-lg">
+									<p className="text-2xl 2k:text-4xl font-bold">KSP Version</p>
+									<p className="text-xl 2k:text-3xl ">{loadedBuild.kspVersion}</p>
+								</div>
+								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-5 items-center justify-center rounded-lg">
+									<p className="text-2xl 2k:text-4xl font-bold">Uses Mods</p>
+									<p className="text-xl 2k:text-3xl ">{loadedBuild.modsUsed ? 'Yes' : 'None'}</p>
+								</div>
+							</div>
+
+							{/* Build Name */}
 							<div className="flex flex-row place-content-between">
-								{/* Name */}
-								<h1 className="text-slate-200 text-2xl font-bold 2k:text-4xl">{loadedBuild.name}</h1>
+								<h1 className="text-slate-200 text-3xl font-bold 2k:text-5xl">{loadedBuild.name}</h1>
 								<p className="flex flex-row text-2xl items-center gap-4 2k:text-4xl">
 									<AiFillEye />
 									<span className="text-lg self-end 2k:text-3xl"> {loadedBuild.views}</span>
@@ -70,7 +91,7 @@ function Build() {
 							</div>
 
 							{/* Voting/Views/Types */}
-							<div className="flex flex-row place-content-between mb-4">
+							<div className="flex flex-row place-content-between mb-8 2k:mb-16">
 								<div className="flex flex-row gap-8">
 									<VoteArrows build={loadedBuild} />
 								</div>
@@ -85,7 +106,7 @@ function Build() {
 
 							{/* Description */}
 							<p className="text-2xl 2k:text-4xl text-slate-500">ABOUT THIS BUILD</p>
-							<p className="mb-16 2k:mb-20 text-xl 2k:text-3xl">{loadedBuild.description}</p>
+							<p className="mb-20 2k:mb-32 text-xl 2k:text-3xl">{loadedBuild.description}</p>
 
 							{/* Buttons */}
 							<div className="flex flex-col md:flex-row place-content-between">

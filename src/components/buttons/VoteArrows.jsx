@@ -3,6 +3,11 @@ import AuthContext from '../../context/auth/AuthContext';
 import useAuth from '../../context/auth/AuthActions';
 import { GoArrowUp, GoArrowDown } from 'react-icons/go';
 
+/**
+ * Shows the arrows to upvote/downvote. Takes in the build
+ * @param {*} build
+ * @returns
+ */
 function VoteArrows({ build }) {
 	const { handleVoting } = useAuth();
 	const { user, authLoading } = useContext(AuthContext);
@@ -26,9 +31,21 @@ function VoteArrows({ build }) {
 		}
 	};
 
+	/**
+	 * Returns the total build vote score
+	 * @returns
+	 */
+	const calculateVoteCount = () => {
+		if (build.upVotes - build.downVotes < 0) {
+			return 0;
+		} else {
+			return build.upVotes - build.downVotes;
+		}
+	};
+
 	return (
 		<div className="flex flex-row gap-5 items-center">
-			<span className="text-lg 2k:text-3xl">{build.upVotes - build.downVotes}</span>
+			<span className="text-lg 2k:text-3xl">{calculateVoteCount()}</span>
 			<span id="upVote" onClick={() => handleVoting('upVote', build)} className={`vote-arrow cursor-pointer hover:text-orange-600 ${checkIfVoted('upVote', build.id)}`}>
 				<GoArrowUp id="upVote" />
 			</span>

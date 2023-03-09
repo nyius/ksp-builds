@@ -18,16 +18,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
-youtube video bug???
 notifications
 make type search prettier
 make avatar menu prettier
 email verification?
+builds not deleting from the users builds
 voting bug (when voting on main page, it doesnt update the build in the builds object even though the db is updated)
 proper text edior for comments/bio/build desc/etc
 something breaks when going to your profile after just making an account (something to do with seconds)
 search that searches the database, not just loaded builds
-terms and conditions
 News feed
  */
 

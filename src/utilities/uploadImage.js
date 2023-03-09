@@ -75,6 +75,15 @@ export const uploadImage = async (image, setLoadingState, uid) => {
 export const uploadImages = async (images, setLoadingState) => {
 	setLoadingState(true);
 
+	for (const image in images) {
+		console.log(images[image]);
+		if (images[image].size > 5242880) {
+			toast.error(`${images[image].name} is too big! Must be smaller than 5mb`);
+			setLoadingState(false);
+			return;
+		}
+	}
+
 	const storeImage = async image => {
 		// Store images in firebase
 		return new Promise((resolve, reject) => {

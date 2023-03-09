@@ -1,9 +1,7 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MdOutlineNotificationsNone } from 'react-icons/md';
 import { auth } from '../../firebase.config';
 import { toast } from 'react-toastify';
-import { TiPlusOutline } from 'react-icons/ti';
 //---------------------------------------------------------------------------------------------------//
 import CreateBuildAdmin from '../buttons/CreateBuildAdmin';
 //---------------------------------------------------------------------------------------------------//
@@ -12,6 +10,8 @@ import AuthContext from '../../context/auth/AuthContext';
 import Logo from '../../assets/logo_light_full.png';
 import Button from '../buttons/Button';
 import LogoIcon from '../../assets/logo_light_icon.png';
+import MobileHamburger from './MobileHamburger';
+import Notifications from './Notifications';
 
 function NavBar() {
 	const { user, dispatchAuth, authLoading } = useContext(AuthContext);
@@ -49,18 +49,9 @@ function NavBar() {
 				<img src={Logo} className="h-10 2k:h-20 btn hidden sm:block" alt="" onClick={() => navigate('/')} />
 
 				{/* Mobile Hamburger */}
-				<div className="dropdown">
-					<label tabIndex={1} className="btn btn-square btn-ghost sm:hidden">
-						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-						</svg>
-					</label>
-					<ul tabIndex={1} className="mt-3 p-2 gap-2 shadow menu menu-compact dropdown-content bg-base-500 rounded-box w-96">
-						<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="home" text="Home" onClick={() => navigate('/')} />
-						<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="plus" text="Create" onClick={handleCreateNavigate} />
-					</ul>
-				</div>
+				<MobileHamburger />
 
+				{/* Buttons */}
 				<ul className="menu menu-horizontal px-6 gap-3 2k:gap-6">
 					<Button onClick={handleCreateNavigate} color="btn-accent" css="text-white hidden sm:flex" text="Create" icon="plus" />
 					<CreateBuildAdmin />
@@ -68,37 +59,24 @@ function NavBar() {
 			</div>
 
 			<div className="flex-none gap-3">
-				{authLoading ? (
-					''
-				) : (
+				{!authLoading && user?.username && (
 					<>
-						{user?.username && (
-							<div className="btn btn-circle w-14 h-14 2k:w-20 2k:h-20 2k:btn-lg avatar">
-								<p className="text-4xl">
-									<MdOutlineNotificationsNone />
-								</p>
-							</div>
-						)}
+						<Notifications />
 						<div className="dropdown dropdown-end">
-							{user?.username ? (
-								<>
-									<label tabIndex={0} className="btn btn-circle w-14 h-14 2k:w-20 2k:h-20 2k:btn-lg avatar">
-										<div className="w-10 2k:w-20 rounded-full">
-											<img src={user.profilePicture ? user.profilePicture : LogoIcon} />
-										</div>
-									</label>
-									<ul tabIndex={0} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box w-96">
-										<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Profile" onClick={() => navigate('/profile')} />
-										<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Settings" onClick={() => navigate('/settings')} />
-										<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="logout" text="Logout" onClick={() => signOut()} />
-									</ul>
-								</>
-							) : (
-								<Button htmlFor="login-modal" icon="login" text="login" />
-							)}
+							<label tabIndex={0} className="btn btn-circle w-14 h-14 2k:w-20 2k:h-20 2k:btn-lg avatar">
+								<div className="w-10 2k:w-20 rounded-full">
+									<img src={user.profilePicture ? user.profilePicture : LogoIcon} />
+								</div>
+							</label>
+							<ul tabIndex={0} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box w-96">
+								<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Profile" onClick={() => navigate('/profile')} />
+								<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Settings" onClick={() => navigate('/settings')} />
+								<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="logout" text="Logout" onClick={() => signOut()} />
+							</ul>
 						</div>
 					</>
 				)}
+				{!authLoading && !user?.username && <Button htmlFor="login-modal" icon="login" text="login" />}
 			</div>
 		</div>
 	);

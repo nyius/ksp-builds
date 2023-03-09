@@ -267,7 +267,18 @@ const useAuth = () => {
 		});
 	};
 
-	return { setNewSignup, setResetPassword, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio, updateUserDbProfilePic, updateUserProfilePicture, fetchUsersProfile, uploadProfilePicture };
+	/**
+	 * Handles setting notifications as 'read' on the DB and in the state
+	 */
+	const setNotificationsRead = async () => {
+		try {
+			await updateDoc(doc(db, 'users', user.uid));
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	return { setNewSignup, setResetPassword, setNotificationsRead, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio, updateUserDbProfilePic, updateUserProfilePicture, fetchUsersProfile, uploadProfilePicture };
 };
 
 export default useAuth;

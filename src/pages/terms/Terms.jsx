@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import AstroBiffComputer from '../../assets/astrobiff-computer.png';
+import useResetStates from '../../utilities/useResetStates';
 
 function Terms() {
+	const { resetStates } = useResetStates();
+
+	useEffect(() => {
+		resetStates();
+	}, []);
+	//---------------------------------------------------------------------------------------------------//
 	return (
 		<MiddleContainer>
 			<PlanetHeader text="Terms and Conditions" />

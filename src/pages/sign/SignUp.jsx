@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { AiFillCamera } from 'react-icons/ai';
 import useAuth from '../../context/auth/AuthActions';
-import { auth } from '../../firebase.config';
+import useResetStates from '../../utilities/useResetStates';
 //---------------------------------------------------------------------------------------------------//
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import TextInput from '../../components/input/TextInput';
 import Button from '../../components/buttons/Button';
-import Spinner1 from '../../components/spinners/Spinner1';
 import newEmailAccount from '../../utilities/newEmailAccount';
 import PlanetHeader from '../../components/header/PlanetHeader';
 
@@ -21,6 +18,11 @@ function SignUp() {
 	const [accountExists, setAccountExists] = useState(false);
 	const { setNewSignup, setResetPassword } = useAuth();
 
+	const { resetStates } = useResetStates();
+
+	useEffect(() => {
+		resetStates();
+	}, []);
 	/**
 	 * Handles setting the newUser state to a changing field
 	 * @param {*} e

@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
-import LeftBar from '../../components/containers/leftBar/LeftBar';
-import RightBar from '../../components/containers/rightBar/RightBar';
 import useBuilds from '../../context/builds/BuildsActions';
 import Builds from './Builds';
+import useResetStates from '../../utilities/useResetStates';
 
 function Index() {
 	const { fetchBuilds } = useBuilds();
 
+	const { resetStates } = useResetStates();
+
 	useEffect(() => {
+		resetStates();
 		fetchBuilds();
 	}, []);
 

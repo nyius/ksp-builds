@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import useResetStates from '../../utilities/useResetStates';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import AstroBiff from '../../assets/astrobiff-balloon.png';
 
 function Privacy() {
+	const { resetStates } = useResetStates();
+
+	useEffect(() => {
+		resetStates();
+	}, []);
+
+	//---------------------------------------------------------------------------------------------------//
 	return (
 		<MiddleContainer>
 			<PlanetHeader text="Privacy Policy" />

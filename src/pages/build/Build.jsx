@@ -7,6 +7,7 @@ import { AiFillEye } from 'react-icons/ai';
 //---------------------------------------------------------------------------------------------------//
 import youtubeLinkConverter from '../../utilities/youtubeLinkConverter';
 import createMarkup from '../../utilities/createMarkup';
+import useResetStates from '../../utilities/useResetStates';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from '../../context/build/BuildContext';
 import AuthContext from '../../context/auth/AuthContext';
@@ -34,6 +35,12 @@ function Build() {
 	const navigate = useNavigate();
 
 	const { id } = useParams();
+
+	const { resetStates } = useResetStates();
+
+	useEffect(() => {
+		resetStates();
+	}, []);
 
 	// Fetch the buil
 	useEffect(() => {

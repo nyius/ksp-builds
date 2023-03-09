@@ -10,6 +10,8 @@ import useBuilds from '../../context/builds/BuildsActions';
 import useFilters from '../../context/filters/FiltersActions';
 import FiltersContext from '../../context/filters/FiltersContext';
 import useAuth from '../../context/auth/AuthActions';
+import useBuild from '../../context/build/BuildActions';
+import useResetStates from '../../utilities/useResetStates';
 //---------------------------------------------------------------------------------------------------//
 import BuildCard from '../../components/buildCard/BuildCard';
 import Spinner1 from '../../components/spinners/Spinner1';
@@ -40,8 +42,12 @@ function Profile() {
 	const [newProfilePhoto, setNewProfilePhoto] = useState(null);
 
 	const dateCreated = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(user.dateCreated.seconds * 1000);
+	const { resetStates } = useResetStates();
 
+	// Reset edidtingBuild/editingComment stats on page load
 	useEffect(() => {
+		resetStates();
+
 		resetFilters();
 		clearFetchedBuilds();
 

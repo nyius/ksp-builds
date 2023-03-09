@@ -25,9 +25,9 @@ favoriting
 reporting
 when navigating away from editing a build/creating, a popup should warn the user <- if they do anyways, clear the editing state
 voting bug (when voting on main page, it doesnt update the build in the builds object even though the db is updated)
-proper text edior for comments/bio/build desc/etc
 something breaks when going to your profile after just making an account (something to do with seconds)
 search that searches the database, not just loaded builds
+settings page/delete account/ notifications
 News feed
  */
 

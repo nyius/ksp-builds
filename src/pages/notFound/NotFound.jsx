@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CantFind from '../../components/cantFind/CantFind';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import Button from '../../components/buttons/Button';
+import useResetStates from '../../utilities/useResetStates';
 
 /**
  * 404 Page
@@ -10,7 +11,12 @@ import Button from '../../components/buttons/Button';
  */
 function NotFound() {
 	const navigate = useNavigate();
+	const { resetStates } = useResetStates();
 
+	useEffect(() => {
+		resetStates();
+	}, []);
+	//---------------------------------------------------------------------------------------------------//
 	return (
 		<MiddleContainer>
 			<CantFind text="Oops.. Page not found">

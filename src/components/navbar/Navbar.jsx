@@ -56,6 +56,8 @@ function NavBar() {
 					<Button onClick={handleCreateNavigate} color="btn-accent" css="text-white hidden sm:flex" text="Create" icon="plus" />
 					<CreateBuildAdmin />
 				</ul>
+
+				<p className="text-2xl 2k:text-5xl text-sate-600 italic font-bold">BETA</p>
 			</div>
 
 			<div className="flex-none gap-3">

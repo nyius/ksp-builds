@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
 
 				// Fetch their notifications --------------------------------------------//
 				const notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
-				const q = query(notificationsRef, where('read', '==', false), orderBy('timestamp', 'desc', limit(50)), limit(50));
+				const q = query(notificationsRef, orderBy('timestamp', 'desc', limit(20)), limit(20));
 
 				const notificationsSnap = await getDocs(q);
 				const notificationsList = notificationsSnap.docs.map(doc => {

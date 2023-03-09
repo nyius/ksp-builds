@@ -38,7 +38,7 @@ function Notifications() {
 							</p>
 						</label>
 					</div>
-					<ul tabIndex={4} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box w-96">
+					<ul tabIndex={4} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box w-110">
 						{user.notifications.map((notif, i) => {
 							return <Notification key={i} notif={notif} />;
 						})}

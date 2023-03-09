@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
 import { BiComment } from 'react-icons/bi';
 import { AiFillEye } from 'react-icons/ai';
+import { FiDownload } from 'react-icons/fi';
 //---------------------------------------------------------------------------------------------------//
 import DeleteBuildAdmin from '../buttons/DeleteBuildAdmin';
 import TypeBadge from '../typeBadge/TypeBadge';
@@ -79,11 +80,17 @@ function BuildCard({ build }) {
 			<div className="flex flex-row flex-wrap absolute bottom-0 rounded-b-xl left-0 bg-base-900 w-full p-2 2k:p-4">
 				<div className="flex flex-row flex-wrap gap-8 items-center">
 					<VoteArrows build={build} />
-					<div className="flex flex-row items-end gap-2">
-						<span className="text-2xl 2k:text-4xl">
+					<div className="flex flex-row items-center gap-2">
+						<p className="text-2xl 2k:text-4xl">
 							<BiComment />
-						</span>
-						<span className="text-lg 2k:text-2xl">{build.commentCount}</span>
+						</p>
+						<p className="text-lg 2k:text-2xl">{build.commentCount}</p>
+					</div>
+					<div className="flex flex-row items-center gap-2">
+						<p className="text-2xl 2k:text-4xl">
+							<FiDownload />
+						</p>
+						<p className="text-lg 2k:text-2xl">{build.downloads}</p>
 					</div>
 				</div>
 			</div>

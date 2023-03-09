@@ -29,7 +29,7 @@ function Build() {
 	//---------------------------------------------------------------------------------------------------//
 	const { loadingBuild, loadedBuild, commentsLoading, comments, editingBuild } = useContext(BuildContext);
 	const { user, authLoading } = useContext(AuthContext);
-	const { fetchBuild, setComment, addComment, updateDownloadCount, setEditingBuild, updateBuild } = useBuild();
+	const { fetchBuild, setComment, addComment, updateDownloadCount, setEditingBuild } = useBuild();
 	const navigate = useNavigate();
 
 	const { id } = useParams();

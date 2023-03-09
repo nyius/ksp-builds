@@ -36,7 +36,7 @@ function Build() {
 
 	useEffect(() => {
 		fetchBuild(id);
-	}, []);
+	}, [id]);
 
 	/**
 	 * Handles copying the build to the clipboard

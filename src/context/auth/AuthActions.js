@@ -1,5 +1,5 @@
 import { db } from '../../firebase.config';
-import { updateDoc, doc, getDoc, collection } from 'firebase/firestore';
+import { updateDoc, doc, getDoc, collection, deleteDoc } from 'firebase/firestore';
 import { useContext } from 'react';
 import AuthContext from './AuthContext';
 import { cloneDeep } from 'lodash';
@@ -272,13 +272,63 @@ const useAuth = () => {
 	 */
 	const setNotificationsRead = async () => {
 		try {
-			await updateDoc(doc(db, 'users', user.uid));
+			let newNotifs = [];
+
+			await user.notifications.map(notif => {
+				if (!notif.read) {
+					const updateNotif = async () => {
+						notif.read = true;
+						newNotifs.push(notif);
+						await updateDoc(doc(db, 'users', user.uid, 'notifications', notif.id), notif).catch(err => console.log(err));
+					};
+
+					updateNotif();
+				} else {
+					newNotifs.push(notif);
+				}
+			});
+
+			dispatchAuth({
+				type: 'UPDATE_USER',
+				payload: { notifications: newNotifs },
+			});
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
-	return { setNewSignup, setResetPassword, setNotificationsRead, updateUserState, handleVoting, addbuildToUser, setEditingProfile, updateUserDbBio, updateUserDbProfilePic, updateUserProfilePicture, fetchUsersProfile, uploadProfilePicture };
+	/**
+	 * handles deleting a notification
+	 * @param {*} i - index position
+	 * @param {*} id -id
+	 */
+	const handleDeleteNotification = async (index, id) => {
+		try {
+			let newNotifs = cloneDeep(user.notifications);
+			newNotifs.splice(index, 1);
+
+			await deleteDoc(doc(db, 'users', user.uid, 'notifications', id)).catch(err => console.log(err));
+			dispatchAuth({ type: 'UPDATE_USER', payload: { notifications: newNotifs } });
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	return {
+		setNewSignup,
+		setResetPassword,
+		setNotificationsRead,
+		handleDeleteNotification,
+		updateUserState,
+		handleVoting,
+		addbuildToUser,
+		setEditingProfile,
+		updateUserDbBio,
+		updateUserDbProfilePic,
+		updateUserProfilePicture,
+		fetchUsersProfile,
+		uploadProfilePicture,
+	};
 };
 
 export default useAuth;

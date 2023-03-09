@@ -29,7 +29,7 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 	return (
 		<label htmlFor={htmlFor} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
 			{icon && (
-				<span className="text-2xl 2k:text-4xl mr-4 2k:mr-6">
+				<span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>
 					{icon === 'cancel' && <GiCancel />}
 					{icon === 'upload' && <ImCloudUpload />}
 					{icon === 'save' && <FaSave />}
@@ -52,7 +52,7 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 					{icon === 'home' && <FaHome />}
 				</span>
 			)}
-			{text}
+			{text !== '' && text}
 		</label>
 	);
 }

@@ -13,17 +13,18 @@ import { Editor } from 'react-draft-wysiwyg';
 function TextEditor(state) {
 	// Handles sending the markup back to the parent
 	const { setState, size, i } = state;
-	const { editingBuild } = useContext(BuildContext);
+	const { editingBuild, editingComment } = useContext(BuildContext);
 
 	const [editorState, setEditorState] = useState(() => {
+		const emptyState = `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`;
 		if (editingBuild) {
 			return EditorState.createWithContent(convertFromRaw(JSON.parse(editingBuild.description)));
 		}
+		if (editingComment) {
+			return EditorState.createWithContent(convertFromRaw(JSON.parse(editingComment.comment)));
+		}
+		return EditorState.createWithContent(convertFromRaw(JSON.parse(emptyState)));
 	});
-
-	useEffect(() => {
-		console.log(editorState.getCurrentContent().getPlainText('\u0001'));
-	}, [editorState]);
 
 	// Handles the user typing
 	const handleEditorChange = state => {
@@ -57,7 +58,7 @@ function TextEditor(state) {
 					size === `sm` && {
 						options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'textAlign', 'colorPicker', 'emoji', 'link'],
 						inline: {
-							options: ['bold', 'italic', 'underline', 'strikethrough', 'monospace'],
+							options: ['bold', 'italic', 'underline', 'monospace'],
 							bold: { className: 'bordered-option-classname' },
 							italic: { className: 'bordered-option-classname' },
 							underline: { className: 'bordered-option-classname' },

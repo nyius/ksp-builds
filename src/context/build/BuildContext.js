@@ -9,6 +9,7 @@ export const BuildProvider = ({ children }) => {
 	const initialState = {
 		loadingBuild: true,
 		editingBuild: false,
+		editingComment: false,
 		uploadingBuild: false,
 		savingBuild: false,
 		deletingCommentId: '',

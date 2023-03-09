@@ -23,6 +23,7 @@ import Button from '../../components/buttons/Button';
 import CantFind from '../../components/cantFind/CantFind';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import UsernameLink from '../../components/buttons/UsernameLink';
+import TextEditor from '../../components/textEditor/TextEditor';
 //---------------------------------------------------------------------------------------------------//
 
 function Build() {
@@ -135,7 +136,7 @@ function Build() {
 							</p>
 							{!authLoading && user?.username && (
 								<>
-									<textarea onChange={e => setComment(e.target.value)} maxLength="3000" name="" id="" placeholder="Leave a comment" rows="2" className="textarea 2k:text-2xl"></textarea>
+									<TextEditor setState={setComment} />
 									<Button onClick={addComment} color="bg-base-900" text="Save" size="w-fit" css="2k:mb-10" icon="comment" />
 								</>
 							)}

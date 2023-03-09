@@ -472,6 +472,17 @@ const useBuild = () => {
 	};
 
 	/**
+	 * Handles editing a comment
+	 * @param {*} comment
+	 */
+	const setEditingComment = comment => {
+		dispatchBuild({
+			type: 'EDITING_COMMENT',
+			payload: comment,
+		});
+	};
+
+	/**
 	 * Handles upading the comment on the DB
 	 */
 	const updateComment = async (comment, commentId) => {
@@ -571,6 +582,7 @@ const useBuild = () => {
 		uploadBuild,
 		setBaseBuild,
 		setEditingBuild,
+		setEditingComment,
 		cancelBuilEdit,
 		setSavingBuild,
 		fetchComments,

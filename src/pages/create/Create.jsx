@@ -307,7 +307,7 @@ function Create() {
 					)}
 
 					{/* Name */}
-					<div className="flex flex-row gap-20 mb-8 2k:mb-15">
+					<div className="flex flex-row flex-wrap gap-20 mb-8 2k:mb-15">
 						<div className="flex flex-row gap-2 items-center">
 							<input onChange={setName} type="text" placeholder="Build Name" defaultValue={editingBuild && editingBuild.name} className="input input-bordered w-96 max-w-lg 2k:input-lg 2k:text-2xl" maxLength="50" />
 							<p className="text-slate-400 italic 2k:text-2xl">{nameLength}</p>

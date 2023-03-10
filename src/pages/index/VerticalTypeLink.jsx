@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import useFilters from '../../context/filters/FiltersActions';
 import FiltersContext from '../../context/filters/FiltersContext';
 //---------------------------------------------------------------------------------------------------//
@@ -18,15 +18,14 @@ function VerticalTypeLink({ text }) {
 
 	const { setTypeFilter } = useFilters();
 	return (
-		<li
+		<Link
+			to={`/builds/${text}`}
 			id={text}
 			onClick={e => {
 				setTypeFilter(e);
-				navigate(`builds/${e.target.id}`);
 			}}
-			className=""
 		>
-			<a id={text} className={`flex flex-row gap-12 2k:gap-16 text-2xl md:text-lg 2k:text-2xl font-light btn btn-block justify-start 2k:h-20 ${typeFilter === text && 'bg-primary hover:bg-violet-900'} text-slate-300`}>
+			<a id={text} className={`flex flex-row gap-12 lg:gap-6 2k:gap-16 variable-font-size font-light btn btn-block justify-start 2k:h-20 ${typeFilter === text && 'bg-primary hover:bg-violet-900'} text-slate-300`}>
 				{text === 'Interplanetary' && (
 					<span className="text-xl 2k:text-3xl">
 						<BiPlanet />
@@ -74,7 +73,7 @@ function VerticalTypeLink({ text }) {
 				)}
 				{text}
 			</a>
-		</li>
+		</Link>
 	);
 }
 

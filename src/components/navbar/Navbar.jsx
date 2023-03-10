@@ -12,6 +12,7 @@ import Button from '../buttons/Button';
 import LogoIcon from '../../assets/logo_light_icon.png';
 import MobileHamburger from './MobileHamburger';
 import Notifications from './Notifications';
+import Types from '../types/Types';
 
 function NavBar() {
 	const { user, dispatchAuth, authLoading } = useContext(AuthContext);
@@ -49,7 +50,10 @@ function NavBar() {
 				<img src={Logo} className="h-10 2k:h-20 btn hidden sm:block" alt="" onClick={() => navigate('/')} />
 
 				{/* Mobile Hamburger */}
-				<MobileHamburger />
+				<div className="flex flex-row gap-4">
+					<MobileHamburger />
+					<Types />
+				</div>
 
 				{/* Buttons */}
 				<ul className="menu menu-horizontal px-6 gap-3 2k:gap-6">

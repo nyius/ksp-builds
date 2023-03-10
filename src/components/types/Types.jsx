@@ -1,13 +1,17 @@
 import React from 'react';
 import VerticalTypeLink from '../../pages/index/VerticalTypeLink';
+import { IoIosRocket } from 'react-icons/io';
 
-function Filter() {
+function Types() {
 	return (
-		<div className="dropdown lg:hidden ">
-			<label tabIndex={2} className="btn bg-base-900">
-				Filters
+		<div className="dropdown md:hidden ">
+			<label tabIndex={2} className="btn flex flex-row gap-2">
+				<span className="text-2xl:2k:text-4xl">
+					<IoIosRocket />
+				</span>
+				Types
 			</label>
-			<ul tabIndex={2} className="mt-2 p-2 shadow menu menu-compact dropdown-content  bg-base-200 rounded-box w-96 gap-2 z-101 p-4 drop-shadow-lg">
+			<ul tabIndex={2} className="mt-2 p-2 shadow menu menu-compact dropdown-content bg-base-200 rounded-box w-96 gap-2 z-101 p-4 drop-shadow-lg">
 				<VerticalTypeLink text="Interplanetary" />
 				<VerticalTypeLink text="Interstellar" />
 				<VerticalTypeLink text="Satellite" />
@@ -22,4 +26,4 @@ function Filter() {
 	);
 }
 
-export default Filter;
+export default Types;

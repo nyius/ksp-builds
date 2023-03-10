@@ -3,6 +3,7 @@ import { getFunctions } from 'firebase/functions';
 import { getFirestore } from 'firebase/firestore';
 import { GoogleAuthProvider, getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
+import { getPerformance } from 'firebase/performance';
 
 const firebaseConfig = {
 	apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -22,6 +23,7 @@ export const googleProvider = new GoogleAuthProvider();
 export const auth = getAuth();
 export const functions = getFunctions(app);
 export const storage = getStorage();
+const perf = getPerformance(app);
 
 googleProvider.setCustomParameters({
 	prompt: 'select_account',

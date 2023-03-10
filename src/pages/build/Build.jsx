@@ -72,24 +72,24 @@ function Build() {
 
 							{/* Author/Uploaded/version */}
 							<div className="flex flex-row flex-wrap gap-2 2k:gap-4 bg-base-900 w-full justify-center p-2 2k:p-4 mb-6 2k:mb-12 rounded-xl">
-								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-4 2k:p-6 items-center justify-center rounded-lg">
-									<p className="text-2xl 2k:text-4xl font-bold">Author</p>
+								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
+									<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Author</p>
 									<UsernameLink username={loadedBuild.author} uid={loadedBuild.uid} />
 								</div>
-								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-5 items-center justify-center rounded-lg">
-									<p className="text-2xl 2k:text-4xl font-bold">Date Created</p>
+								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
+									<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Date Created</p>
 									<p className="text-xl 2k:text-3xl ">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.timestamp.seconds * 1000)}</p>
 								</div>
-								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-5 items-center justify-center rounded-lg">
-									<p className="text-2xl 2k:text-4xl font-bold">KSP Version</p>
+								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
+									<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">KSP Version</p>
 									<p className="text-xl 2k:text-3xl ">{loadedBuild.kspVersion}</p>
 								</div>
-								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-5 items-center justify-center rounded-lg">
-									<p className="text-2xl 2k:text-4xl font-bold">Uses Mods</p>
+								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
+									<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Uses Mods</p>
 									<p className="text-xl 2k:text-3xl ">{loadedBuild.modsUsed ? 'Yes' : 'None'}</p>
 								</div>
-								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-5 items-center justify-center rounded-lg">
-									<p className="text-2xl 2k:text-4xl font-bold">Downloads</p>
+								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
+									<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Downloads</p>
 									<p className="text-xl 2k:text-3xl ">{loadedBuild.downloads}</p>
 								</div>
 							</div>

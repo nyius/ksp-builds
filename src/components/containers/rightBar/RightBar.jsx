@@ -13,10 +13,6 @@ function RightBar() {
 		});
 	}, []);
 
-	useEffect(() => {
-		console.log(news);
-	}, [news]);
-
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="sidebar-right bg-base-400 rounded-xl p-4 h-screen overflow-auto scrollbar">

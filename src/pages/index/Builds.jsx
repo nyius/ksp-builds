@@ -12,8 +12,6 @@ import LoadMoreBuilds from '../../components/buttons/LoadMoreBuilds';
 import Spinner1 from '../../components/spinners/Spinner1';
 import BuildCard from '../../components/buildCard/BuildCard';
 import SearchBar from '../../components/search/SearchBar';
-import Filter from '../../components/filters/Filter';
-import PlanetExplosion from '../../assets/planet_explosion.png';
 import CantFind from '../../components/cantFind/CantFind';
 
 function Builds() {
@@ -22,7 +20,6 @@ function Builds() {
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const { filterBuilds } = useFilters();
 	const { fetchBuilds } = useBuilds();
-	const navigate = useNavigate();
 
 	// Listen for changes to the sorting and filter the builds accordingly
 	useEffect(() => {
@@ -40,7 +37,6 @@ function Builds() {
 	return (
 		<>
 			<div className="flex flex-row gap-4 w-full place-content-between md:place-content-end sm:mb-4">
-				<Filter />
 				<SearchBar />
 				<Sort />
 			</div>

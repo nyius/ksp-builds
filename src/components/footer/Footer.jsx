@@ -7,10 +7,10 @@ function Footer() {
 
 	return (
 		<footer className="footer items-center p-4 bg-neutral text-neutral-content">
-			<div className="items-center grid-flow-col">
+			<div className="items-center flex-row flex flex-wrap lg:grid-flow-col">
 				<img src={LogoLight} className="h-10 2k:h-16 btn" alt="" onClick={() => navigate('/')} />
 				<p className="texg-lg 2k:text-3xl  mr:5 2k:mr-10">Copyright © 2023 Joseph Scicluna - All right reserved</p>
-				<ul className="menu menu-horizontal gap-4 2k:gap-6">
+				<ul className="menu menu-horizontal flex flex-row flex-wrap gap-4 2k:gap-6">
 					<li onClick={() => navigate('/privacy')} className="link link-accent text-lg 2k:text-2xl">
 						Privacy Policy
 					</li>

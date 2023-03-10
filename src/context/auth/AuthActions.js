@@ -1,5 +1,6 @@
 import { db } from '../../firebase.config';
-import { updateDoc, doc, getDoc, collection, deleteDoc } from 'firebase/firestore';
+import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs } from 'firebase/firestore';
+import { deleteUser, getAuth } from 'firebase/auth';
 import { useContext } from 'react';
 import AuthContext from './AuthContext';
 import { cloneDeep } from 'lodash';
@@ -315,8 +316,45 @@ const useAuth = () => {
 		}
 	};
 
+	/**
+	 * handles deleting a user
+	 * @param {*} id
+	 */
+	const deleteUserAccount = async uid => {
+		try {
+			// Delete the notifications
+			const notifQuery = query(collection(db, 'users', uid, 'notifications'));
+			const notifQuerySnapshot = await getDocs(notifQuery);
+			notifQuerySnapshot.forEach(notif => {
+				deleteDoc(doc(db, 'users', uid, 'notifications', notif.id));
+			});
+
+			const userRef = await getDoc(doc(db, 'users', uid));
+			const userData = userRef.data();
+
+			// Delete the users username
+			await deleteDoc(doc(db, 'usernames', userData.username));
+			// Delete the users profile
+			await deleteDoc(doc(db, 'userProfiles', uid));
+			// Delete the user
+			await deleteDoc(doc(db, 'users', uid));
+
+			const userAuth = getAuth();
+			let userToDelete = userAuth.currentUser;
+
+			await deleteUser(userToDelete);
+
+			updateUserState(null);
+
+			toast.success('Account Deleted.');
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	return {
 		setNewSignup,
+		deleteUserAccount,
 		setResetPassword,
 		setNotificationsRead,
 		handleDeleteNotification,

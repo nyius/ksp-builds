@@ -6,6 +6,7 @@ import HowToPasteBuildModal from './HowToPasteModal';
 import LoginModal from './LoginModal';
 import ResetPassword from './ResetPassword';
 import NewAccountModal from './NewAccountModal';
+import DeleteAccount from './DeleteAccount';
 
 function Modals() {
 	return (
@@ -16,6 +17,7 @@ function Modals() {
 			<LoginModal />
 			<NewAccountModal />
 			<ResetPassword />
+			<DeleteAccount />
 		</>
 	);
 }

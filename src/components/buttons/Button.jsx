@@ -22,39 +22,72 @@ import { FcGoogle } from 'react-icons/fc';
  * @param {*} position - used for absolute
  * @param {*} htmlFor - enter this if used to ope a modal
  * @param {*} margin - enter any margin
+ * @param {*} type - enter 'submit' for submitting a form, 'button' to make it not submit
  * @returns
  */
-function Button({ text, onClick, color, size, icon, css, style, position, htmlFor, margin }) {
+function Button({ text, onClick, color, size, icon, css, style, position, htmlFor, margin, type }) {
 	// The button is a label becuase then we can use htmlFor tag to open modals. Not sure if this breaks things but it seems to work fine
-	return (
-		<label htmlFor={htmlFor} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
-			{icon && (
-				<span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>
-					{icon === 'cancel' && <GiCancel />}
-					{icon === 'upload' && <ImCloudUpload />}
-					{icon === 'save' && <FaSave />}
-					{icon === 'export' && <TiExport />}
-					{icon === 'delete' && <RiDeleteBin2Fill />}
-					{icon === 'edit' && <RiEditFill />}
-					{icon === 'help' && <BsFillPatchQuestionFill />}
-					{icon === 'comment' && <BiCommentAdd />}
-					{icon === 'plus' && <TiPlusOutline />}
-					{icon === 'done' && <MdOutlineDoneOutline />}
-					{icon === 'login' && <RiLoginCircleLine />}
-					{icon === 'logout' && <FiLogOut />}
-					{icon === 'google' && <FcGoogle />}
-					{icon === 'reset' && <BiReset />}
-					{icon === 'down' && <BsFillArrowDownSquareFill />}
-					{icon === 'left' && <BsFillArrowLeftSquareFill />}
-					{icon === 'email' && <MdEmail />}
-					{icon === 'head' && <FaUserAstronaut />}
-					{icon === 'settings' && <MdSettingsInputComponent />}
-					{icon === 'home' && <FaHome />}
-				</span>
-			)}
-			{text !== '' && text}
-		</label>
-	);
+	if (type) {
+		return (
+			<button type={type} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
+				{icon && (
+					<span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>
+						{icon === 'cancel' && <GiCancel />}
+						{icon === 'upload' && <ImCloudUpload />}
+						{icon === 'save' && <FaSave />}
+						{icon === 'export' && <TiExport />}
+						{icon === 'delete' && <RiDeleteBin2Fill />}
+						{icon === 'edit' && <RiEditFill />}
+						{icon === 'help' && <BsFillPatchQuestionFill />}
+						{icon === 'comment' && <BiCommentAdd />}
+						{icon === 'plus' && <TiPlusOutline />}
+						{icon === 'done' && <MdOutlineDoneOutline />}
+						{icon === 'login' && <RiLoginCircleLine />}
+						{icon === 'logout' && <FiLogOut />}
+						{icon === 'google' && <FcGoogle />}
+						{icon === 'reset' && <BiReset />}
+						{icon === 'down' && <BsFillArrowDownSquareFill />}
+						{icon === 'left' && <BsFillArrowLeftSquareFill />}
+						{icon === 'email' && <MdEmail />}
+						{icon === 'head' && <FaUserAstronaut />}
+						{icon === 'settings' && <MdSettingsInputComponent />}
+						{icon === 'home' && <FaHome />}
+					</span>
+				)}
+				{text !== '' && text}
+			</button>
+		);
+	} else {
+		return (
+			<label type={type} htmlFor={htmlFor} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
+				{icon && (
+					<span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>
+						{icon === 'cancel' && <GiCancel />}
+						{icon === 'upload' && <ImCloudUpload />}
+						{icon === 'save' && <FaSave />}
+						{icon === 'export' && <TiExport />}
+						{icon === 'delete' && <RiDeleteBin2Fill />}
+						{icon === 'edit' && <RiEditFill />}
+						{icon === 'help' && <BsFillPatchQuestionFill />}
+						{icon === 'comment' && <BiCommentAdd />}
+						{icon === 'plus' && <TiPlusOutline />}
+						{icon === 'done' && <MdOutlineDoneOutline />}
+						{icon === 'login' && <RiLoginCircleLine />}
+						{icon === 'logout' && <FiLogOut />}
+						{icon === 'google' && <FcGoogle />}
+						{icon === 'reset' && <BiReset />}
+						{icon === 'down' && <BsFillArrowDownSquareFill />}
+						{icon === 'left' && <BsFillArrowLeftSquareFill />}
+						{icon === 'email' && <MdEmail />}
+						{icon === 'head' && <FaUserAstronaut />}
+						{icon === 'settings' && <MdSettingsInputComponent />}
+						{icon === 'home' && <FaHome />}
+					</span>
+				)}
+				{text !== '' && text}
+			</label>
+		);
+	}
 }
 
 export default Button;

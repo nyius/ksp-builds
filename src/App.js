@@ -26,6 +26,8 @@ search that searches the database, not just loaded builds
 settings page/delete account/ notifications
 email verification?
 news page
+Mission generation page
+folders
  */
 
 //---------------------------------------------------------------------------------------------------//

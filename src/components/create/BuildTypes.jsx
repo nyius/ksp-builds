@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '../buttons/Button';
 
 /**
  * Takes in a "typesArr" which is an array of types for the build (so we can check if we have that type already selected or not).
@@ -26,33 +27,15 @@ function BuildTypes({ typesArr, setBuildState }) {
 
 	return (
 		<div className="btn-group mb-6 2k:mb-10">
-			<button onClick={e => setTypes(`Interplanetary`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Interplanetary') && 'btn-active'}`}>
-				Interplanetary
-			</button>
-			<button onClick={e => setTypes(`Interstellar`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Interstellar') && 'btn-active'}`}>
-				Interstellar
-			</button>
-			<button onClick={e => setTypes(`Satellite`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Satellite') && 'btn-active'}`}>
-				Satellite
-			</button>
-			<button onClick={e => setTypes(`Space Station`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Space Station') && 'btn-active'}`}>
-				Space Station
-			</button>
-			<button onClick={e => setTypes(`Lander`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Lander') && 'btn-active'}`}>
-				Lander
-			</button>
-			<button onClick={e => setTypes(`Rover`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Rover') && 'btn-active'}`}>
-				Rover
-			</button>
-			<button onClick={e => setTypes(`SSTO`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('SSTO') && 'btn-active'}`}>
-				SSTO
-			</button>
-			<button onClick={e => setTypes(`Spaceplane`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Spaceplane') && 'btn-active'}`}>
-				Spaceplane
-			</button>
-			<button onClick={e => setTypes(`Probe`)} className={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Probe') && 'btn-active'}`}>
-				Probe
-			</button>
+			<Button type="button" text="Interplanetary" onClick={e => setTypes(`Interplanetary`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Interplanetary') && 'btn-active'}`} />
+			<Button type="button" text="Interstellar" onClick={e => setTypes(`Interstellar`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Interstellar') && 'btn-active'}`} />
+			<Button type="button" text="Satellite" onClick={e => setTypes(`Satellite`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Satellite') && 'btn-active'}`} />
+			<Button type="button" text="Space Station" onClick={e => setTypes(`Space Station`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Space Station') && 'btn-active'}`} />
+			<Button type="button" text="Lander" onClick={e => setTypes(`Lander`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Lander') && 'btn-active'}`} />
+			<Button type="button" text="Rover" onClick={e => setTypes(`Rover`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Rover') && 'btn-active'}`} />
+			<Button type="button" text="SSTO" onClick={e => setTypes(`SSTO`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('SSTO') && 'btn-active'}`} />
+			<Button type="button" text="Spaceplane" onClick={e => setTypes(`Spaceplane`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Spaceplane') && 'btn-active'}`} />
+			<Button type="button" text="Probe" onClick={e => setTypes(`Probe`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Probe') && 'btn-active'}`} />
 		</div>
 	);
 }

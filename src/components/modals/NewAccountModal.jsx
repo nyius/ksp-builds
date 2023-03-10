@@ -54,6 +54,9 @@ function NewAccountModal() {
 				} else {
 					const updateUser = {
 						username,
+						builds: [],
+						upVotes: [],
+						downVotes: [],
 						profilePicture: newProfilePicture ? newProfilePicture : 'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/logo_light_icon.png?alt=media&token=bbcff4bd-de9e-4d39-b77e-7046f90ed832',
 					};
 

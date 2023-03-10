@@ -4,6 +4,7 @@ import { db } from '../../firebase.config';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { clonedeep } from 'lodash';
+import axios from 'axios';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from './BuildContext';
 import BuildsContext from '../builds/BuildsContext';
@@ -28,22 +29,19 @@ const useBuild = () => {
 
 		try {
 			const buildRef = doc(db, 'builds', id);
-			const rawBuildRef = doc(db, 'buildsRaw', id);
 
+			// get the build from the db
 			const fetchedBuild = await getDoc(buildRef);
-			const fetchedRawBuild = await getDoc(rawBuildRef);
+
+			const rawBuildRes = await axios.get(`http://localhost:4000/fetchBuild?id=${id}`);
+			const rawBuildData = rawBuildRes.data;
 
 			if (fetchedBuild.exists()) {
 				let build = fetchedBuild.data();
 
-				if (fetchedRawBuild.exists()) {
-					const rawBuild = fetchedRawBuild.data();
-
-					build.build = rawBuild.build;
-				}
-
 				await fetchComments(id);
 				await updateViewCount(build, id);
+				build.build = rawBuildData.build;
 
 				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: build, loadingBuild: false } });
 			} else {
@@ -52,7 +50,7 @@ const useBuild = () => {
 				throw new Error("Couldn't find that build!");
 			}
 		} catch (error) {
-			console.log(error);
+			dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: '', loadingBuild: false } });
 			throw new Error(`Error fetching build: ${error}`);
 		}
 	};
@@ -142,6 +140,7 @@ const useBuild = () => {
 			const newBuild = await makeBuildReadyToUpload(build);
 
 			const rawBuild = { build: newBuild.build };
+			const buildJSON = JSON.stringify(rawBuild);
 			delete build.build;
 
 			await updateDoc(doc(db, 'builds', newBuild.id), {
@@ -151,10 +150,8 @@ const useBuild = () => {
 				throw new Error(err);
 			});
 
-			await updateDoc(doc(db, 'buildsRaw', newBuild.id), rawBuild).catch(err => {
-				setSavingBuild(false);
-				throw new Error(err);
-			});
+			// date the build on the server
+			axios.post('http://localhost:4000/buildUpload', { id: newBuild.id, build: buildJSON }, {}).catch(err => console.error(err));
 
 			newBuild.build = rawBuild.build;
 
@@ -188,7 +185,8 @@ const useBuild = () => {
 
 			// Delete the build
 			await deleteDoc(doc(db, 'builds', id));
-			await deleteDoc(doc(db, 'buildsRaw', id));
+
+			await axios.get(`http://localhost:4000/deleteBuild?id=${id}`);
 
 			// If the build being deleted belongs to the current user, remove it
 			if (userId === user.uid) {
@@ -528,6 +526,7 @@ const useBuild = () => {
 	 */
 	const uploadBuild = async build => {
 		try {
+			setUploadingBuild(true);
 			const buildId = uuidv4().slice(0, 30);
 			build.id = buildId;
 
@@ -565,21 +564,33 @@ const useBuild = () => {
 					payload: build,
 				});
 
-				await setDoc(doc(db, 'buildsRaw', buildId), rawBuild);
+				const buildJSON = JSON.stringify(rawBuild);
 
 				// Add it to the users 'Upvoted'
 				await handleVoting('upVote', build);
 
 				toast.success('Build created!');
-				return newId;
+				return { newId, buildJSON };
 			}
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
+	/**
+	 * Handles setting the uploading build state
+	 * @param {*} bool
+	 */
+	const setUploadingBuild = bool => {
+		dispatchBuild({
+			type: 'UPLOADING_BUILD',
+			payload: bool,
+		});
+	};
+
 	return {
 		uploadBuild,
+		setUploadingBuild,
 		setBaseBuild,
 		setEditingBuild,
 		setEditingComment,

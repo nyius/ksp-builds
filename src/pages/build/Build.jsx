@@ -42,7 +42,7 @@ function Build() {
 		resetStates();
 	}, []);
 
-	// Fetch the buil
+	// Fetch the build
 	useEffect(() => {
 		fetchBuild(id);
 	}, [id]);

@@ -1,5 +1,5 @@
 const FiltersReducer = (state, action) => {
-	console.log(action.type);
+	console.log(action.type, action.payload);
 	switch (action.type) {
 		case 'SET_FILTERS':
 			return {

@@ -6,7 +6,7 @@ function Footer() {
 	const navigate = useNavigate();
 
 	return (
-		<footer className="footer items-center p-4 bg-neutral text-neutral-content">
+		<footer className="footer items-center p-4 bg-neutral text-neutral-content z-60 relative">
 			<div className="items-center flex-row flex flex-wrap lg:grid-flow-col">
 				<img src={LogoLight} className="h-10 2k:h-16 btn" alt="" onClick={() => navigate('/')} />
 				<p className="texg-lg 2k:text-3xl  mr:5 2k:mr-10">Copyright © 2023 Joseph Scicluna - All right reserved</p>

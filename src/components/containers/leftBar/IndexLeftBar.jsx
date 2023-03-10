@@ -37,7 +37,7 @@ function IndexLeftBar({ text }) {
 				<ul className="menu w-full mb-6">
 					<VerticalVersionLink text="1.0.0" />
 				</ul>
-				<Button icon="reset" text="Reset" onClick={handleNavigate} color="bg-primary" size="w-full" />
+				<Button icon="reset" text="Reset" onClick={handleNavigate} color="bg-base-300" size="w-full" />
 			</div>
 		</>
 	);

@@ -876,10 +876,11 @@ $primary: #0f766e;
 
 .rdw-editor-main {
 	height: fit-content;
-
+	min-height: 20rem;
 	overflow: auto;
 	box-sizing: border-box;
 }
+
 .rdw-editor-toolbar {
 	padding: 6px 5px 0;
 	border-radius: 2px;
@@ -1176,5 +1177,9 @@ $primary: #0f766e;
 	.rdw-dropdownoption-default {
 		min-height: 15px;
 		padding: 0 3px;
+	}
+
+	.rdw-editor-main {
+		min-height: 10rem;
 	}
 }

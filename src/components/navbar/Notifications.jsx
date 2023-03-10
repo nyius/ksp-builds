@@ -23,10 +23,11 @@ function Notifications() {
 
 	useEffect(() => {
 		if (!authLoading && user?.username) {
-			calcUnreadNotifs();
+			if (user.notifications) {
+				calcUnreadNotifs();
+			}
 		}
 	}, [authLoading, user]);
-
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="dropdown dropdown-end">
@@ -41,7 +42,7 @@ function Notifications() {
 						</label>
 					</div>
 					<ul tabIndex={4} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box w-110 h-96 overflow-auto flex-nowrap scrollbar">
-						{user.notifications.map((notif, i) => {
+						{user?.notifications?.map((notif, i) => {
 							return <Notification key={i} i={i} notif={notif} />;
 						})}
 					</ul>

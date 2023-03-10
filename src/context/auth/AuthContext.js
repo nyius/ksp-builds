@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }) => {
 
 				if (!user.username) {
 					console.log('No username!');
-					dispatchAuth({ type: 'SET_NEW_GOOGLE_SIGNUP', payload: true });
+					dispatchAuth({ type: 'SET_NEW_SIGNUP', payload: true });
 				} else {
 					//
 				}

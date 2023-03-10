@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../buttons/Button';
 import useAuth from '../../context/auth/AuthActions';
 import UsernameLink from '../buttons/UsernameLink';
 
 function Notification({ i, notif }) {
+	const [timestamp, setTimestamp] = useState(null);
 	const navigate = useNavigate();
-	const timestamp = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(notif.timestamp.seconds * 1000);
 	const { handleDeleteNotification } = useAuth();
+
+	useEffect(() => {
+		if (notif.timestamp) {
+			setTimestamp(new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(notif.timestamp.seconds * 1000));
+		}
+	}, []);
 
 	/**
 	 * handles navigating to a notification

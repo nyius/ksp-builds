@@ -24,8 +24,6 @@ function NewAccountModal() {
 	 * Handles finalizing the account creation
 	 */
 	const finalizeAccount = e => {
-		e.preventDefault();
-
 		if (!newUsername || newUsername === '') {
 			console.log(`No username entered!`);
 			toast.error('You need a username!');
@@ -138,7 +136,7 @@ function NewAccountModal() {
 						<img className="w-12 2k:w-24" src={Astrobiff} alt="" />
 					</div>
 					<p className="py-4 mb-4 2k:mb-8 text-center text-xl 2k:text-3xl">Please take a second to finalize your account.</p>
-					<form action="" className="mb-10">
+					<div className="mb-10">
 						<label htmlFor="usernam" className="text-xl 2k:text-2xl text-slate-400 italic">
 							Username
 						</label>
@@ -162,7 +160,7 @@ function NewAccountModal() {
 							<div className="mr-4">{uploadingImage ? <Spinner1 /> : <img className="avatar-round 2k:w-18" src={newProfilePicture} />}</div>
 							<input type="file" id="profile-picture" max="1" accept=".jpg,.png,.jpeg" className="file-input 2k:file-input-lg 2k:text-3xl" onChange={handleNewProfilePhoto} />
 						</div>
-					</form>
+					</div>
 
 					<Button icon="save" text="Create" onClick={e => finalizeAccount(e)} color="btn-primary" margin="mt-6" />
 				</div>

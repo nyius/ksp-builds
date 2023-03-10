@@ -22,7 +22,6 @@ make type search prettier
 favoriting
 reporting
 voting bug (when voting on main page, it doesnt update the build in the builds object even though the db is updated)
-something breaks when going to your profile after just making an account (something to do with seconds)
 search that searches the database, not just loaded builds
 settings page/delete account/ notifications
 email verification?

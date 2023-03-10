@@ -79,7 +79,7 @@ function BuildCard({ build }) {
 			</div>
 
 			{/* Voting/comments */}
-			<div className="flex flex-row flex-wrap absolute bottom-0 rounded-b-xl left-0 bg-base-900 w-full p-2 2k:p-4">
+			<div className="flex flex-row flex-wrap absolute bottom-0 rounded-b-xl left-0 bg-base-800 w-full p-2 xl:p-4 2k:p-4">
 				<div className="flex flex-row flex-wrap gap-8 items-center">
 					<VoteArrows build={build} />
 					<div className="flex flex-row items-center gap-2">

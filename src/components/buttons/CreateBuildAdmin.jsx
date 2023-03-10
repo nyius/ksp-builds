@@ -34,7 +34,7 @@ function CreateBuildAdmin() {
 
 		build.name = 'test-' + uuidv4().slice(0, 4);
 		build.timestamp = serverTimestamp();
-		build.description = 'Here is a random description!';
+		build.description = '{"blocks":[{"key":"87rfs","text":"here is a sample description","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}';
 		build.images = [images[Math.round(Math.random() * 4)]];
 		build.build = JSON.stringify(shipBuildTestMedium);
 		build.author = 'nyius';
@@ -43,7 +43,7 @@ function CreateBuildAdmin() {
 		build.upVotes = Math.round(Math.random() * 1000);
 		build.downVotes = 0;
 		build.kspVersion = `1.0.0`;
-		build.type = [types[Math.round(Math.random() * 8)], types[Math.round(Math.random() * 8)], types[Math.round(Math.random() * 8)]];
+		build.type = ['Interstellar', types[Math.round(Math.random() * 8)], types[Math.round(Math.random() * 8)]];
 		build.commentCount = Math.round(Math.random() * 1000);
 		build.views = Math.round(Math.random() * 100000);
 

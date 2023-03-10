@@ -36,12 +36,12 @@ const useFilters = () => {
 	 * Handles setting the filter for build types
 	 * @param {*} e
 	 */
-	const setTypeFilter = e => {
+	const setTypeFilter = type => {
 		dispatchBuildFilters({
 			type: 'SET_FILTERS',
 			payload: {
 				filter: 'typeFilter',
-				value: typeFilter === e.target.id ? '' : e.target.id,
+				value: type,
 			},
 		});
 	};

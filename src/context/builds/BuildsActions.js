@@ -15,7 +15,7 @@ const useBuilds = () => {
 
 	/**
 	 * Fetches builds from the DB. Takes in an array of build ids to fetch. if no IDs specified, grabs all builds based on filters
-	 * @param {*} builds
+	 * @param {*} buildsToFetch
 	 */
 	const fetchBuilds = async buildsToFetch => {
 		try {
@@ -119,11 +119,24 @@ const useBuilds = () => {
 		try {
 			dispatchBuilds({ type: 'FETCHING_MORE_BUILDS', payload: true });
 			const builds = [];
+			let q;
 
 			const buildsRef = collection(db, 'builds');
 
 			// Create a query
-			const q = query(buildsRef, orderBy('timestamp', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)), startAfter(lastFetchedBuild), limit(process.env.REACT_APP_BUILDS_FETCH_NUM));
+			if (typeFilter !== '') {
+				q = query(
+					buildsRef,
+					where('type', 'array-contains', typeFilter),
+					where('kspVersion', '==', versionFilter),
+					orderBy('timestamp', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)),
+					startAfter(lastFetchedBuild),
+					limit(process.env.REACT_APP_BUILDS_FETCH_NUM)
+				);
+			} else {
+				// Create a query
+				q = query(buildsRef, orderBy('timestamp', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)), startAfter(lastFetchedBuild), limit(process.env.REACT_APP_BUILDS_FETCH_NUM));
+			}
 
 			const buildsSnap = await getDocs(q);
 

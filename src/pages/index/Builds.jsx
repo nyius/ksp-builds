@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { cloneDeep } from 'lodash';
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
 import BuildsContext from '../../context/builds/BuildsContext';
 import FiltersContext from '../../context/filters/FiltersContext';
@@ -18,8 +18,15 @@ function Builds() {
 	const { typeFilter, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
 	const { loadingBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const [sortedBuilds, setSortedBuilds] = useState([]);
-	const { filterBuilds } = useFilters();
+	const { filterBuilds, setTypeFilter } = useFilters();
 	const { fetchBuilds } = useBuilds();
+	const { id } = useParams();
+
+	useEffect(() => {
+		if (id) {
+			setTypeFilter(id);
+		}
+	}, [id]);
 
 	// Listen for changes to the sorting and filter the builds accordingly
 	useEffect(() => {
@@ -40,7 +47,7 @@ function Builds() {
 				<SearchBar />
 				<Sort />
 			</div>
-			<div className="flex flex-wrap md:grid md:grid-cols-3 2k:grid-cols-4 gap-4 w-full items-center justify-center md:justify-items-center mb-6 p-6 md:p-0">
+			<div className="flex flex-wrap md:grid md:grid-cols-3 xl:grid-cols-4 4k:grid-cols-5 gap-4 xl:gap-8 2k:gap-12 w-full items-center justify-center md:justify-items-center mb-6 p-6 md:p-0">
 				{loadingBuilds ? (
 					<div className="flex flex-row w-full justify-center items-center">
 						<div className="w-20">

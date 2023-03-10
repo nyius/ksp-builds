@@ -22,10 +22,10 @@ function VerticalTypeLink({ text }) {
 			to={`/builds/${text}`}
 			id={text}
 			onClick={e => {
-				setTypeFilter(e);
+				setTypeFilter(e.target.id);
 			}}
 		>
-			<a id={text} className={`flex flex-row gap-12 lg:gap-6 2k:gap-16 variable-font-size font-light btn btn-block justify-start 2k:h-20 ${typeFilter === text && 'bg-primary hover:bg-violet-900'} text-slate-300`}>
+			<a id={text} className={`flex flex-row gap-12 lg:gap-6 2k:gap-16 variable-font-size font-light btn btn-block bg-base-400 justify-start 2k:h-20 ${typeFilter === text && 'bg-primary hover:bg-violet-900'} text-slate-300`}>
 				{text === 'Interplanetary' && (
 					<span className="text-xl 2k:text-3xl">
 						<BiPlanet />

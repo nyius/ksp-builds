@@ -4,9 +4,16 @@ import VerticalVersionLink from '../../../pages/index/VerticalVersionLink';
 import LeftBarTitle from './LeftBarTitle';
 import useFilters from '../../../context/filters/FiltersActions';
 import Button from '../../buttons/Button';
+import { useNavigate } from 'react-router-dom';
 
 function IndexLeftBar({ text }) {
 	const { resetFilters } = useFilters();
+	const navigate = useNavigate();
+
+	const handleNavigate = () => {
+		resetFilters();
+		navigate('/');
+	};
 
 	return (
 		<>
@@ -30,7 +37,7 @@ function IndexLeftBar({ text }) {
 				<ul className="menu w-full mb-6">
 					<VerticalVersionLink text="1.0.0" />
 				</ul>
-				<Button icon="reset" text="Reset" onClick={resetFilters} color="bg-base-600" size="w-full" />
+				<Button icon="reset" text="Reset" onClick={handleNavigate} color="bg-primary" size="w-full" />
 			</div>
 		</>
 	);

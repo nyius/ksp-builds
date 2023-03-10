@@ -7,7 +7,7 @@ function NewsCard({ article }) {
 	return (
 		<a className="rounded-lg bg-base-900 cursor-pointer hover:bg-slate-700 relative" href={article.url} target="_blank">
 			<div className="relative">
-				<img src={article.image} alt="" className="w-full" />
+				<img src={article.image} alt="" className="w-full " />
 				<div className="badge text-xl 2k:text-2xl p-3 2k:p-5 absolute bottom-2 right-2">{article.type}</div>
 			</div>
 			<div className="flex flex-col p-4 2k:p-8">

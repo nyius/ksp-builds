@@ -44,7 +44,8 @@ function App() {
 						{/* Main layout sizing */}
 						<div className="main-container flex w-full justify-center mb-6 min-h-screen">
 							{/* Content Layout*/}
-							<div className="flex flex-col md:grid md:grid-cols-6 gap-4 w-full xl:w-5/6 2k:w-3/4 mt-20 2k:mt-36 m-2">
+							<div className="flex flex-col md:grid md:grid-cols-6 gap-4 xl:gap-20 2k:gap-32 w-full mt-20 2k:mt-36 m-2">
+								{/* xl:w-5/6 2k:w-3/4 */}
 								<div className="md:col-start-1 md:col-end-3 lg:col-end-2">
 									<LeftBar />
 								</div>

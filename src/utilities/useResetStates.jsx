@@ -10,7 +10,6 @@ function useResetStates() {
 	const resetStates = () => {
 		setEditingBuild(false);
 		setEditingComment(false);
-		resetFilters();
 	};
 	return {
 		resetStates,

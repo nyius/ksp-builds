@@ -44,10 +44,10 @@ function NavBar() {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="navbar bg-base-300 mb-5 w-full fixed z-101">
+		<div className="navbar bg-base-900 mb-5 w-full fixed z-101">
 			<div className="flex-1">
 				{/* Logo  */}
-				<img src={Logo} className="h-10 2k:h-20 btn hidden sm:block" alt="" onClick={() => navigate('/')} />
+				<img src={Logo} className="h-10 2k:h-20 btn btn-ghost hidden sm:block" alt="" onClick={() => navigate('/')} />
 
 				{/* Mobile Hamburger */}
 				<div className="flex flex-row gap-4">

@@ -43,7 +43,7 @@
 
 @media (min-width: 1921px) {
 	.h-112 {
-		height: 60rem;
+		height: 70rem;
 	}
 }
 
@@ -53,6 +53,22 @@
 
 @media (min-width: 1921px) {
 	.w-110 {
-		height: 60rem;
+		width: 60rem;
+	}
+}
+
+.left-bar {
+	width: 28%;
+}
+
+@media (min-width: 1024px) {
+	.left-bar {
+		width: 15%;
+	}
+}
+
+@media (min-width: 1024px) {
+	.left-bar {
+		width: 15%;
 	}
 }

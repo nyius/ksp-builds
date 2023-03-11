@@ -6,6 +6,7 @@ import BuildContext from '../build/BuildContext';
 import AuthContext from '../auth/AuthContext';
 import { toast } from 'react-toastify';
 import FiltersContext from '../filters/FiltersContext';
+import { cloneDeep } from 'lodash';
 
 const useBuilds = () => {
 	const { dispatchBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
@@ -18,13 +19,14 @@ const useBuilds = () => {
 	 * @param {*} buildsToFetch
 	 */
 	const fetchBuilds = async buildsToFetch => {
+		const buildsToFetchCopy = cloneDeep(buildsToFetch);
 		try {
 			dispatchBuilds({ type: 'SET_FETCHED_BUILDS_LOADING', payload: true });
 			const buildsRef = collection(db, 'builds');
 			const builds = [];
 			let q;
 
-			if (!buildsToFetch) {
+			if (!buildsToFetchCopy) {
 				// Create a query
 				if (typeFilter !== '') {
 					q = query(
@@ -56,15 +58,14 @@ const useBuilds = () => {
 				const batches = [];
 
 				// because firestore only allows query 'in' by groups of 10, we have to break it up into chunks of 10
-				// by using splice, we alter the original input 'buildsToFetch' arr by removing 10 at a time
-				while (buildsToFetch.length) {
-					const batch = buildsToFetch.splice(0, 10);
+				// by using splice, we alter the original input 'buildsToFetchCopy' arr by removing 10 at a time
+				while (buildsToFetchCopy.length) {
+					const batch = buildsToFetchCopy.splice(0, 10);
 					q = query(buildsRef, where('id', 'in', batch), orderBy('timestamp', 'desc'));
 
 					// this gets all of the docs from our query, then loops over them and returns the raw data to our array
 					batches.push(getDocs(q).then(res => res.docs.map(res => res.data())));
 				}
-
 				// now we resolve all of the promises
 				const builds = await Promise.all(batches);
 
@@ -80,35 +81,6 @@ const useBuilds = () => {
 			console.log(error);
 			dispatchBuilds({ type: 'SET_FETCHED_BUILDS_LOADING', payload: false });
 			throw new Error(error);
-		}
-	};
-
-	/**
-	 * Fetches each of the logged in users favorites
-	 * @param {*} user
-	 */
-	const fetchFavorites = async () => {
-		try {
-			dispatchBuilds({ type: 'SET_FETCHED_BUILDS_LOADING', payload: true });
-
-			let builds = [];
-
-			// Loop over each favorite and load it in
-			let favoritePromises = await user.favorites.map(async favorite => {
-				const buildsSnap = await getDoc(doc(db, 'builds', favorite));
-				const build = buildsSnap.data();
-
-				// Check if the build exists in the db (if we cant find it, it was probably deleted and dont add it to the list)
-				if (build) {
-					builds.push(build);
-				}
-			});
-			await Promise.all(favoritePromises);
-
-			dispatchBuilds({ type: 'SET_FETCHED_BUILDS', payload: { favoriteBuilds: builds, loadingBuilds: false } });
-		} catch (error) {
-			console.log(error);
-			dispatchBuilds({ type: 'SET_FETCHED_BUILDS_LOADING', payload: false });
 		}
 	};
 
@@ -192,7 +164,7 @@ const useBuilds = () => {
 		});
 	};
 
-	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchFavorites, fetchMoreBuilds, setBuildsLoading, clearFetchedBuilds };
+	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchMoreBuilds, setBuildsLoading, clearFetchedBuilds };
 };
 
 export default useBuilds;

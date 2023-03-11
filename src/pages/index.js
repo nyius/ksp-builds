@@ -12,3 +12,4 @@ export { default as News } from './news/News.jsx';
 export { default as UnderConstruction } from './construction/UnderConstruction.jsx';
 export { default as Contact } from './contact/Contact.jsx';
 export { default as AdminPanel } from './admin/AdminPanel.jsx';
+export { default as Favorites } from './favorites/Favorites.jsx';

@@ -7,7 +7,7 @@ import PublicRoute from './routes/PublicRoute';
 import AdminRoute from './routes/AdminRoute';
 import backgroundplanet from './assets/planet.png';
 //---------------------------------------------------------------------------------------------------//
-import { Index, SignUp, Build, NotFound, Create, Profile, Privacy, Terms, VisitProfile, Settings, News, Contact, AdminPanel, UnderConstruction } from './pages';
+import { Index, SignUp, Build, NotFound, Create, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, UnderConstruction } from './pages';
 import RightBar from './components/containers/rightBar/RightBar';
 //---------------------------------------------------------------------------------------------------//
 import { Navbar, Footer } from './components';
@@ -27,7 +27,6 @@ email verification?
 Mission generation page
 folders
 Go to a user like /nyius
-See favs/liked on profile or somewhere
 Newsfeed to cloud function that checks every 30min/ caches to aws
 Mods are a list
 Quick share builds (without needing to create a whole build)
@@ -93,6 +92,7 @@ function App() {
 										<Route exact path="/terms" element={<Terms />} />
 										<Route exact path="/news" element={<News />} />
 										<Route exact path="/contact" element={<Contact />} />
+
 										<Route exact path="/profile/:id" element={<VisitProfile />} />
 										<Route exact path="/build/:id" element={<Build />} />
 										<Route
@@ -101,6 +101,15 @@ function App() {
 											element={
 												<PrivateRoute>
 													<Profile />
+												</PrivateRoute>
+											}
+										/>
+										<Route
+											exact
+											path="/favorites"
+											element={
+												<PrivateRoute>
+													<Favorites />
 												</PrivateRoute>
 											}
 										/>

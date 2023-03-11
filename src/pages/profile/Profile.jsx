@@ -10,7 +10,6 @@ import useBuilds from '../../context/builds/BuildsActions';
 import useFilters from '../../context/filters/FiltersActions';
 import FiltersContext from '../../context/filters/FiltersContext';
 import useAuth from '../../context/auth/AuthActions';
-import useBuild from '../../context/build/BuildActions';
 import useResetStates from '../../utilities/useResetStates';
 //---------------------------------------------------------------------------------------------------//
 import BuildCard from '../../components/buildCard/BuildCard';
@@ -31,15 +30,15 @@ function Profile() {
 	const { fetchedBuilds, loadingBuilds } = useContext(BuildsContext);
 	const { user, authLoading, editingProfile } = useContext(AuthContext);
 	//---------------------------------------------------------------------------------------------------//
-	const { fetchBuilds, setBuildsLoading, clearFetchedBuilds } = useBuilds();
 	const { setEditingProfile, updateUserDbBio, uploadProfilePicture, updateUserDbProfilePic } = useAuth();
+	const { fetchBuilds, setBuildsLoading, clearFetchedBuilds } = useBuilds();
 	const { filterBuilds, resetFilters } = useFilters();
 	//---------------------------------------------------------------------------------------------------//
-	const [sortedBuilds, setSortedBuilds] = useState([]);
-	const [bio, setBio] = useState('');
-	const [bioLength, setBioLength] = useState(1000);
 	const [uploadingProfilePhoto, setUploadingProfilePhoto] = useState(false);
+	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const [dateCreated, setDateCreated] = useState(null);
+	const [bioLength, setBioLength] = useState(1000);
+	const [bio, setBio] = useState('');
 
 	useEffect(() => {
 		if (user?.dateCreated) {
@@ -52,8 +51,10 @@ function Profile() {
 	// Reset edidtingBuild/editingComment stats on page load
 	useEffect(() => {
 		resetStates();
-
 		resetFilters();
+	}, []);
+
+	useEffect(() => {
 		clearFetchedBuilds();
 
 		if (!authLoading) {
@@ -64,7 +65,7 @@ function Profile() {
 				setBuildsLoading(false);
 			}
 		}
-	}, []);
+	}, [authLoading]);
 
 	// Listen for changes to the sorting and filter the builds accordingly
 	useEffect(() => {
@@ -111,7 +112,7 @@ function Profile() {
 	return (
 		<MiddleContainer color="none">
 			<PlanetHeader text="Profile" />
-			{!authLoading && user.username && (
+			{!authLoading && user?.username && (
 				<>
 					<div className="flex flex-col md:flex-row gap-20 items-center mb-10 bg-base-400 border-2 border-dashed border-slate-700 rounded-xl p-6 2k:p-12">
 						{/* Profile Picture */}

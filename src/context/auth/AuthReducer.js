@@ -31,7 +31,7 @@ const AuthReducer = (state, action) => {
 				...state,
 				user: newGetUserStateUpdate,
 			};
-		case 'GET_USER_DB':
+		case 'SET_USER':
 			const getCurrentUserState = { ...state.user };
 			const updatedUserState = Object.assign(getCurrentUserState, action.payload);
 

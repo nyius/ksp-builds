@@ -78,6 +78,7 @@ function NavBar() {
 							</label>
 							<ul tabIndex={0} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box w-96">
 								<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Profile" onClick={() => navigate('/profile')} />
+								<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" onClick={() => navigate('/favorites')} />
 								<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Settings" onClick={() => navigate('/settings')} />
 								<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="logout" text="Logout" onClick={() => signOut()} />
 							</ul>

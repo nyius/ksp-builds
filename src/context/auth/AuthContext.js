@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
 
 				// Dispatch the user
 				dispatchAuth({
-					type: 'GET_USER_DB',
+					type: 'SET_USER',
 					payload: user,
 				});
 
@@ -71,6 +71,7 @@ export const AuthProvider = ({ children }) => {
 					await deleteDoc(doc(db, 'users', auth.currentUser.uid, 'notifications', id));
 				});
 
+				// if the user exists but they dont have a username, must be a new account so prompt for a new one
 				if (!user.username) {
 					console.log('No username!');
 					dispatchAuth({ type: 'SET_NEW_SIGNUP', payload: true });

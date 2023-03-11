@@ -1,0 +1,7 @@
+I NEED S3 (amazon simple storage service)
+https://docs.aws.amazon.com/s3/?icmpid=docs_homepage_featuredsvcs
+go there make a bucket that lets me store stuff
+then switch my fs.writeFile to write to the bukcet (get their nom stuff)
+good idea to have a test/prod bucket
+
+awe serverless to host my express server (lambda) and also vercel

@@ -900,6 +900,7 @@ $primary: #0f766e;
 	outline: none;
 }
 .rdw-editor-wrapper {
+	width: 100%;
 	box-sizing: content-box;
 }
 .rdw-editor-main blockquote {
@@ -1094,7 +1095,15 @@ $primary: #0f766e;
 	counter-reset: ol4;
 }
 
+.public-DraftStyleDefault-ltr {
+	font-size: 1.4rem;
+}
+
 @media (max-width: 1920px) {
+	.public-DraftStyleDefault-ltr {
+		font-size: 1.2rem;
+	}
+
 	.rdw-editor-toolbar {
 		font-size: 11px;
 		padding: 4px 3px 0;

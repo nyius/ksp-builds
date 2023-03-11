@@ -160,7 +160,7 @@ const useAuth = () => {
 					updateUserDb({ downVotes: newDownVotes });
 					await updateDoc(doc(db, 'builds', build.id), { downVotes: (build.downVotes += 1) });
 
-					// If the user has this downvoted but wants to downvote it, remove the upvote
+					// If the user has this upvoted but wants to downvote it, remove the upvote
 					if (newUpVotes.includes(build.id)) {
 						const index = newUpVotes.indexOf(build.id);
 						newUpVotes.splice(index, 1);
@@ -168,7 +168,7 @@ const useAuth = () => {
 						dispatchAuth({ type: 'UPDATE_USER', payload: { upVotes: newUpVotes } });
 
 						updateUserDb({ upVotes: newUpVotes });
-						await updateDoc(doc(db, 'builds', build.id), { upVotes: (build.downVotes -= 1) });
+						await updateDoc(doc(db, 'builds', build.id), { upVotes: (build.upVotes -= 1) });
 					}
 				}
 			}

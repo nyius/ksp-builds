@@ -12,8 +12,7 @@ function Sort() {
 				<option value="date_oldest">Date (oldest)</option>
 				<option value="upVotes">Votes</option>
 				<option value="comments">Comments</option>
-				<option value="views_most">Views (most)</option>
-				<option value="views_least">Views (least)</option>
+				<option value="views_most">Views</option>
 			</optgroup>
 		</select>
 	);

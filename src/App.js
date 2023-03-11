@@ -20,7 +20,6 @@ import './App.css';
 /*TODO
 favoriting
 reporting
-voting bug (when voting on main page, it doesnt update the build in the builds object even though the db is updated)
 search that searches the database, not just loaded builds
 email verification?
 Mission generation page

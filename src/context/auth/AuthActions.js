@@ -179,6 +179,33 @@ const useAuth = () => {
 	};
 
 	/**
+	 * Handles a user favoriting a build
+	 * @param {*} id
+	 */
+	const handleFavoriting = async id => {
+		try {
+			let newFavorites = cloneDeep(user.favorites);
+
+			// Check if we already upvoted this (and if so, unupvote it)
+			if (newFavorites.includes(id)) {
+				const index = newFavorites.indexOf(id);
+				newFavorites.splice(index, 1);
+
+				dispatchAuth({ type: 'UPDATE_USER', payload: { favorites: newFavorites } });
+
+				updateUserDb({ favorites: newFavorites });
+			} else {
+				newFavorites.push(id);
+				dispatchAuth({ type: 'UPDATE_USER', payload: { favorites: newFavorites } });
+
+				updateUserDb({ favorites: newFavorites });
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
 	 * Handles adding a new build to the current users state. takes in a build id
 	 * @param {*} buildId
 	 */
@@ -353,18 +380,19 @@ const useAuth = () => {
 	};
 
 	return {
-		setNewSignup,
-		deleteUserAccount,
-		setResetPassword,
-		setNotificationsRead,
-		handleDeleteNotification,
-		updateUserState,
 		handleVoting,
+		handleDeleteNotification,
+		handleFavoriting,
 		addbuildToUser,
+		setResetPassword,
+		setNewSignup,
+		setNotificationsRead,
 		setEditingProfile,
+		updateUserState,
 		updateUserDbBio,
 		updateUserDbProfilePic,
 		updateUserProfilePicture,
+		deleteUserAccount,
 		fetchUsersProfile,
 		uploadProfilePicture,
 	};

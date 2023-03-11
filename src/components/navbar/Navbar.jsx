@@ -57,9 +57,9 @@ function NavBar() {
 
 				{/* Buttons */}
 				<ul className="menu menu-horizontal px-6 gap-3 2k:gap-6">
-					<Button onClick={handleCreateNavigate} color="btn-accent" css="text-white hidden sm:flex" text="Create" icon="plus" />
-					<Button onClick={() => navigate('/news')} css="text-white hidden sm:flex" text="News" icon="news" />
-					<Button onClick={() => navigate('/contact')} css="text-white hidden sm:flex" text="Contact" icon="email" />
+					<Button onClick={handleCreateNavigate} color="btn-accent" css="text-white hidden md:flex" text="Create" icon="plus" />
+					<Button onClick={() => navigate('/news')} css="text-white hidden md:flex" text="News" icon="news" />
+					<Button onClick={() => navigate('/contact')} css="text-white hidden md:flex" text="Contact" icon="email" />
 					<CreateBuildAdmin />
 				</ul>
 

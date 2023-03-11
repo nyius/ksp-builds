@@ -9,6 +9,7 @@ import DeleteBuildAdmin from '../buttons/DeleteBuildAdmin';
 import TypeBadge from '../typeBadge/TypeBadge';
 import VoteArrows from '../buttons/VoteArrows';
 import UsernameLink from '../buttons/UsernameLink';
+import Favorite from '../buttons/Favorite';
 //---------------------------------------------------------------------------------------------------//
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
 
@@ -26,7 +27,7 @@ function BuildCard({ build }) {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="card card-compact w-full sm:w-96 md:w-full bg-base-400 shadow-lg hover:shadow-xl cursor-pointer h-112">
+		<div className="card card-compact card-sizing w-full sm:w-96 md:w-full bg-base-400 shadow-lg hover:shadow-xl cursor-pointer h-112">
 			<DeleteBuildAdmin style="circle" id={build.id} userID={build.uid} />
 
 			<div className="flex flex-col h-full place-content-between rounded-2xl buildCardHover hover:rounded-2xl" onClick={handleNavigate}>
@@ -78,22 +79,26 @@ function BuildCard({ build }) {
 				</div>
 			</div>
 
-			{/* Voting/comments */}
+			{/* Voting/comments/downloads/favorite */}
 			<div className="flex flex-row flex-wrap absolute bottom-0 rounded-b-xl left-0 bg-base-800 w-full p-2 xl:p-4 2k:p-4">
-				<div className="flex flex-row flex-wrap gap-8 items-center">
+				<div className="flex flex-row place-content-between w-full flex-wrap gap-2 2k:gap-4 items-center">
 					<VoteArrows build={build} />
+
 					<div className="flex flex-row items-center gap-2">
 						<p className="text-2xl 2k:text-4xl">
 							<BiComment />
 						</p>
 						<p className="text-lg 2k:text-2xl">{build.commentCount}</p>
 					</div>
+
 					<div className="flex flex-row items-center gap-2">
 						<p className="text-2xl 2k:text-4xl">
 							<FiDownload />
 						</p>
 						<p className="text-lg 2k:text-2xl">{build.downloads}</p>
 					</div>
+
+					<Favorite id={build.id} />
 				</div>
 			</div>
 		</div>

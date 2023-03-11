@@ -10,6 +10,7 @@ import { BiCommentAdd, BiReset } from 'react-icons/bi';
 import { MdOutlineDoneOutline, MdEmail, MdSettingsInputComponent } from 'react-icons/md';
 import { FcGoogle } from 'react-icons/fc';
 import { HiNewspaper } from 'react-icons/hi';
+import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 
 /**
  *
@@ -54,6 +55,8 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 						{icon === 'settings' && <MdSettingsInputComponent />}
 						{icon === 'home' && <FaHome />}
 						{icon === 'news' && <HiNewspaper />}
+						{icon === 'fill-heart' && <AiFillHeart />}
+						{icon === 'outline-heart' && <AiOutlineHeart />}
 					</span>
 				)}
 				{text !== '' && text}
@@ -85,6 +88,8 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 						{icon === 'settings' && <MdSettingsInputComponent />}
 						{icon === 'home' && <FaHome />}
 						{icon === 'news' && <HiNewspaper />}
+						{icon === 'fill-heart' && <AiFillHeart />}
+						{icon === 'outline-heart' && <AiOutlineHeart />}
 					</span>
 				)}
 				{text !== '' && text}

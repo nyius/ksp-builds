@@ -24,6 +24,7 @@ import Button from '../../components/buttons/Button';
 import CantFind from '../../components/cantFind/CantFind';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import UsernameLink from '../../components/buttons/UsernameLink';
+import Favorite from '../../components/buttons/Favorite';
 import TextEditor from '../../components/textEditor/TextEditor';
 //---------------------------------------------------------------------------------------------------//
 
@@ -94,21 +95,28 @@ function Build() {
 								</div>
 							</div>
 
-							{/* Build Name */}
+							{/* Build Name/ Fav/ Voting/ Views */}
 							<div className="flex flex-row place-content-between">
 								<h1 className="text-slate-200 text-3xl font-bold 2k:text-5xl">{loadedBuild.name}</h1>
-								<p className="flex flex-row text-2xl items-center gap-4 2k:text-4xl">
-									<AiFillEye />
-									<span className="text-lg self-end 2k:text-3xl"> {loadedBuild.views}</span>
-								</p>
+
+								<div className="flex-row flex gap-4 2k:gap-8">
+									{/* Fave */}
+									<Favorite />
+									{/* Vote */}
+									<div className="flex flex-row gap-8">
+										<VoteArrows build={loadedBuild} />
+									</div>
+
+									{/* Views */}
+									<p className="flex flex-row text-2xl items-center gap-4 2k:text-4xl">
+										<AiFillEye />
+										<span className="text-lg 2k:text-3xl"> {loadedBuild.views}</span>
+									</p>
+								</div>
 							</div>
 
 							{/* Voting/Views/Types */}
 							<div className="flex flex-row place-content-between mb-8 2k:mb-16">
-								<div className="flex flex-row gap-8">
-									<VoteArrows build={loadedBuild} />
-								</div>
-
 								{/* Types */}
 								<div className="flex flex-row flex-wrap gap-2">
 									{loadedBuild.type.map((type, i) => {

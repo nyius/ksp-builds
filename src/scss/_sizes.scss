@@ -45,8 +45,18 @@
 	z-index: 101;
 }
 
+.card-sizing {
+	height: 40rem;
+}
+
 @media (min-width: 1921px) {
-	.h-112 {
+	.card-sizing {
+		height: 60rem;
+	}
+}
+
+@media (min-width: 2561px) {
+	.card-sizing {
 		height: 70rem;
 	}
 }
@@ -75,4 +85,9 @@
 	.left-bar {
 		width: 15%;
 	}
+}
+
+.carousel {
+	width: 100%;
+	aspect-ratio: 16/9;
 }

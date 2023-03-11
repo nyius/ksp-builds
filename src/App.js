@@ -26,6 +26,14 @@ search that searches the database, not just loaded builds
 email verification?
 Mission generation page
 folders
+Go to a user like /nyius
+See favs/liked on profile or somewhere
+Newsfeed to cloud function that checks every 30min/ caches to aws
+Mods are a list
+Quick share builds (without needing to create a whole build)
+test out versions
+count new users
+count builds
  */
 
 //---------------------------------------------------------------------------------------------------//

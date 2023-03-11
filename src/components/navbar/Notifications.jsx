@@ -41,7 +41,8 @@ function Notifications() {
 							</p>
 						</label>
 					</div>
-					<ul tabIndex={4} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box w-110 h-96 overflow-auto flex-nowrap scrollbar">
+					<ul tabIndex={4} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box notifications h-fit max-h-96 overflow-auto flex-nowrap scrollbar">
+						{user?.notifications.length === 0 && <p className="text-xl 2k:text-2xl font-bold">No notifications</p>}
 						{user?.notifications?.map((notif, i) => {
 							return <Notification key={i} i={i} notif={notif} />;
 						})}

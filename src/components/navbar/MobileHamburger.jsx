@@ -33,6 +33,7 @@ function MobileHamburger() {
 				<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="home" text="Home" onClick={() => navigate('/')} />
 				<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="plus" text="Create" onClick={handleCreateNavigate} />
 				<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="News" icon="news" onClick={() => navigate('/news')} />
+				<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="Contact" icon="email" onClick={() => navigate('/contact')} />
 			</ul>
 		</div>
 	);

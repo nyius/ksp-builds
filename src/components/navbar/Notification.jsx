@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../buttons/Button';
 import useAuth from '../../context/auth/AuthActions';
 import UsernameLink from '../buttons/UsernameLink';
+import draftJsToPlainText from '../../utilities/draftJsToPlainText';
+import createMarkup from '../../utilities/createMarkup';
 
 function Notification({ i, notif }) {
 	const [timestamp, setTimestamp] = useState(null);
@@ -38,14 +40,14 @@ function Notification({ i, notif }) {
 			{notif.type === 'comment' && (
 				<>
 					<p className="text-lg 2k:text-2xl text-slate-500 italic 2k:mb-3">Someone commented on one of your builds</p>
-					<p className="text-xl 2k:text-3xl multi-line-truncate">{notif.comment}</p>
+					<p className="text-xl 2k:text-3xl multi-line-truncate">{draftJsToPlainText(notif.comment)}</p>
 				</>
 			)}
 			{notif.type === 'welcome' && (
 				<p className="text-xl 2k:text-2xl">
 					<>
 						<p className="text-lg 2k:text-2xl text-slate-500 italic 2k:mb-3">Welcome!</p>
-						<p className="text-xl 2k:text-3xl">{notif.message}</p>
+						<p className="text-xl 2k:text-3xl">{draftJsToPlainText(notif.message)}</p>
 					</>
 				</p>
 			)}
@@ -54,7 +56,7 @@ function Notification({ i, notif }) {
 					{' '}
 					<>
 						<p className="text-lg 2k:text-2xl text-slate-500 italic 2k:mb-3">You have a new message</p>
-						<p className="text-xl 2k:text-3xl multi-line-truncate">{notif.message}</p>
+						<p className="text-xl 2k:text-3xl multi-line-truncate">{draftJsToPlainText(notif.message)}</p>
 					</>
 				</p>
 			)}

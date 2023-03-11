@@ -10,3 +10,5 @@ export { default as VisitProfile } from './profile/VisitProfile.jsx';
 export { default as Settings } from './settings/Settings.jsx';
 export { default as News } from './news/News.jsx';
 export { default as UnderConstruction } from './construction/UnderConstruction.jsx';
+export { default as Contact } from './contact/Contact.jsx';
+export { default as AdminPanel } from './admin/AdminPanel.jsx';

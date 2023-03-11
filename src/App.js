@@ -4,9 +4,10 @@ import { ToastContainer } from 'react-toastify';
 import ContextsProvider from './context/ContextProvider';
 import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoute';
+import AdminRoute from './routes/AdminRoute';
 import backgroundplanet from './assets/planet.png';
 //---------------------------------------------------------------------------------------------------//
-import { Index, SignUp, Build, NotFound, Create, Profile, Privacy, Terms, VisitProfile, Settings, News, UnderConstruction } from './pages';
+import { Index, SignUp, Build, NotFound, Create, Profile, Privacy, Terms, VisitProfile, Settings, News, Contact, AdminPanel, UnderConstruction } from './pages';
 import RightBar from './components/containers/rightBar/RightBar';
 //---------------------------------------------------------------------------------------------------//
 import { Navbar, Footer } from './components';
@@ -19,6 +20,7 @@ import './App.css';
 
 /*TODO
 favoriting
+check logout when on a private page
 reporting
 search that searches the database, not just loaded builds
 email verification?
@@ -82,6 +84,7 @@ function App() {
 										<Route exact path="/privacy" element={<Privacy />} />
 										<Route exact path="/terms" element={<Terms />} />
 										<Route exact path="/news" element={<News />} />
+										<Route exact path="/contact" element={<Contact />} />
 										<Route exact path="/profile/:id" element={<VisitProfile />} />
 										<Route exact path="/build/:id" element={<Build />} />
 										<Route
@@ -91,6 +94,15 @@ function App() {
 												<PrivateRoute>
 													<Profile />
 												</PrivateRoute>
+											}
+										/>
+										<Route
+											exact
+											path="/admin-panel"
+											element={
+												<AdminRoute>
+													<AdminPanel />
+												</AdminRoute>
 											}
 										/>
 										<Route path="*" element={<NotFound />} />

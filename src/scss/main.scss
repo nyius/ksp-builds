@@ -3,7 +3,6 @@
 	padding: 0;
 	box-sizing: inherit;
 }
-
 html {
 	font-size: 10px;
 	box-sizing: border-box;
@@ -13,10 +12,6 @@ body {
 	font-family: 'Open Sans', sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-
-	// &::-webkit-scrollbar {
-	// 	width: 0;
-	// }
 }
 
 :root {
@@ -38,7 +33,5 @@ body {
 }
 
 .gradient {
-	// background: rgb(0, 212, 255);
-	// background: linear-gradient(0deg, rgba(112, 178, 191, 1) 0%, rgba(27, 39, 70, 1) 52%, rgba(12, 14, 19, 1) 100%);
 	z-index: -100;
 }

@@ -24,59 +24,70 @@ function VerticalTypeLink({ text }) {
 	return (
 		<Link
 			to={`/builds/${text}`}
-			id={text}
+			className="flex flex-row w-full"
 			onClick={e => {
 				setTypeFilter(e.target.id);
 			}}
-			className="relative overflow-hidden h-20 2k:h-32"
+			id={text}
 		>
-			<div id={text} className={`flex flex-row h-20 2k:h-32 gap-12 lg:gap-6 2k:gap-16 variable-font-size font-light btn btn-block justify-start 2k:h-20 ${typeFilter === text ? 'bg-primary hover:bg-violet-900' : 'bg-base-400'} text-slate-300`}>
+			<div id={text} className="bg-primary w-12 2k:w-20 h-20 2k:h-32 flex items-center justify-center rounded-l-lg">
 				{text === 'Interplanetary' && (
-					<span className="text-xl 2k:text-3xl">
+					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<BiPlanet />
 					</span>
 				)}
 				{text === 'Interstellar' && (
-					<span className="text-xl 2k:text-3xl">
+					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<GiGalaxy />
 					</span>
 				)}
 				{text === 'Satellite' && (
-					<span className="text-xl 2k:text-3xl">
+					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<FaSatellite />
 					</span>
 				)}
 				{text === 'Space Station' && (
-					<span className="text-xl 2k:text-3xl">
+					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<img src={SpaceStation} className="h-6 2k:h-10" alt="" />
 					</span>
 				)}
 				{text === 'Lander' && (
-					<span className="text-xl 2k:text-3xl">
+					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<img src={LunarModule} className="h-6 2k:h-10" alt="" />
 					</span>
 				)}
 				{text === 'Rover' && (
-					<span className="text-xl 2k:text-3xl">
+					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<GiMarsCuriosity />
 					</span>
 				)}
 				{text === 'SSTO' && (
-					<span className="text-xl 2k:text-3xl">
+					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<IoIosRocket />
 					</span>
 				)}
 				{text === 'Spaceplane' && (
-					<span className="text-xl 2k:text-3xl">
+					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<ImAirplane />
 					</span>
 				)}
 				{text === 'Probe' && (
-					<span className="text-xl 2k:text-3xl">
+					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<img src={Probe} className="h-6 2k:h-10" alt="" />
 					</span>
 				)}
-				<p className="z-60 font-bold">{text}</p>
+			</div>
+			<div id={text} className="relative overflow-hidden h-20 2k:h-32 flex flex-row w-full">
+				<div
+					id={text}
+					className={`relative rounded-none rounded-r-lg flex flex-row h-20 2k:h-32 gap-12 lg:gap-6 2k:gap-16 variable-font-size font-light btn btn-block justify-start 2k:h-20 ${
+						typeFilter === text ? 'bg-primary hover:bg-violet-900' : 'bg-base-400'
+					} text-slate-300`}
+				>
+					<p id={text} className="z-60 font-bold">
+						{text}
+					</p>
+				</div>
 			</div>
 		</Link>
 	);

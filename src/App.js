@@ -6,7 +6,7 @@ import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoute';
 import backgroundplanet from './assets/planet.png';
 //---------------------------------------------------------------------------------------------------//
-import { Index, SignUp, Build, NotFound, Create, Profile, Privacy, Terms, VisitProfile, Settings } from './pages';
+import { Index, SignUp, Build, NotFound, Create, Profile, Privacy, Terms, VisitProfile, Settings, News, UnderConstruction } from './pages';
 import RightBar from './components/containers/rightBar/RightBar';
 //---------------------------------------------------------------------------------------------------//
 import { Navbar, Footer } from './components';
@@ -18,14 +18,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
-make type search prettier
 favoriting
 reporting
 voting bug (when voting on main page, it doesnt update the build in the builds object even though the db is updated)
 search that searches the database, not just loaded builds
-settings page/delete account/ notifications
 email verification?
-news page
 Mission generation page
 folders
  */
@@ -85,6 +82,7 @@ function App() {
 										/>
 										<Route exact path="/privacy" element={<Privacy />} />
 										<Route exact path="/terms" element={<Terms />} />
+										<Route exact path="/news" element={<News />} />
 										<Route exact path="/profile/:id" element={<VisitProfile />} />
 										<Route exact path="/build/:id" element={<Build />} />
 										<Route

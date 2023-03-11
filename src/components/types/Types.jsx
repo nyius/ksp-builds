@@ -1,5 +1,5 @@
 import React from 'react';
-import VerticalTypeLink from '../../pages/index/VerticalTypeLink';
+import VerticalTypeLink from '../buttons/VerticalTypeLink';
 import { IoIosRocket } from 'react-icons/io';
 
 function Types() {

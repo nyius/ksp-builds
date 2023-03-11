@@ -17,7 +17,7 @@ function VerticalVersionLink({ text }) {
 					setVersionFilter(e);
 				}}
 			>
-				<a id={text} className="btn btn-block bg-accent text-slate-900 rounded-lg hover:bg-teal-700 text-slate-300 2k:text-2xl 2k:btn-lg 2k:font-light">
+				<a id={text} className="btn btn-block bg-primary text-white rounded-lg hover:bg-teal-700 text-slate-300 2k:text-2xl 2k:btn-lg 2k:font-light">
 					{text}
 				</a>
 			</li>

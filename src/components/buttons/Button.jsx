@@ -9,6 +9,7 @@ import { BsFillPatchQuestionFill, BsFillArrowDownSquareFill, BsFillArrowLeftSqua
 import { BiCommentAdd, BiReset } from 'react-icons/bi';
 import { MdOutlineDoneOutline, MdEmail, MdSettingsInputComponent } from 'react-icons/md';
 import { FcGoogle } from 'react-icons/fc';
+import { HiNewspaper } from 'react-icons/hi';
 
 /**
  *
@@ -52,6 +53,7 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 						{icon === 'head' && <FaUserAstronaut />}
 						{icon === 'settings' && <MdSettingsInputComponent />}
 						{icon === 'home' && <FaHome />}
+						{icon === 'news' && <HiNewspaper />}
 					</span>
 				)}
 				{text !== '' && text}
@@ -82,6 +84,7 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 						{icon === 'head' && <FaUserAstronaut />}
 						{icon === 'settings' && <MdSettingsInputComponent />}
 						{icon === 'home' && <FaHome />}
+						{icon === 'news' && <HiNewspaper />}
 					</span>
 				)}
 				{text !== '' && text}

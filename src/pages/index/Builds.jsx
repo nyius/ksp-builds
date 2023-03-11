@@ -40,6 +40,10 @@ function Builds() {
 		fetchBuilds();
 	}, [typeFilter, versionFilters, searchTerm, tagsSearch]);
 
+	if (!loadingBuilds && fetchedBuilds.length === 0) {
+		return <CantFind text="No builds found :("></CantFind>;
+	}
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
@@ -56,15 +60,9 @@ function Builds() {
 					</div>
 				) : (
 					<>
-						{fetchedBuilds.length === 0 ? (
-							<CantFind text="No builds found :("></CantFind>
-						) : (
-							<>
-								{sortedBuilds.map((build, i) => {
-									return <BuildCard key={i} i={i} build={build} />;
-								})}
-							</>
-						)}
+						{sortedBuilds.map((build, i) => {
+							return <BuildCard key={i} i={i} build={build} />;
+						})}
 					</>
 				)}
 			</div>

@@ -19,7 +19,7 @@ function News() {
 	return (
 		<MiddleContainer>
 			<PlanetHeader text="Latest KSP News" />
-			<div className="grid grid-cols-3 2k:grid-cols-4 flex-wrap gap-6 2k:gap-12">
+			<div className="grid grid-cols-2 lg:grid-cols-3 2k:grid-cols-4 flex-wrap gap-6 2k:gap-12">
 				{news.map(article => {
 					return <NewsCard article={article} />;
 				})}

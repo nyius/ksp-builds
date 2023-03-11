@@ -51,7 +51,7 @@ function CreateBuildAdmin() {
 	};
 
 	//---------------------------------------------------------------------------------------------------//
-	return <>{user?.siteAdmin && <Button color="btn-error" text="Create Build (admin)" icon="plus" css="text-white hidden md:flex" onClick={createBuild} />}</>;
+	return <>{user?.siteAdmin && <Button color="btn-primary" text="Create Build (admin)" icon="plus" css="text-white hidden md:flex" onClick={createBuild} />}</>;
 }
 
 export default CreateBuildAdmin;

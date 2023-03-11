@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import useFilters from '../../context/filters/FiltersActions';
 import FiltersContext from '../../context/filters/FiltersContext';
 //---------------------------------------------------------------------------------------------------//
@@ -11,16 +11,19 @@ import { GiGalaxy, GiMarsCuriosity } from 'react-icons/gi';
 //---------------------------------------------------------------------------------------------------//
 import SpaceStation from '../../assets/spaceStaion.svg';
 import LunarModule from '../../assets/lunarModule.svg';
-import Shuttle from '../../assets/Shuttle.png';
-import Satellite from '../../assets/Satellite.png';
-import Rocket1 from '../../assets/Rocket1.png';
 import Probe from '../../assets/probe.svg';
 
 function VerticalTypeLink({ text }) {
 	const navigate = useNavigate();
+	const location = useLocation();
+
 	const { typeFilter } = useContext(FiltersContext);
 
 	const { setTypeFilter } = useFilters();
+
+	const parseUrl = url => {
+		return url.replace('%20', ' ');
+	};
 	return (
 		<Link
 			to={`/builds/${text}`}
@@ -30,7 +33,7 @@ function VerticalTypeLink({ text }) {
 			}}
 			id={text}
 		>
-			<div id={text} className="bg-primary w-12 2k:w-20 h-20 2k:h-32 flex items-center justify-center rounded-l-lg">
+			<div id={text} className="bg-primary w-12 2k:w-20 h-20 2k:h-32 flex items-center justify-center rounded-l-lg 2k:rounded-l-xl">
 				{text === 'Interplanetary' && (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<BiPlanet />
@@ -80,8 +83,8 @@ function VerticalTypeLink({ text }) {
 			<div id={text} className="relative overflow-hidden h-20 2k:h-32 flex flex-row w-full">
 				<div
 					id={text}
-					className={`relative rounded-none rounded-r-lg flex flex-row h-20 2k:h-32 gap-12 lg:gap-6 2k:gap-16 variable-font-size font-light btn btn-block justify-start 2k:h-20 ${
-						typeFilter === text ? 'bg-primary hover:bg-violet-900' : 'bg-base-400'
+					className={`relative rounded-none rounded-r-lg 2k:rounded-r-xl flex flex-row h-20 2k:h-32 gap-12 lg:gap-6 2k:gap-16 variable-font-size font-light btn btn-block justify-start 2k:h-20 ${
+						parseUrl(location.pathname).includes(text) ? 'bg-primary hover:bg-violet-900' : 'bg-base-400'
 					} text-slate-300`}
 				>
 					<p id={text} className="z-60 font-bold">

@@ -1,16 +1,19 @@
 //👇🏻index.js
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
 const app = express();
-const cheerio = require('cheerio');
-const axios = require('axios');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+import cheerio from 'cheerio';
+import axios from 'axios';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import buildUpload from './modules/buildUpload.js';
 
-const tmp = require('tmp');
 const PORT = 4000;
 
+//---------------------------------------------------------------------------------------------------//
+
+//---------------------------------------------------------------------------------------------------//
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
@@ -66,14 +69,35 @@ app.get('/news', async (req, res) => {
 // handles uploading the build file to the server and saving it
 app.post('/buildUpload', async (req, res) => {
 	const { build, id } = req.body;
+	buildUpload(id, build);
 
-	fs.writeFile(`./rawBuilds/${id}.json`, build, err => {
-		if (err) {
-			console.log(err);
-		} else {
-			console.log(`File Saved!`);
-		}
-	});
+	// fs.writeFile(`./rawBuilds/${id}.json`, build, err => {
+	// 	if (err) {
+	// 		console.log(err);
+	// 	} else {
+	// 		console.log(`File Saved!`);
+	// 	}
+	// });
+
+	// const buf = Buffer.from(JSON.stringify(build));
+
+	// var data = {
+	// 	Bucket: process.env.S3_BUCKET,
+	// 	Key: `${id}.json`,
+	// 	Body: buf,
+	// 	ContentEncoding: 'base64',
+	// 	ContentType: 'application/json',
+	// 	ACL: 'public-read',
+	// };
+
+	// s3.upload(data, function (err, data) {
+	// 	if (err) {
+	// 		console.log(err);
+	// 		console.log('Error uploading data: ', data);
+	// 	} else {
+	// 		console.log('succesfully uploaded!');
+	// 	}
+	// });
 
 	res.json({
 		message: 'Request successful!',
@@ -92,11 +116,6 @@ app.get('/fetchBuild', async (req, res) => {
 app.get('/deleteBuild', async (req, res) => {
 	const id = req.query.id;
 
-	fs.unlink(`./rawBuilds/${id}.json`, err => {
-		if (err) {
-			console.log(err);
-		}
-	});
 	res.json({
 		message: 'Deleted',
 	});

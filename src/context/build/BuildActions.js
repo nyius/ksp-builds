@@ -4,7 +4,8 @@ import { db } from '../../firebase.config';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { clonedeep } from 'lodash';
-import axios from 'axios';
+import { PutObjectCommand, S3Client, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { s3Client } from '../../S3.config';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from './BuildContext';
 import BuildsContext from '../builds/BuildsContext';
@@ -33,15 +34,21 @@ const useBuild = () => {
 			// get the build from the db
 			const fetchedBuild = await getDoc(buildRef);
 
-			const rawBuildRes = await axios.get(`http://localhost:4000/fetchBuild?id=${id}`);
-			const rawBuildData = rawBuildRes.data;
+			const command = new GetObjectCommand({
+				Bucket: process.env.REACT_APP_BUCKET,
+				Key: `${id}.json`,
+			});
+
+			const response = await s3Client.send(command);
+			const rawBuildData = await response.Body.transformToString();
+			const parsedBuild = JSON.parse(rawBuildData);
 
 			if (fetchedBuild.exists()) {
 				let build = fetchedBuild.data();
 
 				await fetchComments(id);
 				await updateViewCount(build, id);
-				build.build = rawBuildData.build;
+				build.build = parsedBuild;
 
 				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: build, loadingBuild: false } });
 			} else {
@@ -139,9 +146,8 @@ const useBuild = () => {
 		try {
 			const newBuild = await makeBuildReadyToUpload(build);
 
-			const rawBuild = { build: newBuild.build };
-			const buildJSON = JSON.stringify(rawBuild);
-			delete build.build;
+			const buildJSON = JSON.stringify(newBuild.build);
+			delete newBuild.build;
 
 			await updateDoc(doc(db, 'builds', newBuild.id), {
 				...newBuild,
@@ -150,10 +156,18 @@ const useBuild = () => {
 				throw new Error(err);
 			});
 
-			// date the build on the server
-			axios.post('http://localhost:4000/buildUpload', { id: newBuild.id, build: buildJSON }, {}).catch(err => console.error(err));
+			const command = new PutObjectCommand({
+				Bucket: process.env.REACT_APP_BUCKET,
+				Key: `${newBuild.id}.json`,
+				Body: buildJSON,
+				ContentEncoding: 'base64',
+				ContentType: 'application/json',
+				ACL: 'public-read',
+			});
 
-			newBuild.build = rawBuild.build;
+			const response = await s3Client.send(command);
+
+			newBuild.build = JSON.parse(buildJSON);
 
 			dispatchBuild({
 				type: 'SET_BUILD',
@@ -186,7 +200,12 @@ const useBuild = () => {
 			// Delete the build
 			await deleteDoc(doc(db, 'builds', id));
 
-			await axios.get(`http://localhost:4000/deleteBuild?id=${id}`);
+			const command = new DeleteObjectCommand({
+				Bucket: process.env.REACT_APP_BUCKET,
+				Key: `${id}.json`,
+			});
+
+			const response = await s3Client.send(command);
 
 			// If the build being deleted belongs to the current user, remove it
 			if (userId === user.uid) {
@@ -534,7 +553,8 @@ const useBuild = () => {
 			const buildId = uuidv4().slice(0, 30);
 			build.id = buildId;
 
-			const rawBuild = { build: build.build };
+			const buildJson = JSON.stringify(build.build);
+			const rawBuild = buildJson;
 			delete build.build;
 
 			await setDoc(doc(db, 'builds', buildId), build).catch(err => {
@@ -572,16 +592,26 @@ const useBuild = () => {
 					payload: build,
 				});
 
-				const buildJSON = JSON.stringify(rawBuild);
+				const command = new PutObjectCommand({
+					Bucket: process.env.REACT_APP_BUCKET,
+					Key: `${buildId}.json`,
+					Body: rawBuild,
+					ContentEncoding: 'base64',
+					ContentType: 'application/json',
+					ACL: 'public-read',
+				});
+
+				const response = await s3Client.send(command);
 
 				// Add it to the users 'Upvoted'
 				await handleVoting('upVote', build);
 
 				toast.success('Build created!');
-				return { newId, buildJSON };
+				return newId;
 			}
 		} catch (error) {
 			console.log(error);
+			setUploadingBuild(false);
 		}
 	};
 

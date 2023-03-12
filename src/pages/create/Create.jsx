@@ -140,19 +140,9 @@ function Create() {
 			buildToUpload.uid = user.uid;
 			buildToUpload.description = description;
 
-			await uploadBuild(buildToUpload).then(buildInfo => {
-				// Now that the build is on the server, upload the raw build to our storage
-				axios
-					.post('http://localhost:4000/buildUpload', { id: buildInfo.newId, build: buildInfo.buildJSON }, {})
-					.then(res => {
-						if (res.data.message) {
-						}
-					})
-					.catch(err => console.error(err));
-
-				setUploadingBuild(false);
-				navigate(`/build/${buildInfo.newId}`);
-			});
+			const newBuildId = await uploadBuild(buildToUpload);
+			setUploadingBuild(false);
+			navigate(`/build/${newBuildId}`);
 		} catch (error) {
 			toast.error('Something went wrong!');
 			console.log(error);
@@ -270,21 +260,6 @@ function Create() {
 
 	const squareStyle = i => {
 		if (hoverImage === i) return { backgroundColor: '#171b21' };
-	};
-
-	const test = async () => {
-		try {
-			// send the data to our server -------------------------------
-			axios
-				// .post('http://localhost:4000/buildUpload', { name: 123, build: JSON.stringify(BuildBig) }, {})
-				.then(res => {
-					if (res.data.message) {
-					}
-				})
-				.catch(err => console.error(err));
-		} catch (error) {
-			console.log(error);
-		}
 	};
 
 	//---------------------------------------------------------------------------------------------------//

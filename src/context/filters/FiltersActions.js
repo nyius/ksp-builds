@@ -79,7 +79,6 @@ const useFilters = () => {
 	 * @returns
 	 */
 	const filterBuilds = builds => {
-		console.log(`first`);
 		return builds
 			.slice()
 			.sort((a, b) => {

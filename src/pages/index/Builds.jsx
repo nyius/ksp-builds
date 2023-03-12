@@ -15,7 +15,7 @@ import SearchBar from '../../components/search/SearchBar';
 import CantFind from '../../components/cantFind/CantFind';
 
 function Builds() {
-	const { typeFilter, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
+	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
 	const { loadingBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const { filterBuilds, setTypeFilter } = useFilters();
@@ -33,12 +33,12 @@ function Builds() {
 		let newFetchedBuilds = cloneDeep(fetchedBuilds);
 
 		setSortedBuilds(filterBuilds(newFetchedBuilds));
-	}, [fetchedBuilds, sortBy]);
+	}, [fetchedBuilds, versionFilter, sortBy]);
 
 	// listens for filters and fetches builds based on filter
 	useEffect(() => {
 		fetchBuilds();
-	}, [typeFilter, versionFilters, searchTerm, tagsSearch]);
+	}, [typeFilter, versionFilter, searchTerm, tagsSearch]);
 
 	if (!loadingBuilds && fetchedBuilds.length === 0) {
 		return <CantFind text="No builds found :("></CantFind>;

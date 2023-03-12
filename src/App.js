@@ -19,9 +19,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
-favoriting
-check logout when on a private page
-reporting
 search that searches the database, not just loaded builds
 email verification?
 Mission generation page
@@ -30,9 +27,6 @@ Go to a user like /nyius
 Newsfeed to cloud function that checks every 30min/ caches to aws
 Mods are a list
 Quick share builds (without needing to create a whole build)
-test out versions
-count new users
-count builds
  */
 
 //---------------------------------------------------------------------------------------------------//

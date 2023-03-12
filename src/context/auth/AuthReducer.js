@@ -24,7 +24,7 @@ const AuthReducer = (state, action) => {
 				verifyChangeUsername: false,
 			};
 		case 'UPDATE_USER':
-			const getUserStateUpdate = { ...state.user };
+			const getUserStateUpdate = cloneDeep(state.user);
 			const newGetUserStateUpdate = Object.assign(getUserStateUpdate, action.payload);
 
 			return {
@@ -94,6 +94,11 @@ const AuthReducer = (state, action) => {
 			return {
 				...state,
 				newSignup: action.payload,
+			};
+		case 'SET_ACCOUNT_TO_DELETE':
+			return {
+				...state,
+				accountToDelete: action.payload,
 			};
 		case 'SET_CANCEL_EDIT_PROFILE':
 			return {

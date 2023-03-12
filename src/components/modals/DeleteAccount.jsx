@@ -1,25 +1,21 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import GoogleSignIn from '../buttons/google/GoogleSignIn';
 import Button from '../buttons/Button';
 import PlanetHeader from '../header/PlanetHeader';
-import TextInput from '../input/TextInput';
-import emailLogin from '../../utilities/emailLogin';
-import { toast } from 'react-toastify';
 import AuthContext from '../../context/auth/AuthContext';
 import useAuth from '../../context/auth/AuthActions';
 
 function DeleteAccount() {
 	const navigate = useNavigate();
 	const { deleteUserAccount } = useAuth();
-	const { authLoading, user } = useContext(AuthContext);
+	const { authLoading, user, accountToDelete } = useContext(AuthContext);
 
 	/**
 	 * Handles a user starting the login process
 	 * @returns
 	 */
 	const handleDeleteUser = async () => {
-		await deleteUserAccount(user.uid);
+		await deleteUserAccount(accountToDelete);
 		navigate('/');
 	};
 

@@ -14,8 +14,8 @@ function Favorite({ id }) {
 	const { handleFavoriting } = useAuth();
 
 	if (!authLoading) {
-		if (user?.username) {
-			return <Button onClick={() => handleFavoriting(id ? id : loadedBuild.id)} color="btn-ghost" icon={user.favorites.includes(id ? id : loadedBuild.id) ? 'fill-heart' : 'outline-heart'} />;
+		if (user?.username && user?.favorites) {
+			return <Button onClick={() => handleFavoriting(id ? id : loadedBuild.id)} color="btn-ghost" icon={user.favorites?.includes(id ? id : loadedBuild.id) ? 'fill-heart' : 'outline-heart'} />;
 		}
 	}
 }

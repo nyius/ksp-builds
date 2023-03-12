@@ -1,15 +1,21 @@
 import { db } from '../../firebase.config';
-import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs } from 'firebase/firestore';
+import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc } from 'firebase/firestore';
+import { signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
+import { googleProvider } from '../../firebase.config';
+import { auth } from '../../firebase.config';
 import { deleteUser, getAuth } from 'firebase/auth';
 import { useContext } from 'react';
 import AuthContext from './AuthContext';
 import { cloneDeep } from 'lodash';
 import { toast } from 'react-toastify';
-import LogoIcon from '../../assets/logo_light_icon.png';
+import standardUser from '../../utilities/standardUser';
+import standardNotifications from '../../utilities/standardNotifications';
+import standardUserProfile from '../../utilities/standardUserProfile';
 import { uploadImage } from '../../utilities/uploadImage';
+import { v4 as uuidv4 } from 'uuid';
 
 const useAuth = () => {
-	const { dispatchAuth, user, newUsername, newBio, editingProfile, verifyChangeUsername } = useContext(AuthContext);
+	const { dispatchAuth, user, accountToDelete, newUsername, newBio, editingProfile, verifyChangeUsername } = useContext(AuthContext);
 
 	/**
 	 * Handles when a user signs up with google and neeeds to enter a username
@@ -17,6 +23,55 @@ const useAuth = () => {
 	 */
 	const setNewSignup = value => {
 		dispatchAuth({ type: 'SET_NEW_SIGNUP', payload: value });
+	};
+
+	/**
+	 * Handles creating a new users account on the DB. Sets up a 'users' doc, a 'usersProfile' doc, and their 'notifications' doc.
+	 * We havent set up username yet as that comes after initial setup.
+	 * @param {*} name
+	 * @param {*} email
+	 * @param {*} uid
+	 */
+	const createNewUserAccount = async (name, email, uid) => {
+		try {
+			// If the user doesn't exist, create them in the DB
+			let user = cloneDeep(standardUser);
+			let notification = cloneDeep(standardNotifications);
+			let userProfile = cloneDeep(standardUserProfile);
+			const createdAt = serverTimestamp();
+			const notifId = uuidv4().slice(0, 20);
+
+			user.name = name;
+			user.email = email;
+			user.dateCreated = createdAt;
+
+			notification.type = 'welcome';
+			notification.username = 'nyius';
+			notification.uid = 'MMWg1Vzq4EWE0mmaqFI8NHf50Hy2';
+			notification.timestamp = createdAt;
+			notification.read = false;
+			notification.profilePicture = 'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/selfie.png?alt=media&token=031dfd32-5038-4c84-96c3-40b09c0e4529';
+			notification.message =
+				'{"blocks":[{"key":"87rfs","text":"Welcome to KSP Builds! Please feel free to reach out with any questions/comments/ideas, and fly safe!","type":"unstyled","depth":0,"inlineStyleRanges":[{"offset":0,"length":94,"style":"fontsize-14"}],"entityRanges":[],"data":{}}],"entityMap":{}}';
+
+			userProfile.dateCreated = createdAt;
+
+			await setDoc(doc(db, 'users', uid), user);
+			await setDoc(doc(db, 'users', uid, 'notifications', notifId), notification);
+			await setDoc(doc(db, 'userProfiles', uid), userProfile);
+
+			const statsData = await getDoc(doc(db, 'adminPanel', 'stats'));
+			const stats = statsData.data();
+			await updateDoc(doc(db, 'adminPanel', 'stats'), { users: (stats.users += 1) });
+
+			notification.id = notifId;
+
+			updateUserState({
+				notifications: [notification],
+			});
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	/**
@@ -367,16 +422,92 @@ const useAuth = () => {
 			await deleteDoc(doc(db, 'users', uid));
 
 			const userAuth = getAuth();
-			let userToDelete = userAuth.currentUser;
 
-			await deleteUser(userToDelete);
+			if (accountToDelete === user.uid) {
+				await deleteUser(accountToDelete);
+			} else {
+				await setDoc(doc(db, 'BlockList', accountToDelete), { timestamp: serverTimestamp() });
+			}
 
-			updateUserState(null);
+			const statsData = await getDoc(doc(db, 'adminPanel', 'stats'));
+			const stats = statsData.data();
+			await updateDoc(doc(db, 'adminPanel', 'stats'), { users: (stats.users -= 1) });
 
 			toast.success('Account Deleted.');
 		} catch (error) {
 			console.log(error);
 		}
+	};
+
+	/**
+	 * handles logging in with Google
+	 */
+	const loginWithGoogle = async () => {
+		try {
+			const userCredential = await signInWithPopup(auth, googleProvider).catch(err => {
+				console.log(err);
+				toast.error('Something went wrong. Please try again');
+				return;
+			});
+
+			// Get user information.
+			const uid = userCredential.user.uid;
+			const name = userCredential.user.displayName;
+			const email = userCredential.user.email;
+			const createdAt = serverTimestamp();
+
+			const userRef = doc(db, 'users', uid);
+			const userSnap = await getDoc(userRef);
+
+			// Check if the user exists
+			if (userSnap.exists()) {
+				return 'success';
+			} else {
+				setNewSignup(true);
+				createNewUserAccount(name, email, uid, createdAt);
+			}
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong. Please try again');
+		}
+	};
+
+	/**
+	 * Handles creating a new email account
+	 * @param {*} newUser - takes in the formdata for a new user
+	 */
+	const newEmailAccount = async newUser => {
+		try {
+			const userCredential = await createUserWithEmailAndPassword(auth, newUser.email, newUser.password).catch(err => {
+				if (err.code.includes('already-in-use')) {
+					toast.error('Account already exists!');
+					throw new Error('exists');
+				}
+				return;
+			});
+
+			const email = userCredential.user.email;
+			const uid = userCredential.user.uid;
+			const name = '';
+			const createdAt = serverTimestamp();
+
+			setNewSignup(true);
+			createNewUserAccount(name, email, uid, createdAt);
+		} catch (error) {
+			console.log(error);
+			return error;
+		}
+	};
+
+	/**
+	 * Sets the id of the account to delete
+	 * @param {*} id
+	 */
+	const setAccountToDelete = id => {
+		dispatchAuth({
+			type: 'SET_ACCOUNT_TO_DELETE',
+			payload: id,
+		});
 	};
 
 	return {
@@ -388,6 +519,7 @@ const useAuth = () => {
 		setNewSignup,
 		setNotificationsRead,
 		setEditingProfile,
+		setAccountToDelete,
 		updateUserState,
 		updateUserDbBio,
 		updateUserDbProfilePic,
@@ -395,6 +527,9 @@ const useAuth = () => {
 		deleteUserAccount,
 		fetchUsersProfile,
 		uploadProfilePicture,
+		createNewUserAccount,
+		loginWithGoogle,
+		newEmailAccount,
 	};
 };
 

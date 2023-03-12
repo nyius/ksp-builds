@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import GoogleSignIn from '../buttons/google/GoogleSignIn';
 import Button from '../buttons/Button';
 import PlanetHeader from '../header/PlanetHeader';
 import TextInput from '../input/TextInput';
@@ -15,7 +14,7 @@ function LoginModal() {
 	const [password, setPassword] = useState('');
 	const [wrongLogin, setWrongLogin] = useState('');
 	const { user, authLoading, resetPasswordState } = useContext(AuthContext);
-	const { setResetPassword } = useAuth();
+	const { setResetPassword, loginWithGoogle } = useAuth();
 
 	/**
 	 * Handles a user starting the login process
@@ -70,7 +69,7 @@ function LoginModal() {
 
 						{/* Google Login */}
 						<div className="flex justify-center align-center mt-2 w-full">
-							<GoogleSignIn />
+							<Button htmlFor="login-modal" icon="google" text="Login with Google" onClick={loginWithGoogle} />
 						</div>
 					</div>
 				</div>

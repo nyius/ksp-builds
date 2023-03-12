@@ -6,7 +6,6 @@ import useResetStates from '../../utilities/useResetStates';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import TextInput from '../../components/input/TextInput';
 import Button from '../../components/buttons/Button';
-import newEmailAccount from '../../utilities/newEmailAccount';
 import PlanetHeader from '../../components/header/PlanetHeader';
 
 function SignUp() {
@@ -16,7 +15,7 @@ function SignUp() {
 		password: '',
 	});
 	const [accountExists, setAccountExists] = useState(false);
-	const { setNewSignup, setResetPassword } = useAuth();
+	const { setResetPassword, newEmailAccount } = useAuth();
 
 	const { resetStates } = useResetStates();
 
@@ -74,10 +73,6 @@ function SignUp() {
 
 		const signinStatus = await newEmailAccount(newUser);
 
-		// if we have a new google user, set signUp to true so that we can display the modal to allow them create a username/profile picture
-		if (signinStatus === 'newUser') {
-			setNewSignup(true);
-		}
 		if (signinStatus.message === 'exists') {
 			setAccountExists(true);
 		}

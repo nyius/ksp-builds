@@ -30,6 +30,12 @@ function NewAccountModal() {
 			return;
 		}
 
+		if (newUsername.includes(' ')) {
+			toast.error('Username cannot contain spaces!');
+			console.log(`Username cannot contain spaces!`);
+			return;
+		}
+
 		if (newUsername.length > 50) {
 			toast.error('Username is too long! Must be less than 50 characters');
 			console.log(`Username too long`);

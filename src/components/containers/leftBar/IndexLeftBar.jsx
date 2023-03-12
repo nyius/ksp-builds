@@ -1,13 +1,12 @@
 import React from 'react';
 import VerticalTypeLink from '../../buttons/VerticalTypeLink';
-import VerticalVersionLink from '../../buttons/VerticalVersionLink';
 import LeftBarTitle from './LeftBarTitle';
 import useFilters from '../../../context/filters/FiltersActions';
-import Button from '../../buttons/Button';
 import { useNavigate } from 'react-router-dom';
+import kspVersionOpts from '../../../utilities/kspVersions';
 
 function IndexLeftBar({ text }) {
-	const { resetFilters } = useFilters();
+	const { resetFilters, setVersionFilter } = useFilters();
 	const navigate = useNavigate();
 
 	const handleNavigate = () => {
@@ -15,6 +14,7 @@ function IndexLeftBar({ text }) {
 		navigate('/');
 	};
 
+	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
 			<div className="hidden md:block">
@@ -34,10 +34,14 @@ function IndexLeftBar({ text }) {
 
 				{/* Version */}
 				<LeftBarTitle text="KSP Version" />
-				<ul className="menu w-full mb-6">
-					<VerticalVersionLink text="1.0.0" />
-				</ul>
-				<Button icon="reset" text="Reset" onClick={handleNavigate} color="bg-base-300" size="w-full" />
+				<select onChange={setVersionFilter} className="select select-bordered w-full 2k:select-lg 2k:text-2xl">
+					<optgroup>
+						{kspVersionOpts.map(version => {
+							return <option value={version}>{version}</option>;
+						})}
+					</optgroup>
+				</select>
+				{/* <Button icon="reset" text="Reset" onClick={handleNavigate} color="bg-base-300" size="w-full" /> */}
 			</div>
 		</>
 	);

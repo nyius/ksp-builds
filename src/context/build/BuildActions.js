@@ -216,6 +216,10 @@ const useBuild = () => {
 				await updateDoc(doc(db, 'userProfiles', userId), { builds: newBuildsArr });
 			}
 
+			const statsData = await getDoc(doc(db, 'adminPanel', 'stats'));
+			const stats = statsData.data();
+			await updateDoc(doc(db, 'adminPanel', 'stats'), { builds: (stats.builds -= 1) });
+
 			navigate('/');
 
 			// Filter the deleted build out of the loaded builds
@@ -548,6 +552,10 @@ const useBuild = () => {
 			});
 
 			addbuildToUser(buildId);
+
+			const statsData = await getDoc(doc(db, 'adminPanel', 'stats'));
+			const stats = statsData.data();
+			await updateDoc(doc(db, 'adminPanel', 'stats'), { builds: (stats.builds += 1) });
 
 			// now get the document so we can grab its timestamp
 			const ref = doc(db, 'builds', buildId);

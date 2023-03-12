@@ -6,7 +6,7 @@ const FiltersContext = createContext();
 export const FiltersProvider = ({ children }) => {
 	const initialState = {
 		typeFilter: '',
-		versionFilter: '1.0.0',
+		versionFilter: 'any',
 		searchTerm: '',
 		tagsSearch: '',
 		sortBy: 'date_newest',

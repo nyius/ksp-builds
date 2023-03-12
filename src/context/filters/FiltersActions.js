@@ -54,7 +54,7 @@ const useFilters = () => {
 			type: 'SET_FILTERS',
 			payload: {
 				filter: 'versionFilter',
-				value: e.target.id,
+				value: e.target.value,
 			},
 		});
 	};
@@ -79,6 +79,7 @@ const useFilters = () => {
 	 * @returns
 	 */
 	const filterBuilds = builds => {
+		console.log(`first`);
 		return builds
 			.slice()
 			.sort((a, b) => {
@@ -92,13 +93,15 @@ const useFilters = () => {
 					return a.commentCount < b.commentCount ? 1 : -1;
 				} else if (sortBy === 'views_most') {
 					return a.views < b.views ? 1 : -1;
-				} else if (sortBy === 'views_least') {
-					return a.views < b.views ? -1 : 1;
 				}
 			})
 			.filter(build => {
 				if (searchTerm === '') return build;
 				if (build.name.toLowerCase().includes(searchTerm.toLowerCase())) return build;
+			})
+			.filter(build => {
+				if (versionFilter === 'any') return build;
+				if (build.kspVersion === versionFilter) return build;
 			})
 			.filter(build => {
 				if (tagsSearch === '') return build;

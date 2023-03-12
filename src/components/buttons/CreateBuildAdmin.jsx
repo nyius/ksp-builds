@@ -42,7 +42,7 @@ function CreateBuildAdmin() {
 		build.tags = ['Interplanetary', 'SpaceX', 'Epic'];
 		build.upVotes = Math.round(Math.random() * 1000);
 		build.downVotes = 0;
-		build.kspVersion = `1.0.0`;
+		build.kspVersion = `2.0.0`;
 		build.type = ['Interstellar', types[Math.round(Math.random() * 8)], types[Math.round(Math.random() * 8)]];
 		build.commentCount = Math.round(Math.random() * 1000);
 		build.views = Math.round(Math.random() * 100000);

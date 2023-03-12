@@ -21,15 +21,14 @@ function VisitProfile() {
 	const usersId = useParams().id;
 	const navigate = useNavigate();
 	//---------------------------------------------------------------------------------------------------//
-	const [fetchedUser, setFetchedUser] = useState(null);
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const [dateCreated, setDateCreated] = useState(null);
 	//---------------------------------------------------------------------------------------------------//
 	const { typeFilter, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
 	const { fetchedBuilds, loadingBuilds, lastFetchedBuild } = useContext(BuildsContext);
-	const { fetchedUserProfile, fetchingProfile } = useContext(AuthContext);
+	const { fetchedUserProfile, fetchingProfile, user, authLoading } = useContext(AuthContext);
 	//---------------------------------------------------------------------------------------------------//
-	const { fetchUsersProfile } = useAuth();
+	const { fetchUsersProfile, setAccountToDelete } = useAuth();
 	const { filterBuilds, resetFilters } = useFilters();
 	const { fetchBuilds } = useBuilds();
 
@@ -60,6 +59,8 @@ function VisitProfile() {
 		if (fetchedUserProfile) {
 			return (
 				<MiddleContainer color="none">
+					{!authLoading && user?.siteAdmin && <Button htmlFor="delete-account-modal" text="Delete Account (admin)" onClick={() => setAccountToDelete(usersId)} />}
+
 					<div className="flex flex-row gap-14 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
 						{/* Profile Picture */}
 						<div className="avatar">

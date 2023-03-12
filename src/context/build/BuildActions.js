@@ -4,7 +4,7 @@ import { db } from '../../firebase.config';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { clonedeep } from 'lodash';
-import { PutObjectCommand, S3Client, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { s3Client } from '../../S3.config';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from './BuildContext';

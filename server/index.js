@@ -6,8 +6,6 @@ import cheerio from 'cheerio';
 import axios from 'axios';
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
-import buildUpload from './modules/buildUpload.js';
 
 const PORT = 4000;
 
@@ -63,61 +61,6 @@ app.get('/news', async (req, res) => {
 	res.json({
 		message: 'news',
 		data: JSON.stringify(data.splice(0, 20)),
-	});
-});
-
-// handles uploading the build file to the server and saving it
-app.post('/buildUpload', async (req, res) => {
-	const { build, id } = req.body;
-	buildUpload(id, build);
-
-	// fs.writeFile(`./rawBuilds/${id}.json`, build, err => {
-	// 	if (err) {
-	// 		console.log(err);
-	// 	} else {
-	// 		console.log(`File Saved!`);
-	// 	}
-	// });
-
-	// const buf = Buffer.from(JSON.stringify(build));
-
-	// var data = {
-	// 	Bucket: process.env.S3_BUCKET,
-	// 	Key: `${id}.json`,
-	// 	Body: buf,
-	// 	ContentEncoding: 'base64',
-	// 	ContentType: 'application/json',
-	// 	ACL: 'public-read',
-	// };
-
-	// s3.upload(data, function (err, data) {
-	// 	if (err) {
-	// 		console.log(err);
-	// 		console.log('Error uploading data: ', data);
-	// 	} else {
-	// 		console.log('succesfully uploaded!');
-	// 	}
-	// });
-
-	res.json({
-		message: 'Request successful!',
-		// buildUrl,
-	});
-});
-
-// handles a user fetching a build from the server
-app.get('/fetchBuild', async (req, res) => {
-	const id = req.query.id;
-
-	res.download(`./rawBuilds/${id}.json`);
-});
-
-// handles a deleting a build
-app.get('/deleteBuild', async (req, res) => {
-	const id = req.query.id;
-
-	res.json({
-		message: 'Deleted',
 	});
 });
 

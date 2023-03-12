@@ -30,18 +30,23 @@ const useBuild = () => {
 
 		try {
 			const buildRef = doc(db, 'builds', id);
+			let response, rawBuildData, parsedBuild;
 
 			// get the build from the db
 			const fetchedBuild = await getDoc(buildRef);
 
-			const command = new GetObjectCommand({
-				Bucket: process.env.REACT_APP_BUCKET,
-				Key: `${id}.json`,
-			});
+			try {
+				const command = new GetObjectCommand({
+					Bucket: process.env.REACT_APP_BUCKET,
+					Key: `${id}.json`,
+				});
 
-			const response = await s3Client.send(command);
-			const rawBuildData = await response.Body.transformToString();
-			const parsedBuild = JSON.parse(rawBuildData);
+				response = await s3Client.send(command);
+				rawBuildData = await response.Body.transformToString();
+				parsedBuild = JSON.parse(rawBuildData);
+			} catch (error) {
+				console.log(error);
+			}
 
 			if (fetchedBuild.exists()) {
 				let build = fetchedBuild.data();

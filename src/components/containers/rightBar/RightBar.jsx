@@ -1,16 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import NewsCard from '../../news/NewsCard';
+import { s3Client } from '../../../S3.config';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
 
 function RightBar() {
 	const [news, setNews] = useState([]);
 
 	useEffect(() => {
-		axios.get('http://localhost:4000/news').then(res => {
-			if (res.data.message) {
-				setNews(JSON.parse(res.data.data));
+		const fetchNews = async () => {
+			try {
+				const command = new GetObjectCommand({
+					Bucket: process.env.REACT_APP_BUCKET,
+					Key: `kspNews.json`,
+				});
+
+				let response = await s3Client.send(command);
+				let rawNews = await response.Body.transformToString();
+				let parsedNews = JSON.parse(rawNews);
+				setNews(parsedNews);
+			} catch (error) {
+				console.log(error);
 			}
-		});
+		};
+
+		fetchNews();
 	}, []);
 
 	//---------------------------------------------------------------------------------------------------//

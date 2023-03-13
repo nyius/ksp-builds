@@ -24,7 +24,6 @@ email verification?
 Mission generation page
 folders
 Go to a user like /nyius
-Newsfeed to cloud function that checks every 30min/ caches to aws
 Mods are a list
 Quick share builds (without needing to create a whole build)
  */

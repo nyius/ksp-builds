@@ -14,6 +14,8 @@ function Contact() {
 		comment: '',
 		date: serverTimestamp(),
 		username: '',
+		name: '',
+		email: '',
 	});
 
 	const { user } = useContext(AuthContext);
@@ -68,7 +70,11 @@ function Contact() {
 				<>
 					<p className="text-2xl 2k:text-4xl font-bold">Want to get in touch?</p>
 					<form onSubmit={handleSubmit} className="flex flex-col gap-4 2k:gap-8 2xl:max-w-4xl">
-						<p className="text-xl 2k:text-2xl text-slate-400">Leave a comment!</p>
+						<p className="text-xl 2k:text-2xl text-slate-400 mb-6 2k:mb-12">Leave a comment!</p>
+						<p className="text-xl 2k:text-2xl text-slate-400 font-bold">Name (optional)</p>
+						<input placeholder="Enter name" typeof="name" id="name" type="text" className="input" onChange={handleFormChange} />
+						<p className="text-xl 2k:text-2xl text-slate-400 font-bold">Email (optional)</p>
+						<input placeholder="Enter Email" typeof="email" id="email" type="text" className="input" onChange={handleFormChange} />
 						<textarea id="comment" cols="10" rows="4" className="textarea text-xl 2k:text-3xl" placeholder="Message..." onChange={handleFormChange} defaultValue={formData.comment}></textarea>
 						<Button text="send" type="submit" color="btn-primary" margin="mb-10" onClick={handleSubmit} />
 					</form>

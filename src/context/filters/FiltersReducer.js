@@ -9,7 +9,7 @@ const FiltersReducer = (state, action) => {
 			return {
 				...state,
 				typeFilter: '',
-				versionFilter: '1.0.0',
+				versionFilter: 'any',
 				searchTerm: '',
 				tagsSearch: '',
 				sortBy: 'date_newest',

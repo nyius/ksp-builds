@@ -57,7 +57,15 @@ function AdminPanel() {
 					return (
 						<div key={i} className="flex flex-col w-full h-fit p-5 2k:p-10 bg-base-200 gap-10 rounded-xl">
 							<p className="text-2xl 2k:text-4xl">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(report.date.seconds * 1000)}</p>
-							<p className="text-2xl 2k:text-4xl text-slate-100 font-bold">{report.username}</p>
+							<p className="text-2xl 2k:text-4xl text-slate-100">
+								<span className="italic text-slate-400"> Username: </span> {report.username}
+							</p>
+							<p className="text-2xl 2k:text-4xl text-slate-100">
+								<span className="italic text-slate-400"> Name: </span> {report.name}
+							</p>
+							<p className="text-2xl 2k:text-4xl text-slate-100">
+								<span className="italic text-slate-400"> Email: </span> {report.email}
+							</p>
 							<p className="text-2xl 2k:text-4xl text-slate-300">{report.comment}</p>
 							<Button text="Delete" size="w-fit" icon="delete" onClick={() => deleteReport(report.id, i)} />
 						</div>

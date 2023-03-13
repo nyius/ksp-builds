@@ -4,6 +4,7 @@ import LeftBarTitle from './LeftBarTitle';
 import useFilters from '../../../context/filters/FiltersActions';
 import { useNavigate } from 'react-router-dom';
 import kspVersionOpts from '../../../utilities/kspVersions';
+import Button from '../../buttons/Button';
 
 function IndexLeftBar({ text }) {
 	const { resetFilters, setVersionFilter } = useFilters();
@@ -34,14 +35,18 @@ function IndexLeftBar({ text }) {
 
 				{/* Version */}
 				<LeftBarTitle text="KSP Version" />
-				<select onChange={setVersionFilter} className="select select-bordered w-full 2k:select-lg 2k:text-2xl">
+				<select onChange={setVersionFilter} className="select select-bordered w-full 2k:select-lg 2k:text-2xl mb-6 2k:mb-12">
 					<optgroup>
-						{kspVersionOpts.map(version => {
-							return <option value={version}>{version}</option>;
+						{kspVersionOpts.map((version, i) => {
+							return (
+								<option key={i} value={version}>
+									{version}
+								</option>
+							);
 						})}
 					</optgroup>
 				</select>
-				{/* <Button icon="reset" text="Reset" onClick={handleNavigate} color="bg-base-300" size="w-full" /> */}
+				<Button icon="reset" text="Reset" onClick={handleNavigate} color="bg-base-300" size="w-full" />
 			</div>
 		</>
 	);

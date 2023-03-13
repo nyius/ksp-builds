@@ -21,7 +21,7 @@ function IndexLeftBar({ text }) {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<div className="hidden md:block">
+			<div className="hidden md:block mb-44">
 				{/* Type */}
 				<LeftBarTitle text="Type" />
 				<ul className="btn-group btn-group-vertical w-full gap-1 mb-6 2k:mb-10">

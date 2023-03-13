@@ -26,6 +26,7 @@ Mission generation page
 folders
 Go to a user like /nyius
 Mods are a list
+public/private builds
 Quick share builds (without needing to create a whole build)
  */
 

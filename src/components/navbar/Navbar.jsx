@@ -61,6 +61,7 @@ function NavBar() {
 					<Button onClick={() => navigate('/news')} css="text-white hidden md:flex" text="News" icon="news" />
 					<Button onClick={() => navigate('/contact')} css="text-white hidden md:flex" text="Contact" icon="email" />
 					<CreateBuildAdmin />
+					<Button text="How to upload" icon="help" className="btn 2k:btn-lg 2k:text-2xl" htmlFor="how-to-copy-build-modal" />
 				</ul>
 
 				<p className="text-2xl 2k:text-5xl text-sate-600 italic font-bold">BETA</p>

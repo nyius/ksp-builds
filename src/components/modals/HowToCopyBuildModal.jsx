@@ -13,6 +13,7 @@ function HowToCopyBuildModal() {
 					<div className="flex flex-col w-full justify-center">
 						<Button htmlFor="how-to-copy-build-modal" text="X" position="absolute right-2 top-2" style="btn-circle" />
 						<h3 className="text-2xl 2k:text-4xl font-bold text-slate-100 text-center mb-6">How to Copy Build</h3>
+						<h3 className="text-xl 2k:text-3xl text-slate-100 text-center mb-6">**This only works for KSP 2**</h3>
 						{/* Step 1 */}
 						<h4 className="mb-4 text-xl 2k:text-3xl text-slate-300">
 							<span className="badge 2k:badge-lg  text-xl 2k:text-3xl p-3 2k:p-5 mr-2">1</span> Select your craft inside of the VAB

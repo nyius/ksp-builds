@@ -7,6 +7,7 @@ import { db } from '../../firebase.config';
 import { addDoc, doc, collection, serverTimestamp } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { cloneDeep } from 'lodash';
+import AstrobiffThink from '../../assets/astrobiff-think.png';
 
 function Contact() {
 	const [submitted, setSubmitted] = useState(false);
@@ -67,10 +68,10 @@ function Contact() {
 					<p className="text-2xl 2k:text-4xl font-bold">Message Sent!</p>
 				</div>
 			) : (
-				<>
-					<p className="text-2xl 2k:text-4xl font-bold">Want to get in touch?</p>
-					<form onSubmit={handleSubmit} className="flex flex-col gap-4 2k:gap-8 2xl:max-w-4xl">
-						<p className="text-xl 2k:text-2xl text-slate-400 mb-6 2k:mb-12">Leave a comment!</p>
+				<div className="flex flex-col sm:flex-row gap-5 2k:gap-10 items-center justify-center">
+					<form onSubmit={handleSubmit} className="flex flex-col gap-4 2k:gap-8 2xl:max-w-4xl w-full">
+						<p className="text-2xl 2k:text-4xl font-bold">Want to get in touch?</p>
+						<p className="text-xl 2k:text-2xl text-slate-400 mb-3 2k:mb-6">Leave a comment!</p>
 						<p className="text-xl 2k:text-2xl text-slate-400 font-bold">Name (optional)</p>
 						<input placeholder="Enter name" typeof="name" id="name" type="text" className="input" onChange={handleFormChange} />
 						<p className="text-xl 2k:text-2xl text-slate-400 font-bold">Email (optional)</p>
@@ -78,7 +79,8 @@ function Contact() {
 						<textarea id="comment" cols="10" rows="4" className="textarea text-xl 2k:text-3xl" placeholder="Message..." onChange={handleFormChange} defaultValue={formData.comment}></textarea>
 						<Button text="send" type="submit" color="btn-primary" margin="mb-10" onClick={handleSubmit} />
 					</form>
-				</>
+					<img src={AstrobiffThink} alt="AStrobiff Thinking" className="w-100 h-full" />
+				</div>
 			)}
 		</MiddleContainer>
 	);

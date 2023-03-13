@@ -33,6 +33,20 @@
 	height: 48rem;
 }
 
+.w-100 {
+	width: 30rem;
+}
+@media (min-width: 800px) {
+	.w-100 {
+		width: 20rem;
+	}
+}
+@media (min-width: 1921px) {
+	.w-100 {
+		width: 40rem;
+	}
+}
+
 .z-60 {
 	z-index: 60;
 }

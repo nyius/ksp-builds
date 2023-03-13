@@ -87,7 +87,7 @@ function NavBar() {
 				)}
 				{!authLoading && !user?.username && (
 					<>
-						<Button icon="plus" text="Create Account" onClick={() => navigate(`/sign-up`)} />
+						<Button icon="plus" text="Create Account" css="hidden md:flex" onClick={() => navigate(`/sign-up`)} />
 						<Button htmlFor="login-modal" icon="login" text="login" />
 					</>
 				)}

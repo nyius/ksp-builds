@@ -31,7 +31,7 @@ function MobileHamburger() {
 			</label>
 			<ul tabIndex={1} className="mt-3 p-2 gap-2 shadow menu menu-compact dropdown-content bg-base-500 rounded-box w-96">
 				<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="home" text="Home" onClick={() => navigate('/')} />
-				{!authLoading && !user?.username && <Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="plus" text="Create Account" onClick={() => navigate(`/sign-up`)} />}
+				{!authLoading && !user?.username && <Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Create Account" onClick={() => navigate(`/sign-up`)} />}
 				{!authLoading && user?.username && <Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" onClick={() => navigate('/favorites')} />}
 				<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="plus" text="Create" onClick={handleCreateNavigate} />
 				<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="News" icon="news" onClick={() => navigate('/news')} />

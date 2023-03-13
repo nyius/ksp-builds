@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { cloneDeep, update } from 'lodash';
+import { profanity } from '@2toad/profanity';
 //---------------------------------------------------------------------------------------------------//
 import { FiCameraOff } from 'react-icons/fi';
 //---------------------------------------------------------------------------------------------------//
@@ -113,28 +114,50 @@ function Create() {
 	/**
 	 * Handles submitting the build
 	 */
-	const submitBuild = async () => {
+	const submitBuild = async e => {
+		e.preventDefault();
 		try {
-			if (newBuild.name.trim() === '') {
+			const buildToUpload = cloneDeep(newBuild);
+			buildToUpload.name = newBuild.name.trim();
+
+			if (buildToUpload.name === '') {
 				toast.error('Your build needs a name!');
 				return;
 			}
-			if (newBuild.type.length === 0) {
+			if (profanity.exists(buildToUpload.name)) {
+				toast.error('Build name is unacceptable!');
+				return;
+			}
+			if (buildToUpload.type.length === 0) {
 				toast.error('Your build needs atleast 1 tag!');
 				return;
 			}
-			if (newBuild.build.trim() === '') {
+			if (buildToUpload.build.trim() === '') {
 				toast.error('You forgot to include the build!');
 				return;
 			}
-			if (newBuild.images.length > 6) {
+			if (buildToUpload.images.length > 6) {
 				toast.error('Too many build images! Max 6');
 				return;
 			}
+			let newTags = [];
+			let tagProfanity = false;
+			buildToUpload.tags.map(tag => {
+				if (profanity.exists(tag)) {
+					tagProfanity = true;
+				}
+				newTags.push(tag.trim());
+			});
+
+			if (tagProfanity) {
+				toast.error('Tags contain unacceptable words!');
+				return;
+			}
+
+			buildToUpload.tags = newTags;
 
 			// Upload the images to the DB
 
-			const buildToUpload = cloneDeep(newBuild);
 			buildToUpload.images.length === 0 ? (buildToUpload.images = [LogoBackground]) : (buildToUpload.images = newBuild.images);
 			buildToUpload.author = user.username;
 			buildToUpload.uid = user.uid;
@@ -285,7 +308,7 @@ function Create() {
 								)}
 
 								{/* Image Carousel */}
-								<div className="flex flex-row flex-wrap gap-2 2k:gap-4">
+								<div className="flex flex-row flex-wrap gap-2 2k:gap-4 mb-5 2k:mb-10">
 									{newBuild.images.length > 0 &&
 										newBuild.images.map((image, i) => {
 											return (

@@ -8,6 +8,7 @@ import Spinner1 from '../spinners/Spinner1';
 import AuthContext from '../../context/auth/AuthContext';
 import useAuth from '../../context/auth/AuthActions';
 import Button from '../buttons/Button';
+import { profanity } from '@2toad/profanity';
 import TextInput from '../input/TextInput';
 
 function NewAccountModal() {
@@ -39,6 +40,12 @@ function NewAccountModal() {
 		if (newUsername.length > 50) {
 			toast.error('Username is too long! Must be less than 50 characters');
 			console.log(`Username too long`);
+			return;
+		}
+
+		if (profanity.exists(newUsername)) {
+			toast.error('Username not acceptable!');
+			console.log(`Username not acceptable`);
 			return;
 		}
 

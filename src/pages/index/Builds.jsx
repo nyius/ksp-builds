@@ -18,13 +18,16 @@ function Builds() {
 	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
 	const { loadingBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const [sortedBuilds, setSortedBuilds] = useState([]);
-	const { filterBuilds, setTypeFilter } = useFilters();
+	const { filterBuilds, setTypeFilter, resetFilters } = useFilters();
 	const { fetchBuilds } = useBuilds();
 	const { id } = useParams();
 
 	useEffect(() => {
 		if (id) {
 			setTypeFilter(id);
+		}
+		if (!id) {
+			resetFilters();
 		}
 	}, [id]);
 

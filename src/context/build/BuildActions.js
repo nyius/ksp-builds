@@ -11,6 +11,7 @@ import BuildContext from './BuildContext';
 import BuildsContext from '../builds/BuildsContext';
 import AuthContext from '../auth/AuthContext';
 import useAuth from '../auth/AuthActions';
+import { profanity } from '@2toad/profanity';
 //---------------------------------------------------------------------------------------------------//
 import { toast } from 'react-toastify';
 
@@ -35,6 +36,7 @@ const useBuild = () => {
 			// get the build from the db
 			const fetchedBuild = await getDoc(buildRef);
 
+			// Get the raw build from aws
 			try {
 				const command = new GetObjectCommand({
 					Bucket: process.env.REACT_APP_BUCKET,
@@ -51,6 +53,7 @@ const useBuild = () => {
 			if (fetchedBuild.exists()) {
 				let build = fetchedBuild.data();
 
+				// fetch comments and update the view count
 				await fetchComments(id);
 				await updateViewCount(build, id);
 				build.build = parsedBuild;
@@ -63,6 +66,7 @@ const useBuild = () => {
 			}
 		} catch (error) {
 			dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: '', loadingBuild: false } });
+			console.log(error);
 			throw new Error(`Error fetching build: ${error}`);
 		}
 	};
@@ -107,16 +111,6 @@ const useBuild = () => {
 				throw new Error('You forgot to give your build a type!');
 			}
 
-			// Check description length
-			if (build.description.length > 3000) {
-				toast.error('Description too long');
-				dispatchBuild({
-					type: 'UPLOADING_BUILD',
-					payload: false,
-				});
-				throw new Error('Description too long');
-			}
-
 			// Check name length
 			if (build.name.length > 50) {
 				toast.error('Build name too long');
@@ -137,6 +131,15 @@ const useBuild = () => {
 				throw new Error('You forgot to enter a build!');
 			}
 
+			if (profanity.exists(build.name)) {
+				toast.error('Build name is unacceptable!');
+				dispatchBuild({
+					type: 'UPLOADING_BUILD',
+					payload: false,
+				});
+				throw new Error('Build name is unacceptable!');
+			}
+
 			return build;
 		} catch (error) {
 			throw new Error(`Error in makeBuildReadyToUpload: ${error}`);
@@ -154,6 +157,7 @@ const useBuild = () => {
 			const buildJSON = JSON.stringify(newBuild.build);
 			delete newBuild.build;
 
+			// update the document
 			await updateDoc(doc(db, 'builds', newBuild.id), {
 				...newBuild,
 			}).catch(err => {
@@ -161,6 +165,7 @@ const useBuild = () => {
 				throw new Error(err);
 			});
 
+			// update the raw build on aws
 			const command = new PutObjectCommand({
 				Bucket: process.env.REACT_APP_BUCKET,
 				Key: `${newBuild.id}.json`,
@@ -205,6 +210,7 @@ const useBuild = () => {
 			// Delete the build
 			await deleteDoc(doc(db, 'builds', id));
 
+			// delete it from aws
 			const command = new DeleteObjectCommand({
 				Bucket: process.env.REACT_APP_BUCKET,
 				Key: `${id}.json`,
@@ -225,7 +231,7 @@ const useBuild = () => {
 				// remove it from the users userProfile
 				await updateDoc(doc(db, 'userProfiles', userId), { builds: newBuildsArr });
 			} else {
-				// if its not we have to fetch that users profile first, and then remove it from their builds
+				// if its not, this is an admin deleting it and we have to fetch that users profile first, and then remove it from their builds
 				const fetchedProfile = await getDoc(doc(db, 'users', userId));
 				const userData = fetchedProfile.data();
 
@@ -234,7 +240,6 @@ const useBuild = () => {
 						return build !== id;
 					}),
 				];
-				console.log(newBuildsArr);
 
 				await updateDoc(doc(db, 'users', userId), { builds: newBuildsArr });
 				await updateDoc(doc(db, 'userProfiles', userId), { builds: newBuildsArr });
@@ -597,6 +602,7 @@ const useBuild = () => {
 					payload: build,
 				});
 
+				// add the builds to aws
 				const command = new PutObjectCommand({
 					Bucket: process.env.REACT_APP_BUCKET,
 					Key: `${buildId}.json`,

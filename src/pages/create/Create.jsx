@@ -11,6 +11,7 @@ import { standardBuild } from '../../utilities/standardBuild';
 import AuthContext from '../../context/auth/AuthContext';
 import useBuild from '../../context/build/BuildActions';
 import BuildContext from '../../context/build/BuildContext';
+import kspVersionOpts from '../../utilities/kspVersions';
 //---------------------------------------------------------------------------------------------------//
 import Spinner1 from '../../components/spinners/Spinner1';
 import LogoBackground from '../../assets/logo_bg_dark.png';
@@ -329,9 +330,15 @@ function Create() {
 										<p className="2k:text-2xl">KSP Version</p>
 										<select onChange={setVersion} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
 											<optgroup>
-												<option className="text-2xl" value="1.0.0">
-													1.0.0
-												</option>
+												{kspVersionOpts.map((version, i) => {
+													if (version !== 'any') {
+														return (
+															<option key={i} value={version}>
+																{version}
+															</option>
+														);
+													}
+												})}
 											</optgroup>
 										</select>
 									</div>

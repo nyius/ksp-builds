@@ -17,7 +17,7 @@ import { toast } from 'react-toastify';
 
 const useBuild = () => {
 	const navigate = useNavigate();
-	const { dispatchBuild, deletingCommentId, comments, loadedBuild, comment } = useContext(BuildContext);
+	const { dispatchBuild, deletingCommentId, comments, loadedBuild, comment, editingBuild } = useContext(BuildContext);
 	const { fetchedBuilds, dispatchBuilds } = useContext(BuildsContext);
 	const { user } = useContext(AuthContext);
 	const { updateUserState, addbuildToUser, handleVoting } = useAuth();
@@ -165,25 +165,29 @@ const useBuild = () => {
 				throw new Error(err);
 			});
 
-			// update the raw build on aws
-			const command = new PutObjectCommand({
-				Bucket: process.env.REACT_APP_BUCKET,
-				Key: `${newBuild.id}.json`,
-				Body: buildJSON,
-				ContentEncoding: 'base64',
-				ContentType: 'application/json',
-				ACL: 'public-read',
-			});
+			// if the description changed, update AWS
+			if (editingBuild.description !== build.description) {
+				// update the raw build on aws
+				const command = new PutObjectCommand({
+					Bucket: process.env.REACT_APP_BUCKET,
+					Key: `${newBuild.id}.json`,
+					Body: buildJSON,
+					ContentEncoding: 'base64',
+					ContentType: 'application/json',
+					ACL: 'public-read',
+				});
 
-			const response = await s3Client.send(command);
+				const response = await s3Client.send(command);
 
-			newBuild.build = JSON.parse(buildJSON);
+				newBuild.build = JSON.parse(buildJSON);
+			}
 
 			dispatchBuild({
 				type: 'SET_BUILD',
 				payload: {
 					savingBuild: false,
 					editingBuild: false,
+					uploadingBuild: false,
 					loadedBuild: newBuild,
 				},
 			});

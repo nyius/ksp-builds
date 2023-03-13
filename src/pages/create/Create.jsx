@@ -41,7 +41,7 @@ function Create() {
 	const [uploadingImage, setUploadingImage] = useState(false);
 	const [hoverImage, setHoverImage] = useState(false);
 
-	const [description, setDescription] = useState(`{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`);
+	const [description, setDescription] = useState(editingBuild ? editingBuild.description : `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`);
 	//---------------------------------------------------------------------------------------------------//
 	const navigate = useNavigate();
 
@@ -177,8 +177,9 @@ function Create() {
 	 * Handles a user updatin a build
 	 */
 	const handleUpdateBuild = async () => {
-		newBuild.description = description;
-		await updateBuild(newBuild);
+		const buildToUpload = cloneDeep(newBuild);
+		buildToUpload.description = description;
+		await updateBuild(buildToUpload);
 	};
 
 	/**

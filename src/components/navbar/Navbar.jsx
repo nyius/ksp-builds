@@ -58,10 +58,10 @@ function NavBar() {
 				{/* Buttons */}
 				<ul className="menu menu-horizontal px-6 gap-3 2k:gap-6">
 					<Button onClick={handleCreateNavigate} color="btn-accent" css="text-white hidden md:flex" text="Create" icon="plus" />
-					<Button onClick={() => navigate('/news')} css="text-white hidden md:flex" text="News" icon="news" />
-					<Button onClick={() => navigate('/contact')} css="text-white hidden md:flex" text="Contact" icon="email" />
+					<Button onClick={() => navigate('/news')} css="text-white hidden lg:flex" text="News" icon="news" />
+					<Button onClick={() => navigate('/contact')} css="text-white hidden lg:flex" text="Contact" icon="email" />
 					<CreateBuildAdmin />
-					<Button text="How to upload" icon="help" className="btn 2k:btn-lg 2k:text-2xl" htmlFor="how-to-copy-build-modal" />
+					<Button text="How to upload" icon="help" css="hidden lg:flex" htmlFor="how-to-copy-build-modal" />
 				</ul>
 
 				<p className="text-2xl 2k:text-5xl text-sate-600 italic font-bold">BETA</p>

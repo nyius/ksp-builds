@@ -3,6 +3,7 @@ import { AuthProvider } from './auth/AuthContext';
 import { FiltersProvider } from './filters/FiltersContext';
 import { BuildsProvider } from './builds/BuildsContext';
 import { BuildProvider } from './build/BuildContext';
+import { NewsProvider } from './news/NewsContext';
 
 /**
  * Stores all the contexts in one place
@@ -14,7 +15,9 @@ function ContextsProvider({ children }) {
 		<AuthProvider>
 			<FiltersProvider>
 				<BuildsProvider>
-					<BuildProvider>{children}</BuildProvider>
+					<BuildProvider>
+						<NewsProvider>{children}</NewsProvider>
+					</BuildProvider>
 				</BuildsProvider>
 			</FiltersProvider>
 		</AuthProvider>

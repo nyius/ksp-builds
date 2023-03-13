@@ -26,7 +26,7 @@ folders
 Go to a user like /nyius
 Mods are a list
 Quick share builds (without needing to create a whole build)
-Json strng parser for bad/unwanted code
+Json string parser for bad/unwanted code
  */
 
 //---------------------------------------------------------------------------------------------------//

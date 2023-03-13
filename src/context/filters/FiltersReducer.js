@@ -14,7 +14,11 @@ const FiltersReducer = (state, action) => {
 				tagsSearch: '',
 				sortBy: 'date_newest',
 			};
-
+		case 'SET_KSP_VERSIONS':
+			return {
+				...state,
+				kspVersions: action.payload,
+			};
 		default:
 			return state;
 	}

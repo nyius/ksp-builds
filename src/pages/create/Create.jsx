@@ -11,8 +11,8 @@ import { standardBuild } from '../../utilities/standardBuild';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import useBuild from '../../context/build/BuildActions';
+import FiltersContext from '../../context/filters/FiltersContext';
 import BuildContext from '../../context/build/BuildContext';
-import kspVersionOpts from '../../utilities/kspVersions';
 //---------------------------------------------------------------------------------------------------//
 import Spinner1 from '../../components/spinners/Spinner1';
 import LogoBackground from '../../assets/logo_bg_dark.png';
@@ -33,6 +33,7 @@ function Create() {
 	const { user } = useContext(AuthContext);
 	const { uploadBuild, updateBuild, setUploadingBuild } = useBuild();
 	const { editingBuild, uploadingBuild } = useContext(BuildContext);
+	const { filtersLoading, kspVersions } = useContext(FiltersContext);
 
 	//---------------------------------------------------------------------------------------------------//
 	const [newBuild, setNewBuild] = useState(editingBuild ? cloneDeep(editingBuild) : cloneDeep(standardBuild));
@@ -341,7 +342,7 @@ function Create() {
 									</div>
 								)}
 
-								{/* Name */}
+								{/* Name/versions */}
 								<div className="flex flex-row flex-wrap gap-20 mb-8 2k:mb-15">
 									<div className="flex flex-row gap-2 items-center">
 										<input onChange={setName} type="text" placeholder="Build Name" defaultValue={editingBuild ? editingBuild.name : ''} className="input input-bordered w-96 max-w-lg 2k:input-lg 2k:text-2xl" maxLength="50" />
@@ -353,15 +354,15 @@ function Create() {
 										<p className="2k:text-2xl">KSP Version</p>
 										<select onChange={setVersion} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
 											<optgroup>
-												{kspVersionOpts.map((version, i) => {
-													if (version !== 'any') {
+												<option value="any">Any</option>
+												{!filtersLoading &&
+													kspVersions.map((version, i) => {
 														return (
 															<option key={i} value={version}>
 																{version}
 															</option>
 														);
-													}
-												})}
+													})}
 											</optgroup>
 										</select>
 									</div>

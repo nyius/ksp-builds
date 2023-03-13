@@ -38,7 +38,7 @@ function Builds() {
 	// listens for filters and fetches builds based on filter
 	useEffect(() => {
 		fetchBuilds();
-	}, [typeFilter, versionFilter, searchTerm, tagsSearch]);
+	}, [typeFilter, searchTerm, tagsSearch]);
 
 	if (!loadingBuilds && fetchedBuilds.length === 0) {
 		return <CantFind text="No builds found :("></CantFind>;

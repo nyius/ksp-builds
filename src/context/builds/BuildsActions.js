@@ -29,13 +29,10 @@ const useBuilds = () => {
 			if (!buildsToFetchCopy) {
 				// Create a query
 				if (typeFilter !== '') {
-					q = query(
-						buildsRef,
-						where('type', 'array-contains', typeFilter),
-						where('kspVersion', '==', versionFilter),
-						orderBy('timestamp', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)),
-						limit(process.env.REACT_APP_BUILDS_FETCH_NUM)
-					);
+					const constraints = [where('type', 'array-contains', typeFilter), orderBy('timestamp', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)), limit(process.env.REACT_APP_BUILDS_FETCH_NUM)];
+
+					if (versionFilter !== 'any') constraints.push(where('kspVersion', '==', versionFilter));
+					q = query(buildsRef, ...constraints);
 				} else {
 					q = query(buildsRef, orderBy('timestamp', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)), limit(process.env.REACT_APP_BUILDS_FETCH_NUM));
 				}

@@ -178,13 +178,13 @@ const useAuth = () => {
 					dispatchAuth({ type: 'UPDATE_USER', payload: { upVotes: newUpVotes } });
 
 					updateUserDb({ upVotes: newUpVotes });
-					await updateDoc(doc(db, 'builds', build.id), { upVotes: (build.upVotes -= 1) });
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1) });
 				} else {
 					newUpVotes.push(build.id);
 					dispatchAuth({ type: 'UPDATE_USER', payload: { upVotes: newUpVotes } });
 
 					updateUserDb({ upVotes: newUpVotes });
-					await updateDoc(doc(db, 'builds', build.id), { upVotes: (build.upVotes += 1) });
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes += 1) });
 
 					// If the user has this downvoted but wants to upvote it, remove the downvote
 					if (newDownVotes.includes(build.id)) {
@@ -194,7 +194,7 @@ const useAuth = () => {
 						dispatchAuth({ type: 'UPDATE_USER', payload: { downVotes: newDownVotes } });
 
 						updateUserDb({ downVotes: newDownVotes });
-						await updateDoc(doc(db, 'builds', build.id), { downVotes: (build.downVotes -= 1) });
+						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1) });
 					}
 				}
 			}
@@ -207,13 +207,13 @@ const useAuth = () => {
 					dispatchAuth({ type: 'UPDATE_USER', payload: { downVotes: newDownVotes } });
 
 					updateUserDb({ downVotes: newDownVotes });
-					await updateDoc(doc(db, 'builds', build.id), { downVotes: (build.downVotes -= 1) });
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1) });
 				} else {
 					newDownVotes.push(build.id);
 					dispatchAuth({ type: 'UPDATE_USER', payload: { downVotes: newDownVotes } });
 
 					updateUserDb({ downVotes: newDownVotes });
-					await updateDoc(doc(db, 'builds', build.id), { downVotes: (build.downVotes += 1) });
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes += 1) });
 
 					// If the user has this upvoted but wants to downvote it, remove the upvote
 					if (newUpVotes.includes(build.id)) {
@@ -223,7 +223,7 @@ const useAuth = () => {
 						dispatchAuth({ type: 'UPDATE_USER', payload: { upVotes: newUpVotes } });
 
 						updateUserDb({ upVotes: newUpVotes });
-						await updateDoc(doc(db, 'builds', build.id), { upVotes: (build.upVotes -= 1) });
+						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1) });
 					}
 				}
 			}

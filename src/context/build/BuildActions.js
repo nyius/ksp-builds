@@ -33,7 +33,7 @@ const useBuild = () => {
 		dispatchBuild({ type: 'LOADING_BUILD', payload: true });
 
 		try {
-			const buildRef = doc(db, 'builds', id);
+			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, id);
 			let response, rawBuildData, parsedBuild;
 
 			// get the build from the db
@@ -161,7 +161,7 @@ const useBuild = () => {
 			delete newBuild.build;
 
 			// update the document
-			await updateDoc(doc(db, 'builds', newBuild.id), {
+			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, newBuild.id), {
 				...newBuild,
 			}).catch(err => {
 				setSavingBuild(false);
@@ -208,14 +208,14 @@ const useBuild = () => {
 	const deleteBuild = async (id, userId) => {
 		try {
 			// Delete the comments
-			const commentsQuery = query(collection(db, 'builds', id, 'comments'));
+			const commentsQuery = query(collection(db, process.env.REACT_APP_BUILDSDB, id, 'comments'));
 			const commentsQuerySnapshot = await getDocs(commentsQuery);
 			commentsQuerySnapshot.forEach(comment => {
-				deleteDoc(doc(db, 'builds', id, 'comments', comment.id));
+				deleteDoc(doc(db, process.env.REACT_APP_BUILDSDB, id, 'comments', comment.id));
 			});
 
 			// Delete the build
-			await deleteDoc(doc(db, 'builds', id));
+			await deleteDoc(doc(db, process.env.REACT_APP_BUILDSDB, id));
 
 			// delete it from aws
 			const command = new DeleteObjectCommand({
@@ -251,10 +251,6 @@ const useBuild = () => {
 				await updateDoc(doc(db, 'users', userId), { builds: newBuildsArr });
 				await updateDoc(doc(db, 'userProfiles', userId), { builds: newBuildsArr });
 			}
-
-			const statsData = await getDoc(doc(db, 'adminPanel', 'stats'));
-			const stats = statsData.data();
-			await updateDoc(doc(db, 'adminPanel', 'stats'), { builds: (stats.builds -= 1) });
 
 			navigate('/');
 
@@ -302,8 +298,8 @@ const useBuild = () => {
 	const deleteComment = async commentId => {
 		try {
 			// Delete the comments
-			await deleteDoc(doc(db, 'builds', loadedBuild.id, 'comments', commentId));
-			await updateDoc(doc(db, 'builds', loadedBuild.id), { commentCount: (loadedBuild.commentCount -= 1) })
+			await deleteDoc(doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id, 'comments', commentId));
+			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id), { commentCount: (loadedBuild.commentCount -= 1) })
 				.then(() => {
 					//Filter the deleted comment from the comments array
 					const newComments = comments.filter(comment => comment.id !== commentId);
@@ -348,7 +344,7 @@ const useBuild = () => {
 	 */
 	const fetchComments = async id => {
 		try {
-			const commentsRef = collection(db, 'builds', id, 'comments');
+			const commentsRef = collection(db, process.env.REACT_APP_BUILDSDB, id, 'comments');
 			const commentsSnapshot = await getDocs(commentsRef);
 			const commentsList = commentsSnapshot.docs.map(doc => {
 				const comment = doc.data();
@@ -431,7 +427,7 @@ const useBuild = () => {
 				return;
 			}
 
-			const postRef = collection(db, 'builds', loadedBuild.id, 'comments');
+			const postRef = collection(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id, 'comments');
 
 			// Create the comment for the DB
 			const newComment = {
@@ -448,7 +444,7 @@ const useBuild = () => {
 			newComment.id = newId.id;
 
 			// Update the comment count on the build list
-			const update = doc(db, 'builds', loadedBuild.id);
+			const update = doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id);
 			await updateDoc(update, {
 				commentCount: (loadedBuild.commentCount += 1),
 			});
@@ -474,7 +470,7 @@ const useBuild = () => {
 			}
 
 			// now fetch the comment so we can get its timestamp
-			const fetchComment = await getDoc(doc(db, 'builds', loadedBuild.id, 'comments', newId.id));
+			const fetchComment = await getDoc(doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id, 'comments', newId.id));
 
 			if (fetchComment.exists()) {
 				const data = fetchComment.data();
@@ -525,7 +521,7 @@ const useBuild = () => {
 	 */
 	const updateComment = async (comment, commentId) => {
 		try {
-			const ref = doc(db, 'builds', loadedBuild.id, 'comments', commentId);
+			const ref = doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id, 'comments', commentId);
 
 			await updateDoc(ref, { comment });
 
@@ -541,7 +537,7 @@ const useBuild = () => {
 	 */
 	const updateViewCount = async (build, id) => {
 		try {
-			const ref = doc(db, 'builds', id);
+			const ref = doc(db, process.env.REACT_APP_BUILDSDB, id);
 			await updateDoc(ref, { views: (build.views += 1) });
 		} catch (error) {
 			console.log(error);
@@ -553,7 +549,7 @@ const useBuild = () => {
 	 */
 	const updateDownloadCount = async (build, id) => {
 		try {
-			const ref = doc(db, 'builds', id);
+			const ref = doc(db, process.env.REACT_APP_BUILDSDB, id);
 			await updateDoc(ref, { downloads: (build.downloads += 1) });
 		} catch (error) {
 			console.log(error);
@@ -571,37 +567,32 @@ const useBuild = () => {
 			const buildId = uuidv4().slice(0, 30);
 			build.id = buildId;
 
+			// Stringify the json build and remove it from the main build object so it doesnt get uploaded to firebase (as its huge)
+			// It will be uploaded to ASW S3 instead
 			const buildJson = JSON.stringify(build.build);
 			const rawBuild = buildJson;
 			delete build.build;
 
-			const convertThumb = await compressAccurately(build.thumbnail, 200);
-			const thumbURL = await uploadImage(convertThumb, setLoading, `${auth.currentUser.uid}-${convertThumb.name}-${uuidv4()}`);
+			// Create the thumbnail
+			if (typeof build.thumbnail !== 'string') {
+				const convertThumb = await compressAccurately(build.thumbnail, 100);
+				const thumbURL = await uploadImage(convertThumb, setLoading, `${auth.currentUser.uid}-${convertThumb.name}-${uuidv4()}`);
+				build.thumbnail = thumbURL;
+			}
 
-			build.thumbnail = thumbURL;
-
-			await setDoc(doc(db, 'builds', buildId), build).catch(err => {
-				throw new Error(err);
-			});
+			// Add the build object to the DB
+			await setDoc(doc(db, process.env.REACT_APP_BUILDSDB, buildId), build);
 
 			// add it to the users 'userProfile' db
-			await updateDoc(doc(db, 'userProfiles', user.uid), { builds: [...user.builds, buildId] }).catch(err => {
-				throw new Error(err);
-			});
+			await updateDoc(doc(db, 'userProfiles', user.uid), { builds: [...user.builds, buildId] });
 
-			// Add it to the users 'builds'
-			await updateDoc(doc(db, 'users', user.uid), { builds: [...user.builds, buildId] }).catch(err => {
-				throw new Error(err);
-			});
+			// Add it to the users process.env.REACT_APP_BUILDSDB
+			await updateDoc(doc(db, 'users', user.uid), { builds: [...user.builds, buildId] });
 
 			addbuildToUser(buildId);
 
-			const statsData = await getDoc(doc(db, 'adminPanel', 'stats'));
-			const stats = statsData.data();
-			await updateDoc(doc(db, 'adminPanel', 'stats'), { builds: (stats.builds += 1) });
-
 			// now get the document so we can grab its timestamp
-			const ref = doc(db, 'builds', buildId);
+			const ref = doc(db, process.env.REACT_APP_BUILDSDB, buildId);
 			const data = await getDoc(ref);
 
 			if (data.exists()) {

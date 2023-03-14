@@ -31,8 +31,11 @@ style the notifications to be bigger
 comment field clear out after entering
 follow a user
 FAQ Page
+upload image for comments
 replying to comment that notifies the user
 Quick share builds (without needing to create a whole build)
+instead of infinitely loading builds, it should be pages
+home page Builds should probably fetch by default view count 
  */
 
 //---------------------------------------------------------------------------------------------------//

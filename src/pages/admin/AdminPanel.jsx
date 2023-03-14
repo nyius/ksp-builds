@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import { db } from '../../firebase.config';
-import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, getDoc, getCountFromServer } from 'firebase/firestore';
 import Button from '../../components/buttons/Button';
 import TextInput from '../../components/input/TextInput';
 import { toast } from 'react-toastify';
@@ -55,11 +55,12 @@ function AdminPanel() {
 
 		const fetchAdminPanel = async () => {
 			try {
-				const data = await getDoc(doc(db, 'adminPanel', 'stats'));
-				const dataParse = data.data();
-				console.log(dataParse);
+				const bildsColl = collection(db, 'builds');
+				const buildsSnap = await getCountFromServer(bildsColl);
+				const usersCol = collection(db, 'users');
+				const usersSap = await getCountFromServer(usersCol);
 
-				setStats(dataParse);
+				setStats({ builds: buildsSnap.data().count, users: usersSap.data().count });
 				setStatsLoading(false);
 			} catch (error) {
 				console.log(error);

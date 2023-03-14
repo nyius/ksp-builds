@@ -22,7 +22,7 @@ const useBuilds = () => {
 		const buildsToFetchCopy = cloneDeep(buildsToFetch);
 		try {
 			dispatchBuilds({ type: 'SET_FETCHED_BUILDS_LOADING', payload: true });
-			const buildsRef = collection(db, 'builds');
+			const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
 			const builds = [];
 			let q;
 
@@ -90,7 +90,7 @@ const useBuilds = () => {
 			const builds = [];
 			let q;
 
-			const buildsRef = collection(db, 'builds');
+			const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
 
 			// Create a query
 			if (typeFilter !== '') {

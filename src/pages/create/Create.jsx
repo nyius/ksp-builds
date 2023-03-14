@@ -37,8 +37,9 @@ function Create() {
 
 	//---------------------------------------------------------------------------------------------------//
 	const [newBuild, setNewBuild] = useState(editingBuild ? cloneDeep(editingBuild) : cloneDeep(standardBuild));
-	const [nameLength, setNameLength] = useState(50);
 	const [uploadingImage, setUploadingImage] = useState(false);
+	const [rawImageFiles, setRawImageFiles] = useState([]);
+	const [nameLength, setNameLength] = useState(50);
 	const [hoverImage, setHoverImage] = useState(false);
 
 	const [description, setDescription] = useState(editingBuild ? editingBuild.description : `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`);
@@ -108,6 +109,10 @@ function Create() {
 				setNewBuild(prevState => {
 					return { ...prevState, images: [...newBuild.images, ...newBuildImages] };
 				});
+
+				setRawImageFiles(prevState => {
+					return [...prevState, ...e.target.files];
+				});
 			}
 		}
 	};
@@ -120,6 +125,7 @@ function Create() {
 		try {
 			const buildToUpload = cloneDeep(newBuild);
 			buildToUpload.name = newBuild.name.trim();
+			const rawBuild = JSON.stringify(buildToUpload.build);
 
 			if (buildToUpload.name === '') {
 				toast.error('Your build needs a name!');
@@ -141,6 +147,17 @@ function Create() {
 				toast.error('Too many build images! Max 6');
 				return;
 			}
+			if (!rawBuild.includes(`OwnerPlayerGuidString`) && !rawBuild.includes(`AssemblyOABConfig`)) {
+				toast.error('Uh oh, It seems like you have entered an invalid craft! Check out the "How?" Button to see how to properly copy & paste your craft.');
+				return;
+			}
+			try {
+				const json = JSON.parse(rawBuild);
+			} catch (error) {
+				toast.error('Uh oh, It seems like you have entered an invalid craft! Check out the "How?" Button to see how to properly copy & paste your craft.');
+				return;
+			}
+
 			let newTags = [];
 			let tagProfanity = false;
 			buildToUpload.tags.map(tag => {
@@ -156,13 +173,11 @@ function Create() {
 			}
 
 			buildToUpload.tags = newTags;
-
-			// Upload the images to the DB
-
 			buildToUpload.images.length === 0 ? (buildToUpload.images = [LogoBackground]) : (buildToUpload.images = newBuild.images);
 			buildToUpload.author = user.username;
 			buildToUpload.uid = user.uid;
 			buildToUpload.description = description;
+			buildToUpload.thumbnail = rawImageFiles[0];
 
 			const newBuildId = await uploadBuild(buildToUpload);
 			setUploadingBuild(false);
@@ -263,8 +278,19 @@ function Create() {
 
 				return { ...prevState, images: newArr };
 			});
+
+			setRawImageFiles(prevState => {
+				const newState = [...prevState];
+				const img1 = newState[droppedImage];
+				const img2 = newState[newSquare];
+				console.log(img1, img2);
+				newState[droppedImage] = img2;
+				newState[newSquare] = img1;
+				return newState;
+			});
 		} else {
 			newSquare = Number(e.target.parentElement.id.split('-')[1]);
+
 			setNewBuild(prevState => {
 				const newArr = [...newBuild.images];
 				newArr[droppedImage] = newArr[newSquare];
@@ -272,13 +298,25 @@ function Create() {
 
 				return { ...prevState, images: newArr };
 			});
+
+			setRawImageFiles(prevState => {
+				const newState = [...prevState];
+				const img1 = newState[droppedImage];
+				const img2 = newState[newSquare];
+				newState[droppedImage] = img2;
+				newState[newSquare] = img1;
+				return newState;
+			});
 		}
 
 		// Reset hover colors
 		setHoverImage(false);
 	};
 
-	// Handles dragging a piece
+	/**
+	 * Handles dragging a piece
+	 * @param {*} e
+	 */
 	const drag = e => {
 		e.dataTransfer.setData('text', e.target.id);
 	};

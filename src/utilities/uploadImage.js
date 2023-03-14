@@ -3,6 +3,7 @@ import { storage } from '../firebase.config';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import { auth } from '../firebase.config';
+import { compressAccurately } from 'image-conversion';
 
 /**
  * Handles uploading an Image. takes in the image file, a setLoadingState, a users uid. Returns new URL.
@@ -83,6 +84,11 @@ export const uploadImages = async (images, setLoadingState) => {
 		}
 	}
 
+	/**
+	 * Stores the image on firebase
+	 * @param {*} image
+	 * @returns
+	 */
 	const storeImage = async image => {
 		// Store images in firebase
 		return new Promise((resolve, reject) => {
@@ -135,7 +141,30 @@ export const uploadImages = async (images, setLoadingState) => {
 		});
 	};
 
-	const imgUrls = await Promise.all([...images].map(img => storeImage(img))).catch(() => {
+	/**
+	 * Compress all images to 400kb
+	 * @param {*} image
+	 * @returns
+	 */
+	const compressImg = async image => {
+		try {
+			return new Promise((resolve, reject) => {
+				const compressImg = async image => {
+					const compressed = await compressAccurately(image, 400);
+					return compressed;
+				};
+
+				const compressesImage = compressImg(image);
+				resolve(compressesImage);
+			});
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const compressedImages = await Promise.all([...images].map(img => compressImg(img)));
+
+	const imgUrls = await Promise.all([...compressedImages].map(img => storeImage(img))).catch(() => {
 		setLoadingState(false);
 		toast.error('Images not uploaded');
 		return;

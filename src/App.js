@@ -28,6 +28,9 @@ Go to a user like /nyius
 Mods are a list
 public/private builds
 style the notifications to be bigger
+comment field clear out after entering
+follow a user
+replying to comment that notifies the user
 Quick share builds (without needing to create a whole build)
  */
 

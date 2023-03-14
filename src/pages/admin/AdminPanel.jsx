@@ -31,13 +31,13 @@ function AdminPanel() {
 				});
 
 				setReports(reportsData);
+				setMessagesLoading(false);
 			} catch (error) {
 				console.log(error);
 			}
 		};
 
 		fetchMessages();
-		setMessagesLoading(false);
 
 		const fetchKspInfo = async () => {
 			try {
@@ -45,27 +45,28 @@ function AdminPanel() {
 				const dataParse = data.data();
 
 				setVersions(dataParse.versions);
+				setInfoLoading(false);
 			} catch (error) {
 				console.log(error);
 			}
 		};
 
 		fetchKspInfo();
-		setInfoLoading(false);
 
 		const fetchAdminPanel = async () => {
 			try {
 				const data = await getDoc(doc(db, 'adminPanel', 'stats'));
 				const dataParse = data.data();
+				console.log(dataParse);
 
 				setStats(dataParse);
+				setStatsLoading(false);
 			} catch (error) {
 				console.log(error);
 			}
 		};
 
 		fetchAdminPanel();
-		setStatsLoading(false);
 	}, []);
 
 	const submitNewVersion = async () => {

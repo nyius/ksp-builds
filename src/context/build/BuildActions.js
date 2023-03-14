@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +6,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { clonedeep } from 'lodash';
 import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { s3Client } from '../../S3.config';
+import { toast } from 'react-toastify';
+import { compress, compressAccurately } from 'image-conversion';
+import { auth } from '../../firebase.config';
+import { uploadImage } from '../../utilities/uploadImage';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from './BuildContext';
 import BuildsContext from '../builds/BuildsContext';
@@ -13,7 +17,6 @@ import AuthContext from '../auth/AuthContext';
 import useAuth from '../auth/AuthActions';
 import { profanity } from '@2toad/profanity';
 //---------------------------------------------------------------------------------------------------//
-import { toast } from 'react-toastify';
 
 const useBuild = () => {
 	const navigate = useNavigate();
@@ -557,6 +560,7 @@ const useBuild = () => {
 		}
 	};
 
+	const [loading, setLoading] = useState(null);
 	/**
 	 * Handles uploading a build to the server. Takes in a build, and a dispatch function to add the newly created build to
 	 * @param {*} build
@@ -570,6 +574,11 @@ const useBuild = () => {
 			const buildJson = JSON.stringify(build.build);
 			const rawBuild = buildJson;
 			delete build.build;
+
+			const convertThumb = await compressAccurately(build.thumbnail, 200);
+			const thumbURL = await uploadImage(convertThumb, setLoading, `${auth.currentUser.uid}-${convertThumb.name}-${uuidv4()}`);
+
+			build.thumbnail = thumbURL;
 
 			await setDoc(doc(db, 'builds', buildId), build).catch(err => {
 				throw new Error(err);

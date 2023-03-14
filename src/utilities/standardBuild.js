@@ -5,6 +5,7 @@ export const standardBuild = {
 	timestamp: serverTimestamp(),
 	description: '{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}',
 	images: [],
+	thumbnail: null,
 	build: '',
 	author: '',
 	uid: '',

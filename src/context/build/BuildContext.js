@@ -10,6 +10,7 @@ export const BuildProvider = ({ children }) => {
 		loadingBuild: true,
 		editingBuild: false,
 		editingComment: false,
+		replyingComment: null,
 		uploadingBuild: false,
 		savingBuild: false,
 		deletingCommentId: '',

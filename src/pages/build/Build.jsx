@@ -2,11 +2,12 @@ import React, { useEffect, useContext, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { convertFromRaw, EditorState } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
 //---------------------------------------------------------------------------------------------------//
 import { AiFillEye } from 'react-icons/ai';
 //---------------------------------------------------------------------------------------------------//
 import youtubeLinkConverter from '../../utilities/youtubeLinkConverter';
-import createMarkup from '../../utilities/createMarkup';
 import useResetStates from '../../utilities/useResetStates';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from '../../context/build/BuildContext';
@@ -33,6 +34,7 @@ function Build() {
 	const { loadingBuild, loadedBuild, commentsLoading, comments, editingBuild } = useContext(BuildContext);
 	const { user, authLoading } = useContext(AuthContext);
 	const { fetchBuild, setComment, addComment, updateDownloadCount, setEditingBuild } = useBuild();
+	const [buildDesc, setBuildDesc] = useState(null);
 	const navigate = useNavigate();
 
 	const { id } = useParams();
@@ -47,6 +49,12 @@ function Build() {
 	useEffect(() => {
 		fetchBuild(id);
 	}, [id]);
+
+	useEffect(() => {
+		if (!loadingBuild && loadedBuild) {
+			setBuildDesc(EditorState.createWithContent(convertFromRaw(JSON.parse(loadedBuild.description))));
+		}
+	}, [loadingBuild, loadedBuild]);
 
 	/**
 	 * Handles copying the build to the clipboard
@@ -127,7 +135,9 @@ function Build() {
 
 							{/* Description */}
 							<p className="text-2xl 2k:text-4xl text-slate-500 mb-5">ABOUT THIS BUILD</p>
-							<div className="mb-20 2k:mb-32 text-xl 2k:text-3xl" dangerouslySetInnerHTML={createMarkup(loadedBuild.description)}></div>
+							<div className="mb-20 2k:mb-32 text-xl 2k:text-3xl">
+								<Editor editorState={buildDesc} readOnly={true} toolbarHidden={true} />
+							</div>
 
 							{/* Buttons */}
 							<div className="flex flex-col md:flex-row place-content-between">

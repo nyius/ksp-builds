@@ -28,6 +28,11 @@ const BuildReducer = (state, action) => {
 				...state,
 				editingComment: action.payload,
 			};
+		case 'REPLYING_COMMENT':
+			return {
+				...state,
+				replyingComment: action.payload,
+			};
 		case 'UPLOADING_BUILD':
 			return {
 				...state,

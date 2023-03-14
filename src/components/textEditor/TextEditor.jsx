@@ -10,9 +10,9 @@ import { Editor } from 'react-draft-wysiwyg';
  * @param {number} i Takes in an 'i' num if this is used inside of a map, so we know which element to edit
  * @returns
  */
-function TextEditor(state) {
+const TextEditor = state => {
 	// Handles sending the markup back to the parent
-	const { setState, size, i } = state;
+	const { setState, size, i, reset } = state;
 	const { editingBuild, editingComment } = useContext(BuildContext);
 
 	const [editorState, setEditorState] = useState(() => {
@@ -31,6 +31,10 @@ function TextEditor(state) {
 		setEditorState(state);
 		convertContentToJson();
 	};
+
+	useEffect(() => {
+		console.log(reset);
+	}, [reset]);
 
 	// Takes the editor content and converts it to JSON (to store on the DB)
 	const convertContentToJson = () => {
@@ -79,6 +83,6 @@ function TextEditor(state) {
 			/>
 		</>
 	);
-}
+};
 
 export default TextEditor;

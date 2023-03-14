@@ -4,14 +4,21 @@ import useBuild from '../../context/build/BuildActions';
 import BuildContext from '../../context/build/BuildContext';
 import UsernameLink from '../buttons/UsernameLink';
 import TextEditor from '../textEditor/TextEditor';
-import createMarkup from '../../utilities/createMarkup';
+import { convertFromRaw, EditorState } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
 
+/**
+ * Handles displaying a comment
+ * @param {*} comment
+ * @returns
+ */
 function Comment({ comment }) {
 	const { user, authLoading } = useContext(AuthContext);
 	const { loadedBuild, editingComment } = useContext(BuildContext);
 	const [editedComment, setEditedComment] = useState('');
-	const { deleteComment, updateComment, fetchComments, setEditingComment } = useBuild();
+	const { deleteComment, updateComment, fetchComments, setEditingComment, setReplyingComment } = useBuild();
 	const date = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(comment.timestamp.seconds * 1000);
+	const editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(comment.comment)));
 
 	/**
 	 * Handles when a user saves changes to their comment
@@ -33,7 +40,7 @@ function Comment({ comment }) {
 				</div>
 				<p className="2k:text-2xl">{date}</p>
 			</div>
-			{editingComment ? <TextEditor setState={setEditedComment} /> : <p className="text-slate-300 font-thin 2k:text-3xl" dangerouslySetInnerHTML={createMarkup(comment.comment)}></p>}
+			{editingComment ? <TextEditor setState={setEditedComment} /> : <Editor editorState={editorState} readOnly={true} toolbarHidden={true} />}
 
 			{!authLoading && (user?.uid === comment.uid || user?.siteAdmin) && (
 				<div className="flex flex-row gap-4 2k:gap-8">
@@ -50,6 +57,11 @@ function Comment({ comment }) {
 					{!editingComment && (
 						<p onClick={() => setEditingComment(comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-3xl">
 							Edit
+						</p>
+					)}
+					{!editingComment && (
+						<p onClick={() => setReplyingComment(comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-3xl">
+							Reply
 						</p>
 					)}
 					<p onClick={() => deleteComment(comment.id)} className="text-slate-500 hover:text-red-300 cursor-pointer 2k:text-3xl">

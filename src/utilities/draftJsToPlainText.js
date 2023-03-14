@@ -7,7 +7,7 @@ import { convertFromRaw, EditorState } from 'draft-js';
  */
 const draftJsToPlainText = draftjsContent => {
 	const editorText = EditorState.createWithContent(convertFromRaw(JSON.parse(draftjsContent)));
-	return editorText.getCurrentContent().getPlainText('\u0001');
+	return editorText.getCurrentContent().getPlainText();
 };
 
 export default draftJsToPlainText;

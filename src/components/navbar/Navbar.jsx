@@ -48,13 +48,11 @@ function NavBar() {
 			<div className="flex-1">
 				{/* Logo  */}
 				<img src={Logo} className="h-10 2k:h-20 btn btn-ghost hidden sm:block" alt="" onClick={() => navigate('/')} />
-
 				{/* Mobile Hamburger */}
 				<div className="flex flex-row gap-4">
 					<MobileHamburger />
 					<Types />
 				</div>
-
 				{/* Buttons */}
 				<ul className="menu menu-horizontal px-6 gap-3 2k:gap-6">
 					<Button onClick={handleCreateNavigate} color="btn-accent" css="text-white hidden md:flex" text="Create" icon="plus" />
@@ -63,8 +61,10 @@ function NavBar() {
 					<CreateBuildAdmin />
 					<Button text="How to upload" icon="help" css="hidden lg:flex" htmlFor="how-to-copy-build-modal" />
 				</ul>
-
-				<p className="text-2xl 2k:text-5xl text-sate-600 italic font-bold">BETA</p>
+				<div className="flex flex-row items-end">
+					<p className="text-2xl 2k:text-5xl text-sate-600 italic font-bold mr-4 2k:mr-8">BETA</p>
+					<p className="text-xl 2k:text-3xl text-sate-600 italic">Your Hub for KSP 2</p>
+				</div>
 			</div>
 
 			<div className="flex-none gap-3">

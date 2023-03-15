@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
 
 				// Fetch their notifications --------------------------------------------//
 				const notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
-				const q = query(notificationsRef, orderBy('timestamp', 'desc', limit(20)), limit(20));
+				const q = query(notificationsRef, orderBy('timestamp', 'desc', limit(process.env.REACT_APP_NOTIFS_FETCH_NUM)), limit(process.env.REACT_APP_NOTIFS_FETCH_NUM));
 
 				const notificationsSnap = await getDocs(q);
 				const notificationsList = notificationsSnap.docs.map(doc => {
@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }) => {
 
 				let deleteNotifIds = [];
 
+				// Filter the notifications based on blocked notids
 				let filteredNotifications = notificationsList
 					.filter(notif => {
 						// Check if the user doesn't want any notifications, if so, delete them all instantly
@@ -64,6 +65,10 @@ export const AuthProvider = ({ children }) => {
 				dispatchAuth({
 					type: 'SET_USER',
 					payload: user,
+				});
+				dispatchAuth({
+					type: 'SET_AUTH',
+					payload: { lastFetchedNotification: notificationsSnap.docs.length < process.env.REACT_APP_NOTIFS_FETCH_NUM ? 'end' : notificationsSnap.docs[notificationsSnap.docs.length - 1], notificationsLoading: false },
 				});
 
 				// Delete all the notifications that were filtered out
@@ -117,6 +122,8 @@ export const AuthProvider = ({ children }) => {
 		usernameChanged: false,
 		verifyChangeUsername: false,
 		newSignup: false,
+		lastFetchedNotification: null,
+		notificationsLoading: true,
 		fetchingProfile: false,
 		fetchedUserProfile: null,
 		resetPasswordState: false,

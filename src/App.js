@@ -27,15 +27,14 @@ folders
 Go to a user like /nyius
 Mods are a list
 public/private builds
-style the notifications to be bigger
 comment field clear out after entering
 follow a user
 FAQ Page
 upload image for comments
+button closing notifications tab when clicked
 Quick share builds (without needing to create a whole build)
 instead of infinitely loading builds, it should be pages
 home page Builds should probably fetch by default view count 
-remove all notifications
  */
 
 //---------------------------------------------------------------------------------------------------//

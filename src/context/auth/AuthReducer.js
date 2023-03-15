@@ -90,6 +90,11 @@ const AuthReducer = (state, action) => {
 				...state,
 				editingProfile: action.payload,
 			};
+		case 'SET_LAST_FETCHED_NOTIF':
+			return {
+				...state,
+				lastFetchedNotification: action.payload,
+			};
 		case 'SET_NEW_SIGNUP':
 			return {
 				...state,
@@ -134,3 +139,19 @@ const AuthReducer = (state, action) => {
 };
 
 export default AuthReducer;
+
+const test = {
+	Version: '2012-10-17',
+	Statement: [
+		{
+			Effect: 'Allow',
+			Action: 'logs:CreateLogGroup',
+			Resource: 'arn:aws:logs:us-east-1:927867949915:*',
+		},
+		{
+			Effect: 'Allow',
+			Action: ['logs:CreateLogStream', 'logs:PutLogEvents'],
+			Resource: ['arn:aws:logs:us-east-1:927867949915:log-group:/aws/lambda/buildUpload:*'],
+		},
+	],
+};

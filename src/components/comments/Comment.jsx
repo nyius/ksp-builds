@@ -65,28 +65,28 @@ function Comment({ comment }) {
 				<div className="text-white">{editingComment ? <TextEditor setState={setEditedComment} /> : <Editor editorState={editorState} readOnly={true} toolbarHidden={true} />}</div>
 				<div className="flex flex-row gap-4 2k:gap-8">
 					{!editingComment && user?.username && (
-						<a href={`#add-comment`} onClick={() => setReplyingComment(comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-3xl">
+						<a href={`#add-comment`} onClick={() => setReplyingComment(comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
 							Reply
 						</a>
 					)}
 					{!authLoading && (user?.uid === comment.uid || user?.siteAdmin) && (
 						<>
 							{editingComment && (
-								<p className="text-slate-500 hover:text-green-300 cursor-pointer 2k:text-3xl" onClick={e => handleSaveCommentEdit(e)}>
+								<p className="text-slate-500 hover:text-green-300 cursor-pointer 2k:text-2xl" onClick={e => handleSaveCommentEdit(e)}>
 									Save
 								</p>
 							)}
 							{editingComment && (
-								<p onClick={() => setEditingComment(false)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-3xl">
+								<p onClick={() => setEditingComment(false)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
 									Cancel
 								</p>
 							)}
 							{!editingComment && (
-								<p onClick={() => setEditingComment(comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-3xl">
+								<p onClick={() => setEditingComment(comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
 									Edit
 								</p>
 							)}
-							<p onClick={() => deleteComment(comment.id)} className="text-slate-500 hover:text-red-300 cursor-pointer 2k:text-3xl">
+							<p onClick={() => deleteComment(comment.id)} className="text-slate-500 hover:text-red-300 cursor-pointer 2k:text-2xl">
 								Delete
 							</p>
 						</>

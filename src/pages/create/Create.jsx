@@ -177,7 +177,9 @@ function Create() {
 			buildToUpload.author = user.username;
 			buildToUpload.uid = user.uid;
 			buildToUpload.description = description;
-			buildToUpload.thumbnail = rawImageFiles[0];
+			if (rawImageFiles.length > 0) {
+				buildToUpload.thumbnail = rawImageFiles[0];
+			}
 
 			const newBuildId = await uploadBuild(buildToUpload);
 			setUploadingBuild(false);

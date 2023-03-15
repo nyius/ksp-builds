@@ -43,18 +43,20 @@ const useBuild = () => {
 			// get the build from the db
 			const fetchedBuild = await getDoc(buildRef);
 
-			// Get the raw build from aws
-			try {
-				const command = new GetObjectCommand({
-					Bucket: process.env.REACT_APP_BUCKET,
-					Key: `${id}.json`,
-				});
+			if (process.env.REACT_APP_ENV !== 'DEV') {
+				// Get the raw build from aws
+				try {
+					const command = new GetObjectCommand({
+						Bucket: process.env.REACT_APP_BUCKET,
+						Key: `${id}.json`,
+					});
 
-				response = await s3Client.send(command);
-				rawBuildData = await response.Body.transformToString();
-				parsedBuild = JSON.parse(rawBuildData);
-			} catch (error) {
-				console.log(error);
+					response = await s3Client.send(command);
+					rawBuildData = await response.Body.transformToString();
+					parsedBuild = JSON.parse(rawBuildData);
+				} catch (error) {
+					console.log(error);
+				}
 			}
 
 			if (fetchedBuild.exists()) {
@@ -607,6 +609,8 @@ const useBuild = () => {
 				build.thumbnail = thumbURL;
 			}
 
+			console.log(build);
+
 			// Add the build object to the DB
 			await setDoc(doc(db, process.env.REACT_APP_BUILDSDB, buildId), build);
 
@@ -633,17 +637,19 @@ const useBuild = () => {
 					payload: build,
 				});
 
-				// add the builds to aws
-				const command = new PutObjectCommand({
-					Bucket: process.env.REACT_APP_BUCKET,
-					Key: `${buildId}.json`,
-					Body: rawBuild,
-					ContentEncoding: 'base64',
-					ContentType: 'application/json',
-					ACL: 'public-read',
-				});
+				if (process.env.REACT_APP_ENV !== 'DEV') {
+					// add the builds to aws
+					const command = new PutObjectCommand({
+						Bucket: process.env.REACT_APP_BUCKET,
+						Key: `${buildId}.json`,
+						Body: rawBuild,
+						ContentEncoding: 'base64',
+						ContentType: 'application/json',
+						ACL: 'public-read',
+					});
 
-				const response = await s3Client.send(command);
+					const response = await s3Client.send(command);
+				}
 
 				// Add it to the users 'Upvoted'
 				await handleVoting('upVote', build);

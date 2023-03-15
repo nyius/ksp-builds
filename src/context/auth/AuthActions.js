@@ -1,5 +1,5 @@
 import { db } from '../../firebase.config';
-import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc } from 'firebase/firestore';
+import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter } from 'firebase/firestore';
 import { signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 import { googleProvider } from '../../firebase.config';
 import { auth } from '../../firebase.config';
@@ -15,7 +15,7 @@ import { uploadImage } from '../../utilities/uploadImage';
 import { v4 as uuidv4 } from 'uuid';
 
 const useAuth = () => {
-	const { dispatchAuth, user, accountToDelete, newUsername, newBio, editingProfile, verifyChangeUsername } = useContext(AuthContext);
+	const { dispatchAuth, user, accountToDelete, newUsername, newBio, editingProfile, verifyChangeUsername, lastFetchedNotification } = useContext(AuthContext);
 
 	/**
 	 * Handles when a user signs up with google and neeeds to enter a username
@@ -418,6 +418,41 @@ const useAuth = () => {
 	};
 
 	/**
+	 * Handles fetching more notifications
+	 */
+	const fetchMoreNotifications = async () => {
+		try {
+			dispatchAuth({
+				type: 'SET_AUTH',
+				payload: { notificationsLoading: true },
+			});
+
+			const notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
+			const q = query(notificationsRef, orderBy('timestamp', 'desc', limit(process.env.REACT_APP_NOTIFS_FETCH_NUM)), startAfter(lastFetchedNotification), limit(process.env.REACT_APP_NOTIFS_FETCH_NUM));
+
+			const notifsSnap = await getDocs(q);
+
+			let notifs = [];
+			notifsSnap.forEach(doc => {
+				const notif = doc.data();
+				notifs.push(notif);
+			});
+
+			dispatchAuth({
+				type: 'UPDATE_USER',
+				payload: { notifications: [...user.notifications, ...notifs] },
+			});
+
+			dispatchAuth({
+				type: 'SET_AUTH',
+				payload: { lastFetchedNotification: notifsSnap.docs.length < process.env.REACT_APP_NOTIFS_FETCH_NUM ? 'end' : notifsSnap.docs[notifsSnap.docs.length - 1], notificationsLoading: false },
+			});
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
 	 * handles deleting a user
 	 * @param {*} id
 	 */
@@ -561,6 +596,7 @@ const useAuth = () => {
 		updateUserProfilePicture,
 		deleteUserAccount,
 		fetchUsersProfile,
+		fetchMoreNotifications,
 		uploadProfilePicture,
 		createNewUserAccount,
 		loginWithGoogle,

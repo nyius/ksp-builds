@@ -36,7 +36,7 @@ function BuildCard({ build }) {
 						<span className="view-count">
 							<AiFillEye />
 						</span>
-						{build.views} {build.visibility}
+						{build.views}
 					</p>
 					<div className="flex relative w-full items-center justify-center">
 						<img src={build.thumbnail ? build.thumbnail : build.images[0]} alt={build.name} />

@@ -48,6 +48,11 @@ const BuildReducer = (state, action) => {
 				...state,
 				deletingBuild: action.payload,
 			};
+		case 'RESET_TEXT_EDITOR':
+			return {
+				...state,
+				resetTextEditor: action.payload,
+			};
 
 		default:
 			return state;

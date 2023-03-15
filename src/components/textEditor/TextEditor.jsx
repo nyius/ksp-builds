@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import BuildContext from '../../context/build/BuildContext';
 import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
+import useBuild from '../../context/build/BuildActions';
 
 /**
  * Takes in a setState to set when the text is edited. Also takes in a size that specifies how many toolbar icons are shown. (sm, md, lg). default is lg
@@ -13,10 +14,11 @@ import { Editor } from 'react-draft-wysiwyg';
 const TextEditor = state => {
 	// Handles sending the markup back to the parent
 	const { setState, size, i, reset } = state;
-	const { editingBuild, editingComment } = useContext(BuildContext);
+	const { editingBuild, editingComment, resetTextEditor } = useContext(BuildContext);
+	const { setResetTextEditorState } = useBuild();
+	const emptyState = `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`;
 
 	const [editorState, setEditorState] = useState(() => {
-		const emptyState = `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`;
 		if (editingBuild) {
 			return EditorState.createWithContent(convertFromRaw(JSON.parse(editingBuild.description)));
 		}
@@ -33,8 +35,11 @@ const TextEditor = state => {
 	};
 
 	useEffect(() => {
-		console.log(reset);
-	}, [reset]);
+		if (resetTextEditor) {
+			setEditorState(EditorState.createWithContent(convertFromRaw(JSON.parse(emptyState))));
+			setResetTextEditorState(false);
+		}
+	}, [resetTextEditor]);
 
 	// Takes the editor content and converts it to JSON (to store on the DB)
 	const convertContentToJson = () => {

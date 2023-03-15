@@ -34,7 +34,7 @@ function Build() {
 	//---------------------------------------------------------------------------------------------------//
 	const { loadingBuild, loadedBuild, commentsLoading, comments, editingBuild, replyingComment } = useContext(BuildContext);
 	const { user, authLoading } = useContext(AuthContext);
-	const { fetchBuild, setComment, addComment, updateDownloadCount, setEditingBuild, setReplyingComment } = useBuild();
+	const { fetchBuild, setComment, addComment, updateDownloadCount, setEditingBuild, setReplyingComment, setResetTextEditorState } = useBuild();
 	const [buildDesc, setBuildDesc] = useState(null);
 	const navigate = useNavigate();
 

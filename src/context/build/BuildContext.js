@@ -19,6 +19,7 @@ export const BuildProvider = ({ children }) => {
 		comments: [],
 		commentsLoading: true,
 		comment: '',
+		resetTextEditor: '',
 	};
 
 	const [state, dispatchBuild] = useReducer(BuildReducer, initialState);

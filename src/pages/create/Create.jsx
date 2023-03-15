@@ -134,58 +134,13 @@ function Create() {
 		e.preventDefault();
 		try {
 			const buildToUpload = cloneDeep(newBuild);
-			buildToUpload.name = newBuild.name.trim();
-			const rawBuild = JSON.stringify(buildToUpload.build);
-
-			if (buildToUpload.name === '') {
-				toast.error('Your build needs a name!');
-				return;
-			}
-			if (profanity.exists(buildToUpload.name)) {
-				toast.error('Build name is unacceptable!');
-				return;
-			}
-			if (buildToUpload.type.length === 0) {
-				toast.error('Your build needs atleast 1 tag!');
-				return;
-			}
-
-			if (buildToUpload.images.length > 6) {
-				toast.error('Too many build images! Max 6');
-				return;
-			}
-
-			if (process.env.REACT_APP_ENV !== 'DEV') {
-				if (buildToUpload.build.trim() === '') {
-					toast.error('You forgot to include the build!');
-					return;
-				}
-				if (!rawBuild.includes(`OwnerPlayerGuidString`) && !rawBuild.includes(`AssemblyOABConfig`)) {
-					toast.error('Uh oh, It seems like you have entered an invalid craft! Check out the "How?" Button to see how to properly copy & paste your craft.');
-					return;
-				}
-				try {
-					const json = JSON.parse(rawBuild);
-				} catch (error) {
-					toast.error('Uh oh, It seems like you have entered an invalid craft! Check out the "How?" Button to see how to properly copy & paste your craft.');
-					return;
-				}
-			}
 
 			let newTags = [];
-			let tagProfanity = false;
 			buildToUpload.tags.map(tag => {
-				if (profanity.exists(tag)) {
-					tagProfanity = true;
-				}
 				newTags.push(tag.trim());
 			});
 
-			if (tagProfanity) {
-				toast.error('Tags contain unacceptable words!');
-				return;
-			}
-
+			buildToUpload.name = newBuild.name.trim();
 			buildToUpload.tags = newTags;
 			buildToUpload.images.length === 0 ? (buildToUpload.images = [LogoBackground]) : (buildToUpload.images = newBuild.images);
 			buildToUpload.author = user.username;
@@ -196,8 +151,9 @@ function Create() {
 			}
 
 			const newBuildId = await uploadBuild(buildToUpload);
-			setUploadingBuild(false);
-			navigate(`/build/${newBuildId}`);
+			if (newBuildId) {
+				navigate(`/build/${newBuildId}`);
+			}
 		} catch (error) {
 			toast.error('Something went wrong!');
 			console.log(error);
@@ -370,7 +326,9 @@ function Create() {
 											return (
 												<div
 													key={i}
-													className="relative flex items-center justify-center w-36 h-36 2k:w-52 2k:h-52 hover:bg-base-100 overflow-hidden rounded-xl bg-base-300 border-dashed border-2 border-slate-700"
+													className={`relative flex items-center justify-center w-36 h-36 2k:w-52 2k:h-52 hover:bg-base-100 overflow-hidden rounded-xl bg-base-300 border-dashed border-2 ${
+														i === 0 ? 'border-blue-700' : 'border-slate-700'
+													} `}
 													onDrop={e => drop(e)}
 													onDragOver={e => allowDrop(e)}
 													onDragLeave={e => dragExit(e)}
@@ -378,7 +336,7 @@ function Create() {
 													style={squareStyle(i)}
 												>
 													<Button onClick={() => removeImage(i)} text="X" css="hover:bg-red-500" color="btn-error" size="btn-sm" style="btn-circle" position="right-0 top-0 absolute z-50" />
-
+													{i === 0 && <div className="badge badge-sm absolute bottom-1 left-1 text-lg 2k:text-xl p-2 2k:p-3">Thumbnail</div>}
 													<img id={i} src={image} className="w-full object-scale-down cursor-pointer" alt="" draggable={true} onDragStart={e => drag(e)} />
 												</div>
 											);

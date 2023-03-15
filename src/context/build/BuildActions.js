@@ -91,68 +91,67 @@ const useBuild = () => {
 	 */
 	const makeBuildReadyToUpload = async build => {
 		try {
-			dispatchBuild({
-				type: 'UPLOADING_BUILD',
-				payload: true,
-			});
+			const rawBuild = JSON.stringify(build.build);
 
-			// Check if we have a build name
 			if (build.name.length === 0) {
-				dispatchBuild({
-					type: 'UPLOADING_BUILD',
-					payload: false,
-				});
 				toast.error('Please enter a build name');
-				throw new Error('Please enter a build name');
+				return;
 			}
 
-			// Check if user is logged in
-			if (!user) {
-				dispatchBuild({
-					type: 'UPLOADING_BUILD',
-					payload: false,
-				});
-				toast.error('Please log in or create an account to save a build');
-				throw new Error('Not logged in');
-			}
-
-			// Check if theres types in the build
-			if (build.type.length === 0) {
-				toast.error('You forgot to give your build a type!');
-				dispatchBuild({
-					type: 'UPLOADING_BUILD',
-					payload: false,
-				});
-				throw new Error('You forgot to give your build a type!');
-			}
-
-			// Check name length
 			if (build.name.length > 50) {
 				toast.error('Build name too long');
-				dispatchBuild({
-					type: 'UPLOADING_BUILD',
-					payload: false,
-				});
-				throw new Error('Build name too long');
-			}
-
-			if (build.build.length === 0) {
-				toast.error('You forgot to enter a build!');
-
-				dispatchBuild({
-					type: 'UPLOADING_BUILD',
-					payload: false,
-				});
-				throw new Error('You forgot to enter a build!');
+				return;
 			}
 
 			if (profanity.exists(build.name)) {
 				toast.error('Build name is unacceptable!');
-				dispatchBuild({
-					type: 'UPLOADING_BUILD',
-					payload: false,
-				});
-				throw new Error('Build name is unacceptable!');
+				return;
+			}
+
+			if (!user) {
+				toast.error('Please log in or create an account to save a build');
+				return;
+			}
+
+			if (build.type.length === 0) {
+				toast.error('You forgot to give your build a type!');
+				return;
+			}
+
+			if (build.images.length > 6) {
+				toast.error('Too many build images! Max 6');
+				return;
+			}
+
+			if (process.env.REACT_APP_ENV !== 'DEV') {
+				if (build.build.trim() === '') {
+					toast.error('You forgot to include the build!');
+					return;
+				}
+				if (!rawBuild.includes(`OwnerPlayerGuidString`) && !rawBuild.includes(`AssemblyOABConfig`)) {
+					toast.error('Uh oh, It seems like you have entered an invalid craft! Check out the "How?" Button to see how to properly copy & paste your craft.');
+					return;
+				}
+				try {
+					const json = JSON.parse(rawBuild);
+				} catch (error) {
+					toast.error('Uh oh, It seems like you have entered an invalid craft! Check out the "How?" Button to see how to properly copy & paste your craft.');
+					return;
+				}
+			}
+
+			let newTags = [];
+			let tagProfanity = false;
+			build.tags.map(tag => {
+				if (profanity.exists(tag)) {
+					tagProfanity = true;
+				}
+				newTags.push(tag.trim());
+			});
+
+			if (tagProfanity) {
+				toast.error('Tags contain unacceptable words!');
+				return;
 			}
 
 			return build;
@@ -167,34 +166,41 @@ const useBuild = () => {
 	 */
 	const updateBuild = async build => {
 		try {
-			const newBuild = await makeBuildReadyToUpload(build);
+			const buildStatus = await makeBuildReadyToUpload(build);
+			if (!buildStatus) return;
 
-			const buildJSON = JSON.stringify(newBuild.build);
-			delete newBuild.build;
+			setUploadingBuild(true);
+
+			const buildJSON = JSON.stringify(build.build);
+			delete build.build;
 
 			// update the document
-			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, newBuild.id), {
-				...newBuild,
+			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), {
+				...build,
 			}).catch(err => {
 				setSavingBuild(false);
 				throw new Error(err);
 			});
 
-			// if the description changed, update AWS
-			if (editingBuild.description !== build.description) {
-				// update the raw build on aws
-				const command = new PutObjectCommand({
-					Bucket: process.env.REACT_APP_BUCKET,
-					Key: `${newBuild.id}.json`,
-					Body: buildJSON,
-					ContentEncoding: 'base64',
-					ContentType: 'application/json',
-					ACL: 'public-read',
-				});
+			// if the build changed, update AWS
+			if (JSON.stringify(editingBuild.build) !== buildJSON) {
+				if (process.env.REACT_APP_ENV !== 'DEV') {
+					const compressedBuild = compressToEncodedURIComponent(buildJSON);
 
-				const response = await s3Client.send(command);
+					// update the raw build on aws
+					const command = new PutObjectCommand({
+						Bucket: process.env.REACT_APP_BUCKET,
+						Key: `${build.id}.json`,
+						Body: compressedBuild,
+						ContentEncoding: 'base64',
+						ContentType: 'application/json',
+						ACL: 'public-read',
+					});
 
-				newBuild.build = JSON.parse(buildJSON);
+					const response = await s3Client.send(command);
+
+					build.build = JSON.parse(buildJSON);
+				}
 			}
 
 			dispatchBuild({
@@ -203,12 +209,15 @@ const useBuild = () => {
 					savingBuild: false,
 					editingBuild: false,
 					uploadingBuild: false,
-					loadedBuild: newBuild,
+					loadedBuild: build,
+					resetTextEditor: true,
 				},
 			});
 
 			toast.success('Build updated');
+			setUploadingBuild(false);
 		} catch (error) {
+			setUploadingBuild(false);
 			setSavingBuild(false);
 			throw new Error(error);
 		}
@@ -508,6 +517,7 @@ const useBuild = () => {
 					comment: '',
 					comments: [...comments, newComment],
 					replyingComment: null,
+					resetTextEditor: true,
 				},
 			});
 		} catch (error) {
@@ -598,7 +608,11 @@ const useBuild = () => {
 	 */
 	const uploadBuild = async build => {
 		try {
+			const buildStatus = await makeBuildReadyToUpload(build);
+			if (!buildStatus) return;
+
 			setUploadingBuild(true);
+
 			const buildId = uuidv4().slice(0, 30);
 			build.id = buildId;
 
@@ -690,6 +704,17 @@ const useBuild = () => {
 		});
 	};
 
+	/**
+	 * Handles setting the "reset" for the text editor state. True resets it.
+	 * @param {*} bool
+	 */
+	const setResetTextEditorState = bool => {
+		dispatchBuild({
+			type: 'ESET_TEXT_EDITOR',
+			payload: bool,
+		});
+	};
+
 	return {
 		setUploadingBuild,
 		setBaseBuild,
@@ -699,6 +724,7 @@ const useBuild = () => {
 		setComment,
 		setSavingBuild,
 		setDeletingComment,
+		setResetTextEditorState,
 		cancelBuilEdit,
 		fetchComments,
 		deleteComment,

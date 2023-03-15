@@ -4,26 +4,30 @@ import { db } from '../../firebase.config';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { clonedeep } from 'lodash';
+import { convertFromRaw } from 'draft-js';
 import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { s3Client } from '../../S3.config';
 import { toast } from 'react-toastify';
 import { compress, compressAccurately } from 'image-conversion';
 import { auth } from '../../firebase.config';
+import { profanity } from '@2toad/profanity';
+//---------------------------------------------------------------------------------------------------//
 import { uploadImage } from '../../utilities/uploadImage';
+import draftJsToPlainText from '../../utilities/draftJsToPlainText';
+import standardNotifications from '../../utilities/standardNotifications';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from './BuildContext';
 import BuildsContext from '../builds/BuildsContext';
 import AuthContext from '../auth/AuthContext';
 import useAuth from '../auth/AuthActions';
-import { profanity } from '@2toad/profanity';
 //---------------------------------------------------------------------------------------------------//
 
 const useBuild = () => {
 	const navigate = useNavigate();
-	const { dispatchBuild, deletingCommentId, comments, loadedBuild, comment, editingBuild } = useContext(BuildContext);
+	const { dispatchBuild, deletingCommentId, replyingComment, comments, loadedBuild, comment, editingBuild } = useContext(BuildContext);
 	const { fetchedBuilds, dispatchBuilds } = useContext(BuildsContext);
 	const { user } = useContext(AuthContext);
-	const { updateUserState, addbuildToUser, handleVoting } = useAuth();
+	const { updateUserState, addbuildToUser, handleVoting, sendNotification } = useAuth();
 
 	/**
 	 * Fetches the build from the server and dispatches the result.
@@ -352,7 +356,7 @@ const useBuild = () => {
 				return comment;
 			});
 
-			if (commentsList) commentsList.sort((a, b) => b.timestamp - a.timestamp);
+			if (commentsList) commentsList.sort((a, b) => a.timestamp - b.timestamp);
 
 			dispatchBuild({
 				type: 'SET_BUILD',
@@ -438,6 +442,15 @@ const useBuild = () => {
 				uid: user.uid,
 			};
 
+			if (replyingComment) {
+				const plainText = draftJsToPlainText(replyingComment.comment);
+
+				newComment.replyCommentUsername = replyingComment.username;
+				newComment.replyCommentId = replyingComment.id;
+				newComment.replyTimestamp = replyingComment.timestamp;
+				newComment.replyComment = plainText.slice(0, 40);
+			}
+
 			// Add it to the DB
 			const newId = await addDoc(postRef, newComment);
 
@@ -449,24 +462,26 @@ const useBuild = () => {
 				commentCount: (loadedBuild.commentCount += 1),
 			});
 
+			// Handle nofitications
+			const newNotif = { ...standardNotifications };
+			newNotif.buildId = loadedBuild.id;
+			newNotif.buildName = loadedBuild.name;
+			newNotif.uid = user.uid;
+			newNotif.username = user.username;
+			newNotif.timestamp = new Date();
+			newNotif.profilePicture = user.profilePicture;
+			newNotif.comment = comment;
+			newNotif.commentId = newId.id;
+
+			// If we're replying to someones comment, give that user a notification
+			if (replyingComment && replyingComment.username !== user.username) {
+				newNotif.type = 'reply';
+				await sendNotification(replyingComment.uid, newNotif);
+			}
 			// Send a notification to the build author
-			if (loadedBuild.uid !== user.uid) {
-				const authorRef = collection(db, 'users', loadedBuild.uid, 'notifications');
-
-				const newNotification = {
-					buildId: loadedBuild.id,
-					buildName: loadedBuild.name,
-					type: 'comment',
-					uid: user.uid,
-					username: user.username,
-					timestamp: new Date(),
-					profilePicture: user.profilePicture,
-					comment: comment,
-					commentId: newId.id,
-					read: false,
-				};
-
-				await addDoc(authorRef, newNotification);
+			if (loadedBuild.uid !== user.uid && replyingComment?.uid !== loadedBuild.uid) {
+				newNotif.type = 'comment';
+				await sendNotification(loadedBuild.uid, newNotif);
 			}
 
 			// now fetch the comment so we can get its timestamp
@@ -483,7 +498,8 @@ const useBuild = () => {
 				type: 'SET_BUILD',
 				payload: {
 					comment: '',
-					comments: [newComment, ...comments],
+					comments: [...comments, newComment],
+					replyingComment: null,
 				},
 			});
 		} catch (error) {
@@ -587,7 +603,7 @@ const useBuild = () => {
 			// Create the thumbnail
 			if (typeof build.thumbnail !== 'string') {
 				const convertThumb = await compressAccurately(build.thumbnail, 100);
-				const thumbURL = await uploadImage(convertThumb, setLoading, `${auth.currentUser.uid}-${convertThumb.name}-${uuidv4()}`);
+				const thumbURL = await uploadImage(convertThumb, setLoading, auth.currentUser.uid);
 				build.thumbnail = thumbURL;
 			}
 

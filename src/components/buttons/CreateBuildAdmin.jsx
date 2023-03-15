@@ -36,8 +36,7 @@ function CreateBuildAdmin() {
 		build.timestamp = serverTimestamp();
 		build.description = '{"blocks":[{"key":"87rfs","text":"here is a sample description","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}';
 		build.images = [images[Math.round(Math.random() * 4)]];
-		build.thumbnail =
-			'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/images%2FZyVrojY9BZU5ixp09LftOd240LH3-undefined-d3bfcb60-9afe-452e-9699-22b7e3f3072c-undefined-41acd546-8c55-445e-a136-09e3491d6ae5?alt=media&token=9e8b1fef-5b1a-4349-bf73-cce254173475';
+		build.thumbnail = '';
 		build.build = JSON.stringify(shipBuildTestMedium);
 		build.author = 'nyius';
 		build.uid = auth.currentUser.uid;

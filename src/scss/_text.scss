@@ -11,6 +11,13 @@
 	}
 }
 
+.single-line-truncate {
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
 .vote-arrow {
 	font-size: 2rem;
 }

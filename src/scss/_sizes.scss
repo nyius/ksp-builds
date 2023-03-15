@@ -77,6 +77,13 @@
 
 .notifications {
 	width: 25rem;
+	max-height: 50rem;
+}
+
+@media (min-width: 1025px) {
+	.notifications {
+		width: 40rem;
+	}
 }
 
 @media (min-width: 1921px) {

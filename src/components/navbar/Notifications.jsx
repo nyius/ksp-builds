@@ -3,11 +3,12 @@ import AuthContext from '../../context/auth/AuthContext';
 import { MdOutlineNotificationsNone } from 'react-icons/md';
 import Notification from './Notification';
 import useAuth from '../../context/auth/AuthActions';
+import Button from '../buttons/Button';
 
 function Notifications() {
 	const { authLoading, user } = useContext(AuthContext);
 	const [totalUnread, setTotalUnread] = useState(0);
-	const { setNotificationsRead } = useAuth();
+	const { setNotificationsRead, handleDeleteAllNotifications } = useAuth();
 
 	/**
 	 * Calculates total unread notifications
@@ -42,11 +43,15 @@ function Notifications() {
 							</p>
 						</label>
 					</div>
-					<ul tabIndex={4} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box notifications h-fit max-h-96 overflow-auto flex-nowrap scrollbar">
-						{user?.notifications?.length === 0 && <p className="text-xl 2k:text-2xl font-bold">No notifications</p>}
-						{user?.notifications?.map((notif, i) => {
-							return <Notification key={i} i={i} notif={notif} />;
-						})}
+					<ul tabIndex={4} className="mt-3shadow menu dropdown-content gap-2 bg-base-900 rounded-box notifications h-fit overflow-auto flex-nowrap relative scrollbar">
+						<div className="w-full h-20 flex flex-row items-center justify-center bg-primary text-xl 2k:text-3xl text-white font-bold p-3 2k:p-6">Notifications</div>
+						{user.notifications.length > 0 && <Button text="Delete All" size="btn-sm" position="absolute top-2 right-2" color="bg-base-900" onClick={handleDeleteAllNotifications} />}
+						<div className="p-5 2k:p-6 flex flex-col gap-2 2k:gap-4">
+							{user?.notifications?.length === 0 && <p className="text-xl 2k:text-2xl font-bold">No notifications</p>}
+							{user?.notifications?.map((notif, i) => {
+								return <Notification key={i} i={i} notif={notif} />;
+							})}
+						</div>
 					</ul>
 				</>
 			)}

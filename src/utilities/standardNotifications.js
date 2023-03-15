@@ -6,6 +6,10 @@ const standardNotifications = {
 	read: false,
 	profilePicture: '',
 	message: '',
+	buildId: '',
+	buildName: '',
+	comment: '',
+	commentId: '',
 };
 
 export default standardNotifications;

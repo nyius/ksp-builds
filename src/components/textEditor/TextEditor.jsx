@@ -52,35 +52,7 @@ const TextEditor = state => {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Editor
-				wrapperClassName="text-editor"
-				editorClassName="editor-text-area"
-				toolbarClassName="editor-toolbar"
-				editorState={editorState}
-				onEditorStateChange={handleEditorChange}
-				toolbar={
-					size === `sm` && {
-						options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'textAlign', 'colorPicker', 'emoji', 'link'],
-						inline: {
-							options: ['bold', 'italic', 'underline', 'monospace'],
-							bold: { className: 'bordered-option-classname' },
-							italic: { className: 'bordered-option-classname' },
-							underline: { className: 'bordered-option-classname' },
-							strikethrough: { className: 'bordered-option-classname' },
-							code: { className: 'bordered-option-classname' },
-						},
-						blockType: {
-							className: 'bordered-option-classname',
-						},
-						fontSize: {
-							className: 'bordered-option-classname',
-						},
-						fontFamily: {
-							className: 'bordered-option-classname',
-						},
-					}
-				}
-			/>
+			<Editor wrapperClassName="text-editor" editorClassName="editor-text-area" toolbarClassName="editor-toolbar" editorState={editorState} onEditorStateChange={handleEditorChange} toolbar={{}} />
 		</>
 	);
 };

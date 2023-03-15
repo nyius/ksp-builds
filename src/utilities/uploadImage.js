@@ -15,7 +15,7 @@ export const uploadImage = async (image, setLoadingState, uid) => {
 	setLoadingState(true);
 
 	return new Promise((resolve, reject) => {
-		const fileName = `${uid}-${image.name}-${uuidv4()}`;
+		const fileName = `${uid}-${image.name}-${uuidv4().slice(0, 10)}`;
 
 		const storageRef = ref(storage, 'images/' + fileName);
 		const uploadTask = uploadBytesResumable(storageRef, image);

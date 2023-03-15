@@ -1189,6 +1189,19 @@ $primary: #0f766e;
 	}
 
 	.rdw-editor-main {
-		min-height: 10rem;
+		// min-height: 10rem;
 	}
+}
+
+.qq-block {
+	padding-left: 10px;
+}
+.qq-block-grey {
+	background: #f6f5f5;
+}
+.qq-block-yellow {
+	background: #ffffe0;
+}
+.qq-block-green {
+	background: #edffeb;
 }

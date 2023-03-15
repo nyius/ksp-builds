@@ -1,5 +1,5 @@
 import { db } from '../../firebase.config';
-import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc } from 'firebase/firestore';
+import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc } from 'firebase/firestore';
 import { signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 import { googleProvider } from '../../firebase.config';
 import { auth } from '../../firebase.config';
@@ -399,6 +399,25 @@ const useAuth = () => {
 	};
 
 	/**
+	 * Handles deleting all of a users notifications
+	 * @returns
+	 */
+	const handleDeleteAllNotifications = async () => {
+		try {
+			user.notifications.map(notif => {
+				const deleteNotif = async () => {
+					await deleteDoc(doc(db, 'users', user.uid, 'notifications', notif.id));
+				};
+				deleteNotif();
+			});
+			dispatchAuth({ type: 'UPDATE_USER', payload: { notifications: [] } });
+		} catch (error) {
+			console.log(error);
+			return;
+		}
+	};
+
+	/**
 	 * handles deleting a user
 	 * @param {*} id
 	 */
@@ -510,9 +529,25 @@ const useAuth = () => {
 		});
 	};
 
+	/**
+	 * handles sending a user a notification
+	 * @param {*} uid
+	 * @param {*} notification
+	 */
+	const sendNotification = async (uid, notification) => {
+		try {
+			const userRef = collection(db, 'users', uid, 'notifications');
+			await addDoc(userRef, notification);
+		} catch (error) {
+			console.log(error);
+			return;
+		}
+	};
+
 	return {
 		handleVoting,
 		handleDeleteNotification,
+		handleDeleteAllNotifications,
 		handleFavoriting,
 		addbuildToUser,
 		setResetPassword,
@@ -530,6 +565,7 @@ const useAuth = () => {
 		createNewUserAccount,
 		loginWithGoogle,
 		newEmailAccount,
+		sendNotification,
 	};
 };
 

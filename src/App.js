@@ -6,7 +6,6 @@ import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoute';
 import AdminRoute from './routes/AdminRoute';
 import backgroundplanet from './assets/planet.png';
-import planetLaunch from './assets/planetLaunch.png';
 //---------------------------------------------------------------------------------------------------//
 import { Index, SignUp, Build, NotFound, Create, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, UnderConstruction } from './pages';
 import RightBar from './components/containers/rightBar/RightBar';
@@ -34,7 +33,6 @@ button closing notifications tab when clicked
 Quick share builds (without needing to create a whole build)
 instead of infinitely loading builds, it should be pages
 home page Builds should probably fetch by default view count 
-compress strings?
 Competitions for daily
  */
 

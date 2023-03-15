@@ -3,14 +3,13 @@ import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, g
 import { db } from '../../firebase.config';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { clonedeep } from 'lodash';
-import { convertFromRaw } from 'draft-js';
 import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { s3Client } from '../../S3.config';
 import { toast } from 'react-toastify';
-import { compress, compressAccurately } from 'image-conversion';
+import { compressAccurately } from 'image-conversion';
 import { auth } from '../../firebase.config';
 import { profanity } from '@2toad/profanity';
+import { compress, decompress, compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 //---------------------------------------------------------------------------------------------------//
 import { uploadImage } from '../../utilities/uploadImage';
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
@@ -43,8 +42,8 @@ const useBuild = () => {
 			// get the build from the db
 			const fetchedBuild = await getDoc(buildRef);
 
+			// Get the raw build from aws
 			if (process.env.REACT_APP_ENV !== 'DEV') {
-				// Get the raw build from aws
 				try {
 					const command = new GetObjectCommand({
 						Bucket: process.env.REACT_APP_BUCKET,
@@ -53,7 +52,14 @@ const useBuild = () => {
 
 					response = await s3Client.send(command);
 					rawBuildData = await response.Body.transformToString();
-					parsedBuild = JSON.parse(rawBuildData);
+
+					// If we have an older uncompressed buildFile
+					if (rawBuildData.includes('AssemblyOABConfig')) {
+						parsedBuild = JSON.parse(rawBuildData);
+					} else {
+						const decompress = decompressFromEncodedURIComponent(rawBuildData);
+						parsedBuild = JSON.parse(decompress);
+					}
 				} catch (error) {
 					console.log(error);
 				}
@@ -602,23 +608,29 @@ const useBuild = () => {
 			const rawBuild = buildJson;
 			delete build.build;
 
+			const compressedBuild = compressToEncodedURIComponent(rawBuild);
+
 			// Create the thumbnail
 			if (typeof build.thumbnail !== 'string') {
-				const convertThumb = await compressAccurately(build.thumbnail, 100);
+				const convertThumb = await compressAccurately(build.thumbnail, 150);
 				const thumbURL = await uploadImage(convertThumb, setLoading, auth.currentUser.uid);
 				build.thumbnail = thumbURL;
 			}
 
-			console.log(build);
-
 			// Add the build object to the DB
-			await setDoc(doc(db, process.env.REACT_APP_BUILDSDB, buildId), build);
+			await setDoc(doc(db, process.env.REACT_APP_BUILDSDB, buildId), build).catch(err => {
+				throw new Error('Error from build setDoc', err);
+			});
 
 			// add it to the users 'userProfile' db
-			await updateDoc(doc(db, 'userProfiles', user.uid), { builds: [...user.builds, buildId] });
+			await updateDoc(doc(db, 'userProfiles', user.uid), { builds: [...user.builds, buildId] }).catch(err => {
+				throw new Error('Error from profile updateDoc', err);
+			});
 
 			// Add it to the users process.env.REACT_APP_BUILDSDB
-			await updateDoc(doc(db, 'users', user.uid), { builds: [...user.builds, buildId] });
+			await updateDoc(doc(db, 'users', user.uid), { builds: [...user.builds, buildId] }).catch(err => {
+				throw new Error('Error from user updateDoc', err);
+			});
 
 			addbuildToUser(buildId);
 
@@ -642,17 +654,21 @@ const useBuild = () => {
 					const command = new PutObjectCommand({
 						Bucket: process.env.REACT_APP_BUCKET,
 						Key: `${buildId}.json`,
-						Body: rawBuild,
+						Body: compressedBuild,
 						ContentEncoding: 'base64',
 						ContentType: 'application/json',
 						ACL: 'public-read',
 					});
 
-					const response = await s3Client.send(command);
+					const response = await s3Client.send(command).catch(err => {
+						throw new Error('Error from rawBuild to S3', err);
+					});
 				}
 
 				// Add it to the users 'Upvoted'
-				await handleVoting('upVote', build);
+				await handleVoting('upVote', build).catch(err => {
+					throw new Error('Error from handle voting', err);
+				});
 
 				toast.success('Build created!');
 				return newId;

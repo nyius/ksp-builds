@@ -59,7 +59,7 @@ function Profile() {
 
 		if (!authLoading) {
 			if (user?.username && user?.builds.length > 0) {
-				fetchBuilds(user.builds);
+				fetchBuilds(user.builds, user.uid);
 				setBioLength(user.bio.length);
 			} else {
 				setBuildsLoading(false);

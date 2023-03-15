@@ -53,7 +53,11 @@ function Build() {
 
 	useEffect(() => {
 		if (!loadingBuild && loadedBuild) {
-			setBuildDesc(EditorState.createWithContent(convertFromRaw(JSON.parse(loadedBuild.description))));
+			if (loadedBuild.visibility === 'private' && user.uid !== loadedBuild.uid) {
+				navigate('/');
+			} else {
+				setBuildDesc(EditorState.createWithContent(convertFromRaw(JSON.parse(loadedBuild.description))));
+			}
 		}
 	}, [loadingBuild, loadedBuild]);
 

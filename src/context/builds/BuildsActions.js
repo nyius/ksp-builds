@@ -18,7 +18,7 @@ const useBuilds = () => {
 	 * Fetches builds from the DB. Takes in an array of build ids to fetch. if no IDs specified, grabs all builds based on filters
 	 * @param {*} buildsToFetch
 	 */
-	const fetchBuilds = async buildsToFetch => {
+	const fetchBuilds = async (buildsToFetch, fetchUid) => {
 		const buildsToFetchCopy = cloneDeep(buildsToFetch);
 		try {
 			dispatchBuilds({ type: 'SET_FETCHED_BUILDS_LOADING', payload: true });
@@ -29,12 +29,13 @@ const useBuilds = () => {
 			if (!buildsToFetchCopy) {
 				// Create a query
 				if (typeFilter !== '') {
-					const constraints = [where('type', 'array-contains', typeFilter), orderBy('timestamp', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)), limit(process.env.REACT_APP_BUILDS_FETCH_NUM)];
+					const constraints = [where('type', 'array-contains', typeFilter), orderBy('views', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)), limit(process.env.REACT_APP_BUILDS_FETCH_NUM)];
 
 					if (versionFilter !== 'any') constraints.push(where('kspVersion', '==', versionFilter));
 					q = query(buildsRef, ...constraints);
 				} else {
-					q = query(buildsRef, orderBy('timestamp', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)), limit(process.env.REACT_APP_BUILDS_FETCH_NUM));
+					const constraints = [where('visibility', '==', 'public'), orderBy('views', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)), limit(process.env.REACT_APP_BUILDS_FETCH_NUM)];
+					q = query(buildsRef, ...constraints);
 				}
 
 				const buildsSnap = await getDocs(q);
@@ -58,7 +59,11 @@ const useBuilds = () => {
 				// by using splice, we alter the original input 'buildsToFetchCopy' arr by removing 10 at a time
 				while (buildsToFetchCopy.length) {
 					const batch = buildsToFetchCopy.splice(0, 10);
-					q = query(buildsRef, where('id', 'in', batch), orderBy('timestamp', 'desc'));
+					const constraints = [where('id', 'in', batch), orderBy('timestamp', 'desc')];
+
+					// if the builds were fetching isnt the current users, only fetch builds that are listed as public
+					if (fetchUid !== user.uid) constraints.unshift(where('visibility', '==', 'public'));
+					q = query(buildsRef, ...constraints);
 
 					// this gets all of the docs from our query, then loops over them and returns the raw data to our array
 					batches.push(getDocs(q).then(res => res.docs.map(res => res.data())));

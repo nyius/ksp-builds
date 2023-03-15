@@ -40,7 +40,7 @@ function VisitProfile() {
 	// Fetches the users builds once we get their profile
 	useEffect(() => {
 		if (fetchedUserProfile) {
-			fetchBuilds(fetchedUserProfile.builds);
+			fetchBuilds(fetchedUserProfile.builds, usersId);
 			setDateCreated(new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(fetchedUserProfile.dateCreated.seconds * 1000));
 		}
 	}, [fetchedUserProfile]);

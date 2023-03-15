@@ -78,6 +78,16 @@ function Create() {
 	};
 
 	/**
+	 * Handles setting the KSP version
+	 * @param {*} e
+	 */
+	const setVisiblity = e => {
+		setNewBuild(prevState => {
+			return { ...prevState, visibility: e.target.value };
+		});
+	};
+
+	/**
 	 * Handles setting if mods are used
 	 * @param {*} e
 	 */
@@ -139,23 +149,27 @@ function Create() {
 				toast.error('Your build needs atleast 1 tag!');
 				return;
 			}
-			if (buildToUpload.build.trim() === '') {
-				toast.error('You forgot to include the build!');
-				return;
-			}
+
 			if (buildToUpload.images.length > 6) {
 				toast.error('Too many build images! Max 6');
 				return;
 			}
-			if (!rawBuild.includes(`OwnerPlayerGuidString`) && !rawBuild.includes(`AssemblyOABConfig`)) {
-				toast.error('Uh oh, It seems like you have entered an invalid craft! Check out the "How?" Button to see how to properly copy & paste your craft.');
-				return;
-			}
-			try {
-				const json = JSON.parse(rawBuild);
-			} catch (error) {
-				toast.error('Uh oh, It seems like you have entered an invalid craft! Check out the "How?" Button to see how to properly copy & paste your craft.');
-				return;
+
+			if (process.env.REACT_APP_ENV !== 'DEV') {
+				if (buildToUpload.build.trim() === '') {
+					toast.error('You forgot to include the build!');
+					return;
+				}
+				if (!rawBuild.includes(`OwnerPlayerGuidString`) && !rawBuild.includes(`AssemblyOABConfig`)) {
+					toast.error('Uh oh, It seems like you have entered an invalid craft! Check out the "How?" Button to see how to properly copy & paste your craft.');
+					return;
+				}
+				try {
+					const json = JSON.parse(rawBuild);
+				} catch (error) {
+					toast.error('Uh oh, It seems like you have entered an invalid craft! Check out the "How?" Button to see how to properly copy & paste your craft.');
+					return;
+				}
 			}
 
 			let newTags = [];
@@ -383,7 +397,7 @@ function Create() {
 									</div>
 								)}
 
-								{/* Name/versions */}
+								{/* Name/versions/visibility/mods */}
 								<div className="flex flex-row flex-wrap gap-20 mb-8 2k:mb-15">
 									<div className="flex flex-row gap-2 items-center">
 										<input onChange={setName} type="text" placeholder="Build Name" defaultValue={editingBuild ? editingBuild.name : ''} className="input input-bordered w-96 max-w-lg 2k:input-lg 2k:text-2xl" maxLength="50" />
@@ -412,6 +426,18 @@ function Create() {
 									<div className="flex flex-row items-center gap-6 text-slate-400">
 										<p className="2k:text-2xl">Uses Mods</p>
 										<input onChange={setModsUsed} checked={editingBuild ? editingBuild.modsUsed : false} type="checkbox" className="checkbox 2k:checkbox-lg" />
+									</div>
+
+									{/* Visibility */}
+									<div className="flex flex-row items-center gap-6 text-slate-400">
+										<p className="2k:text-2xl">Visibility</p>
+										<select onChange={setVisiblity} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
+											<optgroup>
+												<option value="pubic">Public</option>
+												<option value="private">Private</option>
+												<option value="unlisted">Unlisted</option>
+											</optgroup>
+										</select>
 									</div>
 								</div>
 

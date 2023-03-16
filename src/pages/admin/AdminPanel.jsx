@@ -11,6 +11,7 @@ import TextEditor from '../../components/textEditor/TextEditor';
 import standardNotifications from '../../utilities/standardNotifications';
 import AuthContext from '../../context/auth/AuthContext';
 import useAuth from '../../context/auth/AuthActions';
+import { cloneDeep } from 'lodash';
 
 function AdminPanel() {
 	const { user } = useContext(AuthContext);
@@ -126,6 +127,14 @@ function AdminPanel() {
 			// If we're replying to someones comment, give that user a notification
 			newNotif.type = 'message';
 			await sendNotification(replying.uid, newNotif);
+			await updateDoc(doc(db, 'reports', replying.id), { replied: true });
+
+			setReports(prevState => {
+				const newState = cloneDeep(prevState);
+				newState[replying.i].replied = true;
+				return newState;
+			});
+
 			handleClearReply();
 			toast.success('Message sent!');
 		} catch (error) {
@@ -182,21 +191,26 @@ function AdminPanel() {
 						{reports.length === 0 && <p className="text-2xl 2k:text-4xl font-bold mb-10 2k:mb-20">No Reports</p>}
 						{reports.map((report, i) => {
 							return (
-								<div key={i} className="flex flex-col w-full h-fit p-5 2k:p-10 bg-base-200 gap-10 rounded-xl">
-									<p className="text-2xl 2k:text-4xl">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(report.date.seconds * 1000)}</p>
-									<p className="text-2xl 2k:text-4xl text-slate-100">
+								<div key={i} className="flex flex-col w-full h-fit p-5 2k:p-10 bg-base-200 gap-10 rounded-xl relative">
+									<div className="absolute right-0 top-0">
+										<div className={`alert ${report.replied ? 'alert-success' : 'alert-error'} font-bold shadow-lg`}>
+											<div>{report.replied ? <p className="text-xl 2k:text-2xl">Replied</p> : <p className="text-xl 2k:text-2xl">Havent Replied</p>}</div>
+										</div>
+									</div>
+									<p className="text-xl 2k:text-2xl">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(report.date.seconds * 1000)}</p>
+									<p className="text-xl 2k:text-2xl text-slate-100">
 										<span className="italic text-slate-400"> Username: </span> {report.username}
 									</p>
-									<p className="text-2xl 2k:text-4xl text-slate-100">
+									<p className="text-xl 2k:text-2xl text-slate-100">
 										<span className="italic text-slate-400"> Name: </span> {report.name}
 									</p>
-									<p className="text-2xl 2k:text-4xl text-slate-100">
+									<p className="text-xl 2k:text-2xl text-slate-100">
 										<span className="italic text-slate-400"> Email: </span> {report.email}
 									</p>
-									<p className="text-2xl 2k:text-4xl text-slate-300">{report.comment}</p>
+									<p className="text-xl 2k:text-2xl text-slate-300">{report.comment}</p>
 									<div className="flex flex-row gap-2">
 										<Button text="Delete" size="w-fit" icon="delete" onClick={() => deleteReport(report.id, i)} />
-										<Button text="Reply" size="w-fit" icon="upload" onClick={() => setReplying({ uid: report.uid, i })} />
+										<Button text="Reply" size="w-fit" icon="upload" onClick={() => setReplying({ uid: report.uid, i, id: report.id })} />
 									</div>
 
 									{replying.i === i && <TextEditor setState={setReplyMessage} />}

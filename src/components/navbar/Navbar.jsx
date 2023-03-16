@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { auth } from '../../firebase.config';
 import { toast } from 'react-toastify';
 //---------------------------------------------------------------------------------------------------//
@@ -30,14 +30,12 @@ function NavBar() {
 	};
 
 	/**
-	 * Checks if the user is logged in before navigating to the create page, so we can display an erorr if they aren't
+	 * Checks if the user is logged in before navigating to the upload page, so we can display an erorr if they aren't
 	 */
-	const handleCreateNavigate = () => {
+	const handleUploadNavigate = () => {
 		if (!authLoading) {
-			if (user?.username) {
-				navigate('/create');
-			} else {
-				toast.error('You must be signed in to create a new build!');
+			if (!user?.username) {
+				toast.error('You must be signed in to upload a new build!');
 			}
 		}
 	};
@@ -47,20 +45,25 @@ function NavBar() {
 		<div className="navbar bg-base-900 mb-5 w-full fixed z-101">
 			<div className="flex-1">
 				{/* Logo  */}
-				<img src={Logo} className="h-10 2k:h-20 btn btn-ghost hidden sm:block" alt="" onClick={() => navigate('/')} />
+				<Link to="/">
+					<img src={Logo} className="h-10 2k:h-20 btn btn-ghost hidden sm:block" alt="KSP Builds Logo, navigate home" />
+				</Link>
+
 				{/* Mobile Hamburger */}
 				<div className="flex flex-row gap-4">
 					<MobileHamburger />
 					<Types />
 				</div>
+
 				{/* Buttons */}
 				<ul className="menu menu-horizontal px-6 gap-3 2k:gap-6">
-					<Button onClick={handleCreateNavigate} color="btn-accent" css="text-white hidden md:flex" text="Create" icon="plus" />
-					<Button onClick={() => navigate('/news')} css="text-white hidden lg:flex" text="News" icon="news" />
-					<Button onClick={() => navigate('/contact')} css="text-white hidden lg:flex" text="Contact" icon="email" />
+					<Button type="ahref" href="/upload" onClick={handleUploadNavigate} color="btn-accent" css="text-white hidden md:flex" text="Upload" icon="plus" />
+					<Button type="ahref" href="/news" css="text-white hidden lg:flex" text="News" icon="news" />
+					<Button type="ahref" href="/contact" css="text-white hidden lg:flex" text="Contact" icon="email" />
 					<CreateBuildAdmin />
 					<Button text="How to upload" icon="help" css="hidden lg:flex" htmlFor="how-to-copy-build-modal" />
 				</ul>
+
 				<div className="flex flex-row items-end">
 					<p className="text-2xl 2k:text-5xl text-sate-600 italic font-bold mr-4 2k:mr-8">BETA</p>
 					<p className="text-xl 2k:text-3xl text-sate-600 italic">Your Hub for KSP 2</p>
@@ -78,9 +81,9 @@ function NavBar() {
 								</div>
 							</label>
 							<ul tabIndex={0} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box w-96">
-								<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Profile" onClick={() => navigate('/profile')} />
-								<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" onClick={() => navigate('/favorites')} />
-								<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Settings" onClick={() => navigate('/settings')} />
+								<Button type="ahref" href="/profile" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Profile" />
+								<Button type="ahref" href="/favorites" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" />
+								<Button type="ahref" href="/settings" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Settings" />
 								<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="logout" text="Logout" onClick={() => signOut()} />
 							</ul>
 						</div>
@@ -88,7 +91,7 @@ function NavBar() {
 				)}
 				{!authLoading && !user?.username && (
 					<>
-						<Button icon="plus" text="Create Account" css="hidden md:flex" onClick={() => navigate(`/sign-up`)} />
+						<Button type="ahref" href="/sign-up" icon="plus" text="Create Account" css="hidden md:flex" />
 						<Button htmlFor="login-modal" icon="login" text="login" />
 					</>
 				)}

@@ -7,7 +7,7 @@ import PublicRoute from './routes/PublicRoute';
 import AdminRoute from './routes/AdminRoute';
 import backgroundplanet from './assets/planet.png';
 //---------------------------------------------------------------------------------------------------//
-import { Index, SignUp, Build, NotFound, Create, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, UnderConstruction } from './pages';
+import { Index, SignUp, Build, NotFound, Upload, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, UnderConstruction } from './pages';
 import RightBar from './components/containers/rightBar/RightBar';
 //---------------------------------------------------------------------------------------------------//
 import { Navbar, Footer } from './components';
@@ -20,8 +20,10 @@ import './App.css';
 
 /*TODO
 search that searches the database, not just loaded builds
+reporting
 email verification?
 Mission generation page
+send notifications to all users (like news)
 folders
 Go to a user like /nyius
 Mods are a list
@@ -29,9 +31,11 @@ FAQ Page
 upload image for comments
 button closing notifications tab when clicked
 Quick share builds (without needing to create a whole build)
-instead of infinitely loading builds, it should be pages
+instead of infinitely loading builds, it should be pages <- maybe local store each page as we load them, so when going backwards it just fetches the local storeage
 home page Builds should probably fetch by default view count 
 Competitions for daily
+SEO optimization
+'uses mods' filter
  */
 
 //---------------------------------------------------------------------------------------------------//
@@ -71,10 +75,10 @@ function App() {
 										/>
 										<Route
 											exact
-											path="/create"
+											path="/upload"
 											element={
 												<PrivateRoute>
-													<Create />
+													<Upload />
 												</PrivateRoute>
 											}
 										/>

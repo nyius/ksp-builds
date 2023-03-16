@@ -11,12 +11,10 @@ function MobileHamburger() {
 	/**
 	 * Checks if the user is logged in before navigating to the create page, so we can display an erorr if they aren't
 	 */
-	const handleCreateNavigate = () => {
+	const handleUploadNavigate = () => {
 		if (!authLoading) {
-			if (user?.username) {
-				navigate('/create');
-			} else {
-				toast.error('You must be signed in to create a new build!');
+			if (!user?.username) {
+				toast.error('You must be signed in to upload a new build!');
 			}
 		}
 	};
@@ -30,12 +28,12 @@ function MobileHamburger() {
 				</svg>
 			</label>
 			<ul tabIndex={1} className="mt-3 p-2 gap-2 shadow menu menu-compact dropdown-content bg-base-500 rounded-box w-96">
-				<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="home" text="Home" onClick={() => navigate('/')} />
-				{!authLoading && !user?.username && <Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Create Account" onClick={() => navigate(`/sign-up`)} />}
-				{!authLoading && user?.username && <Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" onClick={() => navigate('/favorites')} />}
-				<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="plus" text="Create" onClick={handleCreateNavigate} />
-				<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="News" icon="news" onClick={() => navigate('/news')} />
-				<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="Contact" icon="email" onClick={() => navigate('/contact')} />
+				<Button type="ahref" href="/" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="home" text="Home" />
+				{!authLoading && !user?.username && <Button type="ahref" href="/sign-up" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Create Account" />}
+				{!authLoading && user?.username && <Button type="ahref" href="/favorites" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" />}
+				<Button type="ahref" href="/upload" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="plus" text="Upload" onClick={handleUploadNavigate} />
+				<Button type="ahref" href="/news" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="News" icon="news" />
+				<Button type="ahref" href="/contact" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="Contact" icon="email" />
 			</ul>
 		</div>
 	);

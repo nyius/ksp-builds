@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cloneDeep } from 'lodash';
+import { Helmet } from 'react-helmet';
 //---------------------------------------------------------------------------------------------------//
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
@@ -66,35 +67,43 @@ function Favorites() {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<MiddleContainer color="none">
-			<PlanetHeader text="Your Favorites" />
-			<Sort />
-			{!authLoading && user?.username && (
-				<div className="flex flex-wrap md:grid md:grid-cols-3 2k:grid-cols-4 gap-8 2k:gap-16 w-full items-center justify-center md:justify-items-center mb-6 p-6 md:p-0">
-					{loadingBuilds ? (
-						<div className="flex flex-row w-full justify-center items-center">
-							<div className="w-20">
-								<Spinner1 />
+		<>
+			<Helmet>
+				<meta charSet="utf-8" />
+				<title>KSP Builds - Favorites</title>
+				<link rel="canonical" href={`https://kspbuilds.com/favorites`} />
+			</Helmet>
+
+			<MiddleContainer color="none">
+				<PlanetHeader text="Your Favorites" />
+				<Sort />
+				{!authLoading && user?.username && (
+					<div className="flex flex-wrap md:grid md:grid-cols-3 2k:grid-cols-4 gap-8 2k:gap-16 w-full items-center justify-center md:justify-items-center mb-6 p-6 md:p-0">
+						{loadingBuilds ? (
+							<div className="flex flex-row w-full justify-center items-center">
+								<div className="w-20">
+									<Spinner1 />
+								</div>
 							</div>
-						</div>
-					) : (
-						<>
-							{fetchedBuilds.length === 0 ? (
-								<CantFind text="You haven't favorited any builds yet!">
-									<Button text="Go find some!" icon="left" onClick={() => navigate('/')} color="btn-primary" />
-								</CantFind>
-							) : (
-								<>
-									{sortedBuilds.map((build, i) => {
-										return <BuildCard key={i} i={i} build={build} />;
-									})}
-								</>
-							)}
-						</>
-					)}
-				</div>
-			)}
-		</MiddleContainer>
+						) : (
+							<>
+								{fetchedBuilds.length === 0 ? (
+									<CantFind text="You haven't favorited any builds yet!">
+										<Button text="Go find some!" icon="left" onClick={() => navigate('/')} color="btn-primary" />
+									</CantFind>
+								) : (
+									<>
+										{sortedBuilds.map((build, i) => {
+											return <BuildCard key={i} i={i} build={build} />;
+										})}
+									</>
+								)}
+							</>
+						)}
+					</div>
+				)}
+			</MiddleContainer>
+		</>
 	);
 }
 

@@ -11,6 +11,7 @@ import { MdOutlineDoneOutline, MdEmail, MdSettingsInputComponent } from 'react-i
 import { FcGoogle } from 'react-icons/fc';
 import { HiNewspaper } from 'react-icons/hi';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
+import { Link } from 'react-router-dom';
 
 /**
  *
@@ -24,74 +25,58 @@ import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
  * @param {*} position - used for absolute
  * @param {*} htmlFor - enter this if used to ope a modal
  * @param {*} margin - enter any margin
- * @param {*} type - enter 'submit' for submitting a form, 'button' to make it not submit
+ * @param {*} href - href if its a link to a page (like profile, settings)
+ * @param {*} type - enter 'submit' for submitting a form, 'button' to make it not submit, 'ahref' for a link to a page for google, leave blank for 'label'
  * @returns
  */
-function Button({ text, onClick, color, size, icon, css, style, position, htmlFor, margin, type }) {
+function Button({ text, onClick, color, size, icon, css, style, position, htmlFor, margin, type, href }) {
+	const buttonIcon = () => {
+		if (icon === 'cancel') return <GiCancel />;
+		if (icon === 'upload') return <ImCloudUpload />;
+		if (icon === 'save') return <FaSave />;
+		if (icon === 'export') return <TiExport />;
+		if (icon === 'delete') return <RiDeleteBin2Fill />;
+		if (icon === 'edit') return <RiEditFill />;
+		if (icon === 'help') return <BsFillPatchQuestionFill />;
+		if (icon === 'comment') return <BiCommentAdd />;
+		if (icon === 'plus') return <TiPlusOutline />;
+		if (icon === 'done') return <MdOutlineDoneOutline />;
+		if (icon === 'login') return <RiLoginCircleLine />;
+		if (icon === 'logout') return <FiLogOut />;
+		if (icon === 'google') return <FcGoogle />;
+		if (icon === 'reset') return <BiReset />;
+		if (icon === 'down') return <BsFillArrowDownSquareFill />;
+		if (icon === 'left') return <BsFillArrowLeftSquareFill />;
+		if (icon === 'email') return <MdEmail />;
+		if (icon === 'head') return <FaUserAstronaut />;
+		if (icon === 'settings') return <MdSettingsInputComponent />;
+		if (icon === 'home') return <FaHome />;
+		if (icon === 'news') return <HiNewspaper />;
+		if (icon === 'fill-heart') return <AiFillHeart />;
+		if (icon === 'outline-heart') return <AiOutlineHeart />;
+	};
+
 	// The button is a label becuase then we can use htmlFor tag to open modals. Not sure if this breaks things but it seems to work fine
 	if (type) {
-		return (
-			<button type={type} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
-				{icon && (
-					<span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>
-						{icon === 'cancel' && <GiCancel />}
-						{icon === 'upload' && <ImCloudUpload />}
-						{icon === 'save' && <FaSave />}
-						{icon === 'export' && <TiExport />}
-						{icon === 'delete' && <RiDeleteBin2Fill />}
-						{icon === 'edit' && <RiEditFill />}
-						{icon === 'help' && <BsFillPatchQuestionFill />}
-						{icon === 'comment' && <BiCommentAdd />}
-						{icon === 'plus' && <TiPlusOutline />}
-						{icon === 'done' && <MdOutlineDoneOutline />}
-						{icon === 'login' && <RiLoginCircleLine />}
-						{icon === 'logout' && <FiLogOut />}
-						{icon === 'google' && <FcGoogle />}
-						{icon === 'reset' && <BiReset />}
-						{icon === 'down' && <BsFillArrowDownSquareFill />}
-						{icon === 'left' && <BsFillArrowLeftSquareFill />}
-						{icon === 'email' && <MdEmail />}
-						{icon === 'head' && <FaUserAstronaut />}
-						{icon === 'settings' && <MdSettingsInputComponent />}
-						{icon === 'home' && <FaHome />}
-						{icon === 'news' && <HiNewspaper />}
-						{icon === 'fill-heart' && <AiFillHeart />}
-						{icon === 'outline-heart' && <AiOutlineHeart />}
-					</span>
-				)}
-				{text !== '' && text}
-			</button>
-		);
+		if (type === 'ahref') {
+			return (
+				<Link to={href} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
+					{icon && <span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
+					{text !== '' && text}
+				</Link>
+			);
+		} else {
+			return (
+				<button type={type} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
+					{icon && <span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
+					{text !== '' && text}
+				</button>
+			);
+		}
 	} else {
 		return (
 			<label type={type} htmlFor={htmlFor} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
-				{icon && (
-					<span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>
-						{icon === 'cancel' && <GiCancel />}
-						{icon === 'upload' && <ImCloudUpload />}
-						{icon === 'save' && <FaSave />}
-						{icon === 'export' && <TiExport />}
-						{icon === 'delete' && <RiDeleteBin2Fill />}
-						{icon === 'edit' && <RiEditFill />}
-						{icon === 'help' && <BsFillPatchQuestionFill />}
-						{icon === 'comment' && <BiCommentAdd />}
-						{icon === 'plus' && <TiPlusOutline />}
-						{icon === 'done' && <MdOutlineDoneOutline />}
-						{icon === 'login' && <RiLoginCircleLine />}
-						{icon === 'logout' && <FiLogOut />}
-						{icon === 'google' && <FcGoogle />}
-						{icon === 'reset' && <BiReset />}
-						{icon === 'down' && <BsFillArrowDownSquareFill />}
-						{icon === 'left' && <BsFillArrowLeftSquareFill />}
-						{icon === 'email' && <MdEmail />}
-						{icon === 'head' && <FaUserAstronaut />}
-						{icon === 'settings' && <MdSettingsInputComponent />}
-						{icon === 'home' && <FaHome />}
-						{icon === 'news' && <HiNewspaper />}
-						{icon === 'fill-heart' && <AiFillHeart />}
-						{icon === 'outline-heart' && <AiOutlineHeart />}
-					</span>
-				)}
+				{icon && <span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
 				{text !== '' && text}
 			</label>
 		);

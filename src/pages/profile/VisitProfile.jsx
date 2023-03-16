@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { cloneDeep } from 'lodash';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import useAuth from '../../context/auth/AuthActions';
@@ -58,66 +59,74 @@ function VisitProfile() {
 		// If we find a profile
 		if (fetchedUserProfile) {
 			return (
-				<MiddleContainer color="none">
-					{!authLoading && user?.siteAdmin && <Button htmlFor="delete-account-modal" text="Delete Account (admin)" onClick={() => setAccountToDelete(usersId)} />}
+				<>
+					<Helmet>
+						<meta charSet="utf-8" />
+						<title>KSP Builds - {fetchedUserProfile.username}</title>
+						<link rel="canonical" href={`https://kspbuilds.com/profile/${fetchedUserProfile.uid}`} />
+					</Helmet>
 
-					<div className="flex flex-row relative gap-14 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
-						{!authLoading && user?.username && user?.uid !== fetchedUserProfile.uid && (
-							<div className="absolute right-2 top-2">
-								<div className="tooltip" data-tip={`${fetchedUserProfile.followers?.includes(user.uid) ? 'Unfollow' : 'Follow'}`}>
-									<Button icon={`${fetchedUserProfile.followers?.includes(user.uid) ? 'fill-heart' : 'outline-heart'}`} color="btn-primary" onClick={() => handleFollowingUser()} />
+					<MiddleContainer color="none">
+						{!authLoading && user?.siteAdmin && <Button htmlFor="delete-account-modal" text="Delete Account (admin)" onClick={() => setAccountToDelete(usersId)} />}
+
+						<div className="flex flex-row relative gap-14 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
+							{!authLoading && user?.username && user?.uid !== fetchedUserProfile.uid && (
+								<div className="absolute right-2 top-2">
+									<div className="tooltip" data-tip={`${fetchedUserProfile.followers?.includes(user.uid) ? 'Unfollow' : 'Follow'}`}>
+										<Button icon={`${fetchedUserProfile.followers?.includes(user.uid) ? 'fill-heart' : 'outline-heart'}`} color="btn-primary" onClick={() => handleFollowingUser()} />
+									</div>
+								</div>
+							)}
+							{/* Profile Picture */}
+							<div className="avatar">
+								<div className="rounded-full w-44 ring ring-primary ring-offset-base-100 ring-offset-4">
+									<img src={fetchedUserProfile.profilePicture} alt="" />
 								</div>
 							</div>
-						)}
-						{/* Profile Picture */}
-						<div className="avatar">
-							<div className="rounded-full w-44 ring ring-primary ring-offset-base-100 ring-offset-4">
-								<img src={fetchedUserProfile.profilePicture} alt="" />
-							</div>
-						</div>
 
-						{/* Username/bio/created */}
-						<div className="flex flex-col gap-3 2k:gap-6 w-full">
-							<p className="text-xl 2k:text-3xl">
-								<span className="text-slate-500 2k:text-2xl italic">Username: </span> {fetchedUserProfile.username}
-							</p>
+							{/* Username/bio/created */}
+							<div className="flex flex-col gap-3 2k:gap-6 w-full">
+								<p className="text-xl 2k:text-3xl">
+									<span className="text-slate-500 2k:text-2xl italic">Username: </span> {fetchedUserProfile.username}
+								</p>
 
-							<p className="text-xl 2k:text-3xl">
-								<span className="text-slate-500 2k:text-2xl italic">Date Created: </span> {dateCreated}
-							</p>
+								<p className="text-xl 2k:text-3xl">
+									<span className="text-slate-500 2k:text-2xl italic">Date Created: </span> {dateCreated}
+								</p>
 
-							<div className="flex flex-row gap-2">
-								<p className="text-slate-500 text-xl 2k:text-2xl italic">Bio: </p>
-								{fetchedUserProfile.bio === '' ? <p className="italic text-slate-500 text-xl 2k:text-3xl">Nothing here...</p> : <p className="text-xl 2k:text-3xl"> {fetchedUserProfile.bio} </p>}
-							</div>
-						</div>
-					</div>
-					<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4">{fetchedUserProfile.username}'s Builds</h2>
-
-					{/* Builds */}
-					<Sort />
-					<div className="flex flex-wrap md:grid md:grid-cols-3 2k:grid-cols-4 gap-4 w-full items-center justify-center md:justify-items-center mb-6 p-6 md:p-0">
-						{loadingBuilds ? (
-							<div className="flex flex-row w-full justify-center items-center">
-								<div className="w-20">
-									<Spinner1 />
+								<div className="flex flex-row gap-2">
+									<p className="text-slate-500 text-xl 2k:text-2xl italic">Bio: </p>
+									{fetchedUserProfile.bio === '' ? <p className="italic text-slate-500 text-xl 2k:text-3xl">Nothing here...</p> : <p className="text-xl 2k:text-3xl"> {fetchedUserProfile.bio} </p>}
 								</div>
 							</div>
-						) : (
-							<>
-								{fetchedBuilds.length === 0 ? (
-									<CantFind text="This user has no builds yet :(" />
-								) : (
-									<>
-										{sortedBuilds.map((build, i) => {
-											return <BuildCard key={i} i={i} build={build} />;
-										})}
-									</>
-								)}
-							</>
-						)}
-					</div>
-				</MiddleContainer>
+						</div>
+						<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4">{fetchedUserProfile.username}'s Builds</h2>
+
+						{/* Builds */}
+						<Sort />
+						<div className="flex flex-wrap md:grid md:grid-cols-3 2k:grid-cols-4 gap-4 w-full items-center justify-center md:justify-items-center mb-6 p-6 md:p-0">
+							{loadingBuilds ? (
+								<div className="flex flex-row w-full justify-center items-center">
+									<div className="w-20">
+										<Spinner1 />
+									</div>
+								</div>
+							) : (
+								<>
+									{fetchedBuilds.length === 0 ? (
+										<CantFind text="This user has no builds yet :(" />
+									) : (
+										<>
+											{sortedBuilds.map((build, i) => {
+												return <BuildCard key={i} i={i} build={build} />;
+											})}
+										</>
+									)}
+								</>
+							)}
+						</div>
+					</MiddleContainer>
+				</>
 			);
 		} else {
 			return (

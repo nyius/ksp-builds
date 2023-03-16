@@ -5,6 +5,7 @@ import useResetStates from '../../utilities/useResetStates';
 import Button from '../../components/buttons/Button';
 import AuthContext from '../../context/auth/AuthContext';
 import useAuth from '../../context/auth/AuthActions';
+import { Helmet } from 'react-helmet';
 
 function Settings() {
 	const { resetStates } = useResetStates();
@@ -17,12 +18,20 @@ function Settings() {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<MiddleContainer>
-			<PlanetHeader text="Settings" />
+		<>
+			<Helmet>
+				<meta charSet="utf-8" />
+				<title>KSP Builds - Settings</title>
+				<link rel="canonical" href={`https://kspbuilds.com/settings`} />
+			</Helmet>
 
-			<p className="text-xl 2k:text-2xl text-slate-400 italic">Delete Account</p>
-			<Button text="Delete Account" htmlFor="delete-account-modal" onClick={() => setAccountToDelete(user.uid)} size="w-fit" icon="delete" color="btn-error" />
-		</MiddleContainer>
+			<MiddleContainer>
+				<PlanetHeader text="Settings" />
+
+				<p className="text-xl 2k:text-2xl text-slate-400 italic">Delete Account</p>
+				<Button text="Delete Account" htmlFor="delete-account-modal" onClick={() => setAccountToDelete(user.uid)} size="w-fit" icon="delete" color="btn-error" />
+			</MiddleContainer>
+		</>
 	);
 }
 

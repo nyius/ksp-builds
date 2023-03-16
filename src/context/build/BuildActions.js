@@ -652,6 +652,7 @@ const useBuild = () => {
 			const ref = doc(db, process.env.REACT_APP_BUILDSDB, buildId);
 			const data = await getDoc(ref);
 
+			// If our build was created correctly
 			if (data.exists()) {
 				const loadedBuild = data.data();
 				const newId = data.id;
@@ -663,8 +664,8 @@ const useBuild = () => {
 					payload: build,
 				});
 
+				// add the builds to aws
 				if (process.env.REACT_APP_ENV !== 'DEV') {
-					// add the builds to aws
 					const command = new PutObjectCommand({
 						Bucket: process.env.REACT_APP_BUCKET,
 						Key: `${buildId}.json`,
@@ -684,7 +685,39 @@ const useBuild = () => {
 					throw new Error('Error from handle voting', err);
 				});
 
+				// Give all of the following users a notification
+				// Handle nofitications
+				const newNotif = { ...standardNotifications };
+				newNotif.buildId = newId;
+				newNotif.buildName = loadedBuild.name;
+				newNotif.uid = loadedBuild.uid;
+				newNotif.username = loadedBuild.author;
+				newNotif.timestamp = new Date();
+				newNotif.thumbnail = loadedBuild.thumbnail;
+				newNotif.type = 'newBuild';
+
+				const userProfileData = await getDoc(doc(db, 'userProfiles', user.uid));
+				const userProfile = userProfileData.data();
+				const followers = userProfile.followers;
+
+				if (followers) {
+					followers.map(follower => {
+						const sendNotif = async () => {
+							try {
+								await sendNotification(follower, newNotif);
+							} catch (error) {
+								console.log(error);
+							}
+						};
+
+						sendNotif();
+					});
+				}
+
 				toast.success('Build created!');
+
+				setUploadingBuild(false);
+
 				return newId;
 			}
 		} catch (error) {

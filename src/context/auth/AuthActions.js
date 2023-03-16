@@ -6,7 +6,7 @@ import { auth } from '../../firebase.config';
 import { deleteUser, getAuth } from 'firebase/auth';
 import { useContext } from 'react';
 import AuthContext from './AuthContext';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, update } from 'lodash';
 import { toast } from 'react-toastify';
 import standardUser from '../../utilities/standardUser';
 import standardNotifications from '../../utilities/standardNotifications';
@@ -15,7 +15,7 @@ import { uploadImage } from '../../utilities/uploadImage';
 import { v4 as uuidv4 } from 'uuid';
 
 const useAuth = () => {
-	const { dispatchAuth, user, accountToDelete, newUsername, newBio, editingProfile, verifyChangeUsername, lastFetchedNotification } = useContext(AuthContext);
+	const { dispatchAuth, user, accountToDelete, newUsername, newBio, editingProfile, verifyChangeUsername, fetchedUserProfile, lastFetchedNotification } = useContext(AuthContext);
 
 	/**
 	 * Handles when a user signs up with google and neeeds to enter a username
@@ -301,6 +301,7 @@ const useAuth = () => {
 
 			if (fetchedProfile.exists()) {
 				const profile = fetchedProfile.data();
+				profile.uid = fetchedProfile.id;
 				dispatchAuth({
 					type: 'FETCH_USERS_PROFILE',
 					payload: profile,
@@ -579,11 +580,41 @@ const useAuth = () => {
 		}
 	};
 
+	/**
+	 * Handles following a users
+	 * @param {*} uid
+	 * @returns
+	 */
+	const handleFollowingUser = async () => {
+		try {
+			let newFollowers = fetchedUserProfile.followers ? cloneDeep(fetchedUserProfile.followers) : [];
+
+			// Check if we are already following this (and if so, unupvote it)
+			if (newFollowers.includes(user.uid)) {
+				const index = newFollowers.indexOf(user.uid);
+				newFollowers.splice(index, 1);
+
+				dispatchAuth({ type: 'UPDATE_FETCHED_USERS_PROFILE', payload: { followers: newFollowers } });
+
+				await updateDoc(doc(db, 'userProfiles', fetchedUserProfile.uid), { followers: newFollowers });
+			} else {
+				newFollowers.push(user.uid);
+				dispatchAuth({ type: 'UPDATE_FETCHED_USERS_PROFILE', payload: { followers: newFollowers } });
+
+				await updateDoc(doc(db, 'userProfiles', fetchedUserProfile.uid), { followers: newFollowers });
+			}
+		} catch (error) {
+			console.log(error);
+			return;
+		}
+	};
+
 	return {
 		handleVoting,
 		handleDeleteNotification,
 		handleDeleteAllNotifications,
 		handleFavoriting,
+		handleFollowingUser,
 		addbuildToUser,
 		setResetPassword,
 		setNewSignup,

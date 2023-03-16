@@ -51,6 +51,13 @@ const AuthReducer = (state, action) => {
 				...state,
 				fetchedUserProfile: action.payload,
 			};
+		case 'UPDATE_FETCHED_USERS_PROFILE':
+			const getCurrentFetchedProfileState = { ...state.fetchedUserProfile };
+			const updateFetchProfileState = Object.assign(getCurrentFetchedProfileState, action.payload);
+			return {
+				...state,
+				fetchedUserProfile: updateFetchProfileState,
+			};
 		case 'CLEAR_NOTIFICATIONS':
 			const getClearNotificationsState = { ...state.user };
 			getClearNotificationsState.notificationsCount = 0;

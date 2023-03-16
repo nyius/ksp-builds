@@ -4,6 +4,7 @@ const standardUserProfile = {
 	dateCreated: '',
 	builds: [],
 	bio: '',
+	followers: [],
 };
 
 export default standardUserProfile;

@@ -28,7 +28,7 @@ function VisitProfile() {
 	const { fetchedBuilds, loadingBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const { fetchedUserProfile, fetchingProfile, user, authLoading } = useContext(AuthContext);
 	//---------------------------------------------------------------------------------------------------//
-	const { fetchUsersProfile, setAccountToDelete } = useAuth();
+	const { fetchUsersProfile, setAccountToDelete, handleFollowingUser } = useAuth();
 	const { filterBuilds, resetFilters } = useFilters();
 	const { fetchBuilds } = useBuilds();
 
@@ -61,7 +61,14 @@ function VisitProfile() {
 				<MiddleContainer color="none">
 					{!authLoading && user?.siteAdmin && <Button htmlFor="delete-account-modal" text="Delete Account (admin)" onClick={() => setAccountToDelete(usersId)} />}
 
-					<div className="flex flex-row gap-14 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
+					<div className="flex flex-row relative gap-14 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
+						{!authLoading && user?.username && user?.uid !== fetchedUserProfile.uid && (
+							<div className="absolute right-2 top-2">
+								<div className="tooltip" data-tip={`${fetchedUserProfile.followers?.includes(user.uid) ? 'Unfollow' : 'Follow'}`}>
+									<Button icon={`${fetchedUserProfile.followers?.includes(user.uid) ? 'fill-heart' : 'outline-heart'}`} color="btn-primary" onClick={() => handleFollowingUser()} />
+								</div>
+							</div>
+						)}
 						{/* Profile Picture */}
 						<div className="avatar">
 							<div className="rounded-full w-44 ring ring-primary ring-offset-base-100 ring-offset-4">

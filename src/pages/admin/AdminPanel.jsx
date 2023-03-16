@@ -7,8 +7,15 @@ import Button from '../../components/buttons/Button';
 import TextInput from '../../components/input/TextInput';
 import { toast } from 'react-toastify';
 import Spinner1 from '../../components/spinners/Spinner1';
+import TextEditor from '../../components/textEditor/TextEditor';
+import standardNotifications from '../../utilities/standardNotifications';
+import AuthContext from '../../context/auth/AuthContext';
+import useAuth from '../../context/auth/AuthActions';
 
 function AdminPanel() {
+	const { user } = useContext(AuthContext);
+	const { sendNotification } = useAuth();
+
 	const [reports, setReports] = useState([]);
 	const [versions, setVersions] = useState([]);
 	const [newVersion, setNewVersion] = useState('');
@@ -16,6 +23,8 @@ function AdminPanel() {
 	const [statsLoading, setStatsLoading] = useState(true);
 	const [infoLoading, setInfoLoading] = useState(true);
 	const [messagesLoading, setMessagesLoading] = useState(true);
+	const [replying, setReplying] = useState({ uid: '', i: '' });
+	const [replyMessage, setReplyMessage] = useState('');
 
 	useEffect(() => {
 		const fetchMessages = async () => {
@@ -101,6 +110,35 @@ function AdminPanel() {
 		}
 	};
 
+	/**
+	 * Handles replying to a report
+	 */
+	const replyToReport = async () => {
+		try {
+			// Handle nofitications
+			const newNotif = { ...standardNotifications };
+			newNotif.uid = user.uid;
+			newNotif.username = user.username;
+			newNotif.timestamp = new Date();
+			newNotif.profilePicture = user.profilePicture;
+			newNotif.message = replyMessage;
+
+			// If we're replying to someones comment, give that user a notification
+			newNotif.type = 'message';
+			await sendNotification(replying.uid, newNotif);
+			handleClearReply();
+			toast.success('Message sent!');
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong');
+		}
+	};
+
+	const handleClearReply = () => {
+		setReplying({ uid: '', i: '' });
+		setReplyMessage('');
+	};
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<MiddleContainer>
@@ -156,7 +194,18 @@ function AdminPanel() {
 										<span className="italic text-slate-400"> Email: </span> {report.email}
 									</p>
 									<p className="text-2xl 2k:text-4xl text-slate-300">{report.comment}</p>
-									<Button text="Delete" size="w-fit" icon="delete" onClick={() => deleteReport(report.id, i)} />
+									<div className="flex flex-row gap-2">
+										<Button text="Delete" size="w-fit" icon="delete" onClick={() => deleteReport(report.id, i)} />
+										<Button text="Reply" size="w-fit" icon="upload" onClick={() => setReplying({ uid: report.uid, i })} />
+									</div>
+
+									{replying.i === i && <TextEditor setState={setReplyMessage} />}
+									{replying.i === i && (
+										<div className="flex flex-row gap-2">
+											<Button text="Send" size="w-fit" icon="save" color="btn-primary" onClick={() => replyToReport()} />
+											<Button text="Cancel" size="w-fit" icon="cancel" onClick={handleClearReply} />
+										</div>
+									)}
 								</div>
 							);
 						})}

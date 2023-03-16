@@ -67,7 +67,7 @@ function Notification({ i, notif }) {
 				<div className="text-xl 2k:text-2xl">
 					<>
 						<p className="text-lg 2k:text-2xl text-slate-400 italic 2k:mb-3">You have a new message</p>
-						<p className="text-xl 2k:text-3xl multi-line-truncate">{draftJsToPlainText(notif.message)}</p>
+						<p className="text-xl 2k:text-3xl">{draftJsToPlainText(notif.message)}</p>
 					</>
 				</div>
 			)}

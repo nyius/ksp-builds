@@ -25,7 +25,6 @@ Mission generation page
 folders
 Go to a user like /nyius
 Mods are a list
-follow a user
 FAQ Page
 upload image for comments
 button closing notifications tab when clicked

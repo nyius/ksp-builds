@@ -17,6 +17,7 @@ function Contact() {
 		username: '',
 		name: '',
 		email: '',
+		uid: '',
 	});
 
 	const { user } = useContext(AuthContext);
@@ -31,6 +32,7 @@ function Contact() {
 
 			if (user?.username) {
 				newFormData.username = user.username;
+				newFormData.uid = user.uid;
 			} else {
 				newFormData.username = 'Anonymous';
 			}

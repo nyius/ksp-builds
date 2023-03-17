@@ -19,10 +19,12 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 		});
 		// every hour '0 * * * *'
 		const data = [];
+		const challenges = [];
 
 		const newsData = await scrapeNews();
 		const patchData = await scrapePatchNotes();
 		const devData = await scrapeDevDiaries();
+		const challengesData = await scrapeChallenges();
 
 		// add all the article to one array
 		for (const article in newsData) {
@@ -34,6 +36,9 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 		for (const article in devData) {
 			data.push(devData[article]);
 		}
+		for (const article in challengesData) {
+			challenges.push(challengesData[article]);
+		}
 
 		// sort the array by date
 		data.sort((a, b) => {
@@ -41,8 +46,14 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 			const bDate = new Date(b.date);
 			return bDate - aDate;
 		});
+		challengesData.sort((a, b) => {
+			const aDate = new Date(a.date);
+			const bDate = new Date(b.date);
+			return bDate - aDate;
+		});
 
 		const dataJSON = JSON.stringify(data);
+		const challengesJson = JSON.stringify(challengesData);
 
 		const command = new PutObjectCommand({
 			Bucket: process.env.REACT_APP_BUCKET,
@@ -54,6 +65,17 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 		});
 
 		const response = await s3Client.send(command);
+
+		const challengesCommand = new PutObjectCommand({
+			Bucket: process.env.REACT_APP_BUCKET,
+			Key: `kspChallenges.json`,
+			Body: challengesJson,
+			ContentEncoding: 'base64',
+			ContentType: 'application/json',
+			ACL: 'public-read',
+		});
+
+		const challengesResponse = await s3Client.send(challengesCommand);
 
 		// return 20 articles
 		return {
@@ -175,6 +197,45 @@ const scrapeDevDiaries = async () => {
 				title,
 				type: 'Dev Diary',
 				url: 'https://www.kerbalspaceprogram.com/dev-diaries',
+			};
+
+			articles.push(article);
+		});
+	const dataJSON = articles;
+	return dataJSON;
+};
+/**
+ * Handles scraping the KSP website for weekly challenges
+ * @returns
+ */
+const scrapeChallenges = async () => {
+	const articles = [];
+	// Scrape the new articles
+	const axiosResponse = await axios.request({
+		method: 'GET',
+		url: 'https://www.kerbalspaceprogram.com/challenges',
+		headers: {
+			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+		},
+	});
+
+	const $ = cheerio.load(axiosResponse.data);
+
+	const htmlElement = $('.css-180q35u');
+
+	$('.css-180q35u')
+		.find('.css-41n5y6')
+		.each((i, element) => {
+			// Extract data
+			const image = $(element).find('.css-1hbpsw3').find('.css-llahnu').find('img').attr('srcset');
+			const date = $(element).find('.css-jwjfk5').find('.css-og1fvt').find('time').text();
+			const title = $(element).find('.css-jwjfk5').find('.css-kv05w6').text();
+			const article = {
+				image,
+				date,
+				title,
+				type: 'Challenge',
+				url: 'https://www.kerbalspaceprogram.com/challenges',
 			};
 
 			articles.push(article);

@@ -13,3 +13,4 @@ export { default as UnderConstruction } from './construction/UnderConstruction.j
 export { default as Contact } from './contact/Contact.jsx';
 export { default as AdminPanel } from './admin/AdminPanel.jsx';
 export { default as Favorites } from './favorites/Favorites.jsx';
+export { default as Challenge } from './challenges/Challenge.jsx';

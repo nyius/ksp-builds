@@ -7,7 +7,7 @@ import PublicRoute from './routes/PublicRoute';
 import AdminRoute from './routes/AdminRoute';
 import backgroundplanet from './assets/planet.png';
 //---------------------------------------------------------------------------------------------------//
-import { Index, SignUp, Build, NotFound, Upload, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, UnderConstruction } from './pages';
+import { Index, SignUp, Build, NotFound, Upload, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, Challenge, UnderConstruction } from './pages';
 import RightBar from './components/containers/rightBar/RightBar';
 //---------------------------------------------------------------------------------------------------//
 import { Navbar, Footer } from './components';
@@ -34,8 +34,8 @@ upload image for comments
 button closing notifications tab when clicked
 Quick share builds (without needing to create a whole build)
 home page Builds should probably fetch by default view count 
-Competitions for daily
 'uses mods' filter
+weekly Challenge tag to submit builds for a challenge 
  */
 
 //---------------------------------------------------------------------------------------------------//
@@ -64,6 +64,13 @@ function App() {
 									<Routes>
 										<Route exact path="/" element={<Index />} />
 										<Route exact path="/builds/:id" element={<Index />} />
+										<Route exact path="/privacy" element={<Privacy />} />
+										<Route exact path="/terms" element={<Terms />} />
+										<Route exact path="/news" element={<News />} />
+										<Route exact path="/contact" element={<Contact />} />
+										<Route exact path="/challenge/:id" element={<Challenge />} />
+										<Route exact path="/profile/:id" element={<VisitProfile />} />
+										<Route exact path="/build/:id" element={<Build />} />
 										<Route
 											exact
 											path="/sign-up"
@@ -91,13 +98,6 @@ function App() {
 												</PrivateRoute>
 											}
 										/>
-										<Route exact path="/privacy" element={<Privacy />} />
-										<Route exact path="/terms" element={<Terms />} />
-										<Route exact path="/news" element={<News />} />
-										<Route exact path="/contact" element={<Contact />} />
-
-										<Route exact path="/profile/:id" element={<VisitProfile />} />
-										<Route exact path="/build/:id" element={<Build />} />
 										<Route
 											exact
 											path="/profile"

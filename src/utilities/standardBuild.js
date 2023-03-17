@@ -21,4 +21,5 @@ export const standardBuild = {
 	video: '',
 	downloads: 0,
 	visibility: 'public',
+	forChallenge: false,
 };

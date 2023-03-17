@@ -72,6 +72,7 @@ const useBuilds = () => {
 					// this gets all of the docs from our query, then loops over them and returns the raw data to our array
 					batches.push(getDocs(q).then(res => res.docs.map(res => res.data())));
 				}
+
 				// now we resolve all of the promises
 				const builds = await Promise.all(batches);
 				const buildsFlat = builds.flat();

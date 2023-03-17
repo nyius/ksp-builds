@@ -222,24 +222,53 @@ const scrapeChallenges = async () => {
 	const $ = cheerio.load(axiosResponse.data);
 
 	const htmlElement = $('.css-180q35u');
+	let articlePromises = [];
 
-	$('.css-180q35u')
-		.find('.css-41n5y6')
-		.each((i, element) => {
-			// Extract data
-			const image = $(element).find('.css-1hbpsw3').find('.css-llahnu').find('img').attr('srcset');
-			const date = $(element).find('.css-jwjfk5').find('.css-og1fvt').find('time').text();
-			const title = $(element).find('.css-jwjfk5').find('.css-kv05w6').text();
-			const article = {
-				image,
-				date,
-				title,
-				type: 'Challenge',
-				url: 'https://www.kerbalspaceprogram.com/challenges',
-			};
+	$('.css-1cc0i4l').each((i, element) => {
+		// Extract data
+		const articleId = $(element).find('.css-180q35u').attr('data-article');
+		const image = $(element).find('.css-180q35u').find('.css-41n5y6').find('.css-1hbpsw3').find('.css-llahnu').find('img').attr('srcset');
+		const date = $(element).find('.css-180q35u').find('.css-41n5y6').find('.css-jwjfk5').find('.css-og1fvt').find('time').text();
+		const title = $(element).find('.css-180q35u').find('.css-41n5y6').find('.css-jwjfk5').find('.css-kv05w6').text();
+		const article = {
+			image,
+			date,
+			title,
+			articleId,
+			type: 'Challenge',
+			url: 'https://www.kerbalspaceprogram.com/challenges',
+		};
 
-			articles.push(article);
+		// Fetch the actual article
+		const fetchArticle = () => {
+			try {
+				articlePromises.push(
+					axios
+						.get(`https://www.kerbalspaceprogram.com/api/getnewsarticle?id=${articleId}`, {
+							headers: {
+								'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+							},
+						})
+						.then(res => {
+							return res.data;
+						})
+				);
+			} catch (error) {
+				functions.logger.log(error);
+			}
+		};
+
+		fetchArticle();
+
+		articles.push(article);
+	});
+
+	await Promise.all(articlePromises).then(res => {
+		res.map((articleRes, i) => {
+			articles[i].article = articleRes;
 		});
+	});
+
 	const dataJSON = articles;
 	return dataJSON;
 };

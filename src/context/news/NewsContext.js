@@ -15,24 +15,27 @@ export const NewsProvider = ({ children }) => {
 	useEffect(() => {
 		const fetchNews = async () => {
 			const storedNews = JSON.parse(window.localStorage.getItem('news'));
-			const timeToCheck = 20 * 60 * 1000;
-			const timeframe = Date.now() - timeToCheck;
-			const oldDate = new Date(storedNews.date);
 
-			if (oldDate < timeframe) {
-				dispatchNews({
-					type: 'SET_NEWS',
-					payload: storedNews.articles,
-				});
+			if (storedNews) {
+				const timeToCheck = 20 * 60 * 1000;
+				const timeframe = Date.now() - timeToCheck;
+				const oldDate = new Date(storedNews.date);
 
-				dispatchNews({
-					type: 'SET_CHALLENGES',
-					payload: storedNews.challenges,
-				});
-				dispatchNews({
-					type: 'SET_ARTICLES_LOADING',
-					payload: false,
-				});
+				if (oldDate < timeframe) {
+					dispatchNews({
+						type: 'SET_NEWS',
+						payload: storedNews.articles,
+					});
+
+					dispatchNews({
+						type: 'SET_CHALLENGES',
+						payload: storedNews.challenges,
+					});
+					dispatchNews({
+						type: 'SET_ARTICLES_LOADING',
+						payload: false,
+					});
+				}
 			} else {
 				try {
 					let parsedChalleges, parsedNews;

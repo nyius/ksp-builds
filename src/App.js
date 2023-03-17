@@ -14,6 +14,8 @@ import { Navbar, Footer } from './components';
 import Stars from './components/stars/Stars';
 import LeftBar from './components/containers/leftBar/LeftBar';
 import Modals from './components/modals/Modals';
+import Alerts from './components/alert/Alerts';
+import Banner from './components/banner/Banner';
 //---------------------------------------------------------------------------------------------------//
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
@@ -34,7 +36,6 @@ Quick share builds (without needing to create a whole build)
 instead of infinitely loading builds, it should be pages <- maybe local store each page as we load them, so when going backwards it just fetches the local storeage
 home page Builds should probably fetch by default view count 
 Competitions for daily
-SEO optimization
 'uses mods' filter
  */
 

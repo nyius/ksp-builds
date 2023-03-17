@@ -5,7 +5,7 @@ import { FaSave, FaUserAstronaut, FaCogs, FaHome } from 'react-icons/fa';
 import { FiLogOut } from 'react-icons/fi';
 import { TiExport, TiPlusOutline } from 'react-icons/ti';
 import { RiDeleteBin2Fill, RiEditFill, RiLoginCircleLine } from 'react-icons/ri';
-import { BsFillPatchQuestionFill, BsFillArrowDownSquareFill, BsFillArrowLeftSquareFill } from 'react-icons/bs';
+import { BsFillPatchQuestionFill, BsFillArrowDownSquareFill, BsFillArrowLeftSquareFill, BsFillArrowRightSquareFill } from 'react-icons/bs';
 import { BiCommentAdd, BiReset } from 'react-icons/bi';
 import { MdOutlineDoneOutline, MdEmail, MdSettingsInputComponent } from 'react-icons/md';
 import { FcGoogle } from 'react-icons/fc';
@@ -47,6 +47,7 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 		if (icon === 'reset') return <BiReset />;
 		if (icon === 'down') return <BsFillArrowDownSquareFill />;
 		if (icon === 'left') return <BsFillArrowLeftSquareFill />;
+		if (icon === 'right') return <BsFillArrowRightSquareFill />;
 		if (icon === 'email') return <MdEmail />;
 		if (icon === 'head') return <FaUserAstronaut />;
 		if (icon === 'settings') return <MdSettingsInputComponent />;

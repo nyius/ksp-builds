@@ -8,18 +8,18 @@ import useFilters from '../../context/filters/FiltersActions';
 import useBuilds from '../../context/builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
 import Sort from '../../components/sort/Sort';
-import LoadMoreBuilds from '../../components/buttons/LoadMoreBuilds';
 import Spinner1 from '../../components/spinners/Spinner1';
 import BuildCard from '../../components/buildCard/BuildCard';
 import SearchBar from '../../components/search/SearchBar';
 import CantFind from '../../components/cantFind/CantFind';
+import Button from '../../components/buttons/Button';
 
 function Builds() {
 	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
-	const { loadingBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
+	const { loadingBuilds, fetchedBuilds, lastFetchedBuild, currentPage } = useContext(BuildsContext);
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const { filterBuilds, setTypeFilter, resetFilters } = useFilters();
-	const { fetchBuilds } = useBuilds();
+	const { fetchBuilds, fetchMoreBuilds, setCurrentPage, goBackPage } = useBuilds();
 	const { id } = useParams();
 
 	useEffect(() => {
@@ -30,6 +30,10 @@ function Builds() {
 			resetFilters();
 		}
 	}, [id]);
+
+	useEffect(() => {
+		setCurrentPage(0);
+	}, []);
 
 	// Listen for changes to the sorting and filter the builds accordingly
 	useEffect(() => {
@@ -70,11 +74,10 @@ function Builds() {
 				)}
 			</div>
 
-			{!loadingBuilds && lastFetchedBuild !== 'end' && (
-				<div className="flex flex-row w-full justify-center items-center">
-					<LoadMoreBuilds />
-				</div>
-			)}
+			<div className="flex flex-row w-full justify-center items-center gap-2 2k:gap-4">
+				{!loadingBuilds && currentPage > 0 && <Button icon="left" onClick={() => goBackPage(currentPage - 1)} color="bg-base-900 text-white" text="Prev" />}
+				{!loadingBuilds && fetchedBuilds.length == process.env.REACT_APP_BUILDS_FETCH_NUM && <Button icon="right" onClick={() => fetchMoreBuilds(process.env.REACT_APP_BUILDS_FETCH_NUM)} color="bg-base-900 text-white" text="Next" />}
+			</div>
 		</>
 	);
 }

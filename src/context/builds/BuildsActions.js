@@ -9,7 +9,7 @@ import FiltersContext from '../filters/FiltersContext';
 import { cloneDeep } from 'lodash';
 
 const useBuilds = () => {
-	const { dispatchBuilds, fetchedBuilds, lastFetchedBuild } = useContext(BuildsContext);
+	const { dispatchBuilds, fetchedBuilds, lastFetchedBuild, currentPage } = useContext(BuildsContext);
 	const { deletingDeckId, loadedBuild } = useContext(BuildContext);
 	const { user } = useContext(AuthContext);
 	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
@@ -44,6 +44,10 @@ const useBuilds = () => {
 					builds.push(doc.data());
 				});
 
+				// Add the fetched builds to local storage
+				const buildsString = JSON.stringify([builds]);
+				window.localStorage.setItem('builds', buildsString);
+
 				dispatchBuilds({
 					type: 'SET_FETCHED_BUILDS',
 					payload: {
@@ -70,11 +74,12 @@ const useBuilds = () => {
 				}
 				// now we resolve all of the promises
 				const builds = await Promise.all(batches);
+				const buildsFlat = builds.flat();
 
 				dispatchBuilds({
 					type: 'SET_FETCHED_BUILDS',
 					payload: {
-						fetchedBuilds: builds.flat(),
+						fetchedBuilds: buildsFlat,
 						loadingBuilds: false,
 					},
 				});
@@ -91,6 +96,20 @@ const useBuilds = () => {
 	 */
 	const fetchMoreBuilds = async () => {
 		try {
+			const currentPageNum = currentPage + 1;
+			// First check what page we're on, and how many pages we have saved in pagination. That way we can load the paginated builds instead of fetching from the db
+			const localBuilds = JSON.parse(window.localStorage.getItem('builds'));
+			if (currentPageNum < localBuilds.length) {
+				dispatchBuilds({
+					type: 'SET_FETCHED_BUILDS',
+					payload: {
+						fetchedBuilds: [...localBuilds[currentPageNum]],
+						currentPage: currentPageNum,
+					},
+				});
+				return;
+			}
+
 			dispatchBuilds({ type: 'FETCHING_MORE_BUILDS', payload: true });
 			const builds = [];
 			let q;
@@ -119,12 +138,18 @@ const useBuilds = () => {
 				builds.push(build);
 			});
 
+			// Add the fetched builds to local storage
+			const storedBuilds = JSON.parse(window.localStorage.getItem('builds'));
+			storedBuilds.push(builds);
+			window.localStorage.setItem('builds', JSON.stringify(storedBuilds));
+
 			dispatchBuilds({
 				type: 'SET_FETCHED_BUILDS',
 				payload: {
-					fetchedBuilds: [...fetchedBuilds, ...builds],
+					fetchedBuilds: [...builds],
 					loadingBuilds: false,
 					lastFetchedBuild: buildsSnap.docs.length < process.env.REACT_APP_BUILDS_FETCH_NUM ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1],
+					currentPage: currentPageNum,
 				},
 			});
 		} catch (error) {
@@ -166,7 +191,35 @@ const useBuilds = () => {
 		});
 	};
 
-	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchMoreBuilds, setBuildsLoading, clearFetchedBuilds };
+	/**
+	 * Handles setting what page of builds the user is currently viewing
+	 * @param {*} page
+	 */
+	const setCurrentPage = page => {
+		dispatchBuilds({
+			type: 'SET_CURRENT_PAGE',
+			payload: page,
+		});
+	};
+
+	/**
+	 * Handles going back a page. Gets the page from the localstorage
+	 * @param {*} page
+	 */
+	const goBackPage = page => {
+		const storedBuilds = JSON.parse(window.localStorage.getItem('builds'));
+		const builds = storedBuilds[page];
+
+		dispatchBuilds({
+			type: 'SET_FETCHED_BUILDS',
+			payload: {
+				fetchedBuilds: [...builds],
+				currentPage: currentPage - 1,
+			},
+		});
+	};
+
+	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchMoreBuilds, setBuildsLoading, setCurrentPage, clearFetchedBuilds, goBackPage };
 };
 
 export default useBuilds;

@@ -12,6 +12,7 @@ export const BuildsProvider = ({ children }) => {
 		fetchedBuilds: [],
 		usersOwnBuilds: [],
 		favoriteBuilds: [],
+		currentPage: 0,
 	};
 
 	const [state, dispatchBuilds] = useReducer(BuildsReducer, initialState);

@@ -46,6 +46,11 @@ const BuildsReducer = (state, action) => {
 				usersOwnBuilds: action.payload,
 				loadingBuilds: false,
 			};
+		case 'SET_CURRENT_PAGE':
+			return {
+				...state,
+				currentPage: action.payload,
+			};
 		default:
 			return state;
 	}

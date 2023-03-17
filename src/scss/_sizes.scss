@@ -47,6 +47,20 @@
 	}
 }
 
+.w-110 {
+	width: 40rem;
+}
+@media (min-width: 800px) {
+	.w-110 {
+		width: 45rem;
+	}
+}
+@media (min-width: 1921px) {
+	.w-110 {
+		width: 50rem;
+	}
+}
+
 .z-60 {
 	z-index: 60;
 }
@@ -96,13 +110,7 @@
 	width: 28%;
 }
 
-@media (min-width: 1024px) {
-	.left-bar {
-		width: 15%;
-	}
-}
-
-@media (min-width: 1024px) {
+@media (min-width: 1025px) {
 	.left-bar {
 		width: 15%;
 	}
@@ -111,4 +119,25 @@
 .carousel {
 	width: 100%;
 	aspect-ratio: 16/9;
+}
+
+.banner {
+	height: fit-content;
+}
+
+@media (min-width: 640px) {
+	.banner {
+		height: 25rem;
+	}
+}
+@media (min-width: 768px) {
+	.banner {
+		height: 20rem;
+	}
+}
+
+@media (min-width: 1025px) {
+	.banner {
+		height: 30rem;
+	}
 }

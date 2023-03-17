@@ -5,7 +5,7 @@ import { FaSave, FaUserAstronaut, FaCogs, FaHome } from 'react-icons/fa';
 import { FiLogOut } from 'react-icons/fi';
 import { TiExport, TiPlusOutline } from 'react-icons/ti';
 import { RiDeleteBin2Fill, RiEditFill, RiLoginCircleLine } from 'react-icons/ri';
-import { BsFillPatchQuestionFill, BsFillArrowDownSquareFill, BsFillArrowLeftSquareFill, BsFillArrowRightSquareFill } from 'react-icons/bs';
+import { BsFillPatchQuestionFill, BsFillArrowDownSquareFill, BsFillArrowLeftSquareFill, BsFillArrowRightSquareFill, BsCaretRightFill, BsCaretLeftFill } from 'react-icons/bs';
 import { BiCommentAdd, BiReset } from 'react-icons/bi';
 import { MdOutlineDoneOutline, MdEmail, MdSettingsInputComponent } from 'react-icons/md';
 import { FcGoogle } from 'react-icons/fc';
@@ -26,10 +26,11 @@ import { Link } from 'react-router-dom';
  * @param {*} htmlFor - enter this if used to ope a modal
  * @param {*} margin - enter any margin
  * @param {*} href - href if its a link to a page (like profile, settings)
+ * @param {*} target - set to _blank if want button click to open in new tab
  * @param {*} type - enter 'submit' for submitting a form, 'button' to make it not submit, 'ahref' for a link to a page for google, leave blank for 'label'
  * @returns
  */
-function Button({ text, onClick, color, size, icon, css, style, position, htmlFor, margin, type, href }) {
+function Button({ text, onClick, color, size, icon, css, style, position, htmlFor, margin, type, href, target }) {
 	const buttonIcon = () => {
 		if (icon === 'cancel') return <GiCancel />;
 		if (icon === 'upload') return <ImCloudUpload />;
@@ -47,7 +48,9 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 		if (icon === 'reset') return <BiReset />;
 		if (icon === 'down') return <BsFillArrowDownSquareFill />;
 		if (icon === 'left') return <BsFillArrowLeftSquareFill />;
+		if (icon === 'left2') return <BsCaretLeftFill />;
 		if (icon === 'right') return <BsFillArrowRightSquareFill />;
+		if (icon === 'right2') return <BsCaretRightFill />;
 		if (icon === 'email') return <MdEmail />;
 		if (icon === 'head') return <FaUserAstronaut />;
 		if (icon === 'settings') return <MdSettingsInputComponent />;
@@ -61,7 +64,7 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 	if (type) {
 		if (type === 'ahref') {
 			return (
-				<Link to={href} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
+				<Link to={href} target={target} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
 					{icon && <span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
 					{text !== '' && text}
 				</Link>

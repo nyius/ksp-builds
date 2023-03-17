@@ -5,6 +5,11 @@ const NewsReducer = (state, action) => {
 				...state,
 				articles: action.payload,
 			};
+		case 'SET_CHALLENGES':
+			return {
+				...state,
+				challenges: action.payload,
+			};
 		case 'SET_ARTICLES_LOADING':
 			return {
 				...state,

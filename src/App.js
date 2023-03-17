@@ -33,7 +33,6 @@ FAQ Page
 upload image for comments
 button closing notifications tab when clicked
 Quick share builds (without needing to create a whole build)
-instead of infinitely loading builds, it should be pages <- maybe local store each page as we load them, so when going backwards it just fetches the local storeage
 home page Builds should probably fetch by default view count 
 Competitions for daily
 'uses mods' filter

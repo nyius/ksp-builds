@@ -13,6 +13,7 @@ import BuildCard from '../../components/buildCard/BuildCard';
 import SearchBar from '../../components/search/SearchBar';
 import CantFind from '../../components/cantFind/CantFind';
 import Button from '../../components/buttons/Button';
+import Banner from '../../components/banner/Banner';
 
 function Builds() {
 	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
@@ -54,6 +55,7 @@ function Builds() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
+			<Banner />
 			<div className="flex flex-row gap-4 w-full place-content-between md:place-content-end sm:mb-4">
 				<SearchBar />
 				<Sort />

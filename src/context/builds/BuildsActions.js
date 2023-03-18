@@ -21,19 +21,25 @@ const useBuilds = () => {
 	const fetchBuilds = async (buildsToFetch, fetchUid) => {
 		const buildsToFetchCopy = cloneDeep(buildsToFetch);
 		try {
-			dispatchBuilds({ type: 'SET_FETCHED_BUILDS_LOADING', payload: true });
+			dispatchBuilds({
+				type: 'SET_FETCHED_BUILDS',
+				payload: {
+					fetchedBuilds: [],
+					loadingBuilds: true,
+				},
+			});
 			const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
 			const builds = [];
 			let q;
 
 			if (!buildsToFetchCopy) {
 				// Create a query
-				const constraints = [where('visibility', '==', 'public'), orderBy('views', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM))];
+				const constraints = [where('visibility', '==', 'public'), orderBy('views', 'desc'), limit(process.env.REACT_APP_BUILDS_FETCH_NUM)];
 
-				if (versionFilter !== 'any') constraints.push(where('kspVersion', '==', versionFilter));
-				if (typeFilter !== '') constraints.push(where('type', 'array-contains', typeFilter));
-				if (modsFilter == 'yes') constraints.push(where('modsUsed', '==', true));
-				if (modsFilter == 'no') constraints.push(where('modsUsed', '==', false));
+				if (versionFilter !== 'any') constraints.unshift(where('kspVersion', '==', versionFilter));
+				if (typeFilter !== '') constraints.unshift(where('type', 'array-contains', typeFilter));
+				if (modsFilter == 'yes') constraints.unshift(where('modsUsed', '==', true));
+				if (modsFilter == 'no') constraints.unshift(where('modsUsed', '==', false));
 				q = query(buildsRef, ...constraints);
 
 				const buildsSnap = await getDocs(q);
@@ -111,20 +117,13 @@ const useBuilds = () => {
 
 			const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
 
-			// Create a query
-			if (typeFilter !== '') {
-				q = query(
-					buildsRef,
-					where('type', 'array-contains', typeFilter),
-					where('kspVersion', '==', versionFilter),
-					orderBy('timestamp', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)),
-					startAfter(lastFetchedBuild),
-					limit(process.env.REACT_APP_BUILDS_FETCH_NUM)
-				);
-			} else {
-				// Create a query
-				q = query(buildsRef, orderBy('timestamp', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)), startAfter(lastFetchedBuild), limit(process.env.REACT_APP_BUILDS_FETCH_NUM));
-			}
+			const constraints = [where('visibility', '==', 'public'), orderBy('views', 'desc'), limit(process.env.REACT_APP_BUILDS_FETCH_NUM), startAfter(lastFetchedBuild)];
+
+			if (versionFilter !== 'any') constraints.unshift(where('kspVersion', '==', versionFilter));
+			if (typeFilter !== '') constraints.unshift(where('type', 'array-contains', typeFilter));
+			if (modsFilter == 'yes') constraints.unshift(where('modsUsed', '==', true));
+			if (modsFilter == 'no') constraints.unshift(where('modsUsed', '==', false));
+			q = query(buildsRef, ...constraints);
 
 			const buildsSnap = await getDocs(q);
 

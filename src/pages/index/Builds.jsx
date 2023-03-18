@@ -41,12 +41,12 @@ function Builds() {
 		let newFetchedBuilds = cloneDeep(fetchedBuilds);
 
 		setSortedBuilds(filterBuilds(newFetchedBuilds));
-	}, [fetchedBuilds, versionFilter, sortBy, modsFilter]);
+	}, [fetchedBuilds, sortBy]);
 
 	// listens for filters and fetches builds based on filter
 	useEffect(() => {
 		fetchBuilds();
-	}, [typeFilter, searchTerm, tagsSearch]);
+	}, [typeFilter, searchTerm, modsFilter, versionFilter, tagsSearch]);
 
 	if (!loadingBuilds && fetchedBuilds.length === 0) {
 		return <CantFind text="No builds found :("></CantFind>;

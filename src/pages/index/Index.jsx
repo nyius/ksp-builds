@@ -11,8 +11,6 @@ function Index() {
 
 	useEffect(() => {
 		resetStates();
-
-		fetchBuilds();
 	}, []);
 
 	return (

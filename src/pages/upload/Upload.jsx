@@ -390,7 +390,7 @@ function Upload() {
 										{/* Used Mods */}
 										<div className="flex flex-row items-center gap-6 text-slate-400">
 											<p className="2k:text-2xl">Uses Mods</p>
-											<input onChange={setModsUsed} checked={editingBuild ? editingBuild.modsUsed : false} type="checkbox" className="checkbox 2k:checkbox-lg" />
+											<input onChange={setModsUsed} defaultChecked={editingBuild && editingBuild.modsUsed} type="checkbox" className="checkbox 2k:checkbox-lg" />
 										</div>
 
 										{/* Visibility */}

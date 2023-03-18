@@ -51,6 +51,11 @@ const BuildsReducer = (state, action) => {
 				...state,
 				currentPage: action.payload,
 			};
+		case 'SET_STORED_BUILDS':
+			return {
+				...state,
+				storedBuilds: [...state.storedBuilds, action.payload],
+			};
 		default:
 			return state;
 	}

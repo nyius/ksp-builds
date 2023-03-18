@@ -13,6 +13,7 @@ export const BuildsProvider = ({ children }) => {
 		usersOwnBuilds: [],
 		favoriteBuilds: [],
 		currentPage: 0,
+		storedBuilds: [],
 	};
 
 	const [state, dispatchBuilds] = useReducer(BuildsReducer, initialState);

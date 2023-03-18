@@ -12,7 +12,7 @@ const FiltersReducer = (state, action) => {
 				versionFilter: 'any',
 				searchTerm: '',
 				tagsSearch: '',
-				sortBy: 'date_newest',
+				sortBy: 'views',
 			};
 		case 'SET_KSP_VERSIONS':
 			return {

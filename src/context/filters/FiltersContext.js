@@ -31,9 +31,10 @@ export const FiltersProvider = ({ children }) => {
 	const initialState = {
 		typeFilter: '',
 		versionFilter: 'any',
+		modsFilter: 'any',
 		searchTerm: '',
 		tagsSearch: '',
-		sortBy: 'date_newest',
+		sortBy: 'views',
 		kspVersions: [],
 	};
 

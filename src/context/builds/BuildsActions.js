@@ -9,10 +9,10 @@ import FiltersContext from '../filters/FiltersContext';
 import { cloneDeep } from 'lodash';
 
 const useBuilds = () => {
-	const { dispatchBuilds, fetchedBuilds, lastFetchedBuild, currentPage } = useContext(BuildsContext);
+	const { dispatchBuilds, fetchedBuilds, lastFetchedBuild, currentPage, storedBuilds } = useContext(BuildsContext);
 	const { deletingDeckId, loadedBuild } = useContext(BuildContext);
 	const { user } = useContext(AuthContext);
-	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
+	const { typeFilter, versionFilter, modsFilter, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
 
 	/**
 	 * Fetches builds from the DB. Takes in an array of build ids to fetch. if no IDs specified, grabs all builds based on filters
@@ -28,15 +28,13 @@ const useBuilds = () => {
 
 			if (!buildsToFetchCopy) {
 				// Create a query
-				if (typeFilter !== '') {
-					const constraints = [where('type', 'array-contains', typeFilter), orderBy('views', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)), limit(process.env.REACT_APP_BUILDS_FETCH_NUM)];
+				const constraints = [where('visibility', '==', 'public'), orderBy('views', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM))];
 
-					if (versionFilter !== 'any') constraints.push(where('kspVersion', '==', versionFilter));
-					q = query(buildsRef, ...constraints);
-				} else {
-					const constraints = [where('visibility', '==', 'public'), orderBy('views', 'desc', limit(process.env.REACT_APP_BUILDS_FETCH_NUM)), limit(process.env.REACT_APP_BUILDS_FETCH_NUM)];
-					q = query(buildsRef, ...constraints);
-				}
+				if (versionFilter !== 'any') constraints.push(where('kspVersion', '==', versionFilter));
+				if (typeFilter !== '') constraints.push(where('type', 'array-contains', typeFilter));
+				if (modsFilter == 'yes') constraints.push(where('modsUsed', '==', true));
+				if (modsFilter == 'no') constraints.push(where('modsUsed', '==', false));
+				q = query(buildsRef, ...constraints);
 
 				const buildsSnap = await getDocs(q);
 
@@ -44,16 +42,13 @@ const useBuilds = () => {
 					builds.push(doc.data());
 				});
 
-				// Add the fetched builds to local storage
-				const buildsString = JSON.stringify([builds]);
-				window.localStorage.setItem('builds', buildsString);
-
 				dispatchBuilds({
 					type: 'SET_FETCHED_BUILDS',
 					payload: {
 						fetchedBuilds: builds,
 						loadingBuilds: false,
 						lastFetchedBuild: buildsSnap.docs.length < process.env.REACT_APP_BUILDS_FETCH_NUM ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1],
+						storedBuilds: [builds],
 					},
 				});
 			} else {
@@ -99,12 +94,11 @@ const useBuilds = () => {
 		try {
 			const currentPageNum = currentPage + 1;
 			// First check what page we're on, and how many pages we have saved in pagination. That way we can load the paginated builds instead of fetching from the db
-			const localBuilds = JSON.parse(window.localStorage.getItem('builds'));
-			if (currentPageNum < localBuilds.length) {
+			if (currentPageNum < storedBuilds.length) {
 				dispatchBuilds({
 					type: 'SET_FETCHED_BUILDS',
 					payload: {
-						fetchedBuilds: [...localBuilds[currentPageNum]],
+						fetchedBuilds: [...storedBuilds[currentPageNum]],
 						currentPage: currentPageNum,
 					},
 				});
@@ -139,11 +133,6 @@ const useBuilds = () => {
 				builds.push(build);
 			});
 
-			// Add the fetched builds to local storage
-			const storedBuilds = JSON.parse(window.localStorage.getItem('builds'));
-			storedBuilds.push(builds);
-			window.localStorage.setItem('builds', JSON.stringify(storedBuilds));
-
 			dispatchBuilds({
 				type: 'SET_FETCHED_BUILDS',
 				payload: {
@@ -151,6 +140,7 @@ const useBuilds = () => {
 					loadingBuilds: false,
 					lastFetchedBuild: buildsSnap.docs.length < process.env.REACT_APP_BUILDS_FETCH_NUM ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1],
 					currentPage: currentPageNum,
+					storedBuilds: [...storedBuilds, builds],
 				},
 			});
 		} catch (error) {
@@ -208,7 +198,6 @@ const useBuilds = () => {
 	 * @param {*} page
 	 */
 	const goBackPage = page => {
-		const storedBuilds = JSON.parse(window.localStorage.getItem('builds'));
 		const builds = storedBuilds[page];
 
 		dispatchBuilds({

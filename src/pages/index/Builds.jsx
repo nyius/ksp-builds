@@ -16,7 +16,7 @@ import Button from '../../components/buttons/Button';
 import Banner from '../../components/banner/Banner';
 
 function Builds() {
-	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
+	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy, modsFilter } = useContext(FiltersContext);
 	const { loadingBuilds, fetchedBuilds, lastFetchedBuild, currentPage } = useContext(BuildsContext);
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const { filterBuilds, setTypeFilter, resetFilters } = useFilters();
@@ -41,7 +41,7 @@ function Builds() {
 		let newFetchedBuilds = cloneDeep(fetchedBuilds);
 
 		setSortedBuilds(filterBuilds(newFetchedBuilds));
-	}, [fetchedBuilds, versionFilter, sortBy]);
+	}, [fetchedBuilds, versionFilter, sortBy, modsFilter]);
 
 	// listens for filters and fetches builds based on filter
 	useEffect(() => {

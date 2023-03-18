@@ -56,7 +56,7 @@ function BuildCard({ build }) {
 							})}
 						</div>
 
-						<div className="flex flex-col 2k:gap-4 mb-3 2k:mb-6">
+						<div className="flex flex-col 2k:gap-3 mb-3 2k:mb-6">
 							{/* Uploaded */}
 							<h3 className="text-slate-400 text-xl 2k:text-2xl sm:text-lg">
 								<span className="text-slate-500">uploaded:</span> {date}
@@ -70,6 +70,11 @@ function BuildCard({ build }) {
 							{/* KSP Version */}
 							<h3 className="text-slate-400 text-xl 2k:text-2xl sm:text-lg">
 								<span className="text-slate-500"> ksp version:</span> {build.kspVersion}
+							</h3>
+
+							{/* Mods Version */}
+							<h3 className="text-slate-400 text-xl 2k:text-2xl sm:text-lg">
+								<span className="text-slate-500"> Uses Mods:</span> {build.modsUsed ? 'Yes' : 'No'}
 							</h3>
 						</div>
 

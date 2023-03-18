@@ -15,9 +15,15 @@ function IndexLeftBar({ text }) {
 	const [versions, setVersions] = useState([]);
 	const navigate = useNavigate();
 
-	const handleNavigate = () => {
+	const reset = () => {
+		const versionsSelect = document.getElementById('versionsSelect');
+		const modsSelect = document.getElementById('modsSelect');
+		const challengesSelect = document.getElementById('challengesSelect');
+
+		versionsSelect.selectedIndex = 0;
+		modsSelect.selectedIndex = 0;
+		challengesSelect.selectedIndex = 0;
 		resetFilters();
-		navigate('/');
 	};
 
 	//---------------------------------------------------------------------------------------------------//
@@ -40,7 +46,7 @@ function IndexLeftBar({ text }) {
 
 				{/* Version */}
 				<LeftBarTitle text="KSP Version" />
-				<select onChange={setVersionFilter} className="select select-bordered w-full 2k:select-lg 2k:text-2xl mb-6 2k:mb-12">
+				<select id="versionsSelect" onChange={setVersionFilter} className="select select-bordered w-full 2k:select-lg 2k:text-2xl mb-6 2k:mb-12">
 					<optgroup>
 						<option value="any">Any</option>
 						{!filtersLoading &&
@@ -56,7 +62,7 @@ function IndexLeftBar({ text }) {
 
 				{/* Mods */}
 				<LeftBarTitle text="Uses Mods" />
-				<select onChange={setModsFilter} className="select select-bordered w-full 2k:select-lg 2k:text-2xl mb-6 2k:mb-12">
+				<select id="modsSelect" onChange={setModsFilter} className="select select-bordered w-full 2k:select-lg 2k:text-2xl mb-6 2k:mb-12">
 					<optgroup>
 						<option value="any">Any</option>
 						<option value="yes">Yes</option>
@@ -66,7 +72,7 @@ function IndexLeftBar({ text }) {
 
 				{/* Challenges */}
 				<LeftBarTitle text="KSP Challenges" />
-				<select onChange={setChallengeFilter} className="select select-bordered w-full 2k:select-lg 2k:text-2xl mb-6 2k:mb-12">
+				<select id="challengesSelect" onChange={setChallengeFilter} className="select select-bordered w-full 2k:select-lg 2k:text-2xl mb-6 2k:mb-12">
 					<optgroup>
 						<option value="any">Any</option>
 						{!articlesLoading &&
@@ -79,7 +85,7 @@ function IndexLeftBar({ text }) {
 							})}
 					</optgroup>
 				</select>
-				<Button icon="reset" text="Reset" onClick={handleNavigate} color="bg-base-300" size="w-full" />
+				<Button icon="reset" text="Reset" onClick={reset} color="bg-base-300" size="w-full" />
 			</div>
 		</>
 	);

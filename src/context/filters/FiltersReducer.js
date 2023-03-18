@@ -13,6 +13,8 @@ const FiltersReducer = (state, action) => {
 				searchTerm: '',
 				tagsSearch: '',
 				sortBy: 'views',
+				modsFilter: 'any',
+				challengeFilter: 'any',
 			};
 		case 'SET_KSP_VERSIONS':
 			return {

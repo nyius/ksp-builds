@@ -10,14 +10,18 @@ export const FiltersProvider = ({ children }) => {
 
 	useEffect(() => {
 		// Fetch the KSP versions from the DB
-		const fetchKspVersions = async () => {
+		const fetchKspInfo = async () => {
 			try {
 				const data = await getDoc(doc(db, 'kspInfo', 'info'));
-				const kspVersions = data.data();
+				const kspInfo = data.data();
 
 				dispatchBuildFilters({
 					type: 'SET_KSP_VERSIONS',
-					payload: kspVersions.versions,
+					payload: kspInfo.versions,
+				});
+				dispatchBuildFilters({
+					type: 'SET_KSP_CHALLENGES',
+					payload: kspInfo.challenges,
 				});
 				setFiltersLoading(false);
 			} catch (error) {
@@ -25,17 +29,19 @@ export const FiltersProvider = ({ children }) => {
 				setFiltersLoading(false);
 			}
 		};
-		fetchKspVersions();
+		fetchKspInfo();
 	}, []);
 
 	const initialState = {
 		typeFilter: '',
 		versionFilter: 'any',
 		modsFilter: 'any',
+		challengeFilter: 'any',
 		searchTerm: '',
 		tagsSearch: '',
 		sortBy: 'views',
 		kspVersions: [],
+		kspChallenges: [],
 	};
 
 	const [state, dispatchBuildFilters] = useReducer(FiltersReducer, initialState);

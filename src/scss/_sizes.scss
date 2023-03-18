@@ -74,18 +74,23 @@
 }
 
 .card-sizing {
-	height: 40rem;
+	padding-bottom: 4rem;
 }
 
-@media (min-width: 1921px) {
+@media (min-width: 641px) {
 	.card-sizing {
-		height: 60rem;
+		padding-bottom: 4rem;
+	}
+}
+@media (min-width: 801px) {
+	.card-sizing {
+		padding-bottom: 4rem;
 	}
 }
 
 @media (min-width: 2561px) {
 	.card-sizing {
-		height: 70rem;
+		padding-bottom: 5rem;
 	}
 }
 

@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import FiltersContext from './FiltersContext';
 
 const useFilters = () => {
-	const { sortBy, typeFilter, versionFilter, searchTerm, tagsSearch, dispatchBuildFilters, modsFilter } = useContext(FiltersContext);
+	const { sortBy, typeFilter, versionFilter, challengeFilter, searchTerm, tagsSearch, dispatchBuildFilters, modsFilter } = useContext(FiltersContext);
 
 	/**
 	 * Handles setting search term
@@ -75,6 +75,20 @@ const useFilters = () => {
 	};
 
 	/**
+	 * Handles setting the filter for if build uses mods
+	 * @param {*} e
+	 */
+	const setChallengeFilter = e => {
+		dispatchBuildFilters({
+			type: 'SET_FILTERS',
+			payload: {
+				filter: 'challengeFilter',
+				value: e.target.value,
+			},
+		});
+	};
+
+	/**
 	 * Handles setting tags search term
 	 * @param {*} e
 	 */
@@ -114,6 +128,10 @@ const useFilters = () => {
 				if (build.name.toLowerCase().includes(searchTerm.toLowerCase())) return build;
 			})
 			.filter(build => {
+				if (challengeFilter === 'any') return build;
+				if (build.forChallenge === challengeFilter) return build;
+			})
+			.filter(build => {
 				if (versionFilter === 'any') return build;
 				if (build.kspVersion === versionFilter) return build;
 			})
@@ -142,7 +160,7 @@ const useFilters = () => {
 		});
 	};
 
-	return { setSearchFilter, setTagSearchFilter, filterBuilds, setSortFilter, setTypeFilter, setVersionFilter, resetFilters, setModsFilter };
+	return { setSearchFilter, setTagSearchFilter, filterBuilds, setSortFilter, setTypeFilter, setVersionFilter, resetFilters, setModsFilter, setChallengeFilter };
 };
 
 export default useFilters;

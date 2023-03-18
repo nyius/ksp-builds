@@ -91,6 +91,15 @@ function App() {
 										/>
 										<Route
 											exact
+											path="/upload/:id"
+											element={
+												<PrivateRoute>
+													<Upload />
+												</PrivateRoute>
+											}
+										/>
+										<Route
+											exact
 											path="/settings"
 											element={
 												<PrivateRoute>

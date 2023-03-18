@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import useBuilds from '../../context/builds/BuildsActions';
-import Builds from './Builds';
+import Builds from '../../components/builds/Builds';
 import useResetStates from '../../utilities/useResetStates';
 import { Helmet } from 'react-helmet';
 

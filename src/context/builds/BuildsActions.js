@@ -12,7 +12,7 @@ const useBuilds = () => {
 	const { dispatchBuilds, fetchedBuilds, lastFetchedBuild, currentPage, storedBuilds } = useContext(BuildsContext);
 	const { deletingDeckId, loadedBuild } = useContext(BuildContext);
 	const { user } = useContext(AuthContext);
-	const { typeFilter, versionFilter, modsFilter, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
+	const { typeFilter, versionFilter, modsFilter, challengeFilter, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
 
 	/**
 	 * Fetches builds from the DB. Takes in an array of build ids to fetch. if no IDs specified, grabs all builds based on filters
@@ -40,6 +40,7 @@ const useBuilds = () => {
 				if (typeFilter !== '') constraints.unshift(where('type', 'array-contains', typeFilter));
 				if (modsFilter == 'yes') constraints.unshift(where('modsUsed', '==', true));
 				if (modsFilter == 'no') constraints.unshift(where('modsUsed', '==', false));
+				if (challengeFilter !== 'any') constraints.unshift(where('forChallenge', '==', challengeFilter));
 				q = query(buildsRef, ...constraints);
 
 				const buildsSnap = await getDocs(q);
@@ -123,6 +124,7 @@ const useBuilds = () => {
 			if (typeFilter !== '') constraints.unshift(where('type', 'array-contains', typeFilter));
 			if (modsFilter == 'yes') constraints.unshift(where('modsUsed', '==', true));
 			if (modsFilter == 'no') constraints.unshift(where('modsUsed', '==', false));
+			if (challengeFilter !== 'any') constraints.unshift(where('forChallenge', '==', challengeFilter));
 			q = query(buildsRef, ...constraints);
 
 			const buildsSnap = await getDocs(q);

@@ -6,10 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import kspVersionOpts from '../../../utilities/kspVersions';
 import Button from '../../buttons/Button';
 import FiltersContext from '../../../context/filters/FiltersContext';
+import NewsContext from '../../../context/news/NewsContext';
 
 function IndexLeftBar({ text }) {
-	const { resetFilters, setVersionFilter, setModsFilter } = useFilters();
-	const { kspVersions, filtersLoading } = useContext(FiltersContext);
+	const { resetFilters, setVersionFilter, setModsFilter, setChallengeFilter } = useFilters();
+	const { kspVersions, kspChallenges, filtersLoading } = useContext(FiltersContext);
+	const { challenges, articlesLoading } = useContext(NewsContext);
 	const [versions, setVersions] = useState([]);
 	const navigate = useNavigate();
 
@@ -59,6 +61,22 @@ function IndexLeftBar({ text }) {
 						<option value="any">Any</option>
 						<option value="yes">Yes</option>
 						<option value="no">No</option>
+					</optgroup>
+				</select>
+
+				{/* Challenges */}
+				<LeftBarTitle text="KSP Challenges" />
+				<select onChange={setChallengeFilter} className="select select-bordered w-full 2k:select-lg 2k:text-2xl mb-6 2k:mb-12">
+					<optgroup>
+						<option value="any">Any</option>
+						{!articlesLoading &&
+							challenges.map((challenge, i) => {
+								return (
+									<option key={i} value={challenge.articleId}>
+										{challenge.title}
+									</option>
+								);
+							})}
 					</optgroup>
 				</select>
 				<Button icon="reset" text="Reset" onClick={handleNavigate} color="bg-base-300" size="w-full" />

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { cloneDeep, update } from 'lodash';
 import { profanity } from '@2toad/profanity';
@@ -12,6 +12,7 @@ import { standardBuild } from '../../utilities/standardBuild';
 import AuthContext from '../../context/auth/AuthContext';
 import useBuild from '../../context/build/BuildActions';
 import FiltersContext from '../../context/filters/FiltersContext';
+import NewsContext from '../../context/news/NewsContext';
 import BuildContext from '../../context/build/BuildContext';
 //---------------------------------------------------------------------------------------------------//
 import Spinner1 from '../../components/spinners/Spinner1';
@@ -33,18 +34,34 @@ function Upload() {
 	const { user } = useContext(AuthContext);
 	const { uploadBuild, updateBuild, setUploadingBuild } = useBuild();
 	const { editingBuild, uploadingBuild } = useContext(BuildContext);
-	const { filtersLoading, kspVersions } = useContext(FiltersContext);
-
+	const { filtersLoading, kspVersions, kspChallenges } = useContext(FiltersContext);
+	const { challenges, articlesLoading } = useContext(NewsContext);
 	//---------------------------------------------------------------------------------------------------//
+	const [description, setDescription] = useState(editingBuild ? editingBuild.description : `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`);
 	const [newBuild, setNewBuild] = useState(editingBuild ? cloneDeep(editingBuild) : cloneDeep(standardBuild));
 	const [uploadingImage, setUploadingImage] = useState(false);
 	const [rawImageFiles, setRawImageFiles] = useState([]);
 	const [nameLength, setNameLength] = useState(50);
 	const [hoverImage, setHoverImage] = useState(false);
-
-	const [description, setDescription] = useState(editingBuild ? editingBuild.description : `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`);
+	const [challengeParam, setChallengeParam] = useState(null);
 	//---------------------------------------------------------------------------------------------------//
 	const navigate = useNavigate();
+	const params = useParams().id;
+
+	useEffect(() => {
+		if (params) {
+			if (!articlesLoading && params.includes('c=')) {
+				const paramsSplit = params.slice(2, params.length);
+				const challenge = challenges.filter(challenge => {
+					if (challenge.articleId === paramsSplit) return challenge;
+				});
+				setNewBuild(prevState => {
+					return { ...prevState, forChallenge: paramsSplit, challengeTitle: challenge[0].title };
+				});
+				setChallengeParam(paramsSplit);
+			}
+		}
+	}, [articlesLoading]);
 
 	/**
 	 * Handles setting the new name
@@ -74,6 +91,20 @@ function Upload() {
 	const setVersion = e => {
 		setNewBuild(prevState => {
 			return { ...prevState, kspVersion: e.target.value };
+		});
+	};
+
+	/**
+	 * Handles setting the KSP version
+	 * @param {*} e
+	 */
+	const setChallenge = e => {
+		const challenge = challenges.filter(challenge => {
+			if (challenge.articleId === e.target.value) return challenge;
+		});
+
+		setNewBuild(prevState => {
+			return { ...prevState, forChallenge: e.target.value === 'none' ? false : e.target.value, challengeTitle: challenge.length > 0 ? challenge[0].title : null };
 		});
 	};
 
@@ -353,24 +384,32 @@ function Upload() {
 
 									{/* Upload build image */}
 									{newBuild.images.length < 6 && (
-										<div className="flex flex-row gap-4 w-full">
-											<input type="file" id="build-image" max="6" accept=".jpg,.png,.jpeg" multiple className="file-input w-full max-w-xs mb-6 2k:file-input-lg" onChange={e => handleAddBuildImages(e)} />
+										<div className="flex flex-row gap-4 w-full mb-2 2k:mb-4">
+											<input type="file" id="build-image" max="6" accept=".jpg,.png,.jpeg" multiple className="file-input w-full max-w-xs mb-6 2k:file-input-lg text-slate-200" onChange={e => handleAddBuildImages(e)} />
 											<div className="flex flex-col">
-												<p className="text-slate-500 font-bold 2k:text-2xl">{newBuild.images.length > 6 && <span className="text-red-400 font-bold">Too many images!</span>} 6 Images max. Max size per image 5mb.</p>
-												<p className="text-slate-500 2k:text-2xl">For best results images should be 16/9</p>
+												<p className="text-slate-400 font-bold 2k:text-2xl">{newBuild.images.length > 6 && <span className="text-red-400 font-bold">Too many images!</span>} 6 Images max. Max size per image 5mb.</p>
+												<p className="text-slate-400 2k:text-2xl">For best results images should be 16/9</p>
 											</div>
 										</div>
 									)}
 
 									{/* Name/versions/visibility/mods */}
-									<div className="flex flex-row flex-wrap gap-20 mb-8 2k:mb-15">
+									<div className="flex flex-row flex-wrap gap-16 mb-10 2k:mb-20">
+										{/* Name */}
 										<div className="flex flex-row gap-2 items-center">
-											<input onChange={setName} type="text" placeholder="Build Name" defaultValue={editingBuild ? editingBuild.name : ''} className="input input-bordered w-96 max-w-lg 2k:input-lg 2k:text-2xl" maxLength="50" />
-											<p className="text-slate-400 italic 2k:text-2xl">{nameLength}</p>
+											<input
+												onChange={setName}
+												type="text"
+												placeholder="Build Name"
+												defaultValue={editingBuild ? editingBuild.name : ''}
+												className="input input-bordered w-96 max-w-lg 2k:input-lg 2k:text-2xl text-slate-200"
+												maxLength="50"
+											/>
+											<p className="text-slate-200 italic 2k:text-2xl ">{nameLength}</p>
 										</div>
 
 										{/* KSP Version */}
-										<div className="flex flex-row items-center gap-6 text-slate-400">
+										<div className="flex flex-row items-center gap-6 text-slate-200">
 											<p className="2k:text-2xl">KSP Version</p>
 											<select onChange={setVersion} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
 												<optgroup>
@@ -387,14 +426,8 @@ function Upload() {
 											</select>
 										</div>
 
-										{/* Used Mods */}
-										<div className="flex flex-row items-center gap-6 text-slate-400">
-											<p className="2k:text-2xl">Uses Mods</p>
-											<input onChange={setModsUsed} defaultChecked={editingBuild && editingBuild.modsUsed} type="checkbox" className="checkbox 2k:checkbox-lg" />
-										</div>
-
 										{/* Visibility */}
-										<div className="flex flex-row items-center gap-6 text-slate-400">
+										<div className="flex flex-row items-center gap-6 text-slate-200">
 											<p className="2k:text-2xl">Visibility</p>
 											<select onChange={setVisiblity} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
 												<optgroup>
@@ -404,36 +437,67 @@ function Upload() {
 												</optgroup>
 											</select>
 										</div>
+
+										{/* KSP Challenge */}
+										<div className="flex flex-row items-center gap-6 text-slate-200">
+											<p className="2k:text-2xl">Weekly Challenge</p>
+											<select onChange={setChallenge} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
+												<optgroup>
+													<option value="none">None</option>
+													{!articlesLoading &&
+														challenges.map((challenge, i) => {
+															return (
+																<option key={i} selected={(params && challengeParam === challenge.articleId) || (editingBuild && editingBuild.forChallenge === challenge.articleId && true)} value={challenge.articleId}>
+																	{challenge.title}
+																</option>
+															);
+														})}
+												</optgroup>
+											</select>
+										</div>
+
+										{/* Used Mods */}
+										<div className="flex flex-row items-center gap-6 text-slate-200">
+											<p className="2k:text-2xl">Uses Mods</p>
+											<input onChange={setModsUsed} defaultChecked={editingBuild && editingBuild.modsUsed} type="checkbox" className="checkbox 2k:checkbox-lg" />
+										</div>
 									</div>
 
 									{/* Description */}
-									<div className="flex flex-row gap-2 items-center w-full mb-10 2k:mb-15">
+									<div className="flex flex-row gap-2 items-center w-full mb-10 2k:mb-20">
 										<TextEditor text={description} setState={setDescription} />
 									</div>
 
 									{/* Video */}
-									<div className="flex flex-row gap-2 items-center 2k:mb-8">
+									<div className="flex flex-row gap-2 items-center mb-10 2k:mb-20">
 										<input
 											onChange={setVideo}
 											type="text"
 											defaultValue={editingBuild ? editingBuild.video : ''}
 											placeholder="Youtube video ID (optional)"
-											className="input 2k:input-lg input-bordered w-96 max-w-lg mb-6 2k:text-2xl"
+											className="input 2k:input-lg input-bordered w-96 max-w-lg mb-6 2k:text-2xl text-slate-200"
 										/>
-										<p className="italic text-slate-500 2k:text-2xl">Eg. dQw4w9WgXcQ, this comes after "youtube.com'watch?v=" in the URL </p>
+										<p className="italic text-slate-400 2k:text-2xl">Eg. dQw4w9WgXcQ, this comes after "youtube.com'watch?v=" in the URL </p>
 									</div>
 
 									{/* Build Types */}
-									<h3 className="text-slate-400 text-xl 2k:text-3xl">Build Type (3 max)</h3>
+									<h3 className="text-slate-200 text-xl 2k:text-3xl mb-2 2k:mb-4">Build Type (3 max)</h3>
 									<BuildTypes typesArr={newBuild.type} setBuildState={setNewBuild} />
 
 									{/* Tags */}
-									<div className="flex flex-row gap-4 items-center">
-										<h3 className="text-slate-400 text-xl 2k:text-3xl">Tags (3 max)</h3>
-										<h4 className="text-slate-500 text-lg italic 2k:text-2xl">Press ',' to add a new tag</h4>
+									<div className="flex flex-row gap-4 items-center mb-2 2k:mb-4 mt-8 2k:mt-18">
+										<h3 className="text-slate-200 text-xl 2k:text-3xl">Tags (3 max)</h3>
+										<h4 className="text-slate-400 text-lg italic 2k:text-2xl">Press ',' to add a new tag</h4>
 									</div>
-									<input id="tagsField" disabled={newBuild.tags.length === 3} onChange={setTags} type="text" placeholder="Tags" className="input 2k:input-lg 2k:text-2xl 2k:mb-6 input-bordered w-96 max-w-lg" maxLength="30" />
-
+									<input
+										id="tagsField"
+										disabled={newBuild.tags.length === 3}
+										onChange={setTags}
+										type="text"
+										placeholder="Tags"
+										className="input 2k:input-lg 2k:text-2xl 2k:mb-6 input-bordered w-96 max-w-lg text-slate-200"
+										maxLength="30"
+									/>
 									<div className="flex flex-row gap-10 2k:mb-10">
 										{newBuild.tags.map((tag, i) => {
 											return (
@@ -448,9 +512,9 @@ function Upload() {
 									</div>
 
 									{/* Build */}
-									<div className="flex flex-row items-center gap-4">
-										<h3 className="text-slate-400 text-xl 2k:text-3xl">Paste build here</h3>
-										<label className="btn 2k:btn-lg 2k:text-2xl" htmlFor="how-to-copy-build-modal">
+									<div className="flex flex-row items-center gap-4 mb-2 2k:mb-4 mt-10 2k:mt-18">
+										<h3 className="text-slate-200 text-xl 2k:text-3xl">Paste build here</h3>
+										<label className="btn 2k:btn-lg 2k:text-2xl text-slate-400 bg-base-900" htmlFor="how-to-copy-build-modal">
 											How?
 										</label>
 									</div>

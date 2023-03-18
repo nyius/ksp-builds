@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, sortBy } from 'lodash';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 //---------------------------------------------------------------------------------------------------//
@@ -25,7 +25,7 @@ function VisitProfile() {
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const [dateCreated, setDateCreated] = useState(null);
 	//---------------------------------------------------------------------------------------------------//
-	const { typeFilter, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
+	const { typeFilter, versionFilter, searchTerm, tagsSearch, modsFilter, challengeFilter } = useContext(FiltersContext);
 	const { fetchedBuilds, loadingBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const { fetchedUserProfile, fetchingProfile, user, authLoading } = useContext(AuthContext);
 	//---------------------------------------------------------------------------------------------------//
@@ -51,8 +51,9 @@ function VisitProfile() {
 		let newFetchedBuilds = cloneDeep(fetchedBuilds);
 
 		setSortedBuilds(filterBuilds(newFetchedBuilds));
-	}, [fetchedBuilds, sortBy]);
+	}, [fetchBuilds, sortBy]);
 
+	//---------------------------------------------------------------------------------------------------//
 	if (fetchingProfile) {
 		return <Spinner1 />;
 	} else {
@@ -104,7 +105,7 @@ function VisitProfile() {
 
 						{/* Builds */}
 						<Sort />
-						<div className="flex flex-wrap md:grid md:grid-cols-3 2k:grid-cols-4 gap-4 w-full items-center justify-center md:justify-items-center mb-6 p-6 md:p-0">
+						<div className="flex flex-row flex-wrap w-full items-stretch justify-center md:justify-items-center mb-6 p-6 md:p-0">
 							{loadingBuilds ? (
 								<div className="flex flex-row w-full justify-center items-center">
 									<div className="w-20">

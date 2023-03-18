@@ -15,7 +15,10 @@ function ChallengeCard({ challenge, i, currentSlide }) {
 						{i === 0 && <p className="badge badge-secondary text-xl 2k:text-2xl p-4">New!</p>}
 					</div>
 					<p className="text-lg 2k:text-2xl italic text-slate-500 mb-10 2k:mb-20 z-50">{challenge.date}</p>
-					<Button onClick={() => navigate(`/challenge/${challenge.articleId}`)} text="Read more" icon="right" color="btn-primary" position="z-50" size="w-fit" />
+					<div className="flex flex-row flex-wrap gap-4 2k:gap-6">
+						<Button type="ahref" href={`/upload/c=${challenge.articleId}`} text="Submit Build" icon="plus" color="btn-accent" position="z-50" size="w-fit" />
+						<Button type="ahref" href={`/challenge/${challenge.articleId}`} text="Read more" icon="right" color="btn-primary" position="z-50" size="w-fit" />
+					</div>
 				</div>
 			</>
 		);

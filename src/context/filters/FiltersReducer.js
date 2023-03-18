@@ -19,6 +19,11 @@ const FiltersReducer = (state, action) => {
 				...state,
 				kspVersions: action.payload,
 			};
+		case 'SET_KSP_CHALLENGES':
+			return {
+				...state,
+				kspChallenges: action.payload,
+			};
 		default:
 			return state;
 	}

@@ -111,20 +111,34 @@ function Build() {
 									</div>
 									<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
 										<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Date Created</p>
-										<p className="text-xl 2k:text-3xl ">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.timestamp.seconds * 1000)}</p>
+										<p className="text-xl 2k:text-3xl text-accent">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.timestamp.seconds * 1000)}</p>
 									</div>
 									<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
 										<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">KSP Version</p>
-										<p className="text-xl 2k:text-3xl ">{loadedBuild.kspVersion}</p>
+										<p className="text-xl 2k:text-3xl text-accent ">{loadedBuild.kspVersion}</p>
 									</div>
 									<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
 										<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Uses Mods</p>
-										<p className="text-xl 2k:text-3xl ">{loadedBuild.modsUsed ? 'Yes' : 'None'}</p>
+										<p className="text-xl 2k:text-3xl text-accent ">{loadedBuild.modsUsed ? 'Yes' : 'None'}</p>
 									</div>
 									<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
 										<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Downloads</p>
-										<p className="text-xl 2k:text-3xl ">{loadedBuild.downloads}</p>
+										<p className="text-xl 2k:text-3xl text-accent ">{loadedBuild.downloads}</p>
 									</div>
+									{loadedBuild.forChallenge && (
+										<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 w-44 lg:w-96 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
+											<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Challenge</p>
+											<Button
+												type="ahref"
+												href={`/challenge/${loadedBuild.forChallenge}`}
+												color="btn-ghost text-accent"
+												css="multi-line-truncate"
+												text={loadedBuild.challengeTitle}
+												size="!text-xl 2k:!text-3xl font-thin !normal-case !h-fit"
+											/>
+											{/* <p className="text-xl 2k:text-3xl text-accent multi-line-truncate">{loadedBuild.challengeTitle}</p> */}
+										</div>
+									)}
 								</div>
 
 								{/* Build Name/ Fav/ Voting/ Views */}

@@ -7,16 +7,16 @@ import FiltersContext from '../../context/filters/FiltersContext';
 import useFilters from '../../context/filters/FiltersActions';
 import useBuilds from '../../context/builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
-import Sort from '../../components/sort/Sort';
-import Spinner1 from '../../components/spinners/Spinner1';
-import BuildCard from '../../components/buildCard/BuildCard';
-import SearchBar from '../../components/search/SearchBar';
-import CantFind from '../../components/cantFind/CantFind';
-import Button from '../../components/buttons/Button';
-import Banner from '../../components/banner/Banner';
+import Sort from '../sort/Sort';
+import Spinner1 from '../spinners/Spinner1';
+import BuildCard from '../buildCard/BuildCard';
+import SearchBar from '../search/SearchBar';
+import CantFind from '../cantFind/CantFind';
+import Button from '../buttons/Button';
+import Banner from '../banner/Banner';
 
 function Builds() {
-	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy, modsFilter } = useContext(FiltersContext);
+	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy, modsFilter, challengeFilter } = useContext(FiltersContext);
 	const { loadingBuilds, fetchedBuilds, lastFetchedBuild, currentPage } = useContext(BuildsContext);
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const { filterBuilds, setTypeFilter, resetFilters } = useFilters();
@@ -46,7 +46,7 @@ function Builds() {
 	// listens for filters and fetches builds based on filter
 	useEffect(() => {
 		fetchBuilds();
-	}, [typeFilter, searchTerm, modsFilter, versionFilter, tagsSearch]);
+	}, [typeFilter, searchTerm, modsFilter, versionFilter, challengeFilter, tagsSearch]);
 
 	if (!loadingBuilds && fetchedBuilds.length === 0) {
 		return <CantFind text="No builds found :("></CantFind>;
@@ -60,7 +60,7 @@ function Builds() {
 				<SearchBar />
 				<Sort />
 			</div>
-			<div className="flex flex-wrap md:grid md:grid-cols-3 xl:grid-cols-4 4k:grid-cols-5 gap-4 xl:gap-8 2k:gap-12 w-full items-center justify-center md:justify-items-center mb-6 p-6 md:p-0">
+			<div className="flex flex-row flex-wrap w-full items-stretch justify-center md:justify-items-center mb-6 p-6 md:p-0">
 				{loadingBuilds ? (
 					<div className="flex flex-row w-full justify-center items-center">
 						<div className="w-20">

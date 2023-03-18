@@ -78,7 +78,7 @@ function Favorites() {
 				<PlanetHeader text="Your Favorites" />
 				<Sort />
 				{!authLoading && user?.username && (
-					<div className="flex flex-wrap md:grid md:grid-cols-3 2k:grid-cols-4 gap-8 2k:gap-16 w-full items-center justify-center md:justify-items-center mb-6 p-6 md:p-0">
+					<div className="flex flex-row flex-wrap w-full items-stretch justify-center md:justify-items-center mb-6 p-6 md:p-0">
 						{loadingBuilds ? (
 							<div className="flex flex-row w-full justify-center items-center">
 								<div className="w-20">

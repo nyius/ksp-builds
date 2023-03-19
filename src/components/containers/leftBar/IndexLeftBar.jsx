@@ -24,6 +24,7 @@ function IndexLeftBar({ text }) {
 		modsSelect.selectedIndex = 0;
 		challengesSelect.selectedIndex = 0;
 		resetFilters();
+		navigate('/');
 	};
 
 	//---------------------------------------------------------------------------------------------------//

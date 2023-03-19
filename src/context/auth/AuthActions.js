@@ -651,8 +651,27 @@ const useAuth = () => {
 				}
 
 				await addDoc(collection(db, 'reports'), report);
-				toast.success('Report submitted. Thanks for helping keep the community safe');
+			} else if (reportType === 'build') {
+				const report = {
+					reportedBuild: reportingContent.name,
+					date: serverTimestamp(),
+					reportedUsername: reportingContent.author,
+					reportedUid: reportingContent.uid,
+					buildId: loadedBuild.id,
+					message: message ? message : '',
+					type: 'build',
+				};
+
+				if (user?.username) {
+					report.username = user.username;
+					report.uid = user.uid;
+				} else {
+					report.username = 'Anonymous';
+				}
+
+				await addDoc(collection(db, 'reports'), report);
 			}
+			toast.success('Report submitted. Thanks for helping keep the community safe');
 		} catch (error) {
 			console.log(error);
 		}

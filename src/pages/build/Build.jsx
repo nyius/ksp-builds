@@ -15,6 +15,7 @@ import draftJsToPlainText from '../../utilities/draftJsToPlainText';
 import BuildContext from '../../context/build/BuildContext';
 import AuthContext from '../../context/auth/AuthContext';
 import useBuild from '../../context/build/BuildActions';
+import useAuth from '../../context/auth/AuthActions';
 //---------------------------------------------------------------------------------------------------//
 import VoteArrows from '../../components/buttons/VoteArrows';
 import Spinner1 from '../../components/spinners/Spinner1';
@@ -33,16 +34,16 @@ import TextEditor from '../../components/textEditor/TextEditor';
 
 function Build() {
 	//---------------------------------------------------------------------------------------------------//
+	const { fetchBuild, setComment, addComment, updateDownloadCount, setEditingBuild, setReplyingComment, setResetTextEditorState } = useBuild();
 	const { loadingBuild, loadedBuild, commentsLoading, comments, editingBuild, replyingComment } = useContext(BuildContext);
 	const { user, authLoading } = useContext(AuthContext);
-	const { fetchBuild, setComment, addComment, updateDownloadCount, setEditingBuild, setReplyingComment, setResetTextEditorState } = useBuild();
 	const [buildDesc, setBuildDesc] = useState(null);
-	const navigate = useNavigate();
-
-	const { id } = useParams();
 
 	const { resetStates } = useResetStates();
 	const location = useLocation();
+	const navigate = useNavigate();
+	const { setReport } = useAuth();
+	const { id } = useParams();
 
 	useEffect(() => {
 		resetStates();
@@ -78,6 +79,13 @@ function Build() {
 	const handleClearComment = () => {
 		setReplyingComment(null);
 		setComment(null);
+	};
+
+	/**
+	 * Handles setting the reported comment
+	 */
+	const handleSetReport = () => {
+		setReport('build', loadedBuild);
 	};
 
 	if (editingBuild) return <Create />;
@@ -179,9 +187,10 @@ function Build() {
 
 								{/* Buttons */}
 								<div className="flex flex-col md:flex-row place-content-between">
-									<div className="flex flex-ro flex-wrap gap-4 mb-10">
+									<div className="flex flex-col sm:flex-row flex-wrap gap-4 mb-10">
 										{loadedBuild.build ? <Button color="btn-primary" icon="export" onClick={copyBuildToClipboard} text="Export to KSP 2" /> : <Button text="Build not found!" color="btn-error" icon="cancel" />}
 										<Button text="How to import into KSP" color="bg-base-900" htmlFor="how-to-paste-build-modal" icon="help" />
+										<Button htmlFor="report-modal" color="btn-error" icon="report" text="Report" onClick={handleSetReport} />
 									</div>
 									{!authLoading && (user?.uid === loadedBuild.uid || user?.siteAdmin) && (
 										<div className="flex flex-row flex-wrap gap-4">

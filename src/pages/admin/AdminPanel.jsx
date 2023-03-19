@@ -321,6 +321,13 @@ function AdminPanel() {
 											</p>
 										)}
 
+										{report.reportedBuild && (
+											<p className="text-xl 2k:text-2xl text-slate-200">
+												<span className="italic text-slate-400"> Reported Build: </span>
+												{report.reportedBuild}
+											</p>
+										)}
+
 										<div className="flex flex-row gap-2">
 											<Button text="Delete" size="w-fit" icon="delete" onClick={() => deleteReport(report.id, i)} />
 											{report.uid && <Button text="Reply" size="w-fit" icon="upload" onClick={() => setReplying({ uid: report.uid, i, id: report.id })} />}

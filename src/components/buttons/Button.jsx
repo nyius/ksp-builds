@@ -7,7 +7,7 @@ import { TiExport, TiPlusOutline } from 'react-icons/ti';
 import { RiDeleteBin2Fill, RiEditFill, RiLoginCircleLine } from 'react-icons/ri';
 import { BsFillPatchQuestionFill, BsFillArrowDownSquareFill, BsFillArrowLeftSquareFill, BsFillArrowRightSquareFill, BsCaretRightFill, BsCaretLeftFill } from 'react-icons/bs';
 import { BiCommentAdd, BiReset } from 'react-icons/bi';
-import { MdOutlineDoneOutline, MdEmail, MdSettingsInputComponent } from 'react-icons/md';
+import { MdOutlineDoneOutline, MdEmail, MdSettingsInputComponent, MdReport } from 'react-icons/md';
 import { FcGoogle } from 'react-icons/fc';
 import { HiNewspaper } from 'react-icons/hi';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
@@ -58,6 +58,7 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 		if (icon === 'news') return <HiNewspaper />;
 		if (icon === 'fill-heart') return <AiFillHeart />;
 		if (icon === 'outline-heart') return <AiOutlineHeart />;
+		if (icon === 'report') return <MdReport />;
 	};
 
 	// The button is a label becuase then we can use htmlFor tag to open modals. Not sure if this breaks things but it seems to work fine

@@ -640,6 +640,7 @@ const useAuth = () => {
 					reportedCommentId: reportingContent.id,
 					buildId: loadedBuild.id,
 					message: message ? message : '',
+					type: 'comment',
 				};
 
 				if (user?.username) {

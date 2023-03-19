@@ -1,32 +1,38 @@
 import React, { useEffect, useState, useContext } from 'react';
-import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
-import PlanetHeader from '../../components/header/PlanetHeader';
-import { db } from '../../firebase.config';
 import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, getDoc, getCountFromServer } from 'firebase/firestore';
-import Button from '../../components/buttons/Button';
-import TextInput from '../../components/input/TextInput';
-import { toast } from 'react-toastify';
-import Spinner1 from '../../components/spinners/Spinner1';
-import TextEditor from '../../components/textEditor/TextEditor';
-import standardNotifications from '../../utilities/standardNotifications';
-import AuthContext from '../../context/auth/AuthContext';
-import useAuth from '../../context/auth/AuthActions';
+import { db } from '../../firebase.config';
 import { cloneDeep } from 'lodash';
 import { Helmet } from 'react-helmet';
+import { toast } from 'react-toastify';
+//---------------------------------------------------------------------------------------------------//
+import AuthContext from '../../context/auth/AuthContext';
+import useAuth from '../../context/auth/AuthActions';
+//---------------------------------------------------------------------------------------------------//
+import standardNotifications from '../../utilities/standardNotifications';
+//---------------------------------------------------------------------------------------------------//
+import TextInput from '../../components/input/TextInput';
+import Button from '../../components/buttons/Button';
+import Spinner1 from '../../components/spinners/Spinner1';
+import TextEditor from '../../components/textEditor/TextEditor';
+import PlanetHeader from '../../components/header/PlanetHeader';
+import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 
 function AdminPanel() {
 	const { user } = useContext(AuthContext);
 	const { sendNotification } = useAuth();
-
-	const [reports, setReports] = useState([]);
-	const [versions, setVersions] = useState([]);
-	const [newVersion, setNewVersion] = useState('');
-	const [stats, setStats] = useState(null);
-	const [statsLoading, setStatsLoading] = useState(true);
-	const [infoLoading, setInfoLoading] = useState(true);
+	//---------------------------------------------------------------------------------------------------//
+	const [reportRepliedFilter, setReportRepliedFilter] = useState(false);
 	const [messagesLoading, setMessagesLoading] = useState(true);
 	const [replying, setReplying] = useState({ uid: '', i: '' });
+	const [siteNotification, setSiteNotification] = useState('');
+	const [sortedReports, setSortedReports] = useState([]);
+	const [statsLoading, setStatsLoading] = useState(true);
+	const [infoLoading, setInfoLoading] = useState(true);
 	const [replyMessage, setReplyMessage] = useState('');
+	const [newVersion, setNewVersion] = useState('');
+	const [versions, setVersions] = useState([]);
+	const [reports, setReports] = useState([]);
+	const [stats, setStats] = useState(null);
 
 	useEffect(() => {
 		const fetchMessages = async () => {
@@ -95,6 +101,15 @@ function AdminPanel() {
 		}
 	};
 
+	useEffect(() => {
+		setSortedReports(prevState => {
+			return reports.filter(report => {
+				if (!reportRepliedFilter) return report;
+				if (reportRepliedFilter && !report.replied) return report;
+			});
+		});
+	}, [reports, reportRepliedFilter]);
+
 	/**
 	 * Handles deleting the report
 	 * @param {*} id
@@ -124,9 +139,12 @@ function AdminPanel() {
 			newNotif.timestamp = new Date();
 			newNotif.profilePicture = user.profilePicture;
 			newNotif.message = replyMessage;
-
-			// If we're replying to someones comment, give that user a notification
 			newNotif.type = 'message';
+			delete newNotif.buildId;
+			delete newNotif.buildName;
+			delete newNotif.comment;
+			delete newNotif.commentId;
+
 			await sendNotification(replying.uid, newNotif);
 			await updateDoc(doc(db, 'reports', replying.id), { replied: true });
 
@@ -144,9 +162,46 @@ function AdminPanel() {
 		}
 	};
 
+	/**
+	 * handles clearing a reply
+	 */
 	const handleClearReply = () => {
 		setReplying({ uid: '', i: '' });
 		setReplyMessage('');
+	};
+
+	/**
+	 * Handles sending a message to everyone on the site
+	 */
+	const sendSiteMessage = async () => {
+		try {
+			if (siteNotification === '') {
+				toast.error('Forgot a message');
+				return;
+			}
+
+			const usersRef = collection(db, 'users');
+			const usersSnap = await getDocs(usersRef);
+
+			const newNotif = cloneDeep(standardNotifications);
+			newNotif.uid = user.uid;
+			newNotif.username = user.username;
+			newNotif.timestamp = new Date();
+			newNotif.profilePicture = user.profilePicture;
+			newNotif.message = siteNotification;
+			newNotif.type = 'message';
+			delete newNotif.buildId;
+			delete newNotif.buildName;
+			delete newNotif.comment;
+			delete newNotif.commentId;
+
+			usersSnap.forEach(user => {
+				sendNotification(user.id, newNotif);
+			});
+			toast.success('Message sent!');
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	//---------------------------------------------------------------------------------------------------//
@@ -179,49 +234,74 @@ function AdminPanel() {
 					)}
 				</div>
 
-				{/* Versopms */}
+				{/* ------------------Versions------------------ */}
 				{infoLoading ? (
 					<Spinner1 />
 				) : (
 					<>
-						<p className="text-2xl 2k:text-4xl font-bold">Add a new KSP version</p>
+						<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Add a new KSP version</p>
 						<TextInput onChange={e => setNewVersion(e.target.value)} placeholder="Version" size="w-44" />
 						<Button text="submit" icon="upload" onClick={submitNewVersion} margin="mb-10 2k:mb-20" size="w-fit" color="btn-primary" />
 					</>
 				)}
 
-				{/* Reports */}
+				{/* ------------------ Site Notification ---------------------- */}
+				<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Send Site-wide message</p>
+				<TextEditor setState={setSiteNotification} />
+				<Button text="send" color="btn-primary" icon="upload" size="w-fit" onClick={sendSiteMessage} />
+
+				{/* ------------------ Reports---------------------- */}
+				<div className="flex flex-row place-content-between mt-10 2k:mt-20">
+					<p className="text-2xl 2k:text-4xl font-bold text-slate-200">Reports/Messages</p>
+					<div className="flex flex-row gap-4">
+						<p className="text-xl 2k:text-3xl">Hide Replied Reports</p>
+						<input type="checkbox" className="checkbox checkbox-lg" onChange={() => setReportRepliedFilter(!reportRepliedFilter)} />
+					</div>
+				</div>
 				<div className="flex flex-col gap-10">
 					{messagesLoading ? (
 						<Spinner1 />
 					) : (
 						<>
 							{reports.length === 0 && <p className="text-2xl 2k:text-4xl font-bold mb-10 2k:mb-20">No Reports</p>}
-							{reports.map((report, i) => {
+							{sortedReports.map((report, i) => {
 								return (
 									<div key={i} className="flex flex-col w-full h-fit p-5 2k:p-10 bg-base-200 gap-10 rounded-xl relative">
-										<div className="absolute right-0 top-0">
+										{/* Replied badge */}
+										<div className="absolute right-2 top-2">
 											<div className={`alert ${report.replied ? 'alert-success' : 'alert-error'} font-bold shadow-lg`}>
 												<div>{report.replied ? <p className="text-xl 2k:text-2xl">Replied</p> : <p className="text-xl 2k:text-2xl">Not Replied</p>}</div>
 											</div>
 										</div>
-										<p className="text-xl 2k:text-2xl">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(report.date.seconds * 1000)}</p>
+
+										{/* date/type */}
+										<div className="flex flex-row gap-5 2k:gap-10">
+											<p className="text-xl 2k:text-2xl">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(report.date.seconds * 1000)}</p>
+											<div className={`badge ${report.type === 'contact' && 'badge-primary'} ${report.type === 'comment' && 'badge-secondary'} ${report.type === 'build' && 'badge-accent'} p-4 2k:p-6 text-xl 2k:text-3xl`}>
+												{report.type}
+											</div>
+										</div>
+
+										{/* Submitter Username */}
 										<p className="text-xl 2k:text-2xl text-slate-100">
 											<span className="italic text-slate-400"> Username: </span> {report.username}
 										</p>
 
+										{/* Submitter name */}
 										{report.name && (
 											<p className="text-xl 2k:text-2xl text-slate-100">
 												<span className="italic text-slate-400"> Name: </span> {report.name}
 											</p>
 										)}
 
+										{/* Submitter email */}
 										{report.email && (
 											<p className="text-xl 2k:text-2xl text-slate-100">
 												<span className="italic text-slate-400"> Email: </span> {report.email}
 											</p>
 										)}
 
+										{/* Submitters messge */}
 										<p className="text-xl 2k:text-2xl text-slate-200">
 											<span className="italic text-slate-400"> Message: </span>
 											{report.message}

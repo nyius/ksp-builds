@@ -24,6 +24,7 @@ function Contact() {
 		email: '',
 		uid: '',
 		replied: false,
+		type: 'contact',
 	});
 
 	const { user } = useContext(AuthContext);

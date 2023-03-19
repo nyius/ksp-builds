@@ -5,11 +5,17 @@ import useAuth from '../../context/auth/AuthActions';
 import UsernameLink from '../buttons/UsernameLink';
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
 import createMarkup from '../../utilities/createMarkup';
+import { convertFromRaw, EditorState } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
 
 function Notification({ i, notif }) {
 	const [timestamp, setTimestamp] = useState(null);
 	const navigate = useNavigate();
 	const { handleDeleteNotification } = useAuth();
+	let editorState;
+
+	if (notif.type === 'message' || notif.type === 'welcome') editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(notif.message)));
+	if (notif.type === 'reply' || notif.type === 'comment') editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(notif.comment)));
 
 	useEffect(() => {
 		if (notif?.timestamp?.seconds) {
@@ -46,20 +52,20 @@ function Notification({ i, notif }) {
 			{notif.type === 'comment' && (
 				<>
 					<p className="text-lg 2k:text-2xl text-slate-400 italic 2k:mb-3">Someone commented on one of your builds</p>
-					<p className="text-xl 2k:text-3xl multi-line-truncate">{draftJsToPlainText(notif.comment)}</p>
+					<Editor editorState={editorState} readOnly={true} toolbarHidden={true} />
 				</>
 			)}
 			{notif.type === 'reply' && (
 				<>
 					<p className="text-lg 2k:text-2xl text-slate-400 italic 2k:mb-3">Someone replied to one of your comments</p>
-					<p className="text-xl 2k:text-3xl multi-line-truncate">{draftJsToPlainText(notif.comment)}</p>
+					<Editor editorState={editorState} readOnly={true} toolbarHidden={true} />
 				</>
 			)}
 			{notif.type === 'welcome' && (
 				<div className="text-xl 2k:text-2xl">
 					<>
 						<p className="text-lg 2k:text-2xl text-slate-400 italic 2k:mb-3">Welcome!</p>
-						<p className="text-xl 2k:text-3xl">{draftJsToPlainText(notif.message)}</p>
+						<Editor editorState={editorState} readOnly={true} toolbarHidden={true} />
 					</>
 				</div>
 			)}
@@ -67,7 +73,7 @@ function Notification({ i, notif }) {
 				<div className="text-xl 2k:text-2xl">
 					<>
 						<p className="text-lg 2k:text-2xl text-slate-400 italic 2k:mb-3">You have a new message</p>
-						<p className="text-xl 2k:text-3xl">{draftJsToPlainText(notif.message)}</p>
+						<Editor editorState={editorState} readOnly={true} toolbarHidden={true} />
 					</>
 				</div>
 			)}

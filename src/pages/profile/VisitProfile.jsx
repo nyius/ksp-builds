@@ -51,7 +51,7 @@ function VisitProfile() {
 		let newFetchedBuilds = cloneDeep(fetchedBuilds);
 
 		setSortedBuilds(filterBuilds(newFetchedBuilds));
-	}, [fetchBuilds, sortBy]);
+	}, [fetchedBuilds, sortBy]);
 
 	//---------------------------------------------------------------------------------------------------//
 	if (fetchingProfile) {

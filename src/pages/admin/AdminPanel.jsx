@@ -202,23 +202,49 @@ function AdminPanel() {
 									<div key={i} className="flex flex-col w-full h-fit p-5 2k:p-10 bg-base-200 gap-10 rounded-xl relative">
 										<div className="absolute right-0 top-0">
 											<div className={`alert ${report.replied ? 'alert-success' : 'alert-error'} font-bold shadow-lg`}>
-												<div>{report.replied ? <p className="text-xl 2k:text-2xl">Replied</p> : <p className="text-xl 2k:text-2xl">Havent Replied</p>}</div>
+												<div>{report.replied ? <p className="text-xl 2k:text-2xl">Replied</p> : <p className="text-xl 2k:text-2xl">Not Replied</p>}</div>
 											</div>
 										</div>
 										<p className="text-xl 2k:text-2xl">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(report.date.seconds * 1000)}</p>
 										<p className="text-xl 2k:text-2xl text-slate-100">
 											<span className="italic text-slate-400"> Username: </span> {report.username}
 										</p>
-										<p className="text-xl 2k:text-2xl text-slate-100">
-											<span className="italic text-slate-400"> Name: </span> {report.name}
+
+										{report.name && (
+											<p className="text-xl 2k:text-2xl text-slate-100">
+												<span className="italic text-slate-400"> Name: </span> {report.name}
+											</p>
+										)}
+
+										{report.email && (
+											<p className="text-xl 2k:text-2xl text-slate-100">
+												<span className="italic text-slate-400"> Email: </span> {report.email}
+											</p>
+										)}
+
+										<p className="text-xl 2k:text-2xl text-slate-200">
+											<span className="italic text-slate-400"> Message: </span>
+											{report.message}
 										</p>
-										<p className="text-xl 2k:text-2xl text-slate-100">
-											<span className="italic text-slate-400"> Email: </span> {report.email}
-										</p>
-										<p className="text-xl 2k:text-2xl text-slate-300">{report.comment}</p>
+
+										{report.reportedUsername && (
+											<p className="text-xl 2k:text-2xl text-slate-200">
+												<span className="italic text-slate-400"> Reported username: </span>
+												{report.reportedUsername}
+											</p>
+										)}
+
+										{report.reportedComment && (
+											<p className="text-xl 2k:text-2xl text-slate-200">
+												<span className="italic text-slate-400"> Reported Comment: </span>
+												{report.reportedComment}
+											</p>
+										)}
+
 										<div className="flex flex-row gap-2">
 											<Button text="Delete" size="w-fit" icon="delete" onClick={() => deleteReport(report.id, i)} />
-											<Button text="Reply" size="w-fit" icon="upload" onClick={() => setReplying({ uid: report.uid, i, id: report.id })} />
+											{report.uid && <Button text="Reply" size="w-fit" icon="upload" onClick={() => setReplying({ uid: report.uid, i, id: report.id })} />}
+											{report.buildId && <Button type="ahref" href={`/build/${report.buildId}`} text="Go to build" size="w-fit" icon="right2" />}
 										</div>
 
 										{replying.i === i && <TextEditor setState={setReplyMessage} />}

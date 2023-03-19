@@ -4,6 +4,7 @@ import { signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 import { googleProvider } from '../../firebase.config';
 import { auth } from '../../firebase.config';
 import { deleteUser, getAuth } from 'firebase/auth';
+import BuildContext from '../build/BuildContext';
 import { useContext } from 'react';
 import AuthContext from './AuthContext';
 import { cloneDeep, update } from 'lodash';
@@ -13,9 +14,11 @@ import standardNotifications from '../../utilities/standardNotifications';
 import standardUserProfile from '../../utilities/standardUserProfile';
 import { uploadImage } from '../../utilities/uploadImage';
 import { v4 as uuidv4 } from 'uuid';
+import draftJsToPlainText from '../../utilities/draftJsToPlainText';
 
 const useAuth = () => {
-	const { dispatchAuth, user, accountToDelete, newUsername, newBio, editingProfile, verifyChangeUsername, fetchedUserProfile, lastFetchedNotification } = useContext(AuthContext);
+	const { dispatchAuth, user, accountToDelete, newUsername, newBio, reportingContent, reportType, fetchedUserProfile, lastFetchedNotification } = useContext(AuthContext);
+	const { loadedBuild } = useContext(BuildContext);
 
 	/**
 	 * Handles when a user signs up with google and neeeds to enter a username
@@ -609,6 +612,51 @@ const useAuth = () => {
 		}
 	};
 
+	/**
+	 * Handles setting a report
+	 */
+	const setReport = (type, content) => {
+		dispatchAuth({
+			type: 'SET_REPORT',
+			payload: {
+				reportingContent: content,
+				reportType: type,
+			},
+		});
+	};
+
+	/**
+	 * Handles submitting a report. Takes in an optional message
+	 * * @param {*} message
+	 */
+	const submitReport = async message => {
+		try {
+			if (reportType === 'comment') {
+				const report = {
+					reportedComment: draftJsToPlainText(reportingContent.comment),
+					date: serverTimestamp(),
+					reportedUsername: reportingContent.username,
+					reportedUid: reportingContent.uid,
+					reportedCommentId: reportingContent.id,
+					buildId: loadedBuild.id,
+					message: message ? message : '',
+				};
+
+				if (user?.username) {
+					report.username = user.username;
+					report.uid = user.uid;
+				} else {
+					report.username = 'Anonymous';
+				}
+
+				await addDoc(collection(db, 'reports'), report);
+				toast.success('Report submitted. Thanks for helping keep the community safe');
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	return {
 		handleVoting,
 		handleDeleteNotification,
@@ -621,6 +669,7 @@ const useAuth = () => {
 		setNotificationsRead,
 		setEditingProfile,
 		setAccountToDelete,
+		setReport,
 		updateUserState,
 		updateUserDbBio,
 		updateUserDbProfilePic,
@@ -633,6 +682,7 @@ const useAuth = () => {
 		loginWithGoogle,
 		newEmailAccount,
 		sendNotification,
+		submitReport,
 	};
 };
 

@@ -128,6 +128,8 @@ export const AuthProvider = ({ children }) => {
 		fetchedUserProfile: null,
 		resetPasswordState: false,
 		accountToDelete: null,
+		reportingContent: null,
+		reportType: '',
 	};
 
 	// Set up the reducer

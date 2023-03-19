@@ -140,6 +140,12 @@ const AuthReducer = (state, action) => {
 				...state,
 				resetPasswordState: action.payload,
 			};
+		case 'SET_REPORT':
+			return {
+				...state,
+				reportingContent: action.payload.reportingContent,
+				reportType: action.payload.reportType,
+			};
 		default:
 			return state;
 	}

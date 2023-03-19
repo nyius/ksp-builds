@@ -3,6 +3,7 @@ import React, { useContext, useState } from 'react';
 import AuthContext from '../../context/auth/AuthContext';
 import useBuild from '../../context/build/BuildActions';
 import BuildContext from '../../context/build/BuildContext';
+import useAuth from '../../context/auth/AuthActions';
 //---------------------------------------------------------------------------------------------------//
 import { convertFromRaw, EditorState } from 'draft-js';
 import TextEditor from '../textEditor/TextEditor';
@@ -18,6 +19,7 @@ import UsernameLink from '../buttons/UsernameLink';
  */
 function Comment({ comment }) {
 	const { user, authLoading } = useContext(AuthContext);
+	const { setReport } = useAuth();
 	const { loadedBuild, editingComment } = useContext(BuildContext);
 	const [editedComment, setEditedComment] = useState('');
 	const { deleteComment, updateComment, fetchComments, setEditingComment, setReplyingComment } = useBuild();
@@ -33,6 +35,13 @@ function Comment({ comment }) {
 		setEditedComment(false);
 		setEditingComment(false);
 		await fetchComments(loadedBuild.id);
+	};
+
+	/**
+	 * Handles setting the reported comment
+	 */
+	const handleSetReport = () => {
+		setReport('comment', comment);
 	};
 
 	//---------------------------------------------------------------------------------------------------//
@@ -91,7 +100,7 @@ function Comment({ comment }) {
 							</p>
 						</>
 					)}
-					<label htmlFor="report-modal" className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
+					<label htmlFor="report-modal" className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl" onClick={handleSetReport}>
 						Report
 					</label>
 				</div>

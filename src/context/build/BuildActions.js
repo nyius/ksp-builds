@@ -685,31 +685,33 @@ const useBuild = () => {
 
 				// Give all of the following users a notification
 				// Handle nofitications
-				const newNotif = { ...standardNotifications };
-				newNotif.buildId = newId;
-				newNotif.buildName = loadedBuild.name;
-				newNotif.uid = loadedBuild.uid;
-				newNotif.username = loadedBuild.author;
-				newNotif.timestamp = new Date();
-				newNotif.thumbnail = loadedBuild.thumbnail;
-				newNotif.type = 'newBuild';
+				if (build.visibility === 'public') {
+					const newNotif = { ...standardNotifications };
+					newNotif.buildId = newId;
+					newNotif.buildName = loadedBuild.name;
+					newNotif.uid = loadedBuild.uid;
+					newNotif.username = loadedBuild.author;
+					newNotif.timestamp = new Date();
+					newNotif.thumbnail = loadedBuild.thumbnail;
+					newNotif.type = 'newBuild';
 
-				const userProfileData = await getDoc(doc(db, 'userProfiles', user.uid));
-				const userProfile = userProfileData.data();
-				const followers = userProfile.followers;
+					const userProfileData = await getDoc(doc(db, 'userProfiles', user.uid));
+					const userProfile = userProfileData.data();
+					const followers = userProfile.followers;
 
-				if (followers) {
-					followers.map(follower => {
-						const sendNotif = async () => {
-							try {
-								await sendNotification(follower, newNotif);
-							} catch (error) {
-								console.log(error);
-							}
-						};
+					if (followers) {
+						followers.map(follower => {
+							const sendNotif = async () => {
+								try {
+									await sendNotification(follower, newNotif);
+								} catch (error) {
+									console.log(error);
+								}
+							};
 
-						sendNotif();
-					});
+							sendNotif();
+						});
+					}
 				}
 
 				toast.success('Build created!');

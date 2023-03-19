@@ -523,7 +523,7 @@ function Upload() {
 									{editingBuild ? (
 										<div className="flex flex-row gap-4 2k:gap-10">
 											<Button type="button" text="Save" icon="save" color="btn-success" onClick={handleUpdateBuild} />
-											<Button htmlFor="cancel-build-edit" text="Cancel" icon="cancel" color="btn-warning" />
+											<Button htmlFor="cancel-build-edit" text="Cancel" icon="cancel" color="btn-error" />
 										</div>
 									) : (
 										<Button type="submit" text="Submit" color="btn-primary" icon="upload" />

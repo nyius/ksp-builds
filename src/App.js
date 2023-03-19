@@ -28,14 +28,10 @@ Mission generation page
 send notifications to all users (like news)
 folders
 Go to a user like /nyius
-Mods are a list
 FAQ Page
 upload image for comments
 button closing notifications tab when clicked
 Quick share builds (without needing to create a whole build)
-home page Builds should probably fetch by default view count 
-'uses mods' filter
-weekly Challenge tag to submit builds for a challenge 
  */
 
 //---------------------------------------------------------------------------------------------------//

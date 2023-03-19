@@ -183,24 +183,22 @@ const useBuild = () => {
 			});
 
 			// if the build changed, update AWS
-			if (JSON.stringify(editingBuild.build) !== buildJSON) {
-				if (process.env.REACT_APP_ENV !== 'DEV') {
-					const compressedBuild = compressToEncodedURIComponent(buildJSON);
+			if (process.env.REACT_APP_ENV !== 'DEV') {
+				const compressedBuild = compressToEncodedURIComponent(buildJSON);
 
-					// update the raw build on aws
-					const command = new PutObjectCommand({
-						Bucket: process.env.REACT_APP_BUCKET,
-						Key: `${build.id}.json`,
-						Body: compressedBuild,
-						ContentEncoding: 'base64',
-						ContentType: 'application/json',
-						ACL: 'public-read',
-					});
+				// update the raw build on aws
+				const command = new PutObjectCommand({
+					Bucket: process.env.REACT_APP_BUCKET,
+					Key: `${build.id}.json`,
+					Body: compressedBuild,
+					ContentEncoding: 'base64',
+					ContentType: 'application/json',
+					ACL: 'public-read',
+				});
 
-					const response = await s3Client.send(command);
+				const response = await s3Client.send(command);
 
-					build.build = JSON.parse(buildJSON);
-				}
+				build.build = JSON.parse(buildJSON);
 			}
 
 			dispatchBuild({

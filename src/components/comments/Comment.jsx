@@ -91,6 +91,9 @@ function Comment({ comment }) {
 							</p>
 						</>
 					)}
+					<label htmlFor="report-modal" className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
+						Report
+					</label>
 				</div>
 			</div>
 		</div>

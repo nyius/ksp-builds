@@ -40,14 +40,14 @@ function Banner() {
 		<>
 			{!articlesLoading && challenges && (
 				<div className="banner flex flex-row w-full p-4 2k:p-8 bg-base-900 rounded-lg mb-10 overflow-hidden relative place-content-between ">
-					<Button icon="left2" size="h-44 !h-fit sm:!h-full" onClick={handlePrevSlide} position="z-60 absolute sm:relative top-1/2 sm:top-0 left-0 translate-x-1/2 sm:-translate-x-0 -translate-y-1/2 sm:-translate-y-0 " />
+					<Button icon="left2" size="h-44 !h-fit sm:!h-full" onClick={handlePrevSlide} position="z-60 absolute sm:relative top-1/2 sm:top-0 left-10 sm:left-0" />
 					<div className="w-full h-full flex flex-col sm:flex-row items-center gap-10 2k:gap-20 ">
 						{challenges.map((challenge, i) => {
 							return <ChallengeCard currentSlide={currentSlide} i={i} key={i} challenge={challenge} />;
 						})}
 					</div>
 					<img src={Planet} className="absolute hidden sm:block inset-x-2/3 inset-y-1/4 w-5/12" alt="Planet image" />
-					<Button icon="right2" size="h-44 !h-fit sm:!h-full" onClick={handleNextSlide} position="z-50 absolute sm:relative top-1/2 sm:top-0 right-0 -translate-x-1/2 sm:-translate-x-0 -translate-y-1/2 sm:-translate-y-0 " />
+					<Button icon="right2" size="h-44 !h-fit sm:!h-full" onClick={handleNextSlide} position="z-50 absolute sm:relative top-1/2 sm:top-0 right-10 sm:right-0" />
 				</div>
 			)}
 		</>

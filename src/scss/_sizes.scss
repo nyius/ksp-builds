@@ -95,13 +95,25 @@
 }
 
 .notifications {
-	width: 25rem;
+	width: 80vw;
 	max-height: 50rem;
+}
+
+@media (min-width: 641px) {
+	.notifications {
+		width: 60vw;
+	}
 }
 
 @media (min-width: 1025px) {
 	.notifications {
-		width: 40rem;
+		width: 50vw;
+	}
+}
+
+@media (min-width: 1281px) {
+	.notifications {
+		width: 30vw;
 	}
 }
 

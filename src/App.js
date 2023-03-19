@@ -25,7 +25,6 @@ search that searches the database, not just loaded builds
 reporting
 email verification?
 Mission generation page
-send notifications to all users (like news)
 folders
 Go to a user like /nyius
 FAQ Page

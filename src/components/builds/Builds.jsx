@@ -76,9 +76,18 @@ function Builds() {
 				)}
 			</div>
 
-			<div className="flex flex-row w-full justify-center items-center gap-2 2k:gap-4">
-				{!loadingBuilds && currentPage > 0 && <Button icon="left" onClick={() => goBackPage(currentPage - 1)} color="bg-base-900 text-white" text="Prev" />}
-				{!loadingBuilds && fetchedBuilds.length == process.env.REACT_APP_BUILDS_FETCH_NUM && <Button icon="right" onClick={() => fetchMoreBuilds(process.env.REACT_APP_BUILDS_FETCH_NUM)} color="bg-base-900 text-white" text="Next" />}
+			<div className="btn-group w-full justify-center items-center">
+				{!loadingBuilds && currentPage > 0 && (
+					<button className="btn btn-lg text-xl 2k:text-2xl" onClick={() => goBackPage(currentPage - 1)}>
+						«
+					</button>
+				)}
+				<button className="btn btn-lg text-xl 2k:text-2xl">Page {currentPage + 1}</button>
+				{!loadingBuilds && fetchedBuilds.length == process.env.REACT_APP_BUILDS_FETCH_NUM && (
+					<button className="btn btn-lg text-xl 2k:text-2xl" onClick={() => fetchMoreBuilds(process.env.REACT_APP_BUILDS_FETCH_NUM)}>
+						»
+					</button>
+				)}
 			</div>
 		</>
 	);

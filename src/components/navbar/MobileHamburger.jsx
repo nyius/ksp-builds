@@ -32,6 +32,7 @@ function MobileHamburger() {
 				{!authLoading && !user?.username && <Button type="ahref" href="/sign-up" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Create Account" />}
 				{!authLoading && user?.username && <Button type="ahref" href="/favorites" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" />}
 				<Button type="ahref" href="/upload" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="plus" text="Upload" onClick={handleUploadNavigate} />
+				<Button type="ahref" href="/faq" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="F.A.Q" icon="help" />
 				<Button type="ahref" href="/news" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="News" icon="news" />
 				<Button type="ahref" href="/contact" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="Contact" icon="email" />
 			</ul>

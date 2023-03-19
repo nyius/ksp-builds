@@ -7,7 +7,7 @@ import PublicRoute from './routes/PublicRoute';
 import AdminRoute from './routes/AdminRoute';
 import backgroundplanet from './assets/planet.png';
 //---------------------------------------------------------------------------------------------------//
-import { Index, SignUp, Build, NotFound, Upload, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, Challenge, UnderConstruction } from './pages';
+import { Index, SignUp, Build, NotFound, Upload, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, Challenge, Faq, UnderConstruction } from './pages';
 import RightBar from './components/containers/rightBar/RightBar';
 //---------------------------------------------------------------------------------------------------//
 import { Navbar, Footer } from './components';
@@ -62,6 +62,7 @@ function App() {
 										<Route exact path="/privacy" element={<Privacy />} />
 										<Route exact path="/terms" element={<Terms />} />
 										<Route exact path="/news" element={<News />} />
+										<Route exact path="/faq" element={<Faq />} />
 										<Route exact path="/contact" element={<Contact />} />
 										<Route exact path="/challenge/:id" element={<Challenge />} />
 										<Route exact path="/profile/:id" element={<VisitProfile />} />

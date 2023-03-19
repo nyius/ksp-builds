@@ -60,8 +60,9 @@ function NavBar() {
 					<Button type="ahref" href="/upload" onClick={handleUploadNavigate} color="btn-accent" css="text-white hidden md:flex" text="Upload" icon="plus" />
 					<Button type="ahref" href="/news" css="text-white hidden lg:flex" text="News" icon="news" />
 					<Button type="ahref" href="/contact" css="text-white hidden lg:flex" text="Contact" icon="email" />
+					<Button type="ahref" href="/faq" css="text-white hidden lg:flex" text="F.A.Q" icon="help" />
 					<CreateBuildAdmin />
-					<Button text="How to upload" icon="help" css="hidden lg:flex" htmlFor="how-to-copy-build-modal" />
+					<Button text="How to upload" icon="info" color="text-white" css="hidden lg:flex" htmlFor="how-to-copy-build-modal" />
 				</ul>
 
 				<div className="flex flex-row items-end">

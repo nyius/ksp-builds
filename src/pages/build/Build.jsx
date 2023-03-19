@@ -189,7 +189,7 @@ function Build() {
 								<div className="flex flex-col md:flex-row place-content-between">
 									<div className="flex flex-col sm:flex-row flex-wrap gap-4 mb-10">
 										{loadedBuild.build ? <Button color="btn-primary" icon="export" onClick={copyBuildToClipboard} text="Export to KSP 2" /> : <Button text="Build not found!" color="btn-error" icon="cancel" />}
-										<Button text="How to import into KSP" color="bg-base-900" htmlFor="how-to-paste-build-modal" icon="help" />
+										<Button text="How to import into KSP" color="bg-base-900" htmlFor="how-to-paste-build-modal" icon="info" />
 										<Button htmlFor="report-modal" color="btn-error" icon="report" text="Report" onClick={handleSetReport} />
 									</div>
 									{!authLoading && (user?.uid === loadedBuild.uid || user?.siteAdmin) && (

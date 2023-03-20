@@ -27,7 +27,6 @@ email verification?
 Mission generation page
 folders
 Go to a user like /nyius
-FAQ Page
 upload image for comments
 button closing notifications tab when clicked
 Quick share builds (without needing to create a whole build)

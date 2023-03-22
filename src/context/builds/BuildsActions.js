@@ -34,13 +34,18 @@ const useBuilds = () => {
 
 			if (!buildsToFetchCopy) {
 				// Create a query
-				const constraints = [where('visibility', '==', 'public'), orderBy('views', 'desc'), limit(process.env.REACT_APP_BUILDS_FETCH_NUM)];
+				const constraints = [where('visibility', '==', 'public'), limit(process.env.REACT_APP_BUILDS_FETCH_NUM)];
 
 				if (versionFilter !== 'any') constraints.unshift(where('kspVersion', '==', versionFilter));
 				if (typeFilter !== '') constraints.unshift(where('type', 'array-contains', typeFilter));
 				if (modsFilter == 'yes') constraints.unshift(where('modsUsed', '==', true));
 				if (modsFilter == 'no') constraints.unshift(where('modsUsed', '==', false));
 				if (challengeFilter !== 'any') constraints.unshift(where('forChallenge', '==', challengeFilter));
+				if (sortBy == 'views') constraints.unshift(orderBy('views', 'desc'));
+				if (sortBy == 'date_newest') constraints.unshift(orderBy('timestamp', 'desc'));
+				if (sortBy == 'date_oldest') constraints.unshift(orderBy('timestamp', 'asc'));
+				if (sortBy == 'upVotes') constraints.unshift(orderBy('upVotes', 'desc'));
+				if (sortBy == 'comments') constraints.unshift(orderBy('commentCount', 'desc'));
 				q = query(buildsRef, ...constraints);
 
 				const buildsSnap = await getDocs(q);
@@ -65,10 +70,15 @@ const useBuilds = () => {
 				// by using splice, we alter the original input 'buildsToFetchCopy' arr by removing 10 at a time
 				while (buildsToFetchCopy.length) {
 					const batch = buildsToFetchCopy.splice(0, 10);
-					const constraints = [where('id', 'in', batch), orderBy('timestamp', 'desc')];
+					const constraints = [where('id', 'in', batch)];
 
 					// if the builds were fetching isnt the current users, only fetch builds that are listed as public
 					if (fetchUid !== user.uid) constraints.unshift(where('visibility', '==', 'public'));
+					if (sortBy == 'views') constraints.unshift(orderBy('views', 'desc'));
+					if (sortBy == 'date_newest') constraints.unshift(orderBy('timestamp', 'desc'));
+					if (sortBy == 'date_oldest') constraints.unshift(orderBy('timestamp', 'asc'));
+					if (sortBy == 'upVotes') constraints.unshift(orderBy('upVotes', 'desc'));
+					if (sortBy == 'comments') constraints.unshift(orderBy('commentCount', 'desc'));
 					q = query(buildsRef, ...constraints);
 
 					// this gets all of the docs from our query, then loops over them and returns the raw data to our array

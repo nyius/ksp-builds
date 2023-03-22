@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import CreateBuildAdmin from '../buttons/CreateBuildAdmin';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
+import useBuilds from '../../context/builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
 import Logo from '../../assets/logo_light_full.png';
 import Button from '../buttons/Button';
@@ -16,6 +17,7 @@ import Types from '../types/Types';
 
 function NavBar() {
 	const { user, dispatchAuth, authLoading } = useContext(AuthContext);
+	const { goBackPage } = useBuilds();
 	const navigate = useNavigate();
 
 	/**
@@ -45,7 +47,7 @@ function NavBar() {
 		<div className="navbar bg-base-900 mb-5 w-full fixed z-101">
 			<div className="flex-1">
 				{/* Logo  */}
-				<Link to="/">
+				<Link onClick={() => goBackPage(0)} to="/">
 					<img src={Logo} className="h-10 2k:h-20 btn btn-ghost hidden sm:block" alt="KSP Builds Logo, navigate home" />
 				</Link>
 

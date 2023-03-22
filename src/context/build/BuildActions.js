@@ -174,6 +174,10 @@ const useBuild = () => {
 			const buildJSON = JSON.stringify(build.build);
 			delete build.build;
 
+			if (build.thumbnail !== build.images[0]) {
+				build.thumbnail = build.images[0];
+			}
+
 			// update the document
 			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), {
 				...build,

@@ -3,31 +3,6 @@ const admin = require('firebase-admin');
 const cheerio = require('cheerio');
 const axios = require('axios');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-const { Configuration, OpenAIApi } = require('openai');
-
-const configuration = new Configuration({
-	apiKey: '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',
-});
-
-const openai = new OpenAIApi(configuration);
-
-/**
- * Function for communicating with openai
- * @param {*} text
- * @returns
- */
-const GPTFunction = async text => {
-	const response = await openai.createCompletion({
-		model: 'text-davinci-003',
-		prompt: text,
-		temperature: 0.6,
-		max_tokens: 250,
-		top_p: 1,
-		frequency_penalty: 1,
-		presence_penalty: 1,
-	});
-	return response.data.choices[0].text;
-};
 
 admin.initializeApp();
 
@@ -297,17 +272,3 @@ const scrapeChallenges = async () => {
 	const dataJSON = articles;
 	return dataJSON;
 };
-
-exports.getGPT = functions.https.onCall(async (data, context) => {
-	const prompt = data.prompt.replace('gpt:', '');
-	try {
-		const gptRes = await GPTFunction(prompt);
-		functions.logger.log(gptRes);
-
-		return {
-			gptRes,
-		};
-	} catch (error) {
-		functions.logger.log('ERROR FROM getGPT: ' + error);
-	}
-});

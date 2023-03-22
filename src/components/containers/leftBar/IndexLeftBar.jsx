@@ -43,6 +43,7 @@ function IndexLeftBar({ text }) {
 					<VerticalTypeLink text="SSTO" />
 					<VerticalTypeLink text="Spaceplane" />
 					<VerticalTypeLink text="Probe" />
+					<VerticalTypeLink text="Miscellaneous" />
 				</ul>
 
 				{/* Version */}

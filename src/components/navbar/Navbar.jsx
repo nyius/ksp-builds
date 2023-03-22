@@ -17,7 +17,7 @@ import Types from '../types/Types';
 
 function NavBar() {
 	const { user, dispatchAuth, authLoading } = useContext(AuthContext);
-	const { goBackPage } = useBuilds();
+	const { goToStartPage } = useBuilds();
 	const navigate = useNavigate();
 
 	/**
@@ -47,7 +47,7 @@ function NavBar() {
 		<div className="navbar bg-base-900 mb-5 w-full fixed z-101">
 			<div className="flex-1">
 				{/* Logo  */}
-				<Link onClick={() => goBackPage(0)} to="/">
+				<Link onClick={() => goToStartPage(0)} to="/">
 					<img src={Logo} className="h-10 2k:h-20 btn btn-ghost hidden sm:block" alt="KSP Builds Logo, navigate home" />
 				</Link>
 

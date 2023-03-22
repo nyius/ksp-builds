@@ -220,7 +220,22 @@ const useBuilds = () => {
 		});
 	};
 
-	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchMoreBuilds, setBuildsLoading, setCurrentPage, clearFetchedBuilds, goBackPage };
+	/**
+	 * Handles going back to page 0
+	 */
+	const goToStartPage = () => {
+		const builds = storedBuilds[0];
+
+		dispatchBuilds({
+			type: 'SET_FETCHED_BUILDS',
+			payload: {
+				fetchedBuilds: [...builds],
+				currentPage: 0,
+			},
+		});
+	};
+
+	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchMoreBuilds, setBuildsLoading, setCurrentPage, clearFetchedBuilds, goBackPage, goToStartPage };
 };
 
 export default useBuilds;

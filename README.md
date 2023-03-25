@@ -1,6 +1,7 @@
 # KSP Builds
 
 A Hub to share and explore KSP2 Builds
+view live at [Kspbuilds.com](www.kspbuilds.com)
 
 ## Created by Joseph Scicluna 2023
 

@@ -10,13 +10,18 @@ function Footer() {
 			<div className="flex flex-col gap-3 2k:gap-6">
 				<div className="items-center flex-row flex flex-wrap lg:grid-flow-col">
 					<img src={LogoLight} className="h-10 2k:h-16 btn" alt="" onClick={() => navigate('/')} />
-					<p className="texg-lg 2k:text-3xl  mr:5 2k:mr-10">Copyright © 2023 Joseph Scicluna - All right reserved</p>
-					<ul className="menu menu-horizontal flex flex-row flex-wrap gap-4 2k:gap-6">
+					<p className="texg-lg 2k:text-3xl  mr-5 2k:mr-10">Copyright © 2023 Joseph Scicluna - All right reserved</p>
+					<ul className="menu menu-horizontal flex flex-row flex-wrap items-center gap-4 2k:gap-6">
 						<li onClick={() => navigate('/privacy')} className="link link-accent text-lg 2k:text-2xl">
 							Privacy Policy
 						</li>
 						<li onClick={() => navigate('/terms')} className="link link-accent text-lg 2k:text-2xl">
 							Terms of Service
+						</li>
+						<li className="link link-accent text-lg 2k:text-2xl">
+							<a href="https://github.com/nyius/ksp-builds" target="_blank">
+								KSP Builds is open source! View on github
+							</a>
 						</li>
 					</ul>
 				</div>
@@ -34,7 +39,7 @@ function Footer() {
 					</a>
 				</div>
 			</div>
-			<div className="grid-flow-col gap-4 md:place-self-center md:justify-self-end text-xl 2k:text-2xl">KSP Builds is not affiliated with Private Division, Intercept Games, Take Two, or the Kerbal Space Program 2.</div>
+			<div className="grid-flow-col gap-4 md:place-self-center md:justify-self-end text-xl 2k:text-2xl">KSP Builds is not affiliated with Private Division, Intercept Games, Take Two, or Kerbal Space Program 2.</div>
 		</footer>
 	);
 }

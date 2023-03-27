@@ -1,7 +1,7 @@
 import React from 'react';
-import Step1 from '../../assets/gifs/paste_01.gif';
+import Step1 from '../../assets/how-to-paste-build-1.png';
 import Step2 from '../../assets/how-to-paste-build-2.png';
-import Step3 from '../../assets/gifs/paste_03.gif';
+import Step3 from '../../assets/how-to-paste-build-3.png';
 import Button from '../buttons/Button';
 
 function HowToPasteBuildModal() {

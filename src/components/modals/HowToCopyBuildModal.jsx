@@ -1,7 +1,7 @@
 import React from 'react';
-import Step1 from '../../assets/gifs/Sequence 01.gif';
+import Step1 from '../../assets/How-to-copy-build-1.png';
 import Step2 from '../../assets/how-to-copy-build-2.png';
-import Step3 from '../../assets/gifs/Sequence 02.gif';
+import Step3 from '../../assets/How-to-copy-build-3.png';
 import Button from '../buttons/Button';
 
 function HowToCopyBuildModal() {

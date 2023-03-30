@@ -34,6 +34,7 @@ function IndexLeftBar({ text }) {
 				{/* Type */}
 				<LeftBarTitle text="Type" />
 				<ul className="btn-group btn-group-vertical w-full gap-1 mb-6 2k:mb-10">
+					<VerticalTypeLink text="Rocket" />
 					<VerticalTypeLink text="Interplanetary" />
 					<VerticalTypeLink text="Interstellar" />
 					<VerticalTypeLink text="Satellite" />

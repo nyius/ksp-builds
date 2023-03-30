@@ -22,13 +22,11 @@ import './App.css';
 
 /*TODO
 search that searches the database, not just loaded builds
-reporting
 email verification?
 Mission generation page
 folders
-Go to a user like /nyius
-upload image for comments
 button closing notifications tab when clicked
+send users a message
 Quick share builds (without needing to create a whole build)
  */
 

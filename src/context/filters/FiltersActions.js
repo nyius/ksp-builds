@@ -1,8 +1,9 @@
 import { useContext } from 'react';
 import FiltersContext from './FiltersContext';
-
+import useBuilds from '../builds/BuildsActions';
 const useFilters = () => {
 	const { sortBy, typeFilter, versionFilter, challengeFilter, searchTerm, tagsSearch, dispatchBuildFilters, modsFilter } = useContext(FiltersContext);
+	const { setCurrentPage } = useBuilds();
 
 	/**
 	 * Handles setting search term
@@ -30,6 +31,7 @@ const useFilters = () => {
 				value: e.target.value,
 			},
 		});
+		setCurrentPage(0);
 	};
 
 	/**
@@ -44,6 +46,7 @@ const useFilters = () => {
 				value: type,
 			},
 		});
+		setCurrentPage(0);
 	};
 
 	/**
@@ -58,6 +61,7 @@ const useFilters = () => {
 				value: e.target.value,
 			},
 		});
+		setCurrentPage(0);
 	};
 
 	/**
@@ -72,6 +76,7 @@ const useFilters = () => {
 				value: e.target.value,
 			},
 		});
+		setCurrentPage(0);
 	};
 
 	/**
@@ -86,6 +91,7 @@ const useFilters = () => {
 				value: e.target.value,
 			},
 		});
+		setCurrentPage(0);
 	};
 
 	/**
@@ -100,6 +106,7 @@ const useFilters = () => {
 				value: tag,
 			},
 		});
+		setCurrentPage(0);
 	};
 
 	/**

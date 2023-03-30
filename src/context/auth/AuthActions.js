@@ -1,5 +1,5 @@
 import { db } from '../../firebase.config';
-import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter } from 'firebase/firestore';
+import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter, where } from 'firebase/firestore';
 import { signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 import { googleProvider } from '../../firebase.config';
 import { auth } from '../../firebase.config';
@@ -312,8 +312,29 @@ const useAuth = () => {
 
 				setFetchingProfile(false);
 			} else {
-				setFetchingProfile(false);
-				throw new Error(`Couldn't find profile!`);
+				// Check if we can find it by username
+				const userCol = collection(db, 'userProfiles');
+				const q = query(userCol, where('username', '==', id));
+				const fetchedProfiles = await getDocs(q);
+				let profiles = [];
+
+				fetchedProfiles.forEach(profile => {
+					profiles.push(profile.data());
+				});
+
+				if (profiles.length > 0) {
+					const profile = profiles[0];
+					profile.uid = fetchedProfile.id;
+					dispatchAuth({
+						type: 'FETCH_USERS_PROFILE',
+						payload: profile,
+					});
+
+					setFetchingProfile(false);
+				} else {
+					setFetchingProfile(false);
+					throw new Error(`Couldn't find profile!`);
+				}
 			}
 		} catch (error) {
 			console.log(error);

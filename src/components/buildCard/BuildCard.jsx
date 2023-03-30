@@ -99,7 +99,7 @@ function BuildCard({ build }) {
 
 				{/* Voting/comments/downloads/favorite */}
 				<div className="flex flex-row flex-wrap absolute bottom-0 rounded-b-xl left-0 bg-base-800 w-full p-2 xl:p-4 2k:p-4">
-					<div className="flex flex-row place-content-between w-full flex-wrap gap-2 2k:gap-4 items-center">
+					<div className="flex flex-row place-content-between w-full flex-wrap gap-2 items-center">
 						<VoteArrows build={build} />
 
 						<div className="flex flex-row items-center gap-2">

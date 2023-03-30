@@ -120,3 +120,9 @@
 		font-size: 1.8rem;
 	}
 }
+
+.tooltip:before {
+	font-size: 1.3rem;
+	background-color: #0c0e12;
+	padding: 0.6rem;
+}

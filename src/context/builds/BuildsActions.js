@@ -128,13 +128,18 @@ const useBuilds = () => {
 
 			const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
 
-			const constraints = [where('visibility', '==', 'public'), orderBy('views', 'desc'), limit(process.env.REACT_APP_BUILDS_FETCH_NUM), startAfter(lastFetchedBuild)];
+			const constraints = [where('visibility', '==', 'public'), limit(process.env.REACT_APP_BUILDS_FETCH_NUM), startAfter(lastFetchedBuild)];
 
 			if (versionFilter !== 'any') constraints.unshift(where('kspVersion', '==', versionFilter));
 			if (typeFilter !== '') constraints.unshift(where('type', 'array-contains', typeFilter));
 			if (modsFilter == 'yes') constraints.unshift(where('modsUsed', '==', true));
 			if (modsFilter == 'no') constraints.unshift(where('modsUsed', '==', false));
 			if (challengeFilter !== 'any') constraints.unshift(where('forChallenge', '==', challengeFilter));
+			if (sortBy == 'views') constraints.unshift(orderBy('views', 'desc'));
+			if (sortBy == 'date_newest') constraints.unshift(orderBy('timestamp', 'desc'));
+			if (sortBy == 'date_oldest') constraints.unshift(orderBy('timestamp', 'asc'));
+			if (sortBy == 'upVotes') constraints.unshift(orderBy('upVotes', 'desc'));
+			if (sortBy == 'comments') constraints.unshift(orderBy('commentCount', 'desc'));
 			q = query(buildsRef, ...constraints);
 
 			const buildsSnap = await getDocs(q);

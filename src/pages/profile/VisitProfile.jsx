@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { cloneDeep, sortBy } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 //---------------------------------------------------------------------------------------------------//
@@ -25,7 +25,7 @@ function VisitProfile() {
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const [dateCreated, setDateCreated] = useState(null);
 	//---------------------------------------------------------------------------------------------------//
-	const { typeFilter, versionFilter, searchTerm, tagsSearch, modsFilter, challengeFilter } = useContext(FiltersContext);
+	const { typeFilter, versionFilter, searchTerm, tagsSearch, modsFilter, challengeFilter, sortBy } = useContext(FiltersContext);
 	const { fetchedBuilds, loadingBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const { fetchedUserProfile, fetchingProfile, user, authLoading } = useContext(AuthContext);
 	//---------------------------------------------------------------------------------------------------//
@@ -40,6 +40,7 @@ function VisitProfile() {
 
 	// Fetches the users builds once we get their profile
 	useEffect(() => {
+		// Check if we found the users profile
 		if (fetchedUserProfile) {
 			fetchBuilds(fetchedUserProfile.builds, usersId);
 			setDateCreated(new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(fetchedUserProfile.dateCreated.seconds * 1000));

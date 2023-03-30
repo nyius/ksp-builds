@@ -18,7 +18,6 @@ import Banner from '../banner/Banner';
 function Builds() {
 	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy, modsFilter, challengeFilter } = useContext(FiltersContext);
 	const { loadingBuilds, fetchedBuilds, lastFetchedBuild, currentPage } = useContext(BuildsContext);
-	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const { filterBuilds, setTypeFilter, resetFilters } = useFilters();
 	const { fetchBuilds, fetchMoreBuilds, setCurrentPage, goBackPage } = useBuilds();
 	const { id } = useParams();
@@ -35,13 +34,6 @@ function Builds() {
 	useEffect(() => {
 		setCurrentPage(0);
 	}, []);
-
-	// Listen for changes to the sorting and filter the builds accordingly
-	useEffect(() => {
-		let newFetchedBuilds = cloneDeep(fetchedBuilds);
-
-		setSortedBuilds(filterBuilds(newFetchedBuilds));
-	}, [fetchedBuilds, sortBy]);
 
 	// listens for filters and fetches builds based on filter
 	useEffect(() => {
@@ -69,7 +61,7 @@ function Builds() {
 					</div>
 				) : (
 					<>
-						{sortedBuilds.map((build, i) => {
+						{fetchedBuilds.map((build, i) => {
 							return <BuildCard key={i} i={i} build={build} />;
 						})}
 					</>

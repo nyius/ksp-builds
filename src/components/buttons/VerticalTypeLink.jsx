@@ -7,7 +7,7 @@ import { BiPlanet } from 'react-icons/bi';
 import { IoIosRocket } from 'react-icons/io';
 import { ImAirplane } from 'react-icons/im';
 import { FaSatellite } from 'react-icons/fa';
-import { GiGalaxy, GiMarsCuriosity } from 'react-icons/gi';
+import { GiGalaxy, GiMarsCuriosity, GiRocketFlight } from 'react-icons/gi';
 import { VscSymbolMisc } from 'react-icons/vsc';
 //---------------------------------------------------------------------------------------------------//
 import SpaceStation from '../../assets/spaceStaion.svg';
@@ -67,7 +67,7 @@ function VerticalTypeLink({ text }) {
 				)}
 				{text === 'SSTO' && (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
-						<IoIosRocket />
+						<GiRocketFlight />
 					</span>
 				)}
 				{text === 'Spaceplane' && (
@@ -83,6 +83,11 @@ function VerticalTypeLink({ text }) {
 				{text === 'Miscellaneous' && (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<VscSymbolMisc />
+					</span>
+				)}
+				{text === 'Rocket' && (
+					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
+						<IoIosRocket />
 					</span>
 				)}
 			</div>

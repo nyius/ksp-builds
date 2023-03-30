@@ -27,6 +27,7 @@ function BuildTypes({ typesArr, setBuildState }) {
 
 	return (
 		<div className="btn-group mb-6 2k:mb-10">
+			<Button type="button" color="text-slate-300" text="Rocket" onClick={e => setTypes(`Rocket`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Rocket') && 'btn-active'}`} />
 			<Button type="button" color="text-slate-300" text="Interplanetary" onClick={e => setTypes(`Interplanetary`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Interplanetary') && 'btn-active'}`} />
 			<Button type="button" color="text-slate-300" text="Interstellar" onClick={e => setTypes(`Interstellar`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Interstellar') && 'btn-active'}`} />
 			<Button type="button" color="text-slate-300" text="Satellite" onClick={e => setTypes(`Satellite`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Satellite') && 'btn-active'}`} />

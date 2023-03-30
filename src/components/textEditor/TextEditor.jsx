@@ -13,7 +13,7 @@ import useBuild from '../../context/build/BuildActions';
  */
 const TextEditor = state => {
 	// Handles sending the markup back to the parent
-	const { setState, size, i, reset } = state;
+	const { setState, size, i, reset, text } = state;
 	const { editingBuild, editingComment, resetTextEditor } = useContext(BuildContext);
 	const { setResetTextEditorState } = useBuild();
 	const emptyState = `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`;
@@ -24,6 +24,9 @@ const TextEditor = state => {
 		}
 		if (editingComment) {
 			return EditorState.createWithContent(convertFromRaw(JSON.parse(editingComment.comment)));
+		}
+		if (text) {
+			return EditorState.createWithContent(convertFromRaw(JSON.parse(text)));
 		}
 		return EditorState.createWithContent(convertFromRaw(JSON.parse(emptyState)));
 	});

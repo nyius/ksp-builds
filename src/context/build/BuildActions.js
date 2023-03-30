@@ -689,7 +689,7 @@ const useBuild = () => {
 
 				// Give all of the following users a notification
 				// Handle nofitications
-				if (build.visibility === 'public') {
+				if (build.visibility === 'public' && process.env.REACT_APP_ENV !== 'DEV') {
 					const newNotif = { ...standardNotifications };
 					newNotif.buildId = newId;
 					newNotif.buildName = loadedBuild.name;

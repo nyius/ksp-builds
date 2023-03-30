@@ -44,6 +44,8 @@ function IndexLeftBar({ text }) {
 					<VerticalTypeLink text="SSTO" />
 					<VerticalTypeLink text="Spaceplane" />
 					<VerticalTypeLink text="Probe" />
+					<VerticalTypeLink text="Historic" />
+					<VerticalTypeLink text="Replica" />
 					<VerticalTypeLink text="Miscellaneous" />
 				</ul>
 
@@ -82,7 +84,7 @@ function IndexLeftBar({ text }) {
 							challenges.map((challenge, i) => {
 								return (
 									<option key={i} value={challenge.articleId}>
-										{challenge.title}
+										{challenge.title.length > 40 ? challenge.title.slice(0, 41) + '...' : challenge.title}
 									</option>
 								);
 							})}

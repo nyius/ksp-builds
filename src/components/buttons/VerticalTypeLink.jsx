@@ -13,6 +13,8 @@ import { VscSymbolMisc } from 'react-icons/vsc';
 import SpaceStation from '../../assets/spaceStaion.svg';
 import LunarModule from '../../assets/lunarModule.svg';
 import Probe from '../../assets/probe.svg';
+import Shuttle from '../../assets/space-shuttle-svgrepo-com.svg';
+import Replica from '../../assets/replica-icon.svg';
 
 function VerticalTypeLink({ text }) {
 	const navigate = useNavigate();
@@ -88,6 +90,16 @@ function VerticalTypeLink({ text }) {
 				{text === 'Rocket' && (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<IoIosRocket />
+					</span>
+				)}
+				{text === 'Historic' && (
+					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
+						<img src={Shuttle} className="h-6 2k:h-10" alt="" />
+					</span>
+				)}
+				{text === 'Replica' && (
+					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
+						<img src={Replica} className="h-6 2k:h-10" alt="" />
 					</span>
 				)}
 			</div>

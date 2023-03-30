@@ -1,11 +1,11 @@
 import React from 'react';
-import { GiCancel } from 'react-icons/gi';
+import { GiCancel, GiPeaks } from 'react-icons/gi';
 import { ImCloudUpload } from 'react-icons/im';
 import { FaSave, FaUserAstronaut, FaCogs, FaHome } from 'react-icons/fa';
 import { FiLogOut } from 'react-icons/fi';
 import { TiExport, TiPlusOutline } from 'react-icons/ti';
 import { RiDeleteBin2Fill, RiEditFill, RiLoginCircleLine } from 'react-icons/ri';
-import { BsFillPatchQuestionFill, BsFillArrowDownSquareFill, BsFillArrowLeftSquareFill, BsFillArrowRightSquareFill, BsCaretRightFill, BsCaretLeftFill } from 'react-icons/bs';
+import { BsFillPatchQuestionFill, BsFillArrowDownSquareFill, BsFillArrowLeftSquareFill, BsFillArrowRightSquareFill, BsCaretRightFill, BsCaretLeftFill, BsTwitter } from 'react-icons/bs';
 import { BiCommentAdd, BiReset } from 'react-icons/bi';
 import { MdOutlineDoneOutline, MdEmail, MdSettingsInputComponent, MdReport } from 'react-icons/md';
 import { FcGoogle } from 'react-icons/fc';
@@ -60,6 +60,8 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 		if (icon === 'outline-heart') return <AiOutlineHeart />;
 		if (icon === 'report') return <MdReport />;
 		if (icon === 'info') return <AiOutlineBulb />;
+		if (icon === 'mountain') return <GiPeaks />;
+		if (icon === 'twitter') return <BsTwitter />;
 	};
 
 	// The button is a label becuase then we can use htmlFor tag to open modals. Not sure if this breaks things but it seems to work fine

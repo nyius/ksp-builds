@@ -36,6 +36,8 @@ function BuildTypes({ typesArr, setBuildState }) {
 			<Button type="button" color="text-slate-300" text="Rover" onClick={e => setTypes(`Rover`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Rover') && 'btn-active'}`} />
 			<Button type="button" color="text-slate-300" text="SSTO" onClick={e => setTypes(`SSTO`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('SSTO') && 'btn-active'}`} />
 			<Button type="button" color="text-slate-300" text="Spaceplane" onClick={e => setTypes(`Spaceplane`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Spaceplane') && 'btn-active'}`} />
+			<Button type="button" color="text-slate-300" text="Historic" onClick={e => setTypes(`Historic`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Historic') && 'btn-active'}`} />
+			<Button type="button" color="text-slate-300" text="Replica" onClick={e => setTypes(`Replica`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Replica') && 'btn-active'}`} />
 			<Button type="button" color="text-slate-300" text="Probe" onClick={e => setTypes(`Probe`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Probe') && 'btn-active'}`} />
 			<Button type="button" color="text-slate-300" text="Miscellaneous" onClick={e => setTypes(`Miscellaneous`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Miscellaneous') && 'btn-active'}`} />
 		</div>

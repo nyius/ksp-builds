@@ -1,14 +1,17 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, getDoc, getCountFromServer } from 'firebase/firestore';
+import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, getDoc, setDoc, getCountFromServer, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { cloneDeep } from 'lodash';
 import { Helmet } from 'react-helmet';
 import { toast } from 'react-toastify';
+import { v4 as uuidv4 } from 'uuid';
+
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import useAuth from '../../context/auth/AuthActions';
 //---------------------------------------------------------------------------------------------------//
 import standardNotifications from '../../utilities/standardNotifications';
+import { uploadImages } from '../../utilities/uploadImage';
 //---------------------------------------------------------------------------------------------------//
 import TextInput from '../../components/input/TextInput';
 import Button from '../../components/buttons/Button';
@@ -21,10 +24,22 @@ function AdminPanel() {
 	const { user } = useContext(AuthContext);
 	const { sendNotification } = useAuth();
 	//---------------------------------------------------------------------------------------------------//
+	const [uploadingChallengeImage, setUploadingChallengeImage] = useState(false);
 	const [reportRepliedFilter, setReportRepliedFilter] = useState(false);
 	const [messagesLoading, setMessagesLoading] = useState(true);
 	const [replying, setReplying] = useState({ uid: '', i: '' });
 	const [siteNotification, setSiteNotification] = useState('');
+	const [challengeContent, setChallengeContent] = useState('');
+	const [patchNotes, setPatchNotes] = useState('');
+	const [challenge, setChallenge] = useState({
+		image: '',
+		title: '',
+		date: serverTimestamp(),
+		articleId: '',
+		type: 'challenge',
+		url: '',
+		article: '',
+	});
 	const [sortedReports, setSortedReports] = useState([]);
 	const [statsLoading, setStatsLoading] = useState(true);
 	const [infoLoading, setInfoLoading] = useState(true);
@@ -173,9 +188,9 @@ function AdminPanel() {
 	/**
 	 * Handles sending a message to everyone on the site
 	 */
-	const sendSiteMessage = async () => {
+	const sendSiteMessage = async (content, type) => {
 		try {
-			if (siteNotification === '') {
+			if (!content && siteNotification === '') {
 				toast.error('Forgot a message');
 				return;
 			}
@@ -188,8 +203,8 @@ function AdminPanel() {
 			newNotif.username = user.username;
 			newNotif.timestamp = new Date();
 			newNotif.profilePicture = user.profilePicture;
-			newNotif.message = siteNotification;
-			newNotif.type = 'message';
+			newNotif.message = content ? content : siteNotification;
+			newNotif.type = type;
 			delete newNotif.buildId;
 			delete newNotif.buildName;
 			delete newNotif.comment;
@@ -198,7 +213,70 @@ function AdminPanel() {
 			usersSnap.forEach(user => {
 				sendNotification(user.id, newNotif);
 			});
+
+			// sendNotification('ZyVrojY9BZU5ixp09LftOd240LH3', newNotif);
 			toast.success('Message sent!');
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
+	 * Handles uploading patch note
+	 */
+	const uploadPatchNote = async () => {
+		try {
+			await setDoc(doc(db, 'patchNotes', uuidv4().slice(0, 15)), { patchNote: patchNotes, timestamp: serverTimestamp() });
+			await sendSiteMessage(patchNotes, 'update');
+
+			toast.success('Patch note update!');
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong creating patch note');
+		}
+	};
+
+	/**
+	 * Handles uploading a challenge
+	 */
+	const uploadChallenge = async () => {
+		try {
+			if (!challenge.title) {
+				console.log(`no title`);
+				toast.error('Forgot challenge title');
+				return;
+			}
+			if (!challenge.image) {
+				console.log(`no image`);
+				toast.error('Forgot challenge image');
+				return;
+			}
+			challenge.article = challengeContent;
+			challenge.articleId = challenge.title.replace(/ /g, '-');
+
+			await setDoc(doc(db, 'challenges', challenge.articleId), challenge);
+
+			toast.success('Challenge created!');
+		} catch (error) {
+			toast.error('Something went wrong creating challenge');
+			console.log(error);
+		}
+	};
+
+	/**
+	 * Handles uploading an image for a new challenge
+	 * @param {*} e
+	 */
+	const handleUploadChallengeImage = async e => {
+		try {
+			const newChallengeImage = await uploadImages(e.target.files, setUploadingChallengeImage);
+
+			setChallenge(prevState => {
+				return {
+					...prevState,
+					image: newChallengeImage[0],
+				};
+			});
 		} catch (error) {
 			console.log(error);
 		}
@@ -216,7 +294,8 @@ function AdminPanel() {
 			<MiddleContainer>
 				<PlanetHeader text="Admin" />
 
-				<div className="w-full rounded-xl bg-base-900 flex flex-row p-4 2k:p-8 mb-6 2k:mb-10">
+				{/* ------------------Stats------------------ */}
+				<div className="w-full rounded-xl text-white bg-base-900 flex flex-row p-4 2k:p-8">
 					{statsLoading ? (
 						<Spinner1 />
 					) : (
@@ -234,21 +313,73 @@ function AdminPanel() {
 					)}
 				</div>
 
+				<div className="divider my-10"></div>
+
 				{/* ------------------Versions------------------ */}
 				{infoLoading ? (
 					<Spinner1 />
 				) : (
-					<>
+					<div className="bg-base-600 rounded-xl p-4 2k:p-8 flex flex-col gap-4">
 						<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Add a new KSP version</p>
 						<TextInput onChange={e => setNewVersion(e.target.value)} placeholder="Version" size="w-44" />
-						<Button text="submit" icon="upload" onClick={submitNewVersion} margin="mb-10 2k:mb-20" size="w-fit" color="btn-primary" />
-					</>
+						<Button text="submit" icon="upload" onClick={submitNewVersion} size="w-fit" color="btn-primary" />
+					</div>
 				)}
 
+				<div className="divider my-10"></div>
+
 				{/* ------------------ Site Notification ---------------------- */}
-				<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Send Site-wide message</p>
-				<TextEditor setState={setSiteNotification} />
-				<Button text="send" color="btn-primary" icon="upload" size="w-fit" onClick={sendSiteMessage} />
+				<div className="bg-base-600 rounded-xl p-4 2k:p-8 flex flex-col gap-4">
+					<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Send Site-wide message</p>
+					<TextEditor setState={setSiteNotification} />
+					<Button text="send" color="btn-primary" icon="upload" size="w-fit" onClick={() => sendSiteMessage('', 'message')} />
+				</div>
+
+				<div className="divider my-10"></div>
+
+				{/* ------------------ Challenge ---------------------- */}
+				<div className="bg-base-600 rounded-xl p-4 2k:p-8 flex flex-col gap-4">
+					<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Create New Challenge</p>
+
+					<div className="input-group text-3xl mb-10">
+						<span>Title</span>
+						<input
+							type="text"
+							className="input w-full text-3xl text-white"
+							placeholder="Challenge Title"
+							onChange={e =>
+								setChallenge(prevState => {
+									return { ...prevState, title: e.target.value };
+								})
+							}
+						/>
+					</div>
+
+					{/* image */}
+					<div className="flex flex-row gap-4 items-center mb-10">
+						<label className="flex flex-row w-fit text-3xl">
+							<span className="font-bold p-4">Image</span>
+							<input type="file" id="build-image" max="1" accept=".jpg,.png,.jpeg" className="file-input w-full max-w-xs mb-6 2k:file-input-lg text-slate-200" onChange={handleUploadChallengeImage} />
+						</label>
+						{uploadingChallengeImage && <Spinner1 />}
+						{challenge.image && <img src={challenge.image} alt="" className="w-56" />}
+					</div>
+
+					{/* Content */}
+					<TextEditor setState={setChallengeContent} />
+					<Button text="Create" color="btn-primary" icon="upload" size="w-fit" onClick={uploadChallenge} />
+				</div>
+
+				<div className="divider my-10"></div>
+
+				{/* ------------------ Patch Notes ---------------------- */}
+				<div className="bg-base-600 rounded-xl p-4 2k:p-8 flex flex-col gap-4">
+					<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Create Patch Notes</p>
+					<TextEditor setState={setPatchNotes} />
+					<Button text="create" color="btn-primary" icon="upload" size="w-fit" onClick={uploadPatchNote} />
+				</div>
+
+				<div className="divider my-10"></div>
 
 				{/* ------------------ Reports---------------------- */}
 				<div className="flex flex-row place-content-between mt-10 2k:mt-20">
@@ -263,7 +394,7 @@ function AdminPanel() {
 						<Spinner1 />
 					) : (
 						<>
-							{reports.length === 0 && <p className="text-2xl 2k:text-4xl font-bold mb-10 2k:mb-20">No Reports</p>}
+							{reports.length === 0 && <p className="text-2xl 2k:text-4xl font-bold mb-10 2k:mb-20">No Messages</p>}
 							{sortedReports.map((report, i) => {
 								return (
 									<div key={i} className="flex flex-col w-full h-fit p-5 2k:p-10 bg-base-200 gap-10 rounded-xl relative">

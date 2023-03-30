@@ -138,7 +138,7 @@ function Build() {
 											<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Challenge</p>
 											<Button
 												type="ahref"
-												href={`/challenge/${loadedBuild.forChallenge}`}
+												href={`/challenges/${loadedBuild.forChallenge}`}
 												color="btn-ghost text-accent"
 												css="multi-line-truncate"
 												text={loadedBuild.challengeTitle}

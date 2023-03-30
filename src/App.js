@@ -7,15 +7,13 @@ import PublicRoute from './routes/PublicRoute';
 import AdminRoute from './routes/AdminRoute';
 import backgroundplanet from './assets/planet.png';
 //---------------------------------------------------------------------------------------------------//
-import { Index, SignUp, Build, NotFound, Upload, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, Challenge, Faq, UnderConstruction } from './pages';
+import { Index, SignUp, Build, NotFound, Upload, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, Challenge, Challenges, Faq, PatchNotes, UnderConstruction } from './pages';
 import RightBar from './components/containers/rightBar/RightBar';
 //---------------------------------------------------------------------------------------------------//
 import { Navbar, Footer } from './components';
 import Stars from './components/stars/Stars';
 import LeftBar from './components/containers/leftBar/LeftBar';
 import Modals from './components/modals/Modals';
-import Alerts from './components/alert/Alerts';
-import Banner from './components/banner/Banner';
 //---------------------------------------------------------------------------------------------------//
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
@@ -27,6 +25,10 @@ Mission generation page
 folders
 button closing notifications tab when clicked
 send users a message
+paid tier (badge next to name, access to premium features)
+scroll issue
+hide craft
+choose how many ships are loaded each time
 Quick share builds (without needing to create a whole build)
  */
 
@@ -61,7 +63,9 @@ function App() {
 										<Route exact path="/news" element={<News />} />
 										<Route exact path="/faq" element={<Faq />} />
 										<Route exact path="/contact" element={<Contact />} />
-										<Route exact path="/challenge/:id" element={<Challenge />} />
+										<Route exact path="/challenges/:id" element={<Challenge />} />
+										<Route exact path="/challenges" element={<Challenges />} />
+										<Route exact path="/patch-notes" element={<PatchNotes />} />
 										<Route exact path="/profile/:id" element={<VisitProfile />} />
 										<Route exact path="/build/:id" element={<Build />} />
 										<Route

@@ -61,10 +61,9 @@ function NavBar() {
 				<ul className="menu menu-horizontal px-6 gap-3 2k:gap-6">
 					<Button type="ahref" href="/upload" onClick={handleUploadNavigate} color="btn-accent" css="text-white hidden md:flex" text="Upload" icon="plus" />
 					<Button type="ahref" href="/news" css="text-white hidden lg:flex" text="News" icon="news" />
-					<Button type="ahref" href="/contact" css="text-white hidden lg:flex" text="Contact" icon="email" />
-					<Button type="ahref" href="/faq" css="text-white hidden lg:flex" text="F.A.Q" icon="help" />
-					<CreateBuildAdmin />
+					<Button type="ahref" href="/challenges" css="text-white hidden lg:flex" text="Challenges" icon="mountain" />
 					<Button text="How to upload" icon="info" color="text-white" css="hidden lg:flex" htmlFor="how-to-copy-build-modal" />
+					<CreateBuildAdmin />
 				</ul>
 
 				<div className="flex flex-row items-end">
@@ -85,6 +84,7 @@ function NavBar() {
 							</label>
 							<ul tabIndex={0} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box w-96">
 								<Button type="ahref" href="/profile" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Profile" />
+								{user.siteAdmin && <Button type="ahref" href="/admin-panel" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Admin Panel" />}
 								<Button type="ahref" href="/favorites" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" />
 								<Button type="ahref" href="/settings" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Settings" />
 								<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="logout" text="Logout" onClick={() => signOut()} />

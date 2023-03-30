@@ -1,32 +1,40 @@
 import React from 'react';
 import LogoLight from '../../assets/logo_light_full.png';
 import { useNavigate } from 'react-router-dom';
+import Button from '../buttons/Button';
 
 function Footer() {
 	const navigate = useNavigate();
 
 	return (
-		<footer className="footer items-center p-4 bg-neutral text-neutral-content z-60 relative">
+		<footer className="footer items-center p-4 bg-neutral grid-flow-row xl:grid-flow-col text-neutral-content z-60 relative">
 			<div className="flex flex-col gap-3 2k:gap-6">
-				<div className="items-center flex-row flex flex-wrap lg:grid-flow-col">
-					<img src={LogoLight} className="h-10 2k:h-16 btn" alt="" onClick={() => navigate('/')} />
-					<p className="texg-lg 2k:text-3xl  mr-5 2k:mr-10">Copyright © 2023 Joseph Scicluna - All right reserved</p>
-					<ul className="menu menu-horizontal flex flex-row flex-wrap items-center gap-4 2k:gap-6">
-						<li onClick={() => navigate('/privacy')} className="link link-accent text-lg 2k:text-2xl">
-							Privacy Policy
-						</li>
-						<li onClick={() => navigate('/terms')} className="link link-accent text-lg 2k:text-2xl">
-							Terms of Service
-						</li>
-						<li className="link link-accent text-lg 2k:text-2xl">
-							<a href="https://github.com/nyius/ksp-builds" target="_blank">
-								KSP Builds is open source! View on github
-							</a>
-						</li>
+				<div className="items-center flex-row flex flex-wrap lg:grid-flow-col gap-5 2k:gap-10">
+					<div className="flex flex-col text-center">
+						<img src={LogoLight} className="h-10 2k:h-16 btn" alt="" onClick={() => navigate('/')} />
+						<p className="texg-lg 2k:text-2xl  mr-5 2k:mr-10">Copyright © 2023 Joseph Scicluna</p>
+						<p className="texg-lg 2k:text-2xl  mr-5 2k:mr-10">All right reserved</p>
+					</div>
+					<ul className="menu items-start">
+						<Button type="ahref" href="https://twitter.com/KSP_Builds" text="Twitter" target="_blank" css="text-white" icon="twitter" />
+						<Button type="ahref" href="/contact" css="text-white" text="Contact" icon="email" />
+						<Button type="ahref" href="/faq" css="text-white" text="F.A.Q" icon="help" />
+					</ul>
+					<ul className="menu items-start">
+						<Button type="ahref" css="text-white" href="/patch-notes" text="KSPB Patch Notes" />
+						<Button type="ahref" css="text-white" href="/challenges" text="Challenges" />
+						<Button type="ahref" css="text-white" href="/news" text="News" />
+					</ul>
+					<ul className="menu items-start">
+						<Button type="ahref" href="/privacy" text="Privacy Policy" />
+						<Button type="ahref" href="/terms" text="Terms of Service" />
+						<Button type="ahref" href="https://github.com/nyius/ksp-builds" target="_blank" text="KSP Builds is open source! View on github" />
 					</ul>
 				</div>
-
-				<div className="flex gap-3 2k:gap-6">
+			</div>
+			<div className="flex flex-col gap-3 2k:gap-6 gap-4 md:place-self-center md:justify-self-end items-end">
+				<div className=" text-xl 2k:text-2xl">KSP Builds is not affiliated with Private Division, Intercept Games, Take Two, or Kerbal Space Program 2.</div>
+				<div className="flex flex-row gap-3 2k:gap-6">
 					<p className="text-xl 2k:text-2xl">Thanks to these amazing artists for their artwork!</p>
 					<a href="https://www.freepik.com/author/catalyststuff" target="_blank" className="text-xl 2k:text-2xl link">
 						@catalyststuff
@@ -39,7 +47,6 @@ function Footer() {
 					</a>
 				</div>
 			</div>
-			<div className="grid-flow-col gap-4 md:place-self-center md:justify-self-end text-xl 2k:text-2xl">KSP Builds is not affiliated with Private Division, Intercept Games, Take Two, or Kerbal Space Program 2.</div>
 		</footer>
 	);
 }

@@ -448,7 +448,7 @@ function Upload() {
 														challenges.map((challenge, i) => {
 															return (
 																<option key={i} selected={(params && challengeParam === challenge.articleId) || (editingBuild && editingBuild.forChallenge === challenge.articleId && true)} value={challenge.articleId}>
-																	{challenge.title}
+																	{challenge.title.length > 40 ? challenge.title.slice(0, 41) + '...' : challenge.title}
 																</option>
 															);
 														})}

@@ -1,3 +1,11 @@
+.truncate-3 {
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	inline-size: 100%;
+}
+
 .multi-line-truncate {
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
@@ -125,4 +133,12 @@
 	font-size: 1.3rem;
 	background-color: #0c0e12;
 	padding: 0.6rem;
+}
+
+.challenge-fade {
+	--mask: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 95%, rgba(0, 0, 0, 0) 0) 100% 50% / 100% 100% repeat-x;
+
+	font: 2em/1.6em Arial;
+	-webkit-mask: var(--mask);
+	mask: var(--mask);
 }

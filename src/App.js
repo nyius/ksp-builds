@@ -6,6 +6,7 @@ import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoute';
 import AdminRoute from './routes/AdminRoute';
 import backgroundplanet from './assets/planet.png';
+import ScrollToTop from './routes/ScrollToTop';
 //---------------------------------------------------------------------------------------------------//
 import { Index, SignUp, Build, NotFound, Upload, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, Challenge, Challenges, Faq, PatchNotes, UnderConstruction } from './pages';
 import RightBar from './components/containers/rightBar/RightBar';
@@ -26,6 +27,7 @@ folders
 button closing notifications tab when clicked
 send users a message
 paid tier (badge next to name, access to premium features)
+filter notifications setting
 scroll issue
 hide craft
 choose how many ships are loaded each time
@@ -55,6 +57,7 @@ function App() {
 								</div>
 								{/* Center Content */}
 								<div className="md:col-start-3 md:col-end-7 lg:col-start-2 xl:col-end-6">
+									<ScrollToTop />
 									<Routes>
 										<Route exact path="/" element={<Index />} />
 										<Route exact path="/builds/:id" element={<Index />} />

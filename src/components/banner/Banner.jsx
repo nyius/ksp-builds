@@ -39,9 +39,9 @@ function Banner() {
 	return (
 		<>
 			{!articlesLoading && challenges && (
-				<div className="banner flex flex-row w-full p-4 2k:p-8 bg-base-900 rounded-lg mb-10 overflow-hidden relative place-content-between ">
+				<div className="banner flex flex-row w-full p-4 2k:p-8 bg-base-900 rounded-lg mb-10 items-center overflow-hidden relative place-content-between ">
 					<Button icon="left2" size="h-44 !h-fit sm:!h-full" onClick={handlePrevSlide} position="z-60 absolute sm:relative top-1/2 sm:top-0 left-10 sm:left-0" />
-					<div className="w-full h-full flex flex-col sm:flex-row items-center gap-10 2k:gap-20 ">
+					<div className="w-full h-full flex flex-col lg:flex-row items-center gap-10 2k:gap-20 ">
 						{challenges.map((challenge, i) => {
 							return <ChallengeCard currentSlide={currentSlide} i={i} key={i} challenge={challenge} />;
 						})}

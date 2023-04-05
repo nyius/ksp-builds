@@ -3,6 +3,9 @@ import { useParams } from 'react-router-dom';
 import { cloneDeep } from 'lodash';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import { convertFromRaw, EditorState, ContentState } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import useAuth from '../../context/auth/AuthActions';
@@ -17,6 +20,8 @@ import Sort from '../../components/sort/Sort';
 import CantFind from '../../components/cantFind/CantFind';
 import Button from '../../components/buttons/Button';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
+//---------------------------------------------------------------------------------------------------//
+import checkIfJson from '../../utilities/checkIfJson';
 
 function VisitProfile() {
 	const usersId = useParams().id;
@@ -24,12 +29,13 @@ function VisitProfile() {
 	//---------------------------------------------------------------------------------------------------//
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const [dateCreated, setDateCreated] = useState(null);
+	const [bioState, setBioState] = useState(null);
 	//---------------------------------------------------------------------------------------------------//
 	const { typeFilter, versionFilter, searchTerm, tagsSearch, modsFilter, challengeFilter, sortBy } = useContext(FiltersContext);
 	const { fetchedBuilds, loadingBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const { fetchedUserProfile, fetchingProfile, user, authLoading } = useContext(AuthContext);
 	//---------------------------------------------------------------------------------------------------//
-	const { fetchUsersProfile, setAccountToDelete, handleFollowingUser } = useAuth();
+	const { fetchUsersProfile, setAccountToDelete, handleFollowingUser, sendMessage, fetchConversation } = useAuth();
 	const { filterBuilds, resetFilters } = useFilters();
 	const { fetchBuilds } = useBuilds();
 
@@ -42,8 +48,14 @@ function VisitProfile() {
 	useEffect(() => {
 		// Check if we found the users profile
 		if (fetchedUserProfile) {
-			fetchBuilds(fetchedUserProfile.builds, usersId);
+			fetchBuilds(fetchedUserProfile.builds, fetchedUserProfile.uid);
 			setDateCreated(new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(fetchedUserProfile.dateCreated.seconds * 1000));
+
+			if (checkIfJson(fetchedUserProfile?.bio)) {
+				setBioState(EditorState.createWithContent(convertFromRaw(JSON.parse(fetchedUserProfile?.bio))));
+			} else {
+				setBioState(EditorState.createWithContent(ContentState.createFromText(fetchedUserProfile?.bio)));
+			}
 		}
 	}, [fetchedUserProfile]);
 
@@ -73,9 +85,12 @@ function VisitProfile() {
 
 						<div className="flex flex-row relative gap-14 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
 							{!authLoading && user?.username && user?.uid !== fetchedUserProfile.uid && (
-								<div className="absolute right-2 top-2">
+								<div className="absolute right-2 top-2 flex flex-row gap-2 2k:gap-4">
 									<div className="tooltip" data-tip={`${fetchedUserProfile.followers?.includes(user.uid) ? 'Unfollow' : 'Follow'}`}>
 										<Button icon={`${fetchedUserProfile.followers?.includes(user.uid) ? 'fill-heart' : 'outline-heart'}`} color="btn-primary" onClick={() => handleFollowingUser()} />
+									</div>
+									<div className="tooltip" data-tip="Message">
+										<Button text="Message" icon="comment" color="btn-primary" onClick={() => fetchConversation(fetchedUserProfile)} />
 									</div>
 								</div>
 							)}
@@ -98,7 +113,7 @@ function VisitProfile() {
 
 								<div className="flex flex-row gap-2">
 									<p className="text-slate-500 text-xl 2k:text-2xl italic">Bio: </p>
-									{fetchedUserProfile.bio === '' ? <p className="italic text-slate-500 text-xl 2k:text-3xl">Nothing here...</p> : <p className="text-xl 2k:text-3xl"> {fetchedUserProfile.bio} </p>}
+									<Editor editorState={bioState} readOnly={true} toolbarHidden={true} />
 								</div>
 							</div>
 						</div>

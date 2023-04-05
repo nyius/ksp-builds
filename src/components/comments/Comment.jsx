@@ -18,11 +18,14 @@ import UsernameLink from '../buttons/UsernameLink';
  * @returns
  */
 function Comment({ comment }) {
-	const { user, authLoading } = useContext(AuthContext);
-	const { setReport } = useAuth();
 	const { loadedBuild, editingComment } = useContext(BuildContext);
+	const { user, authLoading } = useContext(AuthContext);
+	//---------------------------------------------------------------------------------------------------//
 	const [editedComment, setEditedComment] = useState('');
+	//---------------------------------------------------------------------------------------------------//
 	const { deleteComment, updateComment, fetchComments, setEditingComment, setReplyingComment } = useBuild();
+	const { setReport } = useAuth();
+
 	const date = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(comment.timestamp.seconds * 1000);
 	const editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(comment.comment)));
 
@@ -67,7 +70,7 @@ function Comment({ comment }) {
 			<div id={comment.id} className="flex flex-col gap-4 2k:gap-8 w-full bg-base-100 rounded-b-md p-4 2k:p-8  ">
 				<div className="flex flex-row w-full gap-4 place-content-between">
 					<div className="font-bold text-lg text-slate-300 2k:text-3xl">
-						<UsernameLink username={comment.username} uid={comment.uid} />
+						<UsernameLink username={comment.username} uid={comment.uid} hoverPosition={'right'} />
 					</div>
 					<p className="2k:text-2xl">{date}</p>
 				</div>

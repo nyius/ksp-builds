@@ -1,4 +1,7 @@
-import { cloneDeep } from 'lodash';
+import { clone, cloneDeep } from 'lodash';
+import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
+import { db, auth } from '../../firebase.config';
+
 const AuthReducer = (state, action) => {
 	switch (action.type) {
 		case 'SET_AUTH':
@@ -26,7 +29,6 @@ const AuthReducer = (state, action) => {
 		case 'UPDATE_USER':
 			const getUserStateUpdate = cloneDeep(state.user);
 			const newGetUserStateUpdate = Object.assign(getUserStateUpdate, action.payload);
-
 			return {
 				...state,
 				user: newGetUserStateUpdate,
@@ -39,7 +41,6 @@ const AuthReducer = (state, action) => {
 				...state,
 				user: updatedUserState,
 				newUsername: updatedUserState?.username,
-				newBio: updatedUserState?.bio,
 			};
 		case 'SET_FETCHING_PROFILE':
 			return {
@@ -140,31 +141,102 @@ const AuthReducer = (state, action) => {
 				...state,
 				resetPasswordState: action.payload,
 			};
+		case 'SET_MESSAGE_TAB':
+			return {
+				...state,
+				messageTab: action.payload.messageTab,
+			};
+		case 'SET_HOVER_USER':
+			return {
+				...state,
+				hoverUser: action.payload,
+			};
 		case 'SET_REPORT':
 			return {
 				...state,
 				reportingContent: action.payload.reportingContent,
 				reportType: action.payload.reportType,
 			};
+		case 'SET_CONVOS':
+			return {
+				...state,
+				conversations: action.payload,
+			};
+		case 'INCOMING_NEW_CONVO':
+			const checkIfConvoIncoming = state.conversations.filter(convo => {
+				return convo.id === action.payload.id;
+			});
+
+			// if we didn't find a matching conversation it means we have a new convo (and go fetch it)
+			if (checkIfConvoIncoming.length === 0) {
+				return {
+					...state,
+					newConvo: action.payload,
+				};
+			}
+		case 'NEW_CONVO':
+			const checkIfConvo = state.conversations.filter(convo => {
+				return convo.id === action.payload.id;
+			});
+
+			// if we didn't find a matching conversation it means we have a new convo (and go fetch it)
+			if (checkIfConvo.length === 0) {
+				return {
+					...state,
+					conversations: [...state.conversations, action.payload],
+					newConvo: null,
+				};
+			}
+		case 'UPDATE_CONVO':
+			let conversationUpdateCopy = cloneDeep(state.conversations);
+
+			for (let i = 0; i < conversationUpdateCopy.length; i++) {
+				if (conversationUpdateCopy[i].id === action.payload.id) {
+					conversationUpdateCopy[i].newMessage = action.payload.newMessage;
+					conversationUpdateCopy[i].lastMessage = action.payload.lastMessage;
+				}
+			}
+
+			return {
+				...state,
+				conversations: conversationUpdateCopy,
+			};
+		case 'NEW_MESSAGE':
+			let conversationsCloneNew = cloneDeep(state.conversations);
+			let newConversation;
+
+			// Loop over all conversations and we see if we have a matching one
+			for (let i = 0; i < conversationsCloneNew.length; i++) {
+				if (conversationsCloneNew[i].id === action.payload.parent) {
+					conversationsCloneNew[i].messages.push(action.payload);
+					conversationsCloneNew[i].messages.sort((a, b) => {
+						let aDate = new Date(a.timestamp);
+						let bDate = new Date(b.timestamp);
+
+						return aDate < bDate ? -1 : 1;
+					});
+					conversationsCloneNew[i].lastMessageFrom = conversationsCloneNew[i]?.messages[conversationsCloneNew[i]?.messages?.length - 1]?.uid;
+					newConversation = conversationsCloneNew[i];
+					break;
+				}
+			}
+
+			if (state.messageTab?.id === action.payload.parent) {
+				return {
+					...state,
+					conversations: conversationsCloneNew,
+					messageTab: newConversation,
+				};
+			} else {
+				return {
+					...state,
+					conversations: conversationsCloneNew,
+				};
+			}
+
 		default:
 			return state;
 	}
 };
 
 export default AuthReducer;
-
-const test = {
-	Version: '2012-10-17',
-	Statement: [
-		{
-			Effect: 'Allow',
-			Action: 'logs:CreateLogGroup',
-			Resource: 'arn:aws:logs:us-east-1:927867949915:*',
-		},
-		{
-			Effect: 'Allow',
-			Action: ['logs:CreateLogStream', 'logs:PutLogEvents'],
-			Resource: ['arn:aws:logs:us-east-1:927867949915:log-group:/aws/lambda/buildUpload:*'],
-		},
-	],
-};

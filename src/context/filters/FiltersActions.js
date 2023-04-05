@@ -88,7 +88,7 @@ const useFilters = () => {
 			type: 'SET_FILTERS',
 			payload: {
 				filter: 'challengeFilter',
-				value: e.target.value,
+				value: e?.target?.value ? e.target.value : e,
 			},
 		});
 		setCurrentPage(0);

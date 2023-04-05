@@ -4,8 +4,10 @@ import { convertFromRaw, EditorState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 //---------------------------------------------------------------------------------------------------//
 import Button from '../buttons/Button';
+import useFilters from '../../context/filters/FiltersActions';
 
 function ChallengeCard({ challenge, i, currentSlide }) {
+	const { setChallengeFilter } = useFilters();
 	const navigate = useNavigate();
 	const [parsedArticle, setParsedArticle] = useState(null);
 
@@ -23,7 +25,6 @@ function ChallengeCard({ challenge, i, currentSlide }) {
 		return Object.entries(obj).reduce((acc, [key, value]) => (key === keyToFind ? acc.concat(value) : typeof value === 'object' ? acc.concat(findAllByKey(value, keyToFind)) : acc), []);
 	};
 
-	//---------------------------------------------------------------------------------------------------//
 	if (currentSlide === undefined) {
 		return (
 			<>
@@ -68,8 +69,8 @@ function ChallengeCard({ challenge, i, currentSlide }) {
 	if (currentSlide === i) {
 		return (
 			<>
-				<img src={challenge.image} alt={challenge.title} className="rounded-lg h-full z-50" />
-				<div className="flex flex-col">
+				<img src={challenge.image} alt={challenge.title} className="rounded-lg object-contain h-full z-50" />
+				<div className="flex flex-col w-full px-4">
 					<div className="flex flex-row flex-wrap gap-2 2k:gap-4 mb-2 2k:mb-4">
 						<p className="text-3xl 2k:text-5xl text-white font-bold z-50 truncate-3">{challenge.title}</p>
 						{i === 0 && <p className="badge badge-secondary text-xl 2k:text-2xl p-4">New!</p>}
@@ -77,8 +78,9 @@ function ChallengeCard({ challenge, i, currentSlide }) {
 					</div>
 					<p className="text-lg 2k:text-2xl italic text-slate-500 mb-10 2k:mb-20 z-50 shrink-0">{challenge.date}</p>
 					<div className="flex flex-row flex-wrap gap-4 2k:gap-6">
-						<Button type="ahref" href={`/upload/c=${challenge.articleId}`} text="Submit Build" icon="plus" color="btn-accent" position="z-50" size="w-fit" />
-						<Button type="ahref" href={`/challenges/${challenge.articleId}`} text="Read more" icon="right" color="btn-primary" position="z-50" size="w-fit" />
+						<Button type="ahref" href={`/upload/c=${challenge.articleId}`} text="Submit Build" icon="plus" color="btn-dark text-white" position="z-50" size="w-fit" />
+						<Button type="ahref" href={`/challenges/${challenge.articleId}`} text="Read more" icon="right" color="btn-dark text-white" position="z-50" size="w-fit" />
+						<Button onClick={() => setChallengeFilter(challenge.articleId)} text="View Builds" icon="export" color="btn-dark text-white" position="z-50" size="w-fit" />
 					</div>
 				</div>
 			</>

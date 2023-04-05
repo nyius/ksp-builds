@@ -15,6 +15,7 @@ import { Navbar, Footer } from './components';
 import Stars from './components/stars/Stars';
 import LeftBar from './components/containers/leftBar/LeftBar';
 import Modals from './components/modals/Modals';
+import Messaging from './components/Messaging/Messaging';
 //---------------------------------------------------------------------------------------------------//
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
@@ -25,10 +26,11 @@ email verification?
 Mission generation page
 folders
 button closing notifications tab when clicked
-send users a message
+delete conversation
+block a user (no convos at all)
+turn off notifs for convos
 paid tier (badge next to name, access to premium features)
-filter notifications setting
-scroll issue
+hovering a user should show more info
 hide craft
 choose how many ships are loaded each time
 Quick share builds (without needing to create a whole build)
@@ -142,6 +144,7 @@ function App() {
 								</div>
 							</div>
 						</div>
+						<Messaging />
 						<Modals />
 						<Footer />
 					</div>

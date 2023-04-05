@@ -26,9 +26,6 @@
 .h-118 {
 	height: 46rem;
 }
-.h-120 {
-	height: 48rem;
-}
 
 .w-100 {
 	width: 30rem;
@@ -60,6 +57,9 @@
 
 .z-60 {
 	z-index: 60;
+}
+.z-61 {
+	z-index: 61;
 }
 
 .z-100 {
@@ -139,14 +139,9 @@
 	height: fit-content;
 }
 
-@media (min-width: 640px) {
-	.banner {
-		height: 25rem;
-	}
-}
 @media (min-width: 768px) {
 	.banner {
-		height: 20rem;
+		height: 50rem;
 	}
 }
 

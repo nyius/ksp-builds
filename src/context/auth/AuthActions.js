@@ -1,11 +1,11 @@
 import { db } from '../../firebase.config';
-import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter, where } from 'firebase/firestore';
+import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter, where, ref, onSnapshot, QuerySnapshot } from 'firebase/firestore';
 import { signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 import { googleProvider } from '../../firebase.config';
 import { auth } from '../../firebase.config';
 import { deleteUser, getAuth } from 'firebase/auth';
 import BuildContext from '../build/BuildContext';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import AuthContext from './AuthContext';
 import { cloneDeep, update } from 'lodash';
 import { toast } from 'react-toastify';
@@ -17,7 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
 
 const useAuth = () => {
-	const { dispatchAuth, user, accountToDelete, newUsername, newBio, reportingContent, reportType, fetchedUserProfile, lastFetchedNotification } = useContext(AuthContext);
+	const { dispatchAuth, user, accountToDelete, newUsername, messageTab, reportingContent, reportType, fetchedUserProfile, lastFetchedNotification, newConvo, conversations } = useContext(AuthContext);
 	const { loadedBuild } = useContext(BuildContext);
 
 	/**
@@ -59,8 +59,13 @@ const useAuth = () => {
 
 			userProfile.dateCreated = createdAt;
 
+			const firstDoc = {
+				id: 'first',
+			};
+
 			await setDoc(doc(db, 'users', uid), user);
 			await setDoc(doc(db, 'users', uid, 'notifications', notifId), notification);
+			await setDoc(doc(db, 'users', uid, 'messages', 'first'), firstDoc);
 			await setDoc(doc(db, 'userProfiles', uid), userProfile);
 
 			const statsData = await getDoc(doc(db, 'adminPanel', 'stats'));
@@ -92,6 +97,10 @@ const useAuth = () => {
 	const updateUserDb = async update => {
 		try {
 			await updateDoc(doc(db, 'users', user.uid), update);
+			dispatchAuth({
+				type: 'UPDATE_USER',
+				payload: { ...update },
+			});
 		} catch (error) {
 			console.log(error);
 			toast.error('Something went wrong. Please try again');
@@ -123,10 +132,6 @@ const useAuth = () => {
 	 */
 	const updateUserDbBio = async bio => {
 		try {
-			if (bio.length > 1000) {
-				toast.error('Your bio is too long! Must be less than 1000 characters');
-				return;
-			}
 			await updateDoc(doc(db, 'users', user.uid), { bio });
 			await updateDoc(doc(db, 'userProfiles', user.uid), { bio });
 
@@ -142,8 +147,8 @@ const useAuth = () => {
 	};
 
 	/**
-	 * Handles updating the users bio on the server
-	 * @param {*} bio
+	 * Handles updating the users profile picture on the server
+	 * @param {*} profilePicture
 	 */
 	const updateUserDbProfilePic = async profilePicture => {
 		try {
@@ -237,7 +242,7 @@ const useAuth = () => {
 	};
 
 	/**
-	 * Handles a user favoriting a build
+	 * Handles a user favoriting a buildprofile
 	 * @param {*} id
 	 */
 	const handleFavoriting = async id => {
@@ -319,12 +324,14 @@ const useAuth = () => {
 				let profiles = [];
 
 				fetchedProfiles.forEach(profile => {
-					profiles.push(profile.data());
+					let userProfile = profile.data();
+					userProfile.uid = profile.id;
+					profiles.push(userProfile);
 				});
 
 				if (profiles.length > 0) {
 					const profile = profiles[0];
-					profile.uid = fetchedProfile.id;
+
 					dispatchAuth({
 						type: 'FETCH_USERS_PROFILE',
 						payload: profile,
@@ -698,6 +705,152 @@ const useAuth = () => {
 		}
 	};
 
+	/**
+	 * Handles sending a message to a user
+	 * @param {*} id
+	 * @param {*} uid
+	 * @param {*} message
+	 */
+	const sendMessage = async message => {
+		try {
+			// Check if the convo exists
+			if (messageTab === null) return;
+			let convoData;
+
+			if (messageTab.id) convoData = await getDoc(doc(db, 'conversations', messageTab.id));
+
+			const otherUser = messageTab.users.filter(user => {
+				return user !== auth.currentUser.uid;
+			})[0];
+
+			if (convoData && convoData.exists()) {
+				const newIdMessage = uuidv4().slice(0, 20);
+				const messageToSend = {
+					message,
+					timestamp: serverTimestamp(),
+					uid: user.uid,
+					parent: messageTab.id,
+				};
+
+				// Add the convo to the db
+				await setDoc(doc(db, 'conversations', messageTab.id, 'messages', newIdMessage), messageToSend);
+				await updateDoc(doc(db, 'conversations', messageTab.id), { lastMessage: serverTimestamp(), lastMessageFrom: user.uid });
+
+				// Update the current users profile with the id to the new convo
+				await updateDoc(doc(db, 'users', user.uid, 'messages', messageTab.id), { newMessage: false, lastMessage: serverTimestamp() });
+				await updateDoc(doc(db, 'users', otherUser, 'messages', messageTab.id), { newMessage: true, lastMessage: serverTimestamp() });
+			} else {
+				const newId = uuidv4().slice(0, 20);
+				const newIdMessage = uuidv4().slice(0, 20);
+				// If the convo doesn't exist
+				const conversation = {
+					users: messageTab.users,
+					lastMessage: serverTimestamp(),
+					lastMessageFrom: user.uid,
+				};
+				const messageToSend = {
+					message,
+					timestamp: serverTimestamp(),
+					uid: user.uid,
+					parent: newId,
+				};
+				// Add the convo to the db
+				await setDoc(doc(db, 'conversations', newId), conversation);
+				await setDoc(doc(db, 'conversations', newId, 'messages', newIdMessage), messageToSend);
+
+				// Update the current users profile with the id to the new convo
+				await setDoc(doc(db, 'users', user.uid, 'messages', newId), { id: newId, newMessage: false, lastMessage: serverTimestamp() });
+				await setDoc(doc(db, 'users', otherUser, 'messages', newId), { id: newId, newMessage: true, lastMessage: serverTimestamp() });
+
+				conversation.lastMessage = new Date();
+				conversation.id = newId;
+				conversation.userProfilePic = messageTab.userProfilePic;
+				conversation.username = messageTab.username;
+				messageToSend.timestamp = new Date();
+
+				conversation.messaages = [messageToSend];
+
+				dispatchAuth({
+					type: 'SET_MESSAGE_TAB',
+					payload: conversation,
+				});
+			}
+		} catch (error) {
+			toast.error('Something went wrong. Please try again');
+			console.log(error);
+		}
+	};
+
+	/**
+	 * Handles checking if we have a conversation with this user, or if its a new one
+	 * @param {*} userProfile
+	 * @returns
+	 */
+	const fetchConversation = userProfile => {
+		try {
+			const messageBox = document.getElementById('messageBox');
+			const conversationBox = document.getElementById('conversationBox');
+
+			let foundConvo = null;
+			conversations?.map(convo => {
+				if (convo.users.includes(userProfile.uid)) foundConvo = convo;
+			});
+
+			if (foundConvo) {
+				setMessageTab(foundConvo);
+				conversationBox.classList.add('dropdown-open');
+				messageBox.focus();
+			} else {
+				setMessageTab({
+					users: [user.uid, userProfile.uid],
+					lastMessage: null,
+					messages: [],
+					userProfilePic: userProfile?.profilePicture,
+					username: userProfile.username,
+					id: null,
+				});
+				messageBox.focus();
+				conversationBox.classList.add('dropdown-open');
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
+	 * Handles setting the current covnersation message
+	 * @param {*} convo
+	 */
+	const setMessageTab = convo => {
+		dispatchAuth({
+			type: 'SET_MESSAGE_TAB',
+			payload: {
+				messageTab: convo,
+			},
+		});
+	};
+
+	/**
+	 * Handles when a user has 'read' a new message
+	 */
+	const readMessage = async convo => {
+		try {
+			await updateDoc(doc(db, 'users', user.uid, 'messages', convo.id), { newMessage: false });
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
+	 * Handles setting a report
+	 */
+	const setHoverUser = value => {
+		dispatchAuth({
+			type: 'SET_HOVER_USER',
+			payload: value,
+		});
+	};
+
 	return {
 		handleVoting,
 		handleDeleteNotification,
@@ -709,21 +862,27 @@ const useAuth = () => {
 		setNewSignup,
 		setNotificationsRead,
 		setEditingProfile,
+		setMessageTab,
 		setAccountToDelete,
 		setReport,
+		setHoverUser,
 		updateUserState,
 		updateUserDbBio,
+		updateUserDb,
 		updateUserDbProfilePic,
 		updateUserProfilePicture,
 		deleteUserAccount,
 		fetchUsersProfile,
+		fetchConversation,
 		fetchMoreNotifications,
 		uploadProfilePicture,
 		createNewUserAccount,
 		loginWithGoogle,
 		newEmailAccount,
 		sendNotification,
+		sendMessage,
 		submitReport,
+		readMessage,
 	};
 };
 

@@ -31,7 +31,7 @@ function BuildCard({ build }) {
 			<div className="card card-compact card-sizing grow bg-base-400 shadow-lg hover:shadow-xl cursor-pointer">
 				<DeleteBuildAdmin style="circle" id={build.id} userID={build.uid} />
 
-				<div className="flex flex-col w-full rounded-2xl buildCardHover hover:rounded-2xl overflow-hidden w-full" onClick={handleNavigate}>
+				<div className="flex flex-col w-full rounded-2xl buildCardHover hover:rounded-2xl  w-full" onClick={handleNavigate}>
 					{/* Image */}
 					<figure className="bg-base-900 relative">
 						{/* Views */}
@@ -50,7 +50,7 @@ function BuildCard({ build }) {
 
 					{/* Body */}
 					<div className="flex flex-col w-full p-4 2k:p-6 place-content-between">
-						<div className="flex flex-col gap-2 w-full overflow-hidden">
+						<div className="flex flex-col gap-2 w-full">
 							{/* Name */}
 							<h2 className="card-title text-white 2k:text-4xl mb-2 2k:mb-4">{build.name}</h2>
 
@@ -60,7 +60,7 @@ function BuildCard({ build }) {
 
 								{/* Build Author */}
 								<h3 className="flex flex-row text-slate-300 text-xl 2k:text-2xl sm:text-lg">
-									<UsernameLink username={build.author} uid={build.uid} />
+									<UsernameLink hoverPosition={'top-left'} username={build.author} uid={build.uid} />
 								</h3>
 							</div>
 

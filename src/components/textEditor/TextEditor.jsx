@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
 import BuildContext from '../../context/build/BuildContext';
-import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
+import { convertFromRaw, convertToRaw, EditorState, ContentState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import useBuild from '../../context/build/BuildActions';
+import AuthContext from '../../context/auth/AuthContext';
+import checkIfJson from '../../utilities/checkIfJson';
 
 /**
  * Takes in a setState to set when the text is edited. Also takes in a size that specifies how many toolbar icons are shown. (sm, md, lg). default is lg
@@ -15,6 +17,7 @@ const TextEditor = state => {
 	// Handles sending the markup back to the parent
 	const { setState, size, i, reset, text } = state;
 	const { editingBuild, editingComment, resetTextEditor } = useContext(BuildContext);
+	const { editingProfile } = useContext(AuthContext);
 	const { setResetTextEditorState } = useBuild();
 	const emptyState = `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`;
 
@@ -24,6 +27,13 @@ const TextEditor = state => {
 		}
 		if (editingComment) {
 			return EditorState.createWithContent(convertFromRaw(JSON.parse(editingComment.comment)));
+		}
+		if (editingProfile) {
+			if (checkIfJson(editingProfile.bio)) {
+				return EditorState.createWithContent(convertFromRaw(JSON.parse(editingProfile.bio)));
+			} else {
+				return EditorState.createWithContent(ContentState.createFromText(editingProfile.bio));
+			}
 		}
 		if (text) {
 			return EditorState.createWithContent(convertFromRaw(JSON.parse(text)));

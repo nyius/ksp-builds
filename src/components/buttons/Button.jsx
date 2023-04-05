@@ -6,7 +6,7 @@ import { FiLogOut } from 'react-icons/fi';
 import { TiExport, TiPlusOutline } from 'react-icons/ti';
 import { RiDeleteBin2Fill, RiEditFill, RiLoginCircleLine } from 'react-icons/ri';
 import { BsFillPatchQuestionFill, BsFillArrowDownSquareFill, BsFillArrowLeftSquareFill, BsFillArrowRightSquareFill, BsCaretRightFill, BsCaretLeftFill, BsTwitter } from 'react-icons/bs';
-import { BiCommentAdd, BiReset } from 'react-icons/bi';
+import { BiCommentAdd, BiReset, BiMessageAltDetail } from 'react-icons/bi';
 import { MdOutlineDoneOutline, MdEmail, MdSettingsInputComponent, MdReport } from 'react-icons/md';
 import { FcGoogle } from 'react-icons/fc';
 import { HiNewspaper } from 'react-icons/hi';
@@ -27,10 +27,11 @@ import { Link } from 'react-router-dom';
  * @param {*} margin - enter any margin
  * @param {*} href - href if its a link to a page (like profile, settings)
  * @param {*} target - set to _blank if want button click to open in new tab
+ * @param {*} tabIndex - set a numerical tabIndex number to use for things like dropdowns
  * @param {*} type - enter 'submit' for submitting a form, 'button' to make it not submit, 'ahref' for a link to a page for google, leave blank for 'label'
  * @returns
  */
-function Button({ text, onClick, color, size, icon, css, style, position, htmlFor, margin, type, href, target }) {
+function Button({ text, onClick, color, size, icon, css, style, position, htmlFor, margin, type, href, target, tabIndex }) {
 	const buttonIcon = () => {
 		if (icon === 'cancel') return <GiCancel />;
 		if (icon === 'upload') return <ImCloudUpload />;
@@ -62,6 +63,7 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 		if (icon === 'info') return <AiOutlineBulb />;
 		if (icon === 'mountain') return <GiPeaks />;
 		if (icon === 'twitter') return <BsTwitter />;
+		if (icon === 'message') return <BiCommentAdd />;
 	};
 
 	// The button is a label becuase then we can use htmlFor tag to open modals. Not sure if this breaks things but it seems to work fine
@@ -83,7 +85,7 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 		}
 	} else {
 		return (
-			<label type={type} htmlFor={htmlFor} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
+			<label type={type} tabIndex={tabIndex} htmlFor={htmlFor} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
 				{icon && <span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
 				{text !== '' && text}
 			</label>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, getDoc, setDoc, getCountFromServer, serverTimestamp } from 'firebase/firestore';
+import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, getDoc, setDoc, getCountFromServer, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { cloneDeep } from 'lodash';
 import { Helmet } from 'react-helmet';
@@ -222,6 +222,21 @@ function AdminPanel() {
 	};
 
 	/**
+	 * Some function to update all users
+	 */
+	const updateAllUsers = async () => {
+		try {
+			const usersRef = collection(db, 'users');
+			const usersSnap = await getDocs(usersRef);
+
+			// const userRef = collection(db, 'users', 'ZyVrojY9BZU5ixp09LftOd240LH3', 'messages');
+			// await addDoc(userRef, firstDoc);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
 	 * Handles uploading patch note
 	 */
 	const uploadPatchNote = async () => {
@@ -319,10 +334,17 @@ function AdminPanel() {
 				{infoLoading ? (
 					<Spinner1 />
 				) : (
-					<div className="bg-base-600 rounded-xl p-4 2k:p-8 flex flex-col gap-4">
-						<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Add a new KSP version</p>
-						<TextInput onChange={e => setNewVersion(e.target.value)} placeholder="Version" size="w-44" />
-						<Button text="submit" icon="upload" onClick={submitNewVersion} size="w-fit" color="btn-primary" />
+					<div className="flex flex-row bg-base-600 gap-4 rounded-xl p-4 2k:p-8 ">
+						<div className="flex flex-col gap-4">
+							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Add a new KSP version</p>
+							<TextInput onChange={e => setNewVersion(e.target.value)} placeholder="Version" size="w-44" />
+							<Button text="submit" icon="upload" onClick={submitNewVersion} size="w-fit" color="btn-primary" />
+						</div>
+						<div className="divider divider-horizontal"></div>
+						<div className="flex flex-col gap-4 place-content-between">
+							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Upate all users</p>
+							<Button color="btn-primary" text="Update" onClick={updateAllUsers} />
+						</div>
 					</div>
 				)}
 

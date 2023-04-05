@@ -4,6 +4,9 @@ import { toast } from 'react-toastify';
 import { AiFillCamera } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import { convertFromRaw, EditorState, ContentState } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import BuildsContext from '../../context/builds/BuildsContext';
@@ -12,6 +15,7 @@ import useFilters from '../../context/filters/FiltersActions';
 import FiltersContext from '../../context/filters/FiltersContext';
 import useAuth from '../../context/auth/AuthActions';
 import useResetStates from '../../utilities/useResetStates';
+import checkIfJson from '../../utilities/checkIfJson';
 //---------------------------------------------------------------------------------------------------//
 import BuildCard from '../../components/buildCard/BuildCard';
 import Spinner1 from '../../components/spinners/Spinner1';
@@ -20,6 +24,7 @@ import Button from '../../components/buttons/Button';
 import CantFind from '../../components/cantFind/CantFind';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
+import TextEditor from '../../components/textEditor/TextEditor';
 
 /**
  * Displays the users own profile
@@ -39,7 +44,8 @@ function Profile() {
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const [dateCreated, setDateCreated] = useState(null);
 	const [bioLength, setBioLength] = useState(1000);
-	const [bio, setBio] = useState('');
+	const [editedBio, setEditedBio] = useState(null);
+	const [bioState, setBioState] = useState(null);
 
 	useEffect(() => {
 		if (user?.dateCreated) {
@@ -65,6 +71,12 @@ function Profile() {
 			} else {
 				setBuildsLoading(false);
 			}
+
+			if (checkIfJson(user?.bio)) {
+				setBioState(EditorState.createWithContent(convertFromRaw(JSON.parse(user?.bio))));
+			} else {
+				setBioState(EditorState.createWithContent(ContentState.createFromText(user?.bio)));
+			}
 		}
 	}, [authLoading]);
 
@@ -76,20 +88,12 @@ function Profile() {
 	}, [fetchedBuilds, sortBy]);
 
 	/**
-	 * handles setting the bio and updating the total length
-	 * @param {*} e
-	 */
-	const handleSetBio = e => {
-		setBio(e.target.value);
-		setBioLength(prevState => 1000 - e.target.value.length);
-	};
-
-	/**
 	 * Handles updating the users bio
 	 */
 	const handleSubmitBioUpdate = async () => {
-		await updateUserDbBio(bio);
+		await updateUserDbBio(editedBio);
 		setEditingProfile(false);
+		setBioState(EditorState.createWithContent(convertFromRaw(JSON.parse(editedBio))));
 	};
 
 	/**
@@ -151,8 +155,7 @@ function Profile() {
 								{editingProfile ? (
 									<>
 										{/* Bio Edit */}
-										<textarea onChange={handleSetBio} defaultValue={user.bio} maxLength="1000" rows="4" className="textarea w-full text-xl"></textarea>
-										<p className="text-slate-400 italic 2k:text-2xl">{bioLength}</p>
+										<TextEditor setState={setEditedBio} />
 
 										{/* Buttons */}
 										<div className="flex flex-row gap-4">
@@ -165,9 +168,9 @@ function Profile() {
 										<div className="flex flex-row gap-2">
 											{/* Bio */}
 											<p className="text-slate-500 text-xl 2k:text-2xl italic">Bio: </p>
-											{user.bio === '' ? <p className="italic text-slate-500 text-xl 2k:text-3xl">No bio yet</p> : <p className="text-xl 2k:text-3xl"> {user.bio} </p>}
+											<Editor editorState={bioState} readOnly={true} toolbarHidden={true} />
 										</div>
-										<Button text="Edit Bio" icon="edit" onClick={() => setEditingProfile(true)} size="btn-sm 2k:btn-md w-fit" margin="mt-3 2k:mt-6 mb-4" />
+										<Button text="Edit Bio" icon="edit" onClick={() => setEditingProfile({ bio: user.bio })} size="btn-sm 2k:btn-md w-fit" margin="mt-3 2k:mt-6 mb-4" />
 									</div>
 								)}
 								<p className="text-xl 2k:text-3xl">

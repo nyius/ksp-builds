@@ -1,11 +1,12 @@
 import React, { useState, useContext, useEffect, useRef, Fragment } from 'react';
 import AuthContext from '../../context/auth/AuthContext';
 import useAuth from '../../context/auth/AuthActions';
+import Button from '../buttons/Button';
 
 function Conversations() {
 	const { conversations, user } = useContext(AuthContext);
 	const messagesTopTef = useRef(null);
-	const { setMessageTab, readMessage } = useAuth();
+	const { setMessageTab, readMessage, handleDeleteConversationId } = useAuth();
 	const [convos, setConvos] = useState(null);
 
 	const scrollToTop = () => {
@@ -30,9 +31,13 @@ function Conversations() {
 	 * Handles opening a convo up
 	 * @param {*} convo
 	 */
-	const handleOpenConvo = convo => {
-		setMessageTab(convo);
-		readMessage(convo);
+	const handleOpenConvo = (convo, e) => {
+		if (!e.target.htmlFor) {
+			setMessageTab(convo);
+			readMessage(convo);
+		} else {
+			handleDeleteConversationId(convo.id);
+		}
 	};
 
 	/**
@@ -57,7 +62,7 @@ function Conversations() {
 						return (
 							<Fragment key={i}>
 								{message?.messages?.length > 0 && (
-									<div key={i} className="flex flex-row gap-2 2k:gap-4 items-center rounded-xl py-2 2k:py-4 hover:bg-primary cursor-pointer" onClick={() => handleOpenConvo(message)}>
+									<div key={i} className="flex flex-row gap-2 2k:gap-4 items-center rounded-xl py-2 2k:py-4 hover:bg-primary cursor-pointer relative" onClick={e => handleOpenConvo(message, e)}>
 										<div className="avatar">
 											<div className="rounded-full w-24">
 												<img src={message.userProfilePic} alt="" />
@@ -68,15 +73,20 @@ function Conversations() {
 												<p className="text-xl 2k:text-3xl w-1/2 text-white text-ellipsis overflow-hidden">{message.username}</p>
 												<div className="flex flex-row pr-6 shrink-0 items-center">
 													<p className="text-lg 2k:text-2xl text-slate-500 pr-2">
-														{new Intl.DateTimeFormat('en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(message.lastMessage?.seconds * 1000)}
+														{message.lastMessage?.seconds ? (
+															<>{new Intl.DateTimeFormat('en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(message.lastMessage?.seconds * 1000)} </>
+														) : (
+															<>{message.lastMessage}</>
+														)}
 													</p>
 													{message.newMessage && <div className="bg-sky-500 rounded-full w-4 h-4 shrink-0"></div>}
 												</div>
 											</div>
-											<p className="text-slate-500 multi-line-truncate text-lg 2k:text-2xl">
+											<p className="text-slate-500 conversations-preview-text text-lg 2k:text-2xl">
 												{checkWhoSentLastMessage(message)}: {message.messages[message.messages.length - 1].message}
 											</p>
 										</div>
+										<Button htmlFor="delete-conversation-modal" text="x" style="btn-circle" position="absolute top-1 right-1" size="!btn-sm" />
 									</div>
 								)}
 							</Fragment>

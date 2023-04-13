@@ -9,7 +9,7 @@ import FiltersContext from '../filters/FiltersContext';
 import { cloneDeep } from 'lodash';
 
 const useBuilds = () => {
-	const { dispatchBuilds, fetchedBuilds, lastFetchedBuild, currentPage, storedBuilds } = useContext(BuildsContext);
+	const { dispatchBuilds, fetchedBuilds, lastFetchedBuild, currentPage, storedBuilds, fetchAmount } = useContext(BuildsContext);
 	const { deletingDeckId, loadedBuild } = useContext(BuildContext);
 	const { user } = useContext(AuthContext);
 	const { typeFilter, versionFilter, modsFilter, challengeFilter, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
@@ -34,7 +34,7 @@ const useBuilds = () => {
 
 			if (!buildsToFetchCopy) {
 				// Create a query
-				const constraints = [where('visibility', '==', 'public'), limit(process.env.REACT_APP_BUILDS_FETCH_NUM)];
+				const constraints = [where('visibility', '==', 'public'), limit(fetchAmount)];
 
 				if (versionFilter !== 'any') constraints.unshift(where('kspVersion', '==', versionFilter));
 				if (typeFilter !== '') constraints.unshift(where('type', 'array-contains', typeFilter));
@@ -59,7 +59,7 @@ const useBuilds = () => {
 					payload: {
 						fetchedBuilds: builds,
 						loadingBuilds: false,
-						lastFetchedBuild: buildsSnap.docs.length < process.env.REACT_APP_BUILDS_FETCH_NUM ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1],
+						lastFetchedBuild: buildsSnap.docs.length < fetchAmount ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1],
 						storedBuilds: [builds],
 					},
 				});
@@ -210,6 +210,17 @@ const useBuilds = () => {
 	};
 
 	/**
+	 * Handles setting how many ships to fetch
+	 * @param {*} amount
+	 */
+	const setFetchAmount = amount => {
+		dispatchBuilds({
+			type: 'SET_FETCH_AMOUNT',
+			payload: amount,
+		});
+	};
+
+	/**
 	 * Handles going back a page. Gets the page from the localstorage
 	 * @param {*} page
 	 */
@@ -240,7 +251,7 @@ const useBuilds = () => {
 		});
 	};
 
-	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchMoreBuilds, setBuildsLoading, setCurrentPage, clearFetchedBuilds, goBackPage, goToStartPage };
+	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchMoreBuilds, setBuildsLoading, setFetchAmount, setCurrentPage, clearFetchedBuilds, goBackPage, goToStartPage };
 };
 
 export default useBuilds;

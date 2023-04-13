@@ -19,6 +19,7 @@ import Spinner1 from '../../components/spinners/Spinner1';
 import TextEditor from '../../components/textEditor/TextEditor';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
+import UsernameLink from '../../components/buttons/UsernameLink';
 
 function AdminPanel() {
 	const { user } = useContext(AuthContext);
@@ -430,41 +431,45 @@ function AdminPanel() {
 										{/* date/type */}
 										<div className="flex flex-row gap-5 2k:gap-10">
 											<p className="text-xl 2k:text-2xl">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(report.date.seconds * 1000)}</p>
-											<div className={`badge ${report.type === 'contact' && 'badge-primary'} ${report.type === 'comment' && 'badge-secondary'} ${report.type === 'build' && 'badge-accent'} p-4 2k:p-6 text-xl 2k:text-3xl`}>
+											<div
+												className={`badge ${report.type === 'contact' && 'badge-primary'} ${report.type === 'comment' && 'badge-secondary'} ${report.type === 'build' && 'badge-accent'} ${
+													report.type === 'user' && 'badge-info'
+												}  p-4 2k:p-6 text-xl 2k:text-3xl`}
+											>
 												{report.type}
 											</div>
 										</div>
 
 										{/* Submitter Username */}
-										<p className="text-xl 2k:text-2xl text-slate-100">
-											<span className="italic text-slate-400"> Username: </span> {report.username}
-										</p>
+										<div className="text-xl 2k:text-2xl text-slate-100">
+											<span className="italic text-slate-400">Submitter Username: </span> {report.uid ? <UsernameLink username={report.username} uid={report.uid} /> : 'Anon'}
+										</div>
 
 										{/* Submitter name */}
 										{report.name && (
 											<p className="text-xl 2k:text-2xl text-slate-100">
-												<span className="italic text-slate-400"> Name: </span> {report.name}
+												<span className="italic text-slate-400"> Submitter Name: </span> {report.name}
 											</p>
 										)}
 
 										{/* Submitter email */}
 										{report.email && (
 											<p className="text-xl 2k:text-2xl text-slate-100">
-												<span className="italic text-slate-400"> Email: </span> {report.email}
+												<span className="italic text-slate-400"> Submitter Email: </span> {report.email}
 											</p>
 										)}
 
 										{/* Submitters messge */}
 										<p className="text-xl 2k:text-2xl text-slate-200">
-											<span className="italic text-slate-400"> Message: </span>
+											<span className="italic text-slate-400"> Submitter Message: </span>
 											{report.message}
 										</p>
 
 										{report.reportedUsername && (
-											<p className="text-xl 2k:text-2xl text-slate-200">
+											<div className="text-xl 2k:text-2xl text-slate-200">
 												<span className="italic text-slate-400"> Reported username: </span>
-												{report.reportedUsername}
-											</p>
+												{report.reportedUid ? <UsernameLink username={report.reportedUsername} uid={report.reportedUid} /> : 'Anon'}
+											</div>
 										)}
 
 										{report.reportedComment && (

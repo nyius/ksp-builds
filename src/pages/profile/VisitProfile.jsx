@@ -35,7 +35,7 @@ function VisitProfile() {
 	const { fetchedBuilds, loadingBuilds, lastFetchedBuild } = useContext(BuildsContext);
 	const { fetchedUserProfile, fetchingProfile, user, authLoading } = useContext(AuthContext);
 	//---------------------------------------------------------------------------------------------------//
-	const { fetchUsersProfile, setAccountToDelete, handleFollowingUser, sendMessage, fetchConversation } = useAuth();
+	const { fetchUsersProfile, setAccountToDelete, handleFollowingUser, sendMessage, fetchConversation, setReport } = useAuth();
 	const { filterBuilds, resetFilters } = useFilters();
 	const { fetchBuilds } = useBuilds();
 
@@ -66,6 +66,13 @@ function VisitProfile() {
 		setSortedBuilds(filterBuilds(newFetchedBuilds));
 	}, [fetchedBuilds, sortBy]);
 
+	/**
+	 * Handles setting the reported comment
+	 */
+	const handleSetReport = () => {
+		setReport('user', fetchedUserProfile);
+	};
+
 	//---------------------------------------------------------------------------------------------------//
 	if (fetchingProfile) {
 		return <Spinner1 />;
@@ -86,6 +93,9 @@ function VisitProfile() {
 						<div className="flex flex-row relative gap-14 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
 							{!authLoading && user?.username && user?.uid !== fetchedUserProfile.uid && (
 								<div className="absolute right-2 top-2 flex flex-row gap-2 2k:gap-4">
+									<div className="tooltip" data-tip="Report">
+										<Button htmlFor="report-modal" color="btn-ghost" icon="report" text="Report" onClick={handleSetReport} />
+									</div>
 									<div className="tooltip" data-tip={`${fetchedUserProfile.followers?.includes(user.uid) ? 'Unfollow' : 'Follow'}`}>
 										<Button icon={`${fetchedUserProfile.followers?.includes(user.uid) ? 'fill-heart' : 'outline-heart'}`} color="btn-primary" onClick={() => handleFollowingUser()} />
 									</div>

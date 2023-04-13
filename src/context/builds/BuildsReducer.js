@@ -56,6 +56,11 @@ const BuildsReducer = (state, action) => {
 				...state,
 				storedBuilds: [...state.storedBuilds, action.payload],
 			};
+		case 'SET_FETCH_AMOUNT':
+			return {
+				...state,
+				fetchAmount: action.payload,
+			};
 		default:
 			return state;
 	}

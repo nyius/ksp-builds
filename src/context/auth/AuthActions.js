@@ -15,6 +15,7 @@ import standardUserProfile from '../../utilities/standardUserProfile';
 import { uploadImage } from '../../utilities/uploadImage';
 import { v4 as uuidv4 } from 'uuid';
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
+import subscribeToConvo from '../../utilities/subscribeToConvo';
 
 const useAuth = () => {
 	const { dispatchAuth, user, accountToDelete, newUsername, messageTab, reportingContent, reportType, fetchedUserProfile, lastFetchedNotification, newConvo, conversations } = useContext(AuthContext);
@@ -526,6 +527,42 @@ const useAuth = () => {
 	};
 
 	/**
+	 * Handles removing a conversation from a user. Doesn't delete the actual conversation
+	 * @param {*} id
+	 */
+	const deleteConversation = async id => {
+		try {
+			// Delete the convo from the users messages
+			await deleteDoc(doc(db, 'users', user.uid, 'messages', id));
+			const convos = conversations.filter(convo => {
+				if (convo.id !== id) {
+					convo.unsubscribe();
+				}
+				return convo.id !== id;
+			});
+			// remove it from the conversations list
+			dispatchAuth({
+				type: 'SET_CONVOS',
+				payload: convos,
+			});
+			toast.success('Conversation Removed.');
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
+	 * Handles setting the id for the convo to delete
+	 * @param {*} id
+	 */
+	const handleDeleteConversationId = id => {
+		dispatchAuth({
+			type: 'SET_DELETE_CONVO_ID',
+			payload: id,
+		});
+	};
+
+	/**
 	 * handles logging in with Google
 	 */
 	const loginWithGoogle = async () => {
@@ -698,6 +735,23 @@ const useAuth = () => {
 				}
 
 				await addDoc(collection(db, 'reports'), report);
+			} else if (reportType === 'user') {
+				const report = {
+					date: serverTimestamp(),
+					reportedUsername: reportingContent.username,
+					reportedUid: reportingContent.uid,
+					message: message ? message : '',
+					type: 'user',
+				};
+
+				if (user?.username) {
+					report.username = user.username;
+					report.uid = user.uid;
+				} else {
+					report.username = 'Anonymous';
+				}
+
+				await addDoc(collection(db, 'reports'), report);
 			}
 			toast.success('Report submitted. Thanks for helping keep the community safe');
 		} catch (error) {
@@ -723,7 +777,9 @@ const useAuth = () => {
 				return user !== auth.currentUser.uid;
 			})[0];
 
+			// Check if its a new or existing convo
 			if (convoData && convoData.exists()) {
+				const conversation = convoData.data();
 				const newIdMessage = uuidv4().slice(0, 20);
 				const messageToSend = {
 					message,
@@ -736,12 +792,33 @@ const useAuth = () => {
 				await setDoc(doc(db, 'conversations', messageTab.id, 'messages', newIdMessage), messageToSend);
 				await updateDoc(doc(db, 'conversations', messageTab.id), { lastMessage: serverTimestamp(), lastMessageFrom: user.uid });
 
-				// Update the current users profile with the id to the new convo
-				await updateDoc(doc(db, 'users', user.uid, 'messages', messageTab.id), { newMessage: false, lastMessage: serverTimestamp() });
-				await updateDoc(doc(db, 'users', otherUser, 'messages', messageTab.id), { newMessage: true, lastMessage: serverTimestamp() });
+				// Check if the current user has this conversation (maybe they removed it from their list)
+				const currentUserConvo = await getDoc(doc(db, 'users', user.uid, 'messages', messageTab.id));
+
+				// Check if the current user has this convo on their profile or not. Then update the current users profile with the id to the new convo
+				if (currentUserConvo.exists()) {
+					await updateDoc(doc(db, 'users', user.uid, 'messages', messageTab.id), { newMessage: false, lastMessage: serverTimestamp() });
+				} else {
+					await subscribeToConvo(messageTab.id, dispatchAuth);
+
+					await setDoc(doc(db, 'users', user.uid, 'messages', messageTab.id), { id: messageTab.id, newMessage: false, lastMessage: serverTimestamp() });
+					dispatchAuth({
+						type: 'SET_MESSAGE_TAB',
+						payload: convoData,
+					});
+				}
+
+				// Check if the other user has this conversation or not
+				const usersConvo = await getDoc(doc(db, 'users', otherUser, 'messages', messageTab.id));
+				if (usersConvo.exists()) {
+					await updateDoc(doc(db, 'users', otherUser, 'messages', messageTab.id), { newMessage: true, lastMessage: serverTimestamp() });
+				} else {
+					await setDoc(doc(db, 'users', otherUser, 'messages', messageTab.id), { id: messageTab.id, newMessage: true, lastMessage: serverTimestamp() });
+				}
 			} else {
 				const newId = uuidv4().slice(0, 20);
 				const newIdMessage = uuidv4().slice(0, 20);
+
 				// If the convo doesn't exist
 				const conversation = {
 					users: messageTab.users,
@@ -801,16 +878,84 @@ const useAuth = () => {
 				conversationBox.classList.add('dropdown-open');
 				messageBox.focus();
 			} else {
-				setMessageTab({
-					users: [user.uid, userProfile.uid],
-					lastMessage: null,
-					messages: [],
-					userProfilePic: userProfile?.profilePicture,
-					username: userProfile.username,
-					id: null,
+				// If we didnt find the convo in our current list, check the database for an existing one
+				let foundConvo;
+
+				const checkForConvo = async () => {
+					try {
+						const convosRef = collection(db, 'conversations');
+						const convosQ = query(convosRef, where('users', 'array-contains', user.uid));
+						const convosSnap = await getDocs(convosQ);
+
+						const convosList = await Promise.all(
+							convosSnap.docs.map(async convoDoc => {
+								const convo = convoDoc.data();
+								if (convo.users.includes(user.uid) && convo.users.includes(userProfile.uid)) {
+									convo.id = convoDoc.id;
+									convo.lastMessage = new Intl.DateTimeFormat('en-US', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(convo.lastMessage.seconds * 1000);
+
+									// Fetch the other users profile
+									const userToFetch = convo.users.filter(user => {
+										return user !== user.uid;
+									})[0];
+
+									const userFetch = await getDoc(doc(db, 'userProfiles', userToFetch));
+									const userData = userFetch.data();
+									convo.userProfilePic = userData.profilePicture;
+									convo.username = userData.username;
+
+									const messagesRef = collection(db, `conversations`, convo.id, 'messages');
+									const messagesData = await getDocs(messagesRef);
+									let messages = messagesData.docs.map(doc => {
+										const message = doc.data();
+										message.id = doc.id;
+
+										message.timestamp = new Intl.DateTimeFormat('en-US', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(
+											message.timestamp ? message.timestamp.seconds * 1000 : new Date()
+										);
+										return message;
+									});
+
+									convo.messages = messages.sort((a, b) => {
+										let aDate = new Date(a.timestamp);
+										let bDate = new Date(b.timestamp);
+
+										return aDate < bDate ? -1 : 1;
+									});
+
+									foundConvo = convo;
+
+									await setDoc(doc(db, 'users', user.uid, 'messages', convo.id), { id: convo.id, newMessage: false, lastMessage: serverTimestamp() });
+								}
+							})
+						);
+					} catch (error) {
+						console.log(error);
+					}
+				};
+
+				checkForConvo().then(() => {
+					if (foundConvo) {
+						dispatchAuth({
+							type: 'NEW_CONVO',
+							payload: foundConvo,
+						});
+						setMessageTab(foundConvo);
+						messageBox.focus();
+						conversationBox.classList.add('dropdown-open');
+					} else {
+						setMessageTab({
+							users: [user.uid, userProfile.uid],
+							lastMessage: null,
+							messages: [],
+							userProfilePic: userProfile?.profilePicture,
+							username: userProfile.username,
+							id: null,
+						});
+						messageBox.focus();
+						conversationBox.classList.add('dropdown-open');
+					}
 				});
-				messageBox.focus();
-				conversationBox.classList.add('dropdown-open');
 			}
 		} catch (error) {
 			console.log(error);
@@ -857,6 +1002,7 @@ const useAuth = () => {
 		handleDeleteAllNotifications,
 		handleFavoriting,
 		handleFollowingUser,
+		handleDeleteConversationId,
 		addbuildToUser,
 		setResetPassword,
 		setNewSignup,
@@ -872,6 +1018,7 @@ const useAuth = () => {
 		updateUserDbProfilePic,
 		updateUserProfilePicture,
 		deleteUserAccount,
+		deleteConversation,
 		fetchUsersProfile,
 		fetchConversation,
 		fetchMoreNotifications,

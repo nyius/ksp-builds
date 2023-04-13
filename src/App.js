@@ -16,6 +16,7 @@ import Stars from './components/stars/Stars';
 import LeftBar from './components/containers/leftBar/LeftBar';
 import Modals from './components/modals/Modals';
 import Messaging from './components/Messaging/Messaging';
+import AdBannerTop from './components/ads/AdBannerTop';
 //---------------------------------------------------------------------------------------------------//
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
@@ -26,13 +27,11 @@ email verification?
 Mission generation page
 folders
 button closing notifications tab when clicked
-delete conversation
 block a user (no convos at all)
 turn off notifs for convos
 paid tier (badge next to name, access to premium features)
 hovering a user should show more info
-hide craft
-choose how many ships are loaded each time
+Twitter post weekly best build
 Quick share builds (without needing to create a whole build)
  */
 
@@ -52,7 +51,7 @@ function App() {
 						{/* Main layout sizing */}
 						<div className="main-container flex w-full justify-center mb-6 min-h-screen">
 							{/* Content Layout*/}
-							<div className="flex flex-col md:grid md:grid-cols-6 gap-4 xl:gap-20 2k:gap-32 w-full mt-20 2k:mt-36 m-2">
+							<div className="flex flex-col md:grid md:grid-cols-6 gap-4 xl:gap-20 2k:gap-32 w-full mt-20 xl:mt-32 m-2">
 								{/* xl:w-5/6  */}
 								<div className="md:col-start-1 md:col-end-3 lg:col-end-2">
 									<LeftBar />

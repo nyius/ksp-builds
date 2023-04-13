@@ -14,10 +14,11 @@ import SearchBar from '../search/SearchBar';
 import CantFind from '../cantFind/CantFind';
 import Button from '../buttons/Button';
 import Banner from '../banner/Banner';
+import FetchAmount from '../fetchAmount/FetchAmount';
 
 function Builds() {
 	const { typeFilter, versionFilter, searchTerm, tagsSearch, sortBy, modsFilter, challengeFilter } = useContext(FiltersContext);
-	const { loadingBuilds, fetchedBuilds, lastFetchedBuild, currentPage } = useContext(BuildsContext);
+	const { loadingBuilds, fetchedBuilds, lastFetchedBuild, currentPage, fetchAmount } = useContext(BuildsContext);
 	const { filterBuilds, setTypeFilter, resetFilters } = useFilters();
 	const { fetchBuilds, fetchMoreBuilds, setCurrentPage, goBackPage } = useBuilds();
 	const { id } = useParams();
@@ -38,7 +39,7 @@ function Builds() {
 	// listens for filters and fetches builds based on filter
 	useEffect(() => {
 		fetchBuilds();
-	}, [typeFilter, searchTerm, modsFilter, versionFilter, challengeFilter, tagsSearch, sortBy]);
+	}, [typeFilter, searchTerm, modsFilter, versionFilter, challengeFilter, tagsSearch, sortBy, fetchAmount]);
 
 	if (!loadingBuilds && fetchedBuilds.length === 0) {
 		return <CantFind text="No builds found :("></CantFind>;
@@ -48,9 +49,10 @@ function Builds() {
 	return (
 		<>
 			<Banner />
-			<div className="flex flex-row gap-4 w-full place-content-between md:place-content-end sm:mb-4">
+			<div className="flex flex-row flex-wrap gap-4 w-full place-content-end sm:mb-4">
 				<SearchBar />
 				<Sort />
+				<FetchAmount />
 			</div>
 			<div className="flex flex-row flex-wrap w-full items-stretch justify-center md:justify-items-center mb-6 p-6 md:p-0">
 				{loadingBuilds ? (
@@ -75,8 +77,8 @@ function Builds() {
 					</button>
 				)}
 				<button className="btn btn-lg text-xl 2k:text-2xl">Page {currentPage + 1}</button>
-				{!loadingBuilds && fetchedBuilds.length == process.env.REACT_APP_BUILDS_FETCH_NUM && (
-					<button className="btn btn-lg text-xl 2k:text-2xl" onClick={() => fetchMoreBuilds(process.env.REACT_APP_BUILDS_FETCH_NUM)}>
+				{!loadingBuilds && fetchedBuilds.length == fetchAmount && (
+					<button className="btn btn-lg text-xl 2k:text-2xl" onClick={() => fetchMoreBuilds(fetchAmount)}>
 						»
 					</button>
 				)}

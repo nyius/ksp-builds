@@ -42,6 +42,11 @@ const AuthReducer = (state, action) => {
 				user: updatedUserState,
 				newUsername: updatedUserState?.username,
 			};
+		case 'SET_DELETE_CONVO_ID':
+			return {
+				...state,
+				deleteConvoId: action.payload,
+			};
 		case 'SET_FETCHING_PROFILE':
 			return {
 				...state,

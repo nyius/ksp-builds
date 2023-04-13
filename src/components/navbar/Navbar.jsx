@@ -4,6 +4,7 @@ import { auth } from '../../firebase.config';
 import { toast } from 'react-toastify';
 //---------------------------------------------------------------------------------------------------//
 import CreateBuildAdmin from '../buttons/CreateBuildAdmin';
+import AdBannerTop from '../ads/AdBannerTop';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import useBuilds from '../../context/builds/BuildsActions';
@@ -44,60 +45,63 @@ function NavBar() {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="navbar bg-base-900 mb-5 w-full fixed z-101">
-			<div className="flex-1">
-				{/* Logo  */}
-				<Link onClick={() => goToStartPage(0)} to="/">
-					<img src={Logo} className="h-10 2k:h-20 btn btn-ghost hidden sm:block" alt="KSP Builds Logo, navigate home" />
-				</Link>
+		<div className="fixed z-101 flex-col mb-5 w-full bg-base-900">
+			{/* <AdBannerTop /> */}
+			<div className="navbar">
+				<div className="flex-1">
+					{/* Logo  */}
+					<Link onClick={() => goToStartPage(0)} to="/">
+						<img src={Logo} className="h-10 2k:h-20 btn btn-ghost hidden sm:block" alt="KSP Builds Logo, navigate home" />
+					</Link>
 
-				{/* Mobile Hamburger */}
-				<div className="flex flex-row gap-4">
-					<MobileHamburger />
-					<Types />
+					{/* Mobile Hamburger */}
+					<div className="flex flex-row gap-4">
+						<MobileHamburger />
+						<Types />
+					</div>
+
+					{/* Buttons */}
+					<ul className="menu menu-horizontal px-6 gap-3 2k:gap-6">
+						<Button type="ahref" href="/upload" onClick={handleUploadNavigate} color="btn-accent" css="text-white hidden md:flex" text="Upload" icon="plus" />
+						<Button type="ahref" href="/news" css="text-white hidden lg:flex" text="News" icon="news" />
+						<Button type="ahref" href="/challenges" css="text-white hidden lg:flex" text="Challenges" icon="mountain" />
+						<Button text="How to upload" icon="info" color="text-white" css="hidden lg:flex" htmlFor="how-to-copy-build-modal" />
+						<CreateBuildAdmin />
+					</ul>
+
+					<div className="flex flex-row items-end">
+						<p className="text-2xl 2k:text-5xl text-sate-600 italic font-bold mr-4 2k:mr-8">BETA</p>
+						<p className="text-xl 2k:text-3xl text-sate-600 italic">Your Hub for KSP 2</p>
+					</div>
 				</div>
 
-				{/* Buttons */}
-				<ul className="menu menu-horizontal px-6 gap-3 2k:gap-6">
-					<Button type="ahref" href="/upload" onClick={handleUploadNavigate} color="btn-accent" css="text-white hidden md:flex" text="Upload" icon="plus" />
-					<Button type="ahref" href="/news" css="text-white hidden lg:flex" text="News" icon="news" />
-					<Button type="ahref" href="/challenges" css="text-white hidden lg:flex" text="Challenges" icon="mountain" />
-					<Button text="How to upload" icon="info" color="text-white" css="hidden lg:flex" htmlFor="how-to-copy-build-modal" />
-					<CreateBuildAdmin />
-				</ul>
-
-				<div className="flex flex-row items-end">
-					<p className="text-2xl 2k:text-5xl text-sate-600 italic font-bold mr-4 2k:mr-8">BETA</p>
-					<p className="text-xl 2k:text-3xl text-sate-600 italic">Your Hub for KSP 2</p>
+				<div className="flex-none gap-3">
+					{!authLoading && user?.username && (
+						<>
+							<Notifications />
+							<div className="dropdown dropdown-end">
+								<label tabIndex={0} className="btn btn-circle w-14 h-14 2k:w-20 2k:h-20 2k:btn-lg avatar">
+									<div className="w-10 2k:w-20 rounded-full">
+										<img src={user.profilePicture ? user.profilePicture : LogoIcon} />
+									</div>
+								</label>
+								<ul tabIndex={0} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box w-96">
+									<Button type="ahref" href="/profile" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Profile" />
+									{user.siteAdmin && <Button type="ahref" href="/admin-panel" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Admin Panel" />}
+									<Button type="ahref" href="/favorites" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" />
+									<Button type="ahref" href="/settings" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Settings" />
+									<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="logout" text="Logout" onClick={() => signOut()} />
+								</ul>
+							</div>
+						</>
+					)}
+					{!authLoading && !user?.username && (
+						<>
+							<Button type="ahref" href="/sign-up" icon="plus" text="Create Account" css="hidden md:flex" />
+							<Button htmlFor="login-modal" icon="login" text="login" />
+						</>
+					)}
 				</div>
-			</div>
-
-			<div className="flex-none gap-3">
-				{!authLoading && user?.username && (
-					<>
-						<Notifications />
-						<div className="dropdown dropdown-end">
-							<label tabIndex={0} className="btn btn-circle w-14 h-14 2k:w-20 2k:h-20 2k:btn-lg avatar">
-								<div className="w-10 2k:w-20 rounded-full">
-									<img src={user.profilePicture ? user.profilePicture : LogoIcon} />
-								</div>
-							</label>
-							<ul tabIndex={0} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box w-96">
-								<Button type="ahref" href="/profile" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Profile" />
-								{user.siteAdmin && <Button type="ahref" href="/admin-panel" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Admin Panel" />}
-								<Button type="ahref" href="/favorites" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" />
-								<Button type="ahref" href="/settings" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Settings" />
-								<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="logout" text="Logout" onClick={() => signOut()} />
-							</ul>
-						</div>
-					</>
-				)}
-				{!authLoading && !user?.username && (
-					<>
-						<Button type="ahref" href="/sign-up" icon="plus" text="Create Account" css="hidden md:flex" />
-						<Button htmlFor="login-modal" icon="login" text="login" />
-					</>
-				)}
 			</div>
 		</div>
 	);

@@ -59,6 +59,54 @@
 	}
 }
 
+.conversations-preview-text {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	inline-size: 35rem;
+}
+
+@media (max-width: 639px) {
+	.conversations-preview-text {
+		-webkit-line-clamp: 1;
+	}
+}
+
+@media (min-width: 640px) {
+	.conversations-preview-text {
+		inline-size: 30rem;
+	}
+}
+
+@media (min-width: 770px) {
+	.conversations-preview-text {
+		inline-size: 21rem;
+	}
+}
+
+@media (min-width: 1024px) {
+	.conversations-preview-text {
+		inline-size: 25rem;
+	}
+}
+
+@media (min-width: 1536px) {
+	.conversations-preview-text {
+		inline-size: 22rem;
+	}
+}
+@media (min-width: 1921px) {
+	.conversations-preview-text {
+		inline-size: 26rem;
+	}
+}
+@media (min-width: 2561px) {
+	.conversations-preview-text {
+		inline-size: 36rem;
+	}
+}
+
 .single-line-truncate {
 	display: -webkit-box;
 	-webkit-line-clamp: 1;

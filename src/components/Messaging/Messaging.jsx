@@ -5,6 +5,7 @@ import Button from '../buttons/Button';
 import Conversation from './Conversation';
 import Conversations from './Conversations';
 import useAuth from '../../context/auth/AuthActions';
+import DeleteConversationModal from '../modals/DeleteConversationModal';
 
 function Messaging() {
 	const [message, setMessage] = useState('');
@@ -79,28 +80,31 @@ function Messaging() {
 	//---------------------------------------------------------------------------------------------------//
 	if (!authLoading && user?.username) {
 		return (
-			<div id="conversationBox" className="dropdown dropdown-end" onBlur={e => handleBlur(e)}>
-				<div className="fixed bottom-0 right-10 z-100">
-					<div className="indicator">
-						{newMessages !== 0 && <span className="indicator-item badge badge-secondary z-100 text-xl p-4">{newMessages}</span>}
-						<Button onClick={handleChatBtnClick} text={'chat'} icon="message" tabIndex={0} color="bg-base-900 text-white" css="shadow-xl font-bold !text-3xl" />
+			<>
+				<div id="conversationBox" className="dropdown dropdown-end" onBlur={e => handleBlur(e)}>
+					<div className="fixed bottom-0 right-10 z-100">
+						<div className="indicator">
+							{newMessages !== 0 && <span className="indicator-item badge badge-secondary z-100 text-xl p-4">{newMessages}</span>}
+							<Button onClick={handleChatBtnClick} text={'chat'} icon="message" tabIndex={0} color="bg-base-900 text-white" css="shadow-xl font-bold !text-3xl" />
+						</div>
 					</div>
-				</div>
-				<ul
-					id="messageBox"
-					tabIndex={0}
-					className={`h-120 w-full sm:w-180 overflow-auto scrollbar flex-nowrap rounded-xl p-5 bg-base-900 !fixed ${messageTab ? '!bottom-32 2k:!bottom-38' : '!bottom-12 2k:!bottom-16'} right-2 z-101 menu dropdown-content`}
-				>
-					{messageTab ? <Conversation /> : <Conversations />}
-				</ul>
-
-				{/* Handles sending a message */}
-				{messageTab && (
-					<ul tabIndex={0} className="w-full sm:w-180 menu dropdown-content rounded-xl p-5 bg-base-900 !fixed !bottom-12 2k:!bottom-16 right-2 z-101">
-						<input autoComplete="off" onKeyDown={handleSendMessage} id="sendMessageBox" type="text" placeholder="enter message" className="input w-full text-xl 2k:text-3xl" onChange={e => setMessage(e.target.value)} />
+					<ul
+						id="messageBox"
+						tabIndex={0}
+						className={`h-120 w-full sm:w-180 overflow-auto scrollbar flex-nowrap rounded-xl p-5 bg-base-900 !fixed ${messageTab ? '!bottom-32 2k:!bottom-38' : '!bottom-12 2k:!bottom-16'} right-2 z-101 menu dropdown-content`}
+					>
+						{messageTab ? <Conversation /> : <Conversations />}
 					</ul>
-				)}
-			</div>
+
+					{/* Handles sending a message */}
+					{messageTab && (
+						<ul tabIndex={0} className="w-full sm:w-180 menu dropdown-content rounded-xl p-5 bg-base-900 !fixed !bottom-12 2k:!bottom-16 right-2 z-101">
+							<input autoComplete="off" onKeyDown={handleSendMessage} id="sendMessageBox" type="text" placeholder="enter message" className="input w-full text-xl 2k:text-3xl" onChange={e => setMessage(e.target.value)} />
+						</ul>
+					)}
+				</div>
+				<DeleteConversationModal />
+			</>
 		);
 	}
 }

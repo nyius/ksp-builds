@@ -105,7 +105,7 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 							<div className="flex flex-row gap-2 2k:gap-4 w-full items-end">
 								{user?.username && username === 'nyius' && <p className="text-xl 2k:text-2xl text-secondary font-bold">KSP Builds Founder</p>}
 								{usersProfile?.buildOfTheWeekWinner && (
-									<div className="tooltip" data-tip="Buld of the Week Winner">
+									<div className="tooltip" data-tip="Build of the Week Winner">
 										<img src={BotwBadge} alt="" className="w-22" />
 									</div>
 								)}

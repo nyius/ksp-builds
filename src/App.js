@@ -22,6 +22,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
+username says 'author' or something beside their name in the comments of their builds
+Donors get a special badge
 Twitter post weekly best build - not possible through API
 Featured builds
 competitions/ways to give users accolades

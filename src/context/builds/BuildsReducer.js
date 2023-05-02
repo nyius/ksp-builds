@@ -10,10 +10,22 @@ const BuildsReducer = (state, action) => {
 				...state,
 				loadingBuilds: action.payload,
 			};
+		case 'SET_BUILD_OF_THE_WEEK':
+			return {
+				...state,
+				buildOfTheWeek: action.payload,
+				loadingBuildOfTheWeek: false,
+			};
+		case 'SET_LOADING_BUILD_OF_THE_WEEK':
+			return {
+				...state,
+				loadingBuildOfTheWeek: action.payload,
+			};
 		case 'FETCHING_MORE_BUILDS':
 			return {
 				...state,
 				fetchingMoreBuilds: action.payload,
+				loadingBuilds: true,
 			};
 		case `SET_FAVORITES_BUILDS`:
 			return {

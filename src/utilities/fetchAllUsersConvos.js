@@ -24,9 +24,13 @@ const fetchAllUsersConvos = async usersConvos => {
 
 					const userFetch = await getDoc(doc(db, 'userProfiles', userToFetch));
 					const userData = userFetch.data();
+					let blocked;
+					if (userData?.blockList?.includes(auth.currentUser.uid)) blocked = true;
 					fetchedConvoData.userProfilePic = userData.profilePicture;
 					fetchedConvoData.username = userData.username;
+					fetchedConvoData.otherUser = userToFetch;
 					fetchedConvoData.messages = [];
+					fetchedConvoData.blocked = blocked;
 					fetchedConvos.push(fetchedConvoData);
 				}
 			})

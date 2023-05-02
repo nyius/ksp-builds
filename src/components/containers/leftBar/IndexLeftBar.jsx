@@ -58,7 +58,7 @@ function IndexLeftBar({ text }) {
 							kspVersions.map((version, i) => {
 								return (
 									<option key={i} value={version}>
-										{version}
+										{version} {i === 0 && '(Current)'}
 									</option>
 								);
 							})}

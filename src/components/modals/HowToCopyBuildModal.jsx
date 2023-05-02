@@ -28,7 +28,7 @@ function HowToCopyBuildModal() {
 
 						{/* Step 3 */}
 						<h4 className="text-xl 2k:text-3xl text-slate-300 mb-4">
-							<span className="badge 2k:badge-lg text-xl 2k:text-3xl p-3 2k:p-5 mr-2">3 </span> Paste it here! <kbd className="kbd">ctrl</kbd>+<kbd className="kbd">v</kbd>
+							<span className="badge 2k:badge-lg text-xl 2k:text-3xl p-3 2k:p-5 mr-2">3 </span> Paste it on the upload build page! <kbd className="kbd">ctrl</kbd>+<kbd className="kbd">v</kbd>
 						</h4>
 						<img className="rounded-2xl mb-6" src={Step3} alt="" />
 

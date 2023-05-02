@@ -8,7 +8,7 @@ import AdminRoute from './routes/AdminRoute';
 import backgroundplanet from './assets/planet.png';
 import ScrollToTop from './routes/ScrollToTop';
 //---------------------------------------------------------------------------------------------------//
-import { Index, SignUp, Build, NotFound, Upload, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, Challenge, Challenges, Faq, PatchNotes, UnderConstruction } from './pages';
+import { Index, SignUp, Build, NotFound, Upload, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, Challenge, Challenges, Faq, PatchNotes, UnderConstruction, Sponsor } from './pages';
 import RightBar from './components/containers/rightBar/RightBar';
 //---------------------------------------------------------------------------------------------------//
 import { Navbar, Footer } from './components';
@@ -22,17 +22,20 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
-search that searches the database, not just loaded builds
-email verification?
-Mission generation page
+Twitter post weekly best build - not possible through API
+Featured builds
+competitions/ways to give users accolades
+quick copy by just hovering over a build on the main tab... this may result in a lot of AWS calls
+t-shirts
+Volunteer positions (moderate, write posts, create challenges, etc) - this will include all the features they may need to see/have access to
 folders
 button closing notifications tab when clicked
-block a user (no convos at all)
-turn off notifs for convos
 paid tier (badge next to name, access to premium features)
-hovering a user should show more info
-Twitter post weekly best build
 Quick share builds (without needing to create a whole build)
+features from intercepts end that would help: knowing when new KSP versions are up, a point to ping to for news/challenges
+email verification?
+Mission generation page - would get destroyed by chatGPT charges so maybe in the future
+create backup database on an entirely new firebase instance - updates once a week
  */
 
 //---------------------------------------------------------------------------------------------------//
@@ -66,6 +69,7 @@ function App() {
 										<Route exact path="/terms" element={<Terms />} />
 										<Route exact path="/news" element={<News />} />
 										<Route exact path="/faq" element={<Faq />} />
+										<Route exact path="/sponsor" element={<Sponsor />} />
 										<Route exact path="/contact" element={<Contact />} />
 										<Route exact path="/challenges/:id" element={<Challenge />} />
 										<Route exact path="/challenges" element={<Challenges />} />

@@ -12,7 +12,7 @@ function Notification({ i, notif }) {
 	const { handleDeleteNotification } = useAuth();
 	let editorState;
 
-	if (notif.type === 'message' || notif.type === 'welcome' || notif.type === 'update') editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(notif.message)));
+	if (notif.type === 'message' || notif.type === 'welcome' || notif.type === 'update' || notif.type === 'buildOfTheWeek') editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(notif.message)));
 	if (notif.type === 'reply' || notif.type === 'comment') editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(notif.comment)));
 
 	useEffect(() => {
@@ -29,7 +29,7 @@ function Notification({ i, notif }) {
 			if (notif.type === 'comment') {
 				navigate(`/build/${notif.buildId}`);
 			}
-			if (notif.type === 'newBuild') {
+			if (notif.type === 'newBuild' || notif.type === 'buildOfTheWeek') {
 				navigate(`/build/${notif.buildId}`);
 			}
 			if (notif.type === 'reply') {
@@ -53,6 +53,7 @@ function Notification({ i, notif }) {
 				{notif.type === 'comment' && 'Someone commented on one of your builds!'}
 				{notif.type === 'update' && 'KSP Builds update!'}
 				{notif.type === 'challenge' && 'New challenge!'}
+				{notif.type === 'buildOfTheWeek' && "Congratulations, you're the Build of the Week Winner!"}
 				{notif.type === 'newBuild' && <>{notif.username} uploaded a new craft! Check it out</>}
 			</p>
 			{notif.type === 'newBuild' && (

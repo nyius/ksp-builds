@@ -17,3 +17,4 @@ export { default as Favorites } from './favorites/Favorites.jsx';
 export { default as Challenge } from './challenges/Challenge.jsx';
 export { default as Challenges } from './challenges/Challenges.jsx';
 export { default as Faq } from './faq/Faq.jsx';
+export { default as Sponsor } from './sponsor/Sponsor.jsx';

@@ -1,34 +1,59 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState, Fragment } from 'react';
 import NewsContext from '../../context/news/NewsContext';
+import BuildsContext from '../../context/builds/BuildsContext';
 import Button from '../buttons/Button';
 import { useNavigate } from 'react-router-dom';
 import Planet from '../../assets/planet2.png';
-import ChallengeCard from '../challenges/ChallengeCard';
+import ChallengeCard from '../cards/ChallengeCard';
+import BuildOfTheWeekCard from '../cards/BuildOfTheWeekCard';
 
 function Banner() {
+	const [slides, setSlides] = useState([]);
 	const [currentSlide, setCurrentSlide] = useState(0);
 	const navigate = useNavigate();
 	const { challenges, articlesLoading } = useContext(NewsContext);
+	const { loadingBuildOfTheWeek, buildOfTheWeek } = useContext(BuildsContext);
+
+	// Add build of the week and challenges together
+	useEffect(() => {
+		if (!loadingBuildOfTheWeek && !articlesLoading) {
+			const arr = [...challenges];
+			if (buildOfTheWeek) arr.push(buildOfTheWeek);
+
+			// Sort challenges and build of the week together by timestamp
+			arr.sort((a, b) => {
+				let aDate, bDate;
+
+				aDate = a.buildOfTheWeek ? new Date(a.buildOfTheWeek.seconds * 1000) : new Date(a.date);
+				bDate = b.buildOfTheWeek ? new Date(b.buildOfTheWeek.seconds * 1000) : new Date(b.date);
+
+				return aDate < bDate ? 1 : -1;
+			});
+
+			setSlides(arr);
+		}
+	}, [articlesLoading, loadingBuildOfTheWeek]);
 
 	/**
 	 * Handles going to the next slide
 	 */
 	const handleNextSlide = () => {
 		setCurrentSlide(() => {
-			if (currentSlide === challenges.length - 1) {
+			if (currentSlide === slides.length - 1) {
 				return 0;
 			} else {
 				return currentSlide + 1;
 			}
 		});
 	};
+
 	/**
 	 * Handles going to the next slide
 	 */
 	const handlePrevSlide = () => {
 		setCurrentSlide(() => {
 			if (currentSlide === 0) {
-				return challenges.length - 1;
+				return slides.length - 1;
 			} else {
 				return currentSlide - 1;
 			}
@@ -38,16 +63,18 @@ function Banner() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			{!articlesLoading && challenges && (
+			{!articlesLoading && !loadingBuildOfTheWeek && challenges && (
 				<div className="banner flex flex-row w-full p-4 2k:p-8 bg-base-900 rounded-lg mb-10 items-center overflow-hidden relative place-content-between ">
-					<Button icon="left2" size="h-44 !h-fit sm:!h-full" onClick={handlePrevSlide} position="z-60 absolute sm:relative top-1/2 sm:top-0 left-10 sm:left-0" />
+					<Button icon="left2" size="h-44 !h-fit sm:!h-full" onClick={handlePrevSlide} position="z-60 absolute sm:relative top-1/4 sm:top-0 left-10 sm:left-0" />
 					<div className="w-full h-full flex flex-col lg:flex-row items-center gap-10 2k:gap-20 ">
-						{challenges.map((challenge, i) => {
-							return <ChallengeCard currentSlide={currentSlide} i={i} key={i} challenge={challenge} />;
+						{slides.map((item, i) => {
+							return (
+								<Fragment key={i}>{item.buildOfTheWeek ? <BuildOfTheWeekCard currentSlide={currentSlide} i={i} key={i} buildOfTheWeek={item} /> : <ChallengeCard currentSlide={currentSlide} i={i} key={i} challenge={item} />}</Fragment>
+							);
 						})}
 					</div>
 					<img src={Planet} className="absolute hidden sm:block inset-x-2/3 inset-y-1/4 w-5/12" alt="Planet image" />
-					<Button icon="right2" size="h-44 !h-fit sm:!h-full" onClick={handleNextSlide} position="z-50 absolute sm:relative top-1/2 sm:top-0 right-10 sm:right-0" />
+					<Button icon="right2" size="h-44 !h-fit sm:!h-full" onClick={handleNextSlide} position="z-50 absolute sm:relative top-1/4 sm:top-0 right-10 sm:right-0" />
 				</div>
 			)}
 		</>

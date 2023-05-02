@@ -1,9 +1,12 @@
 import { useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import FiltersContext from './FiltersContext';
 import useBuilds from '../builds/BuildsActions';
+
 const useFilters = () => {
 	const { sortBy, typeFilter, versionFilter, challengeFilter, searchTerm, tagsSearch, dispatchBuildFilters, modsFilter } = useContext(FiltersContext);
 	const { setCurrentPage } = useBuilds();
+	const navigate = useNavigate();
 
 	/**
 	 * Handles setting search term
@@ -39,13 +42,26 @@ const useFilters = () => {
 	 * @param {*} e
 	 */
 	const setTypeFilter = type => {
-		dispatchBuildFilters({
-			type: 'SET_FILTERS',
-			payload: {
-				filter: 'typeFilter',
-				value: type,
-			},
-		});
+		if (typeFilter === type) {
+			dispatchBuildFilters({
+				type: 'SET_FILTERS',
+				payload: {
+					filter: 'typeFilter',
+					value: '',
+				},
+			});
+
+			navigate('/');
+			return 'navigate';
+		} else {
+			dispatchBuildFilters({
+				type: 'SET_FILTERS',
+				payload: {
+					filter: 'typeFilter',
+					value: type,
+				},
+			});
+		}
 		setCurrentPage(0);
 	};
 
@@ -129,10 +145,6 @@ const useFilters = () => {
 				} else if (sortBy === 'views_most') {
 					return a.views < b.views ? 1 : -1;
 				}
-			})
-			.filter(build => {
-				if (searchTerm === '') return build;
-				if (build.name.toLowerCase().includes(searchTerm.toLowerCase())) return build;
 			})
 			.filter(build => {
 				if (challengeFilter === 'any') return build;

@@ -53,7 +53,11 @@ const BuildReducer = (state, action) => {
 				...state,
 				resetTextEditor: action.payload,
 			};
-
+		case 'SET_BUILD_OF_THE_WEEK':
+			return {
+				...state,
+				settingBuildOfTheWeek: action.payload,
+			};
 		default:
 			return state;
 	}

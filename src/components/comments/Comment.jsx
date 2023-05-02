@@ -19,7 +19,7 @@ import UsernameLink from '../buttons/UsernameLink';
  */
 function Comment({ comment }) {
 	const { loadedBuild, editingComment } = useContext(BuildContext);
-	const { user, authLoading } = useContext(AuthContext);
+	const { user, authLoading, fetchedUserProfile } = useContext(AuthContext);
 	//---------------------------------------------------------------------------------------------------//
 	const [editedComment, setEditedComment] = useState('');
 	//---------------------------------------------------------------------------------------------------//
@@ -74,21 +74,25 @@ function Comment({ comment }) {
 					</div>
 					<p className="2k:text-2xl">{date}</p>
 				</div>
-				<div className="text-white">{editingComment ? <TextEditor setState={setEditedComment} /> : <Editor editorState={editorState} readOnly={true} toolbarHidden={true} />}</div>
+				<div className="text-white">{editingComment.id === comment.id ? <TextEditor setState={setEditedComment} /> : <Editor editorState={editorState} readOnly={true} toolbarHidden={true} />}</div>
 				<div className="flex flex-row gap-4 2k:gap-8">
 					{!editingComment && user?.username && (
-						<a href={`#add-comment`} onClick={() => setReplyingComment(comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
-							Reply
-						</a>
+						<>
+							{!fetchedUserProfile?.blockList?.includes(user.uid) && (
+								<a href={`#add-comment`} onClick={() => setReplyingComment(comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
+									Reply
+								</a>
+							)}
+						</>
 					)}
 					{!authLoading && (user?.uid === comment.uid || user?.siteAdmin) && (
 						<>
-							{editingComment && (
+							{editingComment && editingComment.id === comment.id && (
 								<p className="text-slate-500 hover:text-green-300 cursor-pointer 2k:text-2xl" onClick={e => handleSaveCommentEdit(e)}>
 									Save
 								</p>
 							)}
-							{editingComment && (
+							{editingComment && editingComment.id === comment.id && (
 								<p onClick={() => setEditingComment(false)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
 									Cancel
 								</p>

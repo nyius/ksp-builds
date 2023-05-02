@@ -7,6 +7,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import { Helmet } from 'react-helmet';
 //---------------------------------------------------------------------------------------------------//
 import { AiFillEye } from 'react-icons/ai';
+import { RiMedalFill } from 'react-icons/ri';
 //---------------------------------------------------------------------------------------------------//
 import youtubeLinkConverter from '../../utilities/youtubeLinkConverter';
 import useResetStates from '../../utilities/useResetStates';
@@ -22,6 +23,7 @@ import Spinner1 from '../../components/spinners/Spinner1';
 import TypeBadge from '../../components/typeBadge/TypeBadge';
 import Comment from '../../components/comments/Comment';
 import DeleteBuildModal from '../../components/modals/DeleteBuildModal';
+import MakeBuildOfTheWeekModal from '../../components/modals/MakeBuildOfTheWeekModal';
 import Carousel from '../../components/carousel/Carousel';
 import Create from '../upload/Upload';
 import Button from '../../components/buttons/Button';
@@ -30,19 +32,20 @@ import MiddleContainer from '../../components/containers/middleContainer/MiddleC
 import UsernameLink from '../../components/buttons/UsernameLink';
 import Favorite from '../../components/buttons/Favorite';
 import TextEditor from '../../components/textEditor/TextEditor';
+import BotwBadge from '../../assets/BotW_badge2.png';
 //---------------------------------------------------------------------------------------------------//
 
 function Build() {
 	//---------------------------------------------------------------------------------------------------//
-	const { fetchBuild, setComment, addComment, updateDownloadCount, setEditingBuild, setReplyingComment, setResetTextEditorState } = useBuild();
+	const { fetchBuild, setComment, addComment, updateDownloadCount, setEditingBuild, setReplyingComment, setBuildOfTheWeek } = useBuild();
 	const { loadingBuild, loadedBuild, commentsLoading, comments, editingBuild, replyingComment } = useContext(BuildContext);
-	const { user, authLoading } = useContext(AuthContext);
+	const { user, authLoading, fetchedUserProfile } = useContext(AuthContext);
 	const [buildDesc, setBuildDesc] = useState(null);
 
+	const { setReport, fetchUsersProfile } = useAuth();
 	const { resetStates } = useResetStates();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { setReport } = useAuth();
 	const { id } = useParams();
 
 	useEffect(() => {
@@ -60,6 +63,7 @@ function Build() {
 				navigate('/');
 			} else {
 				setBuildDesc(EditorState.createWithContent(convertFromRaw(JSON.parse(loadedBuild.description))));
+				fetchUsersProfile(loadedBuild.uid);
 			}
 		}
 	}, [loadingBuild, loadedBuild]);
@@ -108,6 +112,7 @@ function Build() {
 					<>
 						{loadedBuild ? (
 							<div className="flex flex-col gap-4 w-full">
+								{user && user?.siteAdmin && <Button text="Make build of the week" color="btn-primary" icon="fill-star" htmlFor="build-of-the-week-modal" onClick={() => setBuildOfTheWeek(loadedBuild)} />}
 								{/* Images */}
 								<Carousel images={loadedBuild.images} />
 
@@ -133,14 +138,23 @@ function Build() {
 										<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Downloads</p>
 										<p className="text-xl 2k:text-3xl text-accent ">{loadedBuild.downloads}</p>
 									</div>
+									{loadedBuild.buildOfTheWeek && (
+										<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
+											<img src={BotwBadge} alt="" className="w-22 2k:w-44" />
+											<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Build of the Week</p>
+											<p className="text-lg xl:text-2xl 2k:text-4xl italic text-slate-500 ">
+												{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.buildOfTheWeek.seconds * 1000)}
+											</p>
+										</div>
+									)}
 									{loadedBuild.forChallenge && (
-										<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 w-44 lg:w-96 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
+										<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 w-44  lg:w-96 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
 											<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Challenge</p>
 											<Button
 												type="ahref"
 												href={`/challenges/${loadedBuild.forChallenge}`}
 												color="btn-ghost text-accent"
-												css="multi-line-truncate"
+												css="single-line-truncat"
 												text={loadedBuild.challengeTitle}
 												size="!text-xl 2k:!text-3xl font-thin !normal-case !h-fit"
 											/>
@@ -224,23 +238,27 @@ function Build() {
 								)}
 								{!authLoading && user?.username && (
 									<>
-										{/* Show quoted comment being replied to */}
-										{replyingComment && (
-											<div className="flex flex-row items-center gap-4 2k:gap-8 bg-base-800 w-full rounded-t-lg p-3 2k:p-6">
-												<div className="italic text-slate-400 text-xl 2k:text-2xl shrink-0">Replying To</div>
-												<UsernameLink username={replyingComment.username} uid={replyingComment.uid} />
-												<p className="single-line-truncate text-xl 2k-text-2xl italic">"{draftJsToPlainText(replyingComment.comment)}"</p>
-											</div>
+										{!fetchedUserProfile?.blockList?.includes(user.uid) && (
+											<>
+												{/* Show quoted comment being replied to */}
+												{replyingComment && (
+													<div className="flex flex-row items-center gap-4 2k:gap-8 bg-base-800 w-full rounded-t-lg p-3 2k:p-6">
+														<div className="italic text-slate-400 text-xl 2k:text-2xl shrink-0">Replying To</div>
+														<UsernameLink username={replyingComment.username} uid={replyingComment.uid} />
+														<p className="single-line-truncate text-xl 2k-text-2xl italic">"{draftJsToPlainText(replyingComment.comment)}"</p>
+													</div>
+												)}
+
+												{/* Text Editor */}
+												<TextEditor setState={setComment} />
+
+												{/* Buttons */}
+												<div id="add-comment" className="flex flex-row gap-3 2k:gap-6">
+													<Button onClick={addComment} color="btn-primary" text="Save" size="w-fit" css="2k:mb-10" icon="comment" />
+													<Button onClick={handleClearComment} color="bg-base-900" text="Clear" size="w-fit" css="2k:mb-10" icon="cancel" />
+												</div>
+											</>
 										)}
-
-										{/* Text Editor */}
-										<TextEditor setState={setComment} />
-
-										{/* Buttons */}
-										<div id="add-comment" className="flex flex-row gap-3 2k:gap-6">
-											<Button onClick={addComment} color="btn-primary" text="Save" size="w-fit" css="2k:mb-10" icon="comment" />
-											<Button onClick={handleClearComment} color="bg-base-900" text="Clear" size="w-fit" css="2k:mb-10" icon="cancel" />
-										</div>
 									</>
 								)}
 							</div>
@@ -252,6 +270,7 @@ function Build() {
 					</>
 				)}
 				{loadedBuild && <DeleteBuildModal id={loadedBuild.id} userID={loadedBuild.uid} />}
+				{loadedBuild && user?.siteAdmin && <MakeBuildOfTheWeekModal />}
 			</MiddleContainer>
 		</>
 	);

@@ -107,6 +107,7 @@ export const AuthProvider = ({ children }) => {
 		newConvo: null,
 		hoverUser: null,
 		deleteConvoId: null,
+		userToBlock: null,
 	};
 
 	// Set up the reducer

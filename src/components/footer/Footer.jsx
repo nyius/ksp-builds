@@ -19,11 +19,13 @@ function Footer() {
 						<Button type="ahref" href="https://twitter.com/KSP_Builds" text="Twitter" target="_blank" css="text-white" icon="twitter" />
 						<Button type="ahref" href="/contact" css="text-white" text="Contact" icon="email" />
 						<Button type="ahref" href="/faq" css="text-white" text="F.A.Q" icon="help" />
+						<Button type="ahref" target="blank" css="text-white" href="https://www.paypal.com/donate/?hosted_button_id=CCLY8A74UC328" text="Donate" icon="fill-heart" />
 					</ul>
 					<ul className="menu items-start">
 						<Button type="ahref" css="text-white" href="/patch-notes" text="KSPB Patch Notes" />
 						<Button type="ahref" css="text-white" href="/challenges" text="Challenges" />
 						<Button type="ahref" css="text-white" href="/news" text="News" />
+						<Button type="ahref" css="text-white" href="/sponsor" text="Sponsors & Advertise" />
 					</ul>
 					<ul className="menu items-start">
 						<Button type="ahref" href="/privacy" text="Privacy Policy" />

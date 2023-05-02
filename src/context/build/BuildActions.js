@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, getDocs } from 'firebase/firestore';
+import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { compressAccurately } from 'image-conversion';
 import { auth } from '../../firebase.config';
 import { profanity } from '@2toad/profanity';
+import { cloneDeep } from 'lodash';
 import { compress, decompress, compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 //---------------------------------------------------------------------------------------------------//
 import { uploadImage } from '../../utilities/uploadImage';
@@ -19,12 +20,14 @@ import BuildContext from './BuildContext';
 import BuildsContext from '../builds/BuildsContext';
 import AuthContext from '../auth/AuthContext';
 import useAuth from '../auth/AuthActions';
+import FiltersContext from '../filters/FiltersContext';
 //---------------------------------------------------------------------------------------------------//
 
 const useBuild = () => {
 	const navigate = useNavigate();
-	const { dispatchBuild, deletingCommentId, replyingComment, comments, loadedBuild, comment, editingBuild } = useContext(BuildContext);
+	const { dispatchBuild, deletingCommentId, replyingComment, comments, loadedBuild, comment, editingBuild, settingBuildOfTheWeek } = useContext(BuildContext);
 	const { fetchedBuilds, dispatchBuilds } = useContext(BuildsContext);
+	const { kspVersions } = useContext(FiltersContext);
 	const { user } = useContext(AuthContext);
 	const { updateUserState, addbuildToUser, handleVoting, sendNotification } = useAuth();
 
@@ -140,6 +143,10 @@ const useBuild = () => {
 				}
 			}
 
+			if (build.kspVersion === 'any') {
+				build.kspVersion = kspVersions[0];
+			}
+
 			let newTags = [];
 			let tagProfanity = false;
 			build.tags.map(tag => {
@@ -153,6 +160,8 @@ const useBuild = () => {
 				toast.error('Tags contain unacceptable words!');
 				return;
 			}
+
+			build.searchName = build.name.toLowerCase();
 
 			return build;
 		} catch (error) {
@@ -752,6 +761,61 @@ const useBuild = () => {
 		});
 	};
 
+	/**
+	 * handles getting ready to set the build of the week. Saves it to the context
+	 * @param {*} build
+	 */
+	const setBuildOfTheWeek = build => {
+		dispatchBuild({
+			type: 'SET_BUILD_OF_THE_WEEK',
+			payload: build,
+		});
+	};
+
+	/**
+	 * Handles making a build the build of the week
+	 * @param {*} build
+	 */
+	const makeBuildOfTheWeek = async notification => {
+		try {
+			if (notification === '') {
+				throw new Error('Forgot to change notification');
+			}
+			await updateDoc(doc(db, 'kspInfo', 'weeklyFeaturedBuilds'), { [settingBuildOfTheWeek.id]: { dateAdded: serverTimestamp() } });
+			await updateDoc(doc(db, 'kspInfo', 'weeklyFeaturedBuild'), { id: settingBuildOfTheWeek.id, dateAdded: serverTimestamp() });
+
+			if (process.env.REACT_APP_ENV !== 'DEV') {
+				await updateDoc(doc(db, 'builds', settingBuildOfTheWeek.id), { buildOfTheWeek: serverTimestamp() });
+			} else {
+				await updateDoc(doc(db, 'testBuilds', settingBuildOfTheWeek.id), { buildOfTheWeek: serverTimestamp() });
+			}
+
+			// Notify the author
+			const newNotif = cloneDeep(standardNotifications);
+			newNotif.uid = user.uid;
+			newNotif.username = user.username;
+			newNotif.timestamp = new Date();
+			newNotif.profilePicture = user.profilePicture;
+			newNotif.message = notification;
+			newNotif.type = 'buildOfTheWeek';
+			newNotif.buildId = settingBuildOfTheWeek.id;
+			newNotif.buildName = settingBuildOfTheWeek.name;
+			delete newNotif.comment;
+			delete newNotif.commentId;
+
+			await sendNotification(settingBuildOfTheWeek.uid, newNotif);
+
+			// Update the author to have 'build of the week' badge
+			await updateDoc(doc(db, 'users', settingBuildOfTheWeek.uid), { buildOfTheWeekWinner: true });
+			await updateDoc(doc(db, 'userProfiles', settingBuildOfTheWeek.uid), { buildOfTheWeekWinner: true });
+
+			toast.success('Made build of the week!');
+		} catch (error) {
+			console.log(error);
+			toast.error(`Whoops... Something went wrong: ${error} `);
+		}
+	};
+
 	return {
 		setUploadingBuild,
 		setBaseBuild,
@@ -761,6 +825,7 @@ const useBuild = () => {
 		setComment,
 		setSavingBuild,
 		setDeletingComment,
+		setBuildOfTheWeek,
 		setResetTextEditorState,
 		cancelBuilEdit,
 		fetchComments,
@@ -774,6 +839,7 @@ const useBuild = () => {
 		updateComment,
 		updateViewCount,
 		updateDownloadCount,
+		makeBuildOfTheWeek,
 	};
 };
 

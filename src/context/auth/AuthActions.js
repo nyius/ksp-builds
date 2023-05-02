@@ -1,24 +1,27 @@
+import { useContext, useEffect } from 'react';
 import { db } from '../../firebase.config';
 import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter, where, ref, onSnapshot, QuerySnapshot } from 'firebase/firestore';
 import { signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 import { googleProvider } from '../../firebase.config';
 import { auth } from '../../firebase.config';
 import { deleteUser, getAuth } from 'firebase/auth';
-import BuildContext from '../build/BuildContext';
-import { useContext, useEffect } from 'react';
-import AuthContext from './AuthContext';
 import { cloneDeep, update } from 'lodash';
 import { toast } from 'react-toastify';
+import { compressAccurately } from 'image-conversion';
+import { v4 as uuidv4 } from 'uuid';
+//---------------------------------------------------------------------------------------------------//
+import AuthContext from './AuthContext';
+import BuildContext from '../build/BuildContext';
+//---------------------------------------------------------------------------------------------------//
 import standardUser from '../../utilities/standardUser';
 import standardNotifications from '../../utilities/standardNotifications';
 import standardUserProfile from '../../utilities/standardUserProfile';
 import { uploadImage } from '../../utilities/uploadImage';
-import { v4 as uuidv4 } from 'uuid';
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
 import subscribeToConvo from '../../utilities/subscribeToConvo';
 
 const useAuth = () => {
-	const { dispatchAuth, user, accountToDelete, newUsername, messageTab, reportingContent, reportType, fetchedUserProfile, lastFetchedNotification, newConvo, conversations } = useContext(AuthContext);
+	const { dispatchAuth, user, accountToDelete, newUsername, messageTab, reportingContent, reportType, fetchedUserProfile, lastFetchedNotification, newConvo, conversations, userToBlock } = useContext(AuthContext);
 	const { loadedBuild } = useContext(BuildContext);
 
 	/**
@@ -109,6 +112,18 @@ const useAuth = () => {
 	};
 
 	/**
+	 * handles updating a users public profile
+	 * @param {*} update
+	 */
+	const updateUserProfiles = async update => {
+		try {
+			await updateDoc(doc(db, 'userProfiles', user.uid), update);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
 	 * Handles updating the users profile picture on the server
 	 * @param {*} picture
 	 */
@@ -188,12 +203,18 @@ const useAuth = () => {
 
 					updateUserDb({ upVotes: newUpVotes });
 					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1) });
+
+					await updateWeeklyUpvoted(build.id, 'remove');
 				} else {
 					newUpVotes.push(build.id);
 					dispatchAuth({ type: 'UPDATE_USER', payload: { upVotes: newUpVotes } });
 
 					updateUserDb({ upVotes: newUpVotes });
 					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes += 1) });
+
+					if (build.uid !== user.uid) {
+						await updateWeeklyUpvoted(build.id, 'add');
+					}
 
 					// If the user has this downvoted but wants to upvote it, remove the downvote
 					if (newDownVotes.includes(build.id)) {
@@ -224,6 +245,8 @@ const useAuth = () => {
 					updateUserDb({ downVotes: newDownVotes });
 					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes += 1) });
 
+					await updateWeeklyUpvoted(build.id, 'remove');
+
 					// If the user has this upvoted but wants to downvote it, remove the upvote
 					if (newUpVotes.includes(build.id)) {
 						const index = newUpVotes.indexOf(build.id);
@@ -239,6 +262,44 @@ const useAuth = () => {
 		} catch (error) {
 			console.log(error);
 			toast.error('Something went wrong D:');
+		}
+	};
+
+	/**
+	 * handles adding or removing the users id from the ships upvotes
+	 * @param {*} id build id
+	 * @param {*} type 'add' or 'remove'
+	 */
+	const updateWeeklyUpvoted = async (id, type) => {
+		try {
+			// Change the weekly upvoted amount for this build
+			const weeklyUpvotedData = await getDoc(doc(db, 'kspInfo', 'weeklyUpvoted'));
+			const weeklyUpvoted = weeklyUpvotedData.data();
+
+			if (type === 'add') {
+				if (weeklyUpvotedData.exists()) {
+					if (weeklyUpvoted[id]) {
+						weeklyUpvoted[id].push(user.uid);
+					} else {
+						weeklyUpvoted[id] = [user.uid];
+					}
+					await updateDoc(doc(db, 'kspInfo', 'weeklyUpvoted'), weeklyUpvoted);
+				} else {
+					await setDoc(doc(db, 'kspInfo', 'weeklyUpvoted'), { [id]: [user.uid] });
+				}
+			} else if (type === 'remove') {
+				if (weeklyUpvotedData.exists()) {
+					if (weeklyUpvoted[id]) {
+						if (weeklyUpvoted[id].includes(user.uid)) {
+							const index = weeklyUpvoted[id].indexOf(user.uid);
+							weeklyUpvoted[id].splice(index, 1);
+							await updateDoc(doc(db, 'kspInfo', 'weeklyUpvoted'), weeklyUpvoted);
+						}
+					}
+				}
+			}
+		} catch (error) {
+			console.log(error);
 		}
 	};
 
@@ -356,6 +417,13 @@ const useAuth = () => {
 	 * @returns
 	 */
 	const uploadProfilePicture = async (e, setUploadingState) => {
+		let convertProfilePic;
+
+		// Shrink the file size
+		if (e.target.files) {
+			convertProfilePic = await compressAccurately(e.target.files[0], 200);
+		}
+
 		return new Promise((resolve, reject) => {
 			// make sure we have a file uploaded
 			if (e.target.files) {
@@ -366,7 +434,9 @@ const useAuth = () => {
 					e.target.value = null;
 					return;
 				}
-				uploadImage(profilePicture, setUploadingState, user.uid).then(url => {
+
+				uploadImage(convertProfilePic, setUploadingState, user.uid).then(url => {
+					console.log(url);
 					resolve(url);
 				});
 			}
@@ -996,6 +1066,68 @@ const useAuth = () => {
 		});
 	};
 
+	/**
+	 * Handles setting the id of the user we want to block.
+	 * @param {*} id
+	 */
+	const setUserToBlock = id => {
+		dispatchAuth({
+			type: 'SET_USER_TO_BLOCK',
+			payload: id,
+		});
+	};
+
+	/**
+	 * Handles blocking a user.
+	 *
+	 */
+	const blockUser = async () => {
+		try {
+			let newBlockList;
+
+			// Check if the user has anyone blocked yet
+			if (user.blockList) {
+				newBlockList = [...user.blockList];
+
+				if (user.blockList.includes(userToBlock)) {
+					const index = newBlockList.indexOf(userToBlock);
+					newBlockList.splice(index, 1);
+
+					updateUserDb({ blockList: newBlockList });
+					await updateDoc(doc(db, 'userProfiles', user.uid), { blockList: newBlockList });
+
+					toast.success('User unblocked.');
+				} else {
+					newBlockList.push(userToBlock);
+
+					updateUserDb({ blockList: newBlockList });
+					await updateDoc(doc(db, 'userProfiles', user.uid), { blockList: newBlockList });
+
+					toast.success('User blocked.');
+				}
+			} else {
+				newBlockList = [userToBlock];
+
+				updateUserDb({ blockList: newBlockList });
+				await updateDoc(doc(db, 'userProfiles', user.uid), { blockList: newBlockList });
+
+				toast.success('User blocked.');
+			}
+
+			dispatchAuth({
+				type: 'UPDATE_USER',
+				payload: { blockList: newBlockList },
+			});
+
+			dispatchAuth({
+				type: 'SET_USER_TO_BLOCK',
+				payload: null,
+			});
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	return {
 		handleVoting,
 		handleDeleteNotification,
@@ -1012,9 +1144,11 @@ const useAuth = () => {
 		setAccountToDelete,
 		setReport,
 		setHoverUser,
+		setUserToBlock,
 		updateUserState,
 		updateUserDbBio,
 		updateUserDb,
+		updateUserProfiles,
 		updateUserDbProfilePic,
 		updateUserProfilePicture,
 		deleteUserAccount,
@@ -1030,6 +1164,7 @@ const useAuth = () => {
 		sendMessage,
 		submitReport,
 		readMessage,
+		blockUser,
 	};
 };
 

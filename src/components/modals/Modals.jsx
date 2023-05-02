@@ -7,6 +7,7 @@ import ResetPassword from './ResetPassword';
 import NewAccountModal from './NewAccountModal';
 import DeleteAccount from './DeleteAccount';
 import ReportModal from './ReportModal';
+import BlockModal from './BlockModal';
 
 function Modals() {
 	return (
@@ -19,6 +20,7 @@ function Modals() {
 			<ResetPassword />
 			<ReportModal />
 			<DeleteAccount />
+			<BlockModal />
 		</>
 	);
 }

@@ -5,6 +5,7 @@ import { cloneDeep } from 'lodash';
 import { Helmet } from 'react-helmet';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
@@ -238,6 +239,33 @@ function AdminPanel() {
 	};
 
 	/**
+	 * Handles updating every build
+	 */
+	const updateAllBuilds = async () => {
+		try {
+			const buildsRef = collection(db, 'builds');
+			const buildsSnap = await getDocs(buildsRef);
+
+			buildsSnap.forEach(buildDoc => {
+				const buildRef = doc(db, 'builds', buildDoc.id);
+				const build = buildDoc.data();
+
+				const updateBuild = async () => {
+					try {
+						await updateDoc(buildRef, { searchName: build.name.toLowerCase() });
+					} catch (error) {
+						console.log(error);
+					}
+				};
+
+				updateBuild();
+			});
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
 	 * Handles uploading patch note
 	 */
 	const uploadPatchNote = async () => {
@@ -298,6 +326,38 @@ function AdminPanel() {
 		}
 	};
 
+	/**
+	 * handles verifying my account to make tweets
+	 */
+	const verifyTwitter = async () => {
+		try {
+			axios
+				.post('https://us-central1-kspbuilds.cloudfunctions.net/startTwitterVerify', {})
+				.then(res => {
+					console.log(res);
+				})
+				.catch(err => console.error(err));
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
+	 * handles tweeting
+	 */
+	const tweet = async () => {
+		try {
+			axios
+				.post('https://us-central1-kspbuilds.cloudfunctions.net/postTweet', { tweet: 'hello from my app!' }, {})
+				.then(res => {
+					console.log(res);
+				})
+				.catch(err => console.error(err));
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
@@ -341,11 +401,34 @@ function AdminPanel() {
 							<TextInput onChange={e => setNewVersion(e.target.value)} placeholder="Version" size="w-44" />
 							<Button text="submit" icon="upload" onClick={submitNewVersion} size="w-fit" color="btn-primary" />
 						</div>
+
 						<div className="divider divider-horizontal"></div>
+
 						<div className="flex flex-col gap-4 place-content-between">
-							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Upate all users</p>
+							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Upate all Users</p>
 							<Button color="btn-primary" text="Update" onClick={updateAllUsers} />
 						</div>
+
+						<div className="divider divider-horizontal"></div>
+
+						<div className="flex flex-col gap-4 place-content-between">
+							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Upate all Builds</p>
+							<Button color="btn-primary" text="Update" onClick={updateAllBuilds} />
+						</div>
+
+						<div className="divider divider-horizontal"></div>
+
+						{/* <div className="flex flex-col gap-4 place-content-between">
+							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Verify Twitter</p>
+							<Button color="btn-primary" text="Verify Twitter" onClick={verifyTwitter} />
+						</div>
+
+						<div className="divider divider-horizontal"></div>
+
+						<div className="flex flex-col gap-4 place-content-between">
+							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Tweet</p>
+							<Button color="btn-primary" text="Tweet" onClick={tweet} />
+						</div> */}
 					</div>
 				)}
 
@@ -489,7 +572,7 @@ function AdminPanel() {
 										<div className="flex flex-row gap-2">
 											<Button text="Delete" size="w-fit" icon="delete" onClick={() => deleteReport(report.id, i)} />
 											{report.uid && <Button text="Reply" size="w-fit" icon="upload" onClick={() => setReplying({ uid: report.uid, i, id: report.id })} />}
-											{report.buildId && <Button type="ahref" href={`/build/${report.buildId}`} text="Go to build" size="w-fit" icon="right2" />}
+											{report.buildId && <Button type="ahref" target="blank" href={`/build/${report.buildId}`} text="Go to build" size="w-fit" icon="right2" />}
 										</div>
 
 										{replying.i === i && <TextEditor setState={setReplyMessage} />}

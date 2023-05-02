@@ -3,11 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { auth } from '../../firebase.config';
 import { toast } from 'react-toastify';
 //---------------------------------------------------------------------------------------------------//
-import CreateBuildAdmin from '../buttons/CreateBuildAdmin';
 import AdBannerTop from '../ads/AdBannerTop';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import useBuilds from '../../context/builds/BuildsActions';
+import useFilters from '../../context/filters/FiltersActions';
 //---------------------------------------------------------------------------------------------------//
 import Logo from '../../assets/logo_light_full.png';
 import Button from '../buttons/Button';
@@ -15,9 +15,9 @@ import LogoIcon from '../../assets/logo_light_icon.png';
 import MobileHamburger from './MobileHamburger';
 import Notifications from './Notifications';
 import Types from '../types/Types';
-
 function NavBar() {
 	const { user, dispatchAuth, authLoading } = useContext(AuthContext);
+	const { resetFilters } = useFilters();
 	const { goToStartPage } = useBuilds();
 	const navigate = useNavigate();
 
@@ -50,7 +50,13 @@ function NavBar() {
 			<div className="navbar">
 				<div className="flex-1">
 					{/* Logo  */}
-					<Link onClick={() => goToStartPage(0)} to="/">
+					<Link
+						onClick={() => {
+							resetFilters();
+							goToStartPage(0);
+						}}
+						to="/"
+					>
 						<img src={Logo} className="h-10 2k:h-20 btn btn-ghost hidden sm:block" alt="KSP Builds Logo, navigate home" />
 					</Link>
 
@@ -66,13 +72,7 @@ function NavBar() {
 						<Button type="ahref" href="/news" css="text-white hidden lg:flex" text="News" icon="news" />
 						<Button type="ahref" href="/challenges" css="text-white hidden lg:flex" text="Challenges" icon="mountain" />
 						<Button text="How to upload" icon="info" color="text-white" css="hidden lg:flex" htmlFor="how-to-copy-build-modal" />
-						<CreateBuildAdmin />
 					</ul>
-
-					<div className="flex flex-row items-end">
-						<p className="text-2xl 2k:text-5xl text-sate-600 italic font-bold mr-4 2k:mr-8">BETA</p>
-						<p className="text-xl 2k:text-3xl text-sate-600 italic">Your Hub for KSP 2</p>
-					</div>
 				</div>
 
 				<div className="flex-none gap-3">

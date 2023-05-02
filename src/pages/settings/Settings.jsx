@@ -11,7 +11,7 @@ import useAuth from '../../context/auth/AuthActions';
 function Settings() {
 	const { resetStates } = useResetStates();
 	const { user, authLoading } = useContext(AuthContext);
-	const { setAccountToDelete, updateUserDb, updateUserDbBlockedNotifs } = useAuth();
+	const { setAccountToDelete, updateUserDb, updateUserDbBlockedNotifs, updateUserProfiles } = useAuth();
 
 	useEffect(() => {
 		resetStates();
@@ -58,9 +58,11 @@ function Settings() {
 	const handleMessagingChange = e => {
 		if (user.allowPrivateMessaging !== undefined) {
 			updateUserDb({ allowPrivateMessaging: !user.allowPrivateMessaging });
+			updateUserProfiles({ allowPrivateMessaging: !user.allowPrivateMessaging });
 			toast.success('Saved');
 		} else {
 			updateUserDb({ allowPrivateMessaging: false });
+			updateUserProfiles({ allowPrivateMessaging: false });
 			toast.success('Saved');
 		}
 	};

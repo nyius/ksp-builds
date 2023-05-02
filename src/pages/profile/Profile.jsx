@@ -17,7 +17,7 @@ import useAuth from '../../context/auth/AuthActions';
 import useResetStates from '../../utilities/useResetStates';
 import checkIfJson from '../../utilities/checkIfJson';
 //---------------------------------------------------------------------------------------------------//
-import BuildCard from '../../components/buildCard/BuildCard';
+import BuildCard from '../../components/cards/BuildCard';
 import Spinner1 from '../../components/spinners/Spinner1';
 import Sort from '../../components/sort/Sort';
 import Button from '../../components/buttons/Button';
@@ -25,6 +25,7 @@ import CantFind from '../../components/cantFind/CantFind';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import TextEditor from '../../components/textEditor/TextEditor';
+import BotwBadge from '../../assets/BotW_badge2.png';
 
 /**
  * Displays the users own profile
@@ -126,61 +127,76 @@ function Profile() {
 				<PlanetHeader text="Profile" />
 				{!authLoading && user?.username && (
 					<>
-						<div className="flex flex-col md:flex-row gap-20 items-center mb-10 bg-base-400 border-2 border-dashed border-slate-700 rounded-xl p-6 2k:p-12">
-							{/* Profile Picture */}
-							<div className="indicator">
-								<div className="avatar">
-									<div className="rounded-full w-44 ring ring-primary ring-offset-base-100 ring-offset-4">{uploadingProfilePhoto ? <Spinner1 /> : <img src={user.profilePicture} alt="" />}</div>
-								</div>
-								<div className="tooltip" data-tip="Edit Profile Picture">
-									<label htmlFor="profile-picture-upload" className="indicator-item indicator-bottom text-3xl cursor-pointer rounded-full p-4 bg-base-600">
-										<AiFillCamera />
-									</label>
+						<div className="flex flex-col gap-20 mb-10 bg-base-400 border-2 border-dashed border-slate-700 rounded-xl p-6 2k:p-12">
+							<div className="flex flex-col md:flex-row gap-20 items-center">
+								{/* Profile Picture */}
+								<div className="indicator">
+									<div className="avatar">
+										<div className="rounded-full w-44 ring ring-primary ring-offset-base-100 ring-offset-4">{uploadingProfilePhoto ? <Spinner1 /> : <img src={user.profilePicture} alt="" />}</div>
+									</div>
+									<div className="tooltip" data-tip="Edit Profile Picture">
+										<label htmlFor="profile-picture-upload" className="indicator-item indicator-bottom text-3xl cursor-pointer rounded-full p-4 bg-base-600">
+											<AiFillCamera />
+										</label>
 
-									<input type="file" id="profile-picture-upload" max="1" accept=".jpg,.png,.jpeg" className="hidden-file-input file-input 2k:file-input-lg 2k:text-3xl" onChange={handleNewProfilePhoto} />
+										<input type="file" id="profile-picture-upload" max="1" accept=".jpg,.png,.jpeg" className="hidden-file-input file-input 2k:file-input-lg 2k:text-3xl" onChange={handleNewProfilePhoto} />
+									</div>
+								</div>
+
+								<div className="flex flex-col gap-3 2k:gap-6 w-full">
+									{/* Username */}
+									<p className="text-xl 2k:text-3xl font-thin text-white">
+										<span className="text-slate-500 text-xl 2k:text-2xl italic">Username: </span> {user.username}
+									</p>
+
+									{editingProfile ? (
+										<>
+											{/* Bio Edit */}
+											<TextEditor setState={setEditedBio} />
+
+											{/* Buttons */}
+											<div className="flex flex-row gap-4">
+												<Button text="Save" icon="save" onClick={handleSubmitBioUpdate} size="w-fit" />
+												<Button text="Cancel" icon="cancel" onClick={() => setEditingProfile(false)} size="w-fit" />
+											</div>
+										</>
+									) : (
+										<div>
+											<div className="flex flex-row gap-2">
+												{/* Bio */}
+												<Editor editorState={bioState} readOnly={true} toolbarHidden={true} />
+											</div>
+											<Button text="Edit Bio" icon="edit" onClick={() => setEditingProfile({ bio: user.bio })} size="btn-sm 2k:btn-md w-fit" margin="mt-3 2k:mt-6 mb-4" />
+										</div>
+									)}
+									<p className="text-xl 2k:text-3xl">
+										<span className="text-slate-500 text-xl 2k:text-2xl italic">Email:</span> {user.email}
+									</p>
 								</div>
 							</div>
 
-							<div className="flex flex-col gap-3 2k:gap-6 w-full">
-								{/* Username */}
-								<p className="text-xl 2k:text-3xl font-thin">
-									<span className="text-slate-500 text-xl 2k:text-2xl italic">Username: </span> {user.username}
-								</p>
-
-								{/* Created */}
-								<p className="text-xl 2k:text-3xl">
-									<span className="text-slate-500 2k:text-2xl italic">Date Created: </span> {dateCreated}
-								</p>
-
-								{editingProfile ? (
-									<>
-										{/* Bio Edit */}
-										<TextEditor setState={setEditedBio} />
-
-										{/* Buttons */}
-										<div className="flex flex-row gap-4">
-											<Button text="Save" icon="save" onClick={handleSubmitBioUpdate} size="w-fit" />
-											<Button text="Cancel" icon="cancel" onClick={() => setEditingProfile(false)} size="w-fit" />
-										</div>
-									</>
-								) : (
-									<div>
-										<div className="flex flex-row gap-2">
-											{/* Bio */}
-											<p className="text-slate-500 text-xl 2k:text-2xl italic">Bio: </p>
-											<Editor editorState={bioState} readOnly={true} toolbarHidden={true} />
-										</div>
-										<Button text="Edit Bio" icon="edit" onClick={() => setEditingProfile({ bio: user.bio })} size="btn-sm 2k:btn-md w-fit" margin="mt-3 2k:mt-6 mb-4" />
+							{/* User Details */}
+							<div className="flex flex-row flex-wrap gap-2 2k:gap-4 bg-base-900 w-full justify-center p-2 2k:p-4 rounded-xl">
+								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
+									<p className="text-lg xl:text-2xl 2k:text-3xl font-bold">Joined</p>
+									<p className="text-xl 2k:text-3xl text-accent">{dateCreated}</p>
+								</div>
+								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
+									<p className="text-lg xl:text-2xl 2k:text-3xl font-bold">Total Builds</p>
+									<p className="text-xl 2k:text-3xl text-accent">{sortedBuilds.length}</p>
+								</div>
+								{user?.username && user?.buildOfTheWeekWinner && (
+									<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
+										<img src={BotwBadge} alt="" className="w-22 2k:w-44" />
+										<p className="text-lg xl:text-2xl 2k:text-3xl font-bold">Build of the Week Winner</p>
 									</div>
 								)}
-								<p className="text-xl 2k:text-3xl">
-									<span className="text-slate-500 text-xl 2k:text-2xl italic">Email:</span> {user.email}
-								</p>
 							</div>
 						</div>
-						<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4">Your Builds</h2>
 
 						{/* Builds */}
+						<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4">Your Builds</h2>
+
 						<Sort />
 						<div className="flex flex-row flex-wrap w-full items-stretch justify-center md:justify-items-center mb-6 p-6 md:p-0">
 							{loadingBuilds ? (

@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { getDocs, collection, getDoc, doc, startAfter, orderBy, limit, query, where, deleteDoc } from 'firebase/firestore';
+import { getDocs, collection, getDoc, doc, startAfter, orderBy, limit, query, where, deleteDoc, startAt, endAt } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import BuildsContext from './BuildsContext';
 import BuildContext from '../build/BuildContext';
@@ -41,11 +41,12 @@ const useBuilds = () => {
 				if (modsFilter == 'yes') constraints.unshift(where('modsUsed', '==', true));
 				if (modsFilter == 'no') constraints.unshift(where('modsUsed', '==', false));
 				if (challengeFilter !== 'any') constraints.unshift(where('forChallenge', '==', challengeFilter));
-				if (sortBy == 'views') constraints.unshift(orderBy('views', 'desc'));
+				if (sortBy == 'views_most') constraints.unshift(orderBy('views', 'desc'));
 				if (sortBy == 'date_newest') constraints.unshift(orderBy('timestamp', 'desc'));
 				if (sortBy == 'date_oldest') constraints.unshift(orderBy('timestamp', 'asc'));
 				if (sortBy == 'upVotes') constraints.unshift(orderBy('upVotes', 'desc'));
 				if (sortBy == 'comments') constraints.unshift(orderBy('commentCount', 'desc'));
+
 				q = query(buildsRef, ...constraints);
 
 				const buildsSnap = await getDocs(q);
@@ -228,10 +229,15 @@ const useBuilds = () => {
 		const builds = storedBuilds[page];
 
 		dispatchBuilds({
+			type: 'SET_FETCHED_BUILDS_LOADING',
+			payload: true,
+		});
+		dispatchBuilds({
 			type: 'SET_FETCHED_BUILDS',
 			payload: {
 				fetchedBuilds: [...builds],
 				currentPage: currentPage - 1,
+				loadingBuilds: false,
 			},
 		});
 	};
@@ -242,13 +248,15 @@ const useBuilds = () => {
 	const goToStartPage = () => {
 		const builds = storedBuilds[0];
 
-		dispatchBuilds({
-			type: 'SET_FETCHED_BUILDS',
-			payload: {
-				fetchedBuilds: [...builds],
-				currentPage: 0,
-			},
-		});
+		if (builds) {
+			dispatchBuilds({
+				type: 'SET_FETCHED_BUILDS',
+				payload: {
+					fetchedBuilds: [...builds],
+					currentPage: 0,
+				},
+			});
+		}
 	};
 
 	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchMoreBuilds, setBuildsLoading, setFetchAmount, setCurrentPage, clearFetchedBuilds, goBackPage, goToStartPage };

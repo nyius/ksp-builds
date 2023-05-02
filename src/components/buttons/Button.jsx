@@ -10,7 +10,7 @@ import { BiCommentAdd, BiReset, BiMessageAltDetail } from 'react-icons/bi';
 import { MdOutlineDoneOutline, MdEmail, MdSettingsInputComponent, MdReport } from 'react-icons/md';
 import { FcGoogle } from 'react-icons/fc';
 import { HiNewspaper } from 'react-icons/hi';
-import { AiOutlineHeart, AiFillHeart, AiOutlineBulb } from 'react-icons/ai';
+import { AiOutlineHeart, AiFillHeart, AiOutlineBulb, AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 
 /**
@@ -64,6 +64,8 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 		if (icon === 'mountain') return <GiPeaks />;
 		if (icon === 'twitter') return <BsTwitter />;
 		if (icon === 'message') return <BiCommentAdd />;
+		if (icon === 'fill-star') return <AiFillStar />;
+		if (icon === 'outline-star') return <AiOutlineStar />;
 	};
 
 	// The button is a label becuase then we can use htmlFor tag to open modals. Not sure if this breaks things but it seems to work fine

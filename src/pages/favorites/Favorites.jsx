@@ -9,7 +9,7 @@ import Sort from '../../components/sort/Sort';
 import Spinner1 from '../../components/spinners/Spinner1';
 import CantFind from '../../components/cantFind/CantFind';
 import Button from '../../components/buttons/Button';
-import BuildCard from '../../components/buildCard/BuildCard';
+import BuildCard from '../../components/cards/BuildCard';
 //---------------------------------------------------------------------------------------------------//
 import useResetStates from '../../utilities/useResetStates';
 //---------------------------------------------------------------------------------------------------//

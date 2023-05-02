@@ -11,7 +11,7 @@ export const standardBuild = {
 	uid: '',
 	upVotes: 0,
 	downVotes: 0,
-	kspVersion: `1.0.0`,
+	kspVersion: `any`,
 	type: [],
 	tags: [],
 	commentCount: 0,

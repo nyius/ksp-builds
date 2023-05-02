@@ -3,7 +3,7 @@ import NewsContext from '../../context/news/NewsContext';
 import { Helmet } from 'react-helmet';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
-import ChallengeCard from '../../components/challenges/ChallengeCard';
+import ChallengeCard from '../../components/cards/ChallengeCard';
 import Spinner1 from '../../components/spinners/Spinner1';
 
 function Challenges() {

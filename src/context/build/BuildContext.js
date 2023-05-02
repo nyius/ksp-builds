@@ -20,6 +20,7 @@ export const BuildProvider = ({ children }) => {
 		commentsLoading: true,
 		comment: '',
 		resetTextEditor: '',
+		settingBuildOfTheWeek: null,
 	};
 
 	const [state, dispatchBuild] = useReducer(BuildReducer, initialState);

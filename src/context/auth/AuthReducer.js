@@ -47,6 +47,11 @@ const AuthReducer = (state, action) => {
 				...state,
 				deleteConvoId: action.payload,
 			};
+		case 'SET_USER_TO_BLOCK':
+			return {
+				...state,
+				userToBlock: action.payload,
+			};
 		case 'SET_FETCHING_PROFILE':
 			return {
 				...state,

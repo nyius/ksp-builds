@@ -12,6 +12,7 @@ function Messaging() {
 	const [blurClose, setBlurClose] = useState(false);
 	const { setMessageTab, sendMessage } = useAuth();
 	const [newMessages, setNewMessages] = useState(0);
+	const [otherUser, setOtherUser] = useState(null);
 	const { authLoading, user, messageTab, conversations } = useContext(AuthContext);
 	const conversationBox = document.getElementById('conversationBox');
 	const sendMessageBox = document.getElementById('sendMessageBox');
@@ -85,7 +86,14 @@ function Messaging() {
 					<div className="fixed bottom-0 right-10 z-100">
 						<div className="indicator">
 							{newMessages !== 0 && <span className="indicator-item badge badge-secondary z-100 text-xl p-4">{newMessages}</span>}
-							<Button onClick={handleChatBtnClick} text={'chat'} icon="message" tabIndex={0} color="bg-base-900 text-white" css="shadow-xl font-bold !text-3xl" />
+							<Button
+								onClick={handleChatBtnClick}
+								text={messageTab && !blurClose ? 'Convos' : 'chat'}
+								icon={messageTab && !blurClose ? 'left2' : 'message'}
+								tabIndex={0}
+								color="bg-base-900 text-white"
+								css="shadow-xl font-bold !text-3xl"
+							/>
 						</div>
 					</div>
 					<ul
@@ -99,7 +107,11 @@ function Messaging() {
 					{/* Handles sending a message */}
 					{messageTab && (
 						<ul tabIndex={0} className="w-full sm:w-180 menu dropdown-content rounded-xl p-5 bg-base-900 !fixed !bottom-12 2k:!bottom-16 right-2 z-101">
-							<input autoComplete="off" onKeyDown={handleSendMessage} id="sendMessageBox" type="text" placeholder="enter message" className="input w-full text-xl 2k:text-3xl" onChange={e => setMessage(e.target.value)} />
+							{!messageTab.blocked && !user?.blockList?.includes(messageTab.otherUser) ? (
+								<input autoComplete="off" onKeyDown={handleSendMessage} id="sendMessageBox" type="text" placeholder="enter message" className="input w-full text-xl 2k:text-3xl" onChange={e => setMessage(e.target.value)} />
+							) : (
+								<div className="input w-full bg-base-900"></div>
+							)}
 						</ul>
 					)}
 				</div>

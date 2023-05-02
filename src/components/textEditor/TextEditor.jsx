@@ -16,7 +16,7 @@ import checkIfJson from '../../utilities/checkIfJson';
 const TextEditor = state => {
 	// Handles sending the markup back to the parent
 	const { setState, size, i, reset, text } = state;
-	const { editingBuild, editingComment, resetTextEditor } = useContext(BuildContext);
+	const { editingBuild, editingComment, resetTextEditor, settingBuildOfTheWeek } = useContext(BuildContext);
 	const { editingProfile } = useContext(AuthContext);
 	const { setResetTextEditorState } = useBuild();
 	const emptyState = `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`;
@@ -27,6 +27,12 @@ const TextEditor = state => {
 		}
 		if (editingComment) {
 			return EditorState.createWithContent(convertFromRaw(JSON.parse(editingComment.comment)));
+		}
+		if (settingBuildOfTheWeek) {
+			return EditorState.createWithContent(
+				ContentState.createFromText(`Congratulations ${settingBuildOfTheWeek.author}! Your build '${settingBuildOfTheWeek.name}' has been chosen as the Build of the Week on our website! We were blown away by your creation and impressed by its design & creativity. As a reward for being selected as the Build of the Week, your creation will be featured prominently on our website's "Builds of the Week" page, and a special badge to display on your profile & build to recognize your achievement. We want to thank you for sharing your amazing creation with us and the KSP community. Keep up the fantastic work, and we can't wait to see what you'll build next! Congratulations once again! ~nyius :)
+			`)
+			);
 		}
 		if (editingProfile) {
 			if (checkIfJson(editingProfile.bio)) {
@@ -47,6 +53,7 @@ const TextEditor = state => {
 		convertContentToJson();
 	};
 
+	// Reser the text editor
 	useEffect(() => {
 		if (resetTextEditor) {
 			setEditorState(EditorState.createWithContent(convertFromRaw(JSON.parse(emptyState))));

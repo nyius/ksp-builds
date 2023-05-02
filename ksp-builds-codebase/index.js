@@ -3,8 +3,9 @@ const admin = require('firebase-admin');
 const cheerio = require('cheerio');
 const axios = require('axios');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-
 admin.initializeApp();
+const { TwitterApi } = require('twitter-api-v2');
+const { firebase } = require('googleapis/build/src/apis/firebase');
 
 // Gets the news articles
 exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context => {
@@ -84,6 +85,220 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 		};
 	} catch (error) {
 		console.log(error);
+	}
+});
+
+/**
+ * handles posting a tweet
+ */
+exports.postTweet = functions.https.onRequest(async (req, res) => {
+	try {
+		let accessToken;
+		const docRef = admin.firestore().doc(`adminPanel/twitter`);
+
+		// See if that channel exists
+		await docRef.get().then(docSnap => {
+			if (!docSnap.exists) {
+				throw new functions.https.HttpsError(`Didn't find the twitter doc in adminPanel`);
+			}
+			const data = docSnap.data();
+			accessToken = data.accessToken;
+		});
+
+		const client = new TwitterApi(accessToken);
+		await client.v2.tweet('Hello World!');
+
+		// Example uploading images to twitter (with V1)
+		// First, post all your images to Twitter
+		// const mediaIds = await Promise.all([
+		// 	// file path
+		// 	client.v1.uploadMedia('./my-image.jpg'),
+		// 	// from a buffer, for example obtained with an image modifier package
+		// 	client.v1.uploadMedia(Buffer.from(rotatedImage), { type: 'png' }),
+		// ]);
+	} catch (error) {
+		functions.logger.log(error);
+	}
+});
+
+/**
+ * handles initial twitter verifications setup. Need to visit link on google cloud functions logger to start verifications.
+ */
+exports.startTwitterVerify = functions.https.onRequest(async (req, res) => {
+	try {
+		// INITIAL VERIFYING
+		const client = new TwitterApi({
+			clientId: process.env.REACT_APP_TWITTER_CLIENT,
+			clientSecret: process.env.REACT_APP_TWITTER_SECRET,
+		});
+
+		const { url, codeVerifier, state } = client.generateOAuth2AuthLink('https://us-central1-kspbuilds.cloudfunctions.net/verifyTwitter', { scope: ['tweet.write', 'offline.access'] });
+		functions.logger.log('Please go to', url);
+
+		const twitterDbRef = admin.firestore().doc(`adminPanel/twitter`);
+		await twitterDbRef.update({
+			codeVerifier,
+			state,
+		});
+
+		res.json({
+			status: 200,
+			url: url,
+		});
+	} catch (error) {
+		functions.logger.log(error);
+	}
+});
+
+/**
+ * Handles verifying the twitter account and getting us the proper tokens to access it
+ */
+exports.verifyTwitter = functions.https.onRequest(async (req, res) => {
+	try {
+		let codeVerifier;
+		const { state, code } = req.query;
+
+		const client = new TwitterApi({
+			clientId: process.env.REACT_APP_TWITTER_CLIENT,
+			clientSecret: process.env.REACT_APP_TWITTER_SECRET,
+		});
+
+		const docRef = admin.firestore().doc(`adminPanel/twitter`);
+
+		// See if that channel exists
+		await docRef.get().then(docSnap => {
+			if (!docSnap.exists) {
+				throw new functions.https.HttpsError(`Didn't find the twitter doc in adminPanel`);
+			}
+			const data = docSnap.data();
+			codeVerifier = data.codeVerifier;
+		});
+
+		if (!codeVerifier || !state || !code) {
+			return res.status(400).send('You denied the app or your session expired!');
+		}
+
+		const { loggedClient, accessToken, refreshToken, expiresIn } = await client.loginWithOAuth2({ code, codeVerifier, redirectUri: 'https://us-central1-kspbuilds.cloudfunctions.net/verifyTwitter' });
+
+		const twitterDbRef = admin.firestore().doc(`adminPanel/twitter`);
+		await twitterDbRef.update({
+			accessToken,
+			refreshToken,
+			expiresIn,
+		});
+
+		res.json({
+			status: 200,
+			message: `Verified!`,
+		});
+	} catch (error) {
+		functions.logger.log(error);
+	}
+});
+
+/**
+ * handles refreshing the twitter auth so we stay logged in
+ */
+exports.refreshTwitterAuth = functions.pubsub.schedule('every 2 hours').onRun(async context => {
+	try {
+		let refreshTokenOld;
+		const docRef = admin.firestore().doc(`adminPanel/twitter`);
+
+		// See if that channel exists
+		await docRef.get().then(docSnap => {
+			if (!docSnap.exists) {
+				throw new functions.https.HttpsError(`Didn't find the twitter doc in adminPanel`);
+			}
+			const data = docSnap.data();
+			refreshTokenOld = data.refreshToken;
+		});
+
+		const client = new TwitterApi({
+			clientId: process.env.REACT_APP_TWITTER_CLIENT,
+			clientSecret: process.env.REACT_APP_TWITTER_SECRET,
+		});
+
+		const { accessToken, refreshToken: newRefreshToken } = await client.refreshOAuth2Token(refreshTokenOld);
+
+		const twitterDbRef = admin.firestore().doc(`adminPanel/twitter`);
+		twitterDbRef.update({
+			refreshToken,
+			accessToken,
+		});
+	} catch (error) {
+		functions.logger.log(error);
+	}
+});
+
+/**
+ * handles clearing the weekly upvoted craft, for the new week
+ */
+exports.clearWeeklyUpvotedBuilds = functions.pubsub.schedule('every sun 23:00').onRun(async context => {
+	try {
+		const docRef = admin.firestore().doc(`kspInfo/weeklyUpvoted`);
+
+		await docRef.delete();
+	} catch (error) {
+		functions.logger.log(error);
+	}
+});
+
+/**
+ * handles generating the build of the week
+ */
+exports.generateBuildOfTheWeek = functions.https.onRequest(async (req, res) => {
+	try {
+		// Fetch the weekly upvoted builds
+		const weeklyUpvotedRef = admin.firestore().doc(`kspInfo/weeklyUpvoted`);
+		const weeklyFeaturedBuildsRef = admin.firestore().doc(`kspInfo/weeklyFeaturedBuilds`);
+		let weeklyFeaturedBuildsData;
+
+		await weeklyFeaturedBuildsRef.get().then(docSnap => {
+			if (!docSnap.exists) {
+				throw new functions.https.HttpsError(`Couldn't find the weekly featured`);
+			}
+
+			weeklyFeaturedBuildsData = docSnap.data();
+		});
+
+		await weeklyUpvotedRef.get().then(docSnap => {
+			if (!docSnap.exists) {
+				throw new functions.https.HttpsError(`Couldn't find the weekly upvoted builds`);
+			}
+
+			const weeklyUpvoted = docSnap.data();
+
+			// Get the highest upvoted builds ---------------------------------------------------------------------------------------------------//
+			let highest;
+			let builds = [];
+
+			for (const build in weeklyUpvoted) {
+				if (weeklyFeaturedBuildsData[build]) {
+					// This build was already featured, ignore it
+				} else {
+					if (highest) {
+						if (weeklyUpvoted[build].length >= highest) {
+							highest = weeklyUpvoted[build].length;
+						}
+					} else {
+						highest = weeklyUpvoted[build].length;
+					}
+					builds.push([build, weeklyUpvoted[build].length]);
+				}
+			}
+
+			const filtered = builds.filter(build => {
+				return build[1] >= highest;
+			});
+
+			functions.logger.log('builds:', filtered);
+
+			// Pick a random build ---------------------------------------------------------------------------------------------------//
+			// Fetch it from the DB ---------------------------------------------------------------------------------------------------//
+			// Create a new 'weekly best build' doc ---------------------------------------------------------------------------------------------------//
+		});
+	} catch (error) {
+		functions.logger.log(error);
 	}
 });
 

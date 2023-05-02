@@ -52,7 +52,8 @@ function BuildOfTheWeekCard({ buildOfTheWeek, i, currentSlide }) {
 	if (currentSlide === i) {
 		return (
 			<>
-				<img src={buildOfTheWeek.thumbnail} alt={buildOfTheWeek.name} className="rounded-lg object-contain h-full z-50" />
+				<img src={buildOfTheWeek.thumbnail} alt={buildOfTheWeek.name} className="rounded-lg object-contain h-full z-50 cursor-pointer" onClick={() => navigate(`/build/${buildOfTheWeek.id}`)} />
+
 				<div className="flex flex-row w-full px-4 place-content-between items-center">
 					<div className="flex flex-col max-w-1/2">
 						<div className="flex flex-row flex-wrap gap-2 2k:gap-4 mb-2 2k:mb-4">

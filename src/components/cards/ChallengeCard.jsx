@@ -69,7 +69,8 @@ function ChallengeCard({ challenge, i, currentSlide }) {
 	if (currentSlide === i) {
 		return (
 			<>
-				<img src={challenge.image} alt={challenge.title} className="rounded-lg object-contain h-full z-50" />
+				<img src={challenge.image} alt={challenge.title} className="rounded-lg object-contain h-full z-50 cursor-pointer" onClick={() => navigate(`/challenges/${challenge.articleId}`)} />
+
 				<div className="flex flex-col w-full px-4">
 					<div className="flex flex-row flex-wrap gap-2 2k:gap-4 mb-2 2k:mb-4">
 						<p className="text-3xl 2k:text-5xl text-white font-bold z-50 truncate-3">{challenge.title}</p>

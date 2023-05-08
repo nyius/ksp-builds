@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, getDoc, setDoc, getCountFromServer, serverTimestamp, addDoc, getDocFromCache, getDocsFromCache } from 'firebase/firestore';
+import { updateMetadata, ref, listAll } from 'firebase/storage';
 import { db } from '../../firebase.config';
 import { cloneDeep } from 'lodash';
 import { Helmet } from 'react-helmet';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
-
+import { storage } from '../../firebase.config';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import useAuth from '../../context/auth/AuthActions';
@@ -371,99 +372,6 @@ function AdminPanel() {
 		}
 	};
 
-	const fetchAllBuilds = async () => {
-		try {
-			const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
-			const builds = [];
-
-			const buildsSnap = await getDocs(buildsRef);
-
-			buildsSnap.forEach(doc => {
-				builds.push(doc.data());
-				fetchComments(doc.id);
-			});
-
-			console.log(builds);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	const fetchComments = async id => {
-		try {
-			const commentsRef = collection(db, process.env.REACT_APP_BUILDSDB, id, 'comments');
-			const commentsSnapshot = await getDocs(commentsRef);
-
-			const commentsList = commentsSnapshot.docs.map(doc => {
-				const comment = doc.data();
-				comment.id = doc.id;
-				return comment;
-			});
-			console.log(commentsList);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	const fetchAllUsers = async () => {
-		try {
-			const userProfilesRef = collection(db, 'userProfiles');
-			const usersRef = collection(db, 'users');
-			const userProfiles = [];
-			const users = [];
-
-			const userProfilesSnap = await getDocs(userProfilesRef);
-			const usersSnap = await getDocs(usersRef);
-
-			userProfilesSnap.forEach(doc => {
-				userProfiles.push(doc.data());
-			});
-
-			usersSnap.forEach(doc => {
-				users.push(doc.data());
-			});
-
-			console.log(users);
-			console.log(userProfiles);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	const fetchKSPInfo = async () => {
-		try {
-			const kspInfoRef = collection(db, 'kspInfo');
-			const kspInfo = [];
-
-			const kspInfoSnap = await getDocs(kspInfoRef);
-
-			kspInfoSnap.forEach(doc => {
-				kspInfo.push(doc.data());
-			});
-
-			console.log(kspInfo);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	const fetchPatchNotes = async () => {
-		try {
-			const patchNotesRef = collection(db, 'patchNotes');
-			const patchNotes = [];
-
-			const patchNotesSnap = await getDocs(patchNotesRef);
-
-			patchNotesSnap.forEach(doc => {
-				patchNotes.push(doc.data());
-			});
-
-			console.log(patchNotes);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
 	const updateUser = async () => {
 		try {
 			await updateDoc(doc(db, 'users', 'ZyVrojY9BZU5ixp09LftOd240LH3'), { lastModified: user.dateCreated });
@@ -471,6 +379,40 @@ function AdminPanel() {
 			toast.success('User updated');
 		} catch (error) {
 			console.log(error);
+		}
+	};
+
+	const updateAllStorageItems = async () => {
+		try {
+			const imagesRef = ref(storage, 'images');
+
+			const newMetadata = {
+				cacheControl: 'public,max-age=31536000',
+			};
+
+			listAll(imagesRef)
+				.then(res => {
+					res.items.forEach(image => {
+						const imageRef = ref(storage, image._location.path);
+
+						updateMetadata(imageRef, newMetadata)
+							.then(metadata => {
+								// Updated metadata for 'images/forest.jpg' is returned in the Promise
+								console.log(metadata);
+							})
+							.catch(error => {
+								throw new Error(error);
+							});
+					});
+				})
+				.catch(err => {
+					throw new Error(err);
+				});
+
+			toast.success('Storage items updated');
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong');
 		}
 	};
 
@@ -535,29 +477,8 @@ function AdminPanel() {
 						<div className="divider divider-horizontal"></div>
 
 						<div className="flex flex-col gap-4 place-content-between">
-							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Fetch all Builds</p>
-							<Button color="btn-primary" text="Fetch" onClick={fetchAllBuilds} />
-						</div>
-
-						<div className="divider divider-horizontal"></div>
-
-						<div className="flex flex-col gap-4 place-content-between">
-							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Fetch all Users </p>
-							<Button color="btn-primary" text="Fetch" onClick={fetchAllUsers} />
-						</div>
-
-						<div className="divider divider-horizontal"></div>
-
-						<div className="flex flex-col gap-4 place-content-between">
-							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Fetch KSPInfo</p>
-							<Button color="btn-primary" text="Fetch" onClick={fetchKSPInfo} />
-						</div>
-
-						<div className="divider divider-horizontal"></div>
-
-						<div className="flex flex-col gap-4 place-content-between">
-							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Fetch patch notes</p>
-							<Button color="btn-primary" text="Fetch" onClick={fetchPatchNotes} />
+							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Update all storage items</p>
+							<Button color="btn-primary" text="Update" onClick={updateAllStorageItems} />
 						</div>
 
 						<div className="divider divider-horizontal"></div>

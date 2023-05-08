@@ -18,7 +18,7 @@ export const uploadImage = async (image, setLoadingState, uid) => {
 		const fileName = `${uid}-${image.name}-${uuidv4().slice(0, 10)}`;
 
 		const storageRef = ref(storage, 'images/' + fileName);
-		const uploadTask = uploadBytesResumable(storageRef, image);
+		const uploadTask = uploadBytesResumable(storageRef, image, { cacheControl: 'public,max-age=31536000' });
 
 		// Listen for state changes, errors, and completion of the upload.
 		uploadTask.on(
@@ -95,7 +95,7 @@ export const uploadImages = async (images, setLoadingState) => {
 			const fileName = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`;
 
 			const storageRef = ref(storage, 'images/' + fileName);
-			const uploadTask = uploadBytesResumable(storageRef, image);
+			const uploadTask = uploadBytesResumable(storageRef, image, { cacheControl: 'public,max-age=31536000' });
 
 			// Listen for state changes, errors, and completion of the upload.
 			uploadTask.on(

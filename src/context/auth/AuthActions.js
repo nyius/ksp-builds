@@ -367,9 +367,8 @@ const useAuth = () => {
 	const fetchUsersProfile = async id => {
 		try {
 			setFetchingProfile(true);
-			await fetchLastUpdatedUsers();
 
-			const fetchedProfile = await getDocFromCache(doc(db, 'userProfiles', id));
+			const fetchedProfile = await getDoc(doc(db, 'userProfiles', id));
 
 			if (fetchedProfile.exists()) {
 				const profile = fetchedProfile.data();
@@ -384,24 +383,30 @@ const useAuth = () => {
 				// Check if we can find it by username
 				const userCol = collection(db, 'userProfiles');
 				const q = query(userCol, where('username', '==', id));
-				const fetchedProfiles = await getDocsFromCache(q);
+				const fetchedProfiles = await getDocs(q);
 				let profiles = [];
 
-				if (!fetchedProfiles.empty) {
-					fetchedProfiles.forEach(profile => {
-						let userProfile = profile.data();
-						userProfile.uid = profile.id;
-						profiles.push(userProfile);
-					});
-				} else {
-					const fetchedProfiles = await getDocs(q);
+				fetchedProfiles.forEach(profile => {
+					let userProfile = profile.data();
+					userProfile.uid = profile.id;
+					profiles.push(userProfile);
+				});
 
-					fetchedProfiles.forEach(profile => {
-						let userProfile = profile.data();
-						userProfile.uid = profile.id;
-						profiles.push(userProfile);
-					});
-				}
+				// if (!fetchedProfiles.empty) {
+				// 	fetchedProfiles.forEach(profile => {
+				// 		let userProfile = profile.data();
+				// 		userProfile.uid = profile.id;
+				// 		profiles.push(userProfile);
+				// 	});
+				// } else {
+				// 	const fetchedProfiles = await getDocs(q);
+
+				// 	fetchedProfiles.forEach(profile => {
+				// 		let userProfile = profile.data();
+				// 		userProfile.uid = profile.id;
+				// 		profiles.push(userProfile);
+				// 	});
+				// }
 
 				if (profiles.length > 0) {
 					const profile = profiles[0];
@@ -418,7 +423,7 @@ const useAuth = () => {
 				}
 			}
 		} catch (error) {
-			await fetchUsersProfileServer(id);
+			console.log(error);
 		}
 	};
 
@@ -632,22 +637,26 @@ const useAuth = () => {
 			const notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
 			const q = query(notificationsRef, orderBy('timestamp', 'desc', limit(process.env.REACT_APP_NOTIFS_FETCH_NUM)), startAfter(lastFetchedNotification), limit(process.env.REACT_APP_NOTIFS_FETCH_NUM));
 
-			const notifsSnap = await getDocsFromCache(q);
+			const notifsSnap = await getDocs(q);
 			let notifs = [];
+			notifsSnap.forEach(doc => {
+				const notif = doc.data();
+				notifs.push(notif);
+			});
 
-			if (!notifsSnap.empty) {
-				notifsSnap.forEach(doc => {
-					const notif = doc.data();
-					notifs.push(notif);
-				});
-			} else {
-				const notifsSnap = await getDocs(q);
+			// if (!notifsSnap.empty) {
+			// 	notifsSnap.forEach(doc => {
+			// 		const notif = doc.data();
+			// 		notifs.push(notif);
+			// 	});
+			// } else {
+			// 	const notifsSnap = await getDocs(q);
 
-				notifsSnap.forEach(doc => {
-					const notif = doc.data();
-					notifs.push(notif);
-				});
-			}
+			// 	notifsSnap.forEach(doc => {
+			// 		const notif = doc.data();
+			// 		notifs.push(notif);
+			// 	});
+			// }
 
 			dispatchAuth({
 				type: 'UPDATE_USER',
@@ -1293,7 +1302,6 @@ const useAuth = () => {
 		fetchUsersProfile,
 		fetchConversation,
 		fetchMoreNotifications,
-		fetchLastUpdatedUsers,
 		uploadProfilePicture,
 		createNewUserAccount,
 		loginWithGoogle,

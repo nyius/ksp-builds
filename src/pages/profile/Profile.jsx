@@ -213,7 +213,7 @@ function Profile() {
 								<>
 									{fetchedBuilds.length === 0 ? (
 										<CantFind text="You have no builds yet!">
-											<Button text="Create your first" icon="plus" onClick={() => navigate('/create')} color="btn-primary" />
+											<Button text="Create your first" icon="plus" onClick={() => navigate('/upload')} color="btn-primary" />
 										</CantFind>
 									) : (
 										<>

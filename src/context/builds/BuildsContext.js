@@ -28,7 +28,7 @@ export const BuildsProvider = ({ children }) => {
 				const snap = await getDoc(doc(db, 'kspInfo', 'weeklyFeaturedBuild'));
 				const data = snap.data();
 
-				await fetchCacheBuild(data.id);
+				await fetchServerBuild(data.id);
 			} catch (error) {
 				console.log(`Couldn't find BotW`);
 				dispatchBuilds({

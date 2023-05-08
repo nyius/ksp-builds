@@ -27,7 +27,7 @@ const useBuilds = () => {
 				},
 			});
 
-			await fetchLastUpdatedBuilds();
+			// await fetchLastUpdatedBuilds();
 
 			const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
 			const builds = [];
@@ -48,22 +48,23 @@ const useBuilds = () => {
 
 			let q = query(buildsRef, ...constraints);
 
-			const buildsSnap = await getDocsFromCache(q);
+			const buildsSnap = await getDocs(q);
 
-			if (!buildsSnap.empty) {
-				buildsSnap.forEach(doc => {
-					builds.push(doc.data());
-				});
-			} else {
-				const buildsSnap = await getDocs(q);
+			buildsSnap.forEach(doc => {
+				builds.push(doc.data());
+			});
 
-				buildsSnap.forEach(doc => {
-					builds.push(doc.data());
-				});
-			}
+			// if (!buildsSnap.empty) {
+			// 	buildsSnap.forEach(doc => {
+			// 		builds.push(doc.data());
+			// 	});
+			// } else {
+			// 	const buildsSnap = await getDocs(q);
 
-			// console.log(builds[0]);
-			// localStorage.setItem('newestBuild', JSON.stringify(builds[0]?.lastModified));
+			// 	buildsSnap.forEach(doc => {
+			// 		builds.push(doc.data());
+			// 	});
+			// }
 
 			dispatchBuilds({
 				type: 'SET_FETCHED_BUILDS',
@@ -103,7 +104,7 @@ const useBuilds = () => {
 				// check if the local newest update is now older than the last thing updated on the server
 				if (localNewest.seconds < newestDoc.lastModified.seconds) {
 					let newDocsQ = query(buildsRef, where('visibility', '==', 'public'), where('lastModified', '>', new Date(localNewest.seconds * 1000)));
-					await getDocs(newDocsQ); // simply getDocs so it updates our cache
+					await getDocs(newDocsQ);
 
 					localStorage.setItem('newestBuild', JSON.stringify(newestDoc.lastModified));
 				}
@@ -158,19 +159,23 @@ const useBuilds = () => {
 
 			q = query(buildsRef, ...constraints, startAfter(lastFetchedBuild));
 
-			const buildsSnap = await getDocsFromCache(q);
+			const buildsSnap = await getDocs(q);
 
-			if (!buildsSnap.empty) {
-				buildsSnap.forEach(doc => {
-					builds.push(doc.data());
-				});
-			} else {
-				const buildsSnap = await getDocs(q);
+			buildsSnap.forEach(doc => {
+				builds.push(doc.data());
+			});
 
-				buildsSnap.forEach(doc => {
-					builds.push(doc.data());
-				});
-			}
+			// if (!buildsSnap.empty) {
+			// 	buildsSnap.forEach(doc => {
+			// 		builds.push(doc.data());
+			// 	});
+			// } else {
+			// 	const buildsSnap = await getDocs(q);
+
+			// 	buildsSnap.forEach(doc => {
+			// 		builds.push(doc.data());
+			// 	});
+			// }
 
 			dispatchBuilds({
 				type: 'SET_FETCHED_BUILDS',
@@ -205,8 +210,6 @@ const useBuilds = () => {
 				},
 			});
 
-			await fetchLastUpdatedBuilds();
-
 			const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
 			let q;
 
@@ -228,7 +231,7 @@ const useBuilds = () => {
 				q = query(buildsRef, ...constraints);
 
 				// this gets all of the docs from our query, then loops over them and returns the raw data to our array
-				batches.push(getDocsFromCache(q).then(res => res.docs.map(res => res.data())));
+				batches.push(getDocs(q).then(res => res.docs.map(res => res.data())));
 			}
 
 			// now we resolve all of the promises
@@ -341,7 +344,7 @@ const useBuilds = () => {
 		}
 	};
 
-	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchLastUpdatedBuilds, fetchUsersBuilds, fetchMoreBuilds, setBuildsLoading, setFetchAmount, setCurrentPage, clearFetchedBuilds, goBackPage, goToStartPage };
+	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchUsersBuilds, fetchMoreBuilds, setBuildsLoading, setFetchAmount, setCurrentPage, clearFetchedBuilds, goBackPage, goToStartPage };
 };
 
 export default useBuilds;

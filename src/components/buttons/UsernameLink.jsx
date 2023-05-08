@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from './Button';
 import useAuth from '../../context/auth/AuthActions';
 import AuthContext from '../../context/auth/AuthContext';
-import { doc, getDoc, getDocFromCache } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import BotwBadge from '../../assets/BotW_badge2.png';
 import Tier1Badge from '../../assets/badges/tier1/tier1_badge36.png';
@@ -14,7 +14,7 @@ import Tier3Badge from '../../assets/badges/tier3/tier3_badge36.png';
 function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 	const { user, hoverUser } = useContext(AuthContext);
 	const navigate = useNavigate();
-	const { fetchConversation, setReport, setUserToBlock, handleFollowingUser, fetchLastUpdatedUsers } = useAuth();
+	const { fetchConversation, setReport, setUserToBlock, handleFollowingUser } = useAuth();
 	const [hover, setHover] = useState(false);
 	const [usersProfile, setUsersProfile] = useState(null);
 	const [loadingProfile, setLoadingProfile] = useState(true);
@@ -63,9 +63,8 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 	useEffect(() => {
 		const fetchUserProfile = async () => {
 			try {
-				await fetchLastUpdatedUsers();
 				if (uid) {
-					let userSnap = await getDocFromCache(doc(db, 'userProfiles', uid));
+					let userSnap = await getDoc(doc(db, 'userProfiles', uid));
 
 					const data = userSnap.data();
 					setLoadingProfile(false);

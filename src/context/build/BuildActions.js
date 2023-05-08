@@ -41,13 +41,11 @@ const useBuild = () => {
 		dispatchBuild({ type: 'LOADING_BUILD', payload: true });
 
 		try {
-			await fetchLastUpdatedBuilds();
-
 			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, id);
 			let response, rawBuildData, parsedBuild;
 
 			// get the build from the db
-			const fetchedBuild = await getDocFromCache(buildRef);
+			const fetchedBuild = await getDoc(buildRef);
 
 			// Get the raw build from aws
 			if (process.env.REACT_APP_ENV !== 'DEV') {
@@ -230,9 +228,6 @@ const useBuild = () => {
 					resetTextEditor: true,
 				},
 			});
-
-			// Get the doc so the cache updates the changes
-			// await fetch(`https://us-central1-kspbuilds.cloudfunctions.net/fetchUpdatedDoc?id=${build.id}`);
 
 			toast.success('Build updated');
 			setUploadingBuild(false);

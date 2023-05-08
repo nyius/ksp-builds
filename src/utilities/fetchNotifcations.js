@@ -9,29 +9,18 @@ import { collection, orderBy, getDocs, deleteDoc, limit, query, doc, where, getD
  */
 const fetchNotifications = async (user, dispatchAuth) => {
 	try {
-		await fetchAllUsersNotifs();
 		// Fetch their notifications --------------------------------------------//
 		const notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
 		const q = query(notificationsRef, orderBy('timestamp', 'desc', limit(process.env.REACT_APP_NOTIFS_FETCH_NUM)), limit(process.env.REACT_APP_NOTIFS_FETCH_NUM));
 
-		const notificationsSnap = await getDocsFromCache(q);
+		const notificationsSnap = await getDocs(q);
 		const notificationsList = [];
 
-		if (!notificationsSnap.empty) {
-			notificationsSnap.forEach(doc => {
-				const notif = doc.data();
-				notif.id = doc.id;
-				notificationsList.push(notif);
-			});
-		} else {
-			const notificationsSnap = await getDocs(q);
-
-			notificationsSnap.forEach(doc => {
-				const notif = doc.data();
-				notif.id = doc.id;
-				notificationsList.push(notif);
-			});
-		}
+		notificationsSnap.forEach(doc => {
+			const notif = doc.data();
+			notif.id = doc.id;
+			notificationsList.push(notif);
+		});
 
 		if (notificationsList) notificationsList.sort((a, b) => b.timestamp - a.timestamp); // Sort by timestamp
 

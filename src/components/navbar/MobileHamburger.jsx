@@ -31,6 +31,7 @@ function MobileHamburger() {
 				<Button type="ahref" href="/" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="home" text="Home" />
 				{!authLoading && !user?.username && <Button type="ahref" href="/sign-up" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Create Account" />}
 				{!authLoading && user?.username && <Button type="ahref" href="/favorites" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" />}
+				{!authLoading && user?.username && <>{!user?.subscribed && <Button text="Subscribe" icon="outline-star" htmlFor="subscribe-modal" css="border-2 border-solid border-slate-500 space-between" color="btn-ghost" />}</>}
 				<Button type="ahref" href="/upload" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="plus" text="Upload" onClick={handleUploadNavigate} />
 				<Button type="ahref" href="/challenges" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="Challenges" icon="mountain" />
 				<Button type="ahref" href="/faq" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="F.A.Q" icon="help" />

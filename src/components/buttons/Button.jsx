@@ -12,6 +12,9 @@ import { FcGoogle } from 'react-icons/fc';
 import { HiNewspaper } from 'react-icons/hi';
 import { AiOutlineHeart, AiFillHeart, AiOutlineBulb, AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
+import Tier1Badge from '../../assets/badges/tier1/tier1_badge36.png';
+import Tier2Badge from '../../assets/badges/tier2/tier2_badge36.png';
+import Tier3Badge from '../../assets/badges/tier3/tier3_badge36.png';
 
 /**
  *
@@ -31,7 +34,7 @@ import { Link } from 'react-router-dom';
  * @param {*} type - enter 'submit' for submitting a form, 'button' to make it not submit, 'ahref' for a link to a page for google, leave blank for 'label'
  * @returns
  */
-function Button({ text, onClick, color, size, icon, css, style, position, htmlFor, margin, type, href, target, tabIndex }) {
+function Button({ text, onClick, color, size, icon, css, style, position, htmlFor, margin, type, href, target, tabIndex, price }) {
 	const buttonIcon = () => {
 		if (icon === 'cancel') return <GiCancel />;
 		if (icon === 'upload') return <ImCloudUpload />;
@@ -66,6 +69,9 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 		if (icon === 'message') return <BiCommentAdd />;
 		if (icon === 'fill-star') return <AiFillStar />;
 		if (icon === 'outline-star') return <AiOutlineStar />;
+		if (icon === 'tier1') return <img src={Tier1Badge} alt="" className="w-8 h-8 2k:w-12 2k:h-12" />;
+		if (icon === 'tier2') return <img src={Tier2Badge} alt="" className="w-8 h-8 2k:w-12 2k:h-12" />;
+		if (icon === 'tier3') return <img src={Tier3Badge} alt="" className="w-8 h-8 2k:w-12 2k:h-12" />;
 	};
 
 	// The button is a label becuase then we can use htmlFor tag to open modals. Not sure if this breaks things but it seems to work fine

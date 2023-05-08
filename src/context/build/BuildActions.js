@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, getDocs, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, getDocs, serverTimestamp, getDocsFromCache, getDocFromCache } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,7 +10,7 @@ import { compressAccurately } from 'image-conversion';
 import { auth } from '../../firebase.config';
 import { profanity } from '@2toad/profanity';
 import { cloneDeep } from 'lodash';
-import { compress, decompress, compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 //---------------------------------------------------------------------------------------------------//
 import { uploadImage } from '../../utilities/uploadImage';
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
@@ -21,15 +21,17 @@ import BuildsContext from '../builds/BuildsContext';
 import AuthContext from '../auth/AuthContext';
 import useAuth from '../auth/AuthActions';
 import FiltersContext from '../filters/FiltersContext';
+import useBuilds from '../builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
 
 const useBuild = () => {
 	const navigate = useNavigate();
-	const { dispatchBuild, deletingCommentId, replyingComment, comments, loadedBuild, comment, editingBuild, settingBuildOfTheWeek } = useContext(BuildContext);
-	const { fetchedBuilds, dispatchBuilds } = useContext(BuildsContext);
+	const { dispatchBuild, replyingComment, comments, loadedBuild, comment, settingBuildOfTheWeek } = useContext(BuildContext);
+	const { dispatchBuilds } = useContext(BuildsContext);
 	const { kspVersions } = useContext(FiltersContext);
 	const { user } = useContext(AuthContext);
-	const { updateUserState, addbuildToUser, handleVoting, sendNotification } = useAuth();
+	const { fetchLastUpdatedBuilds } = useBuilds();
+	const { addbuildToUser, handleVoting, sendNotification } = useAuth();
 
 	/**
 	 * Fetches the build from the server and dispatches the result.
@@ -39,11 +41,13 @@ const useBuild = () => {
 		dispatchBuild({ type: 'LOADING_BUILD', payload: true });
 
 		try {
+			await fetchLastUpdatedBuilds();
+
 			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, id);
 			let response, rawBuildData, parsedBuild;
 
 			// get the build from the db
-			const fetchedBuild = await getDoc(buildRef);
+			const fetchedBuild = await getDocFromCache(buildRef);
 
 			// Get the raw build from aws
 			if (process.env.REACT_APP_ENV !== 'DEV') {
@@ -187,6 +191,8 @@ const useBuild = () => {
 				build.thumbnail = build.images[0];
 			}
 
+			build.lastModified = serverTimestamp();
+
 			// update the document
 			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), {
 				...build,
@@ -224,6 +230,9 @@ const useBuild = () => {
 					resetTextEditor: true,
 				},
 			});
+
+			// Get the doc so the cache updates the changes
+			// await fetch(`https://us-central1-kspbuilds.cloudfunctions.net/fetchUpdatedDoc?id=${build.id}`);
 
 			toast.success('Build updated');
 			setUploadingBuild(false);
@@ -378,6 +387,7 @@ const useBuild = () => {
 		try {
 			const commentsRef = collection(db, process.env.REACT_APP_BUILDSDB, id, 'comments');
 			const commentsSnapshot = await getDocs(commentsRef);
+
 			const commentsList = commentsSnapshot.docs.map(doc => {
 				const comment = doc.data();
 				comment.id = doc.id;

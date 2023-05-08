@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFunctions } from 'firebase/functions';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, initializeFirestore, CACHE_SIZE_UNLIMITED, enableIndexedDbPersistence, clearIndexedDbPersistence } from 'firebase/firestore';
 import { GoogleAuthProvider, getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 import { getPerformance } from 'firebase/performance';
@@ -18,7 +18,10 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-export const db = getFirestore();
+export const db = initializeFirestore(app, { cacheSizeBytes: CACHE_SIZE_UNLIMITED });
+// clearIndexedDbPersistence(db);
+enableIndexedDbPersistence(db);
+// export const db = getFirestore();
 export const googleProvider = new GoogleAuthProvider();
 export const auth = getAuth();
 export const functions = getFunctions(app);

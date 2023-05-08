@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, getDoc, setDoc, getCountFromServer, serverTimestamp, addDoc } from 'firebase/firestore';
+import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, getDoc, setDoc, getCountFromServer, serverTimestamp, addDoc, getDocFromCache, getDocsFromCache } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { cloneDeep } from 'lodash';
 import { Helmet } from 'react-helmet';
@@ -33,6 +33,7 @@ function AdminPanel() {
 	const [siteNotification, setSiteNotification] = useState('');
 	const [challengeContent, setChallengeContent] = useState('');
 	const [patchNotes, setPatchNotes] = useState('');
+	const [patchNotesNotif, setPatchNotesNotif] = useState('');
 	const [challenge, setChallenge] = useState({
 		image: '',
 		title: '',
@@ -231,8 +232,13 @@ function AdminPanel() {
 			const usersRef = collection(db, 'users');
 			const usersSnap = await getDocs(usersRef);
 
-			// const userRef = collection(db, 'users', 'ZyVrojY9BZU5ixp09LftOd240LH3', 'messages');
-			// await addDoc(userRef, firstDoc);
+			usersSnap.forEach(user => {
+				const data = user.data();
+				updateDoc(doc(db, 'users', user.id), { lastModified: data.dateCreated });
+				updateDoc(doc(db, 'userProfiles', user.id), { lastModified: data.dateCreated });
+			});
+
+			toast.success('All users updated!');
 		} catch (error) {
 			console.log(error);
 		}
@@ -252,7 +258,7 @@ function AdminPanel() {
 
 				const updateBuild = async () => {
 					try {
-						await updateDoc(buildRef, { searchName: build.name.toLowerCase() });
+						await updateDoc(buildRef, { lastModified: build.timestamp });
 					} catch (error) {
 						console.log(error);
 					}
@@ -260,6 +266,8 @@ function AdminPanel() {
 
 				updateBuild();
 			});
+
+			toast.success('All Builds updated!');
 		} catch (error) {
 			console.log(error);
 		}
@@ -270,8 +278,13 @@ function AdminPanel() {
 	 */
 	const uploadPatchNote = async () => {
 		try {
+			if (patchNotesNotif === '') {
+				console.log(`Forgot patch notif`);
+				toast.error(`Forgot patch notif`);
+				return;
+			}
 			await setDoc(doc(db, 'patchNotes', uuidv4().slice(0, 15)), { patchNote: patchNotes, timestamp: serverTimestamp() });
-			await sendSiteMessage(patchNotes, 'update');
+			await sendSiteMessage(patchNotesNotif, 'update');
 
 			toast.success('Patch note update!');
 		} catch (error) {
@@ -358,6 +371,109 @@ function AdminPanel() {
 		}
 	};
 
+	const fetchAllBuilds = async () => {
+		try {
+			const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
+			const builds = [];
+
+			const buildsSnap = await getDocs(buildsRef);
+
+			buildsSnap.forEach(doc => {
+				builds.push(doc.data());
+				fetchComments(doc.id);
+			});
+
+			console.log(builds);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const fetchComments = async id => {
+		try {
+			const commentsRef = collection(db, process.env.REACT_APP_BUILDSDB, id, 'comments');
+			const commentsSnapshot = await getDocs(commentsRef);
+
+			const commentsList = commentsSnapshot.docs.map(doc => {
+				const comment = doc.data();
+				comment.id = doc.id;
+				return comment;
+			});
+			console.log(commentsList);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const fetchAllUsers = async () => {
+		try {
+			const userProfilesRef = collection(db, 'userProfiles');
+			const usersRef = collection(db, 'users');
+			const userProfiles = [];
+			const users = [];
+
+			const userProfilesSnap = await getDocs(userProfilesRef);
+			const usersSnap = await getDocs(usersRef);
+
+			userProfilesSnap.forEach(doc => {
+				userProfiles.push(doc.data());
+			});
+
+			usersSnap.forEach(doc => {
+				users.push(doc.data());
+			});
+
+			console.log(users);
+			console.log(userProfiles);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const fetchKSPInfo = async () => {
+		try {
+			const kspInfoRef = collection(db, 'kspInfo');
+			const kspInfo = [];
+
+			const kspInfoSnap = await getDocs(kspInfoRef);
+
+			kspInfoSnap.forEach(doc => {
+				kspInfo.push(doc.data());
+			});
+
+			console.log(kspInfo);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const fetchPatchNotes = async () => {
+		try {
+			const patchNotesRef = collection(db, 'patchNotes');
+			const patchNotes = [];
+
+			const patchNotesSnap = await getDocs(patchNotesRef);
+
+			patchNotesSnap.forEach(doc => {
+				patchNotes.push(doc.data());
+			});
+
+			console.log(patchNotes);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const updateUser = async () => {
+		try {
+			await updateDoc(doc(db, 'users', 'ZyVrojY9BZU5ixp09LftOd240LH3'), { lastModified: user.dateCreated });
+			await updateDoc(doc(db, 'userProfiles', 'ZyVrojY9BZU5ixp09LftOd240LH3'), { lastModified: user.dateCreated });
+			toast.success('User updated');
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
@@ -395,7 +511,7 @@ function AdminPanel() {
 				{infoLoading ? (
 					<Spinner1 />
 				) : (
-					<div className="flex flex-row bg-base-600 gap-4 rounded-xl p-4 2k:p-8 ">
+					<div className="flex flex-row flex-wrap bg-base-600 gap-4 rounded-xl p-4 2k:p-8 ">
 						<div className="flex flex-col gap-4">
 							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Add a new KSP version</p>
 							<TextInput onChange={e => setNewVersion(e.target.value)} placeholder="Version" size="w-44" />
@@ -418,6 +534,41 @@ function AdminPanel() {
 
 						<div className="divider divider-horizontal"></div>
 
+						<div className="flex flex-col gap-4 place-content-between">
+							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Fetch all Builds</p>
+							<Button color="btn-primary" text="Fetch" onClick={fetchAllBuilds} />
+						</div>
+
+						<div className="divider divider-horizontal"></div>
+
+						<div className="flex flex-col gap-4 place-content-between">
+							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Fetch all Users </p>
+							<Button color="btn-primary" text="Fetch" onClick={fetchAllUsers} />
+						</div>
+
+						<div className="divider divider-horizontal"></div>
+
+						<div className="flex flex-col gap-4 place-content-between">
+							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Fetch KSPInfo</p>
+							<Button color="btn-primary" text="Fetch" onClick={fetchKSPInfo} />
+						</div>
+
+						<div className="divider divider-horizontal"></div>
+
+						<div className="flex flex-col gap-4 place-content-between">
+							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Fetch patch notes</p>
+							<Button color="btn-primary" text="Fetch" onClick={fetchPatchNotes} />
+						</div>
+
+						<div className="divider divider-horizontal"></div>
+
+						<div className="flex flex-col gap-4 place-content-between">
+							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Update User</p>
+							<Button color="btn-primary" text="Update" onClick={updateUser} />
+						</div>
+
+						<div className="divider divider-horizontal"></div>
+
 						{/* <div className="flex flex-col gap-4 place-content-between">
 							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Verify Twitter</p>
 							<Button color="btn-primary" text="Verify Twitter" onClick={verifyTwitter} />
@@ -435,7 +586,7 @@ function AdminPanel() {
 				<div className="divider my-10"></div>
 
 				{/* ------------------ Site Notification ---------------------- */}
-				<div className="bg-base-600 rounded-xl p-4 2k:p-8 flex flex-col gap-4">
+				<div className="bg-base-500 rounded-xl p-4 2k:p-8 flex flex-col gap-4">
 					<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Send Site-wide message</p>
 					<TextEditor setState={setSiteNotification} />
 					<Button text="send" color="btn-primary" icon="upload" size="w-fit" onClick={() => sendSiteMessage('', 'message')} />
@@ -444,7 +595,7 @@ function AdminPanel() {
 				<div className="divider my-10"></div>
 
 				{/* ------------------ Challenge ---------------------- */}
-				<div className="bg-base-600 rounded-xl p-4 2k:p-8 flex flex-col gap-4">
+				<div className="bg-base-500 rounded-xl p-4 2k:p-8 flex flex-col gap-4">
 					<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Create New Challenge</p>
 
 					<div className="input-group text-3xl mb-10">
@@ -479,8 +630,11 @@ function AdminPanel() {
 				<div className="divider my-10"></div>
 
 				{/* ------------------ Patch Notes ---------------------- */}
-				<div className="bg-base-600 rounded-xl p-4 2k:p-8 flex flex-col gap-4">
+				<div className="bg-base-500 rounded-xl p-4 2k:p-8 flex flex-col gap-4">
 					<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Create Patch Notes</p>
+					<p className="text-2xl 2k:text-4xl text-slate-200">Notif</p>
+					<TextEditor setState={setPatchNotesNotif} />
+					<p className="text-2xl 2k:text-4xl text-slate-200">Patch Note</p>
 					<TextEditor setState={setPatchNotes} />
 					<Button text="create" color="btn-primary" icon="upload" size="w-fit" onClick={uploadPatchNote} />
 				</div>

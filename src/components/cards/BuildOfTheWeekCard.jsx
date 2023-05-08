@@ -54,7 +54,7 @@ function BuildOfTheWeekCard({ buildOfTheWeek, i, currentSlide }) {
 			<>
 				<img src={buildOfTheWeek.thumbnail} alt={buildOfTheWeek.name} className="rounded-lg object-contain h-full z-50 cursor-pointer" onClick={() => navigate(`/build/${buildOfTheWeek.id}`)} />
 
-				<div className="flex flex-row w-full px-4 place-content-between items-center">
+				<div className="flex flex-row w-full px-4 items-center">
 					<div className="flex flex-col max-w-1/2">
 						<div className="flex flex-row flex-wrap gap-2 2k:gap-4 mb-2 2k:mb-4">
 							<p className="text-2xl 2k:text-4xl text-slate-300 z-50 font-bold flex flex-row gap-2 2k:gap-4">Build of the Week</p>
@@ -72,8 +72,8 @@ function BuildOfTheWeekCard({ buildOfTheWeek, i, currentSlide }) {
 							<Button type="ahref" href={`/build/${buildOfTheWeek.id}`} text="View build" icon="right" color="btn-dark text-white" position="z-50" size="w-fit" />
 						</div>
 					</div>
-					<div className="flex justify-center w-full z-50">
-						<img src={BotwBadge} alt="" className="xl:w-64 2k:w-72 aspect-auto" />
+					<div className="flex justify-center z-50">
+						<img src={BotwBadge} alt="" className="w-60 xl:w-64 2k:w-72 aspect-auto" />
 					</div>
 				</div>
 			</>

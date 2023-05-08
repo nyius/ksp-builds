@@ -12,7 +12,6 @@ const FiltersReducer = (state, action) => {
 				versionFilter: 'any',
 				searchTerm: '',
 				tagsSearch: '',
-				sortBy: 'views',
 				modsFilter: 'any',
 				challengeFilter: 'any',
 			};

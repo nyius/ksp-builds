@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { db } from '../../firebase.config';
-import { doc, getDocs, collection, updateDoc } from 'firebase/firestore';
+import { doc, getDocs, getDocsFromCache, collection, updateDoc } from 'firebase/firestore';
 import { Helmet } from 'react-helmet';
 import { toast } from 'react-toastify';
 import { convertFromRaw, EditorState } from 'draft-js';
@@ -26,14 +26,24 @@ function PatchNotes() {
 	useEffect(() => {
 		const fetchPatchNotes = async () => {
 			try {
-				const fetched = await getDocs(collection(db, 'patchNotes'));
+				const patchSnap = await getDocsFromCache(collection(db, 'patchNotes'));
 				let data = [];
 
-				fetched.forEach(note => {
-					const noteData = note.data();
-					noteData.id = note.id;
-					data.push(noteData);
-				});
+				if (!patchSnap.empty) {
+					patchSnap.forEach(note => {
+						const noteData = note.data();
+						noteData.id = note.id;
+						data.push(noteData);
+					});
+				} else {
+					const patchSnap = await getDocs(collection(db, 'patchNotes'));
+
+					patchSnap.forEach(note => {
+						const noteData = note.data();
+						noteData.id = note.id;
+						data.push(noteData);
+					});
+				}
 
 				const sortedPatchNotes = data.sort((a, b) => {
 					let aDate = a.timestamp.seconds;

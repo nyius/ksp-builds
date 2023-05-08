@@ -54,7 +54,7 @@ function Notifications() {
 								<div className="p-5 2k:p-6 flex flex-col gap-2 2k:gap-4">
 									{user?.notifications?.length === 0 && <p className="text-xl 2k:text-2xl font-bold">No notifications</p>}
 									{user?.notifications?.map((notif, i) => {
-										return <Notification key={i} i={i} notif={notif} />;
+										return <Notification key={notif.id} i={i} notif={notif} />;
 									})}
 								</div>
 

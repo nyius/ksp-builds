@@ -38,7 +38,7 @@ function Profile() {
 	const { user, authLoading, editingProfile } = useContext(AuthContext);
 	//---------------------------------------------------------------------------------------------------//
 	const { setEditingProfile, updateUserDbBio, uploadProfilePicture, updateUserDbProfilePic } = useAuth();
-	const { fetchBuilds, setBuildsLoading, clearFetchedBuilds } = useBuilds();
+	const { fetchUsersBuilds, setBuildsLoading, clearFetchedBuilds } = useBuilds();
 	const { filterBuilds, resetFilters } = useFilters();
 	//---------------------------------------------------------------------------------------------------//
 	const [uploadingProfilePhoto, setUploadingProfilePhoto] = useState(false);
@@ -67,7 +67,7 @@ function Profile() {
 
 		if (!authLoading) {
 			if (user?.username && user?.builds.length > 0) {
-				fetchBuilds(user.builds, user.uid);
+				fetchUsersBuilds(user.builds, user.uid);
 				setBioLength(user.bio.length);
 			} else {
 				setBuildsLoading(false);
@@ -92,9 +92,13 @@ function Profile() {
 	 * Handles updating the users bio
 	 */
 	const handleSubmitBioUpdate = async () => {
-		await updateUserDbBio(editedBio);
-		setEditingProfile(false);
-		setBioState(EditorState.createWithContent(convertFromRaw(JSON.parse(editedBio))));
+		if (editedBio) {
+			await updateUserDbBio(editedBio);
+			setEditingProfile(false);
+			setBioState(EditorState.createWithContent(convertFromRaw(JSON.parse(editedBio))));
+		} else {
+			setEditingProfile(false);
+		}
 	};
 
 	/**

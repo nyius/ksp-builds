@@ -1,5 +1,5 @@
 import { db, auth } from '../firebase.config';
-import { collection, orderBy, getDocs, deleteDoc, limit, query, doc } from 'firebase/firestore';
+import { collection, orderBy, getDocs, deleteDoc, limit, query, doc, where, getDocsFromCache } from 'firebase/firestore';
 
 /**
  * Handles fetching current users notifications. Deletes any notifications that the user filters
@@ -9,16 +9,29 @@ import { collection, orderBy, getDocs, deleteDoc, limit, query, doc } from 'fire
  */
 const fetchNotifications = async (user, dispatchAuth) => {
 	try {
+		await fetchAllUsersNotifs();
 		// Fetch their notifications --------------------------------------------//
 		const notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
 		const q = query(notificationsRef, orderBy('timestamp', 'desc', limit(process.env.REACT_APP_NOTIFS_FETCH_NUM)), limit(process.env.REACT_APP_NOTIFS_FETCH_NUM));
 
-		const notificationsSnap = await getDocs(q);
-		const notificationsList = notificationsSnap.docs.map(doc => {
-			const notif = doc.data();
-			notif.id = doc.id;
-			return notif;
-		});
+		const notificationsSnap = await getDocsFromCache(q);
+		const notificationsList = [];
+
+		if (!notificationsSnap.empty) {
+			notificationsSnap.forEach(doc => {
+				const notif = doc.data();
+				notif.id = doc.id;
+				notificationsList.push(notif);
+			});
+		} else {
+			const notificationsSnap = await getDocs(q);
+
+			notificationsSnap.forEach(doc => {
+				const notif = doc.data();
+				notif.id = doc.id;
+				notificationsList.push(notif);
+			});
+		}
 
 		if (notificationsList) notificationsList.sort((a, b) => b.timestamp - a.timestamp); // Sort by timestamp
 
@@ -53,6 +66,40 @@ const fetchNotifications = async (user, dispatchAuth) => {
 		});
 
 		return filteredNotifications; // Set the notifs
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+const fetchAllUsersNotifs = async () => {
+	try {
+		const notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
+		let q = query(notificationsRef, orderBy('timestamp', 'desc'), limit(1));
+		// Get the most recently updated doc
+		const newestDocSnap = await getDocs(q);
+		let newestDoc;
+
+		newestDocSnap.forEach(doc => {
+			newestDoc = doc.data();
+		});
+
+		// Fetch the locally saved newest
+		const localNewest = JSON.parse(localStorage.getItem('newestNotif'));
+
+		if (localNewest) {
+			// check if the local newest update is now older than the last thing updated on the server
+			if (localNewest.seconds < newestDoc.timestamp.seconds) {
+				let newDocsQ = query(notificationsRef, where('timestamp', '>', new Date(localNewest.seconds * 1000)));
+				await getDocs(newDocsQ); // simply getDocs so it updates our cache
+
+				localStorage.setItem('newestNotif', JSON.stringify(newestDoc.timestamp));
+			}
+		} else {
+			// Users first time/ no localNewest saved, fetch all builds so they're cached
+			console.log(`No local stored timestamp`);
+			await getDocs(notificationsRef);
+			localStorage.setItem('newestNotif', JSON.stringify(newestDoc.timestamp));
+		}
 	} catch (error) {
 		console.log(error);
 	}

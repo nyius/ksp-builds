@@ -230,7 +230,7 @@ function Build() {
 										) : (
 											<div className="flex flex-col gap-4 2k:gap-8 mb-20">
 												{comments.map((comment, i) => {
-													return <Comment key={i} comment={comment} />;
+													return <Comment key={comment.id} comment={comment} />;
 												})}
 											</div>
 										)}

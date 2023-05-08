@@ -22,4 +22,5 @@ export const standardBuild = {
 	downloads: 0,
 	visibility: 'public',
 	forChallenge: false,
+	lastModified: serverTimestamp(),
 };

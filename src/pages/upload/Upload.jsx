@@ -431,7 +431,7 @@ function Upload() {
 											<p className="2k:text-2xl">Visibility</p>
 											<select onChange={setVisiblity} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
 												<optgroup>
-													<option value="pubic">Public</option>
+													<option value="public">Public</option>
 													<option value="private">Private</option>
 													<option value="unlisted">Unlisted</option>
 												</optgroup>

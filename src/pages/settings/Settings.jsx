@@ -1,6 +1,7 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { toast } from 'react-toastify';
+import { TwitterPicker } from 'react-color';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import useResetStates from '../../utilities/useResetStates';
@@ -9,13 +10,22 @@ import AuthContext from '../../context/auth/AuthContext';
 import useAuth from '../../context/auth/AuthActions';
 
 function Settings() {
+	const [usernameColor, setUsernameColor] = useState(null);
 	const { resetStates } = useResetStates();
 	const { user, authLoading } = useContext(AuthContext);
-	const { setAccountToDelete, updateUserDb, updateUserDbBlockedNotifs, updateUserProfiles } = useAuth();
+	const { setAccountToDelete, updateUserDb, updateUserDbBlockedNotifs, updateUserProfiles, updateUsernameColor } = useAuth();
 
 	useEffect(() => {
 		resetStates();
 	}, []);
+
+	useEffect(() => {
+		if (!authLoading && user?.username) {
+			if (user.customUsernameColor) {
+				setUsernameColor(user.customUsernameColor);
+			}
+		}
+	}, [authLoading]);
 
 	/**
 	 * Listens for changes for notifications
@@ -67,6 +77,15 @@ function Settings() {
 		}
 	};
 
+	/**
+	 * Handles a user changing their username color
+	 * @param {*} color
+	 * @param {*} e
+	 */
+	const handleUsernameColorChange = (color, e) => {
+		setUsernameColor(color.hex);
+	};
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
@@ -109,6 +128,93 @@ function Settings() {
 							</label>
 						</div>
 
+						{/* ----------------------------------- Username Color ----------------------------------- */}
+						<div className="divider"></div>
+						<div className="text-xl 2k:text-3xl text-white font-bold mb-4">Username Color</div>
+						<div style={{ color: `${usernameColor}` }} className={`text-2xl 2k:text-4xl font-bold mb-4 text-accent`}>
+							{user.username}
+						</div>
+						<div className="flex flex-row gap-4 2k:gap-8 w-full flex-wrap">
+							<TwitterPicker
+								colors={user?.subscribed ? ['#1fb2a5', '#661ae6', '#d926aa', '#FF6900', '#FCB900', '#7BDCB5', '#00D084', '#8ED1FC', '#0693E3', '#ABB8C3', '#EB144C', '#F78DA7', '#9900EF'] : ['#1fb2a5']}
+								onChange={handleUsernameColorChange}
+							/>
+							<div className="flex flex-col w-fit">
+								<p className="text-xl 2k:text-2xl text-slate-300 mb-3 text-center">Light Mode</p>
+								<div className="w-full h-44 px-20 text-2xl 2k:text-4xl font-bold items-center flex justify-center text-accent rounded-xl bg-slate-100" style={{ color: `${usernameColor}` }}>
+									{user.username}
+								</div>
+							</div>
+							<div className="flex flex-col w-fit">
+								<p className="text-xl 2k:text-2xl text-slate-300 mb-3 text-center">Dark Mode</p>
+								<div className="w-full h-44 px-20 text-2xl 2k:text-4xl font-bold items-center flex justify-center text-accent rounded-xl bg-base-800" style={{ color: `${usernameColor}` }}>
+									{user.username}
+								</div>
+							</div>
+						</div>
+						{user?.subscribed ? (
+							<> {usernameColor && <Button text="Save" icon="save" color="btn-accent" size="w-fit" onClick={() => updateUsernameColor(usernameColor)} />} </>
+						) : (
+							<div className="text-2xl 2k:text-3xl">Subscribe to change your username color! </div>
+						)}
+
+						{/* ----------------------------------- SUSBCRIPTION ----------------------------------- */}
+						<div className="divider"></div>
+						<div className="text-xl 2k:text-3xl text-white font-bold">Subscription</div>
+						<h4 className="text-xl 2k:text-3xl text-white">Support every month by Subscribing to help keep KSP Builds running and join an amazing group of space enthusiasts.</h4>
+						{user?.subscribed ? (
+							<Button
+								type="ahref"
+								href={process.env.REACT_APP_ENV === 'DEV' ? process.env.REACT_APP_MANAGE_SUBSCRIPTION_DEV : process.env.REACT_APP_MANAGE_SUBSCRIPTION_PROD}
+								target="blank"
+								color="btn-accent"
+								text="Manage Subscription"
+								icon="head"
+								size="w-fit"
+							/>
+						) : (
+							<div className="flex flex-col gap-4 2k:gap-8 w-1/2">
+								<div className="text-3xl 2k:text-4xl text-slate-300 font-bold mb-4 2k:mb-8">Tiers</div>
+								<div className="flex flex-row items-center">
+									<Button
+										type="ahref"
+										href={process.env.REACT_APP_ENV === 'DEV' ? `${process.env.REACT_APP_TIER1_DEV_LINK}?client_reference_id=${user?.uid}` : `${process.env.REACT_APP_TIER1_PROD_LINK}?client_reference_id=${user?.uid}`}
+										target="blank"
+										color="btn-primary"
+										text="Subscribe Tier 1"
+										icon="tier1"
+										size="w-3/4"
+									/>
+									<p className="text-lg 2k:text-2xl text-white font-bold bg-base-500 rounded-xl flex items-center justify-center w-full px-6 2k:px-8 h-12 2k:h-16">US$3.66</p>
+								</div>
+								<div className="flex flex-row items-center">
+									<Button
+										type="ahref"
+										href={process.env.REACT_APP_ENV === 'DEV' ? `${process.env.REACT_APP_TIER2_DEV_LINK}?client_reference_id=${user?.uid}` : `${process.env.REACT_APP_TIER2_PROD_LINK}?client_reference_id=${user?.uid}`}
+										target="blank"
+										color="btn-secondary"
+										text="Subscribe Tier 2"
+										icon="tier2"
+										size="w-3/4"
+									/>
+									<p className="text-lg 2k:text-2xl text-white font-bold bg-base-500 rounded-xl flex items-center justify-center w-full px-6 2k:px-8 h-12 2k:h-16">US$7.33</p>
+								</div>
+								<div className="flex flex-row items-center">
+									<Button
+										type="ahref"
+										href={process.env.REACT_APP_ENV === 'DEV' ? `${process.env.REACT_APP_TIER3_DEV_LINK}?client_reference_id=${user?.uid}` : `${process.env.REACT_APP_TIER3_PROD_LINK}?client_reference_id=${user?.uid}`}
+										target="blank"
+										color="btn-accent"
+										text="Subscribe Tier 3"
+										icon="tier3"
+										size="w-3/4"
+									/>
+									<p className="text-lg 2k:text-2xl text-white font-bold bg-base-500 rounded-xl text-center w-full flex justify-center items-center px-6 2k:px-8 h-12 2k:h-16">US$14.68</p>
+								</div>
+							</div>
+						)}
+
+						{/* ----------------------------------- Messaging ----------------------------------- */}
 						<div className="divider"></div>
 						<div className="flex flex-col gap-2 2k:gap-4">
 							<div className="text-xl 2k:text-3xl text-white font-bold">Messaging</div>
@@ -117,7 +223,6 @@ function Settings() {
 								<span className="label-text text-xl 2k:text-2xl">Allow private messages</span>
 							</label>
 						</div>
-
 						<div className="divider"></div>
 						<p className="text-xl 2k:text-2xl text-slate-400 italic">Delete Account</p>
 						<Button text="Delete Account" htmlFor="delete-account-modal" onClick={() => setAccountToDelete(user.uid)} size="w-fit" icon="delete" color="btn-error" />

@@ -38,7 +38,7 @@ function VisitProfile() {
 	//---------------------------------------------------------------------------------------------------//
 	const { fetchUsersProfile, setAccountToDelete, handleFollowingUser, setUserToBlock, fetchConversation, setReport } = useAuth();
 	const { filterBuilds, resetFilters } = useFilters();
-	const { fetchBuilds } = useBuilds();
+	const { fetchUsersBuilds } = useBuilds();
 
 	// Fetches the users profile first so we know what builds they have
 	useEffect(() => {
@@ -49,7 +49,7 @@ function VisitProfile() {
 	useEffect(() => {
 		// Check if we found the users profile
 		if (fetchedUserProfile) {
-			fetchBuilds(fetchedUserProfile.builds, fetchedUserProfile.uid);
+			fetchUsersBuilds(fetchedUserProfile.builds, fetchedUserProfile.uid);
 			setDateCreated(new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(fetchedUserProfile.dateCreated.seconds * 1000));
 
 			if (checkIfJson(fetchedUserProfile?.bio)) {

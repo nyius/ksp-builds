@@ -22,21 +22,22 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
-username says 'author' or something beside their name in the comments of their builds
-Donors get a special badge
-Twitter post weekly best build - not possible through API
+thumbnails scale down
+fix 512 and 192 logos
 competitions/ways to give users accolades
+allow cookies popup
 quick copy by just hovering over a build on the main tab... this may result in a lot of AWS calls
 t-shirts
 Volunteer positions (moderate, write posts, create challenges, etc) - this will include all the features they may need to see/have access to
-folders
+build folders on personal profile
+twitch sidebar
 button closing notifications tab when clicked
-paid tier (badge next to name, access to premium features)
 Quick share builds (without needing to create a whole build)
 features from intercepts end that would help: knowing when new KSP versions are up, a point to ping to for news/challenges
 email verification?
 Mission generation page - would get destroyed by chatGPT charges so maybe in the future
 create backup database on an entirely new firebase instance - updates once a week
+Twitter post weekly best build - not possible through API
  */
 
 //---------------------------------------------------------------------------------------------------//

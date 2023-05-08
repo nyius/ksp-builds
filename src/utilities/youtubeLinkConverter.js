@@ -3,9 +3,16 @@
  * @param {*} id
  */
 const youtubeLinkConverter = id => {
-	//https://www.youtube.com/watch?v=aegUUtkvkoY&ab_channel=Ludwig
-	const newUrl = `https://www.youtube.com/embed/${id}`;
-	return newUrl;
+	const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+
+	// Test the URL against the regular expression
+	const match = id.match(regExp);
+
+	if (match && match[2].length === 11) {
+		return `https://www.youtube.com/embed/${match[2]}`;
+	} else {
+		return `https://www.youtube.com/embed/${id}`;
+	}
 };
 
 export default youtubeLinkConverter;

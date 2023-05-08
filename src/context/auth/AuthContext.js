@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash';
 import AuthReducer from './AuthReducer';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../../firebase.config';
-import { doc, getDoc, getDocs, collection, query, where, orderBy, limit, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import fetchNotifications from '../../utilities/fetchNotifcations';
 import fetchAllUserMessages from '../../utilities/fetchAllUserMessages';
 import fetchAllUsersConvos from '../../utilities/fetchAllUsersConvos';
@@ -40,6 +40,27 @@ export const AuthProvider = ({ children }) => {
 
 				// Listen to current users messages to know if we get a new one -------------------------------------------------------------------------------------------------------------------------------------------------
 				await subscribeToUsersMessages(dispatchAuth);
+
+				// Listen to current user -----------------------------------------
+				const unsubUserSnap = onSnapshot(doc(db, 'users', auth.currentUser.uid), userListenData => {
+					const userChanged = userListenData.data();
+
+					if (!user.subscribed && userChanged.subscribed) {
+						console.log('User subscribed.');
+						dispatchAuth({
+							type: 'UPDATE_USER',
+							payload: {
+								subscribed: userChanged.subscribed,
+							},
+						});
+						dispatchAuth({
+							type: 'SET_AUTH',
+							payload: {
+								newSub: true,
+							},
+						});
+					}
+				});
 
 				dispatchAuth({
 					type: 'SET_CONVOS',
@@ -108,6 +129,7 @@ export const AuthProvider = ({ children }) => {
 		hoverUser: null,
 		deleteConvoId: null,
 		userToBlock: null,
+		newSub: false,
 	};
 
 	// Set up the reducer

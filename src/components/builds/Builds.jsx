@@ -53,7 +53,7 @@ function Builds() {
 						) : (
 							<>
 								{fetchedBuilds.map((build, i) => {
-									return <BuildCard key={i} i={i} build={build} />;
+									return <BuildCard key={build.id} i={i} build={build} />;
 								})}
 							</>
 						)}

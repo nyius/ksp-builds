@@ -1,6 +1,6 @@
 import { useContext, useEffect } from 'react';
 import { db } from '../../firebase.config';
-import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter, where, ref, onSnapshot, QuerySnapshot } from 'firebase/firestore';
+import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter, where, getDocFromCache, getDocsFromCache } from 'firebase/firestore';
 import { signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 import { googleProvider } from '../../firebase.config';
 import { auth } from '../../firebase.config';
@@ -54,7 +54,7 @@ const useAuth = () => {
 
 			notification.type = 'welcome';
 			notification.username = 'nyius';
-			notification.uid = 'MMWg1Vzq4EWE0mmaqFI8NHf50Hy2';
+			notification.uid = 'ZyVrojY9BZU5ixp09LftOd240LH3';
 			notification.timestamp = createdAt;
 			notification.read = false;
 			notification.profilePicture = 'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/selfie.png?alt=media&token=031dfd32-5038-4c84-96c3-40b09c0e4529';
@@ -129,8 +129,8 @@ const useAuth = () => {
 	 */
 	const updateUserProfilePicture = async profilePicture => {
 		try {
-			await updateDoc(doc(db, 'users', user.uid), { profilePicture });
-			await updateDoc(doc(db, 'userProfiles', user.uid), { profilePicture });
+			await updateDoc(doc(db, 'users', user.uid), { profilePicture, lastModified: serverTimestamp() });
+			await updateDoc(doc(db, 'userProfiles', user.uid), { profilePicture, lastModified: serverTimestamp() });
 
 			dispatchAuth({
 				type: 'UPDATE_USER',
@@ -148,8 +148,8 @@ const useAuth = () => {
 	 */
 	const updateUserDbBio = async bio => {
 		try {
-			await updateDoc(doc(db, 'users', user.uid), { bio });
-			await updateDoc(doc(db, 'userProfiles', user.uid), { bio });
+			await updateDoc(doc(db, 'users', user.uid), { bio, lastModified: serverTimestamp() });
+			await updateDoc(doc(db, 'userProfiles', user.uid), { bio, lastModified: serverTimestamp() });
 
 			toast.success('Bio updated!');
 			dispatchAuth({
@@ -168,8 +168,8 @@ const useAuth = () => {
 	 */
 	const updateUserDbProfilePic = async profilePicture => {
 		try {
-			await updateDoc(doc(db, 'users', user.uid), { profilePicture });
-			await updateDoc(doc(db, 'userProfiles', user.uid), { profilePicture });
+			await updateDoc(doc(db, 'users', user.uid), { profilePicture, lastModified: serverTimestamp() });
+			await updateDoc(doc(db, 'userProfiles', user.uid), { profilePicture, lastModified: serverTimestamp() });
 
 			toast.success('Profile Picture updated!');
 			dispatchAuth({
@@ -202,7 +202,7 @@ const useAuth = () => {
 					dispatchAuth({ type: 'UPDATE_USER', payload: { upVotes: newUpVotes } });
 
 					updateUserDb({ upVotes: newUpVotes });
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1) });
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1), lastModified: serverTimestamp() });
 
 					await updateWeeklyUpvoted(build.id, 'remove');
 				} else {
@@ -210,7 +210,7 @@ const useAuth = () => {
 					dispatchAuth({ type: 'UPDATE_USER', payload: { upVotes: newUpVotes } });
 
 					updateUserDb({ upVotes: newUpVotes });
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes += 1) });
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes += 1), lastModified: serverTimestamp() });
 
 					if (build.uid !== user.uid) {
 						await updateWeeklyUpvoted(build.id, 'add');
@@ -224,7 +224,7 @@ const useAuth = () => {
 						dispatchAuth({ type: 'UPDATE_USER', payload: { downVotes: newDownVotes } });
 
 						updateUserDb({ downVotes: newDownVotes });
-						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1) });
+						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1), lastModified: serverTimestamp() });
 					}
 				}
 			}
@@ -237,13 +237,13 @@ const useAuth = () => {
 					dispatchAuth({ type: 'UPDATE_USER', payload: { downVotes: newDownVotes } });
 
 					updateUserDb({ downVotes: newDownVotes });
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1) });
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1), lastModified: serverTimestamp() });
 				} else {
 					newDownVotes.push(build.id);
 					dispatchAuth({ type: 'UPDATE_USER', payload: { downVotes: newDownVotes } });
 
 					updateUserDb({ downVotes: newDownVotes });
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes += 1) });
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes += 1), lastModified: serverTimestamp() });
 
 					await updateWeeklyUpvoted(build.id, 'remove');
 
@@ -255,7 +255,7 @@ const useAuth = () => {
 						dispatchAuth({ type: 'UPDATE_USER', payload: { upVotes: newUpVotes } });
 
 						updateUserDb({ upVotes: newUpVotes });
-						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1) });
+						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1), lastModified: serverTimestamp() });
 					}
 				}
 			}
@@ -367,6 +367,67 @@ const useAuth = () => {
 	const fetchUsersProfile = async id => {
 		try {
 			setFetchingProfile(true);
+			await fetchLastUpdatedUsers();
+
+			const fetchedProfile = await getDocFromCache(doc(db, 'userProfiles', id));
+
+			if (fetchedProfile.exists()) {
+				const profile = fetchedProfile.data();
+				profile.uid = fetchedProfile.id;
+				dispatchAuth({
+					type: 'FETCH_USERS_PROFILE',
+					payload: profile,
+				});
+
+				setFetchingProfile(false);
+			} else {
+				// Check if we can find it by username
+				const userCol = collection(db, 'userProfiles');
+				const q = query(userCol, where('username', '==', id));
+				const fetchedProfiles = await getDocsFromCache(q);
+				let profiles = [];
+
+				if (!fetchedProfiles.empty) {
+					fetchedProfiles.forEach(profile => {
+						let userProfile = profile.data();
+						userProfile.uid = profile.id;
+						profiles.push(userProfile);
+					});
+				} else {
+					const fetchedProfiles = await getDocs(q);
+
+					fetchedProfiles.forEach(profile => {
+						let userProfile = profile.data();
+						userProfile.uid = profile.id;
+						profiles.push(userProfile);
+					});
+				}
+
+				if (profiles.length > 0) {
+					const profile = profiles[0];
+
+					dispatchAuth({
+						type: 'FETCH_USERS_PROFILE',
+						payload: profile,
+					});
+
+					setFetchingProfile(false);
+				} else {
+					setFetchingProfile(false);
+					throw new Error(`Couldn't find profile!`);
+				}
+			}
+		} catch (error) {
+			await fetchUsersProfileServer(id);
+		}
+	};
+
+	/**
+	 * handles fetching the profile from the server if for some reason fetching from the cache fails
+	 * @param {*} id
+	 */
+	const fetchUsersProfileServer = async id => {
+		try {
 			const fetchedProfile = await getDoc(doc(db, 'userProfiles', id));
 
 			if (fetchedProfile.exists()) {
@@ -404,6 +465,44 @@ const useAuth = () => {
 					setFetchingProfile(false);
 					throw new Error(`Couldn't find profile!`);
 				}
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
+	 * Fetches the lasted added/updated users.  Updates the latest fetched local storage and updates the cache
+	 */
+	const fetchLastUpdatedUsers = async () => {
+		try {
+			const usersRef = collection(db, 'userProfiles');
+			// Get the most recently updated doc
+			let newestDocQ = query(usersRef, orderBy('lastModified', 'desc'), limit(1));
+			const newestDocSnap = await getDocs(newestDocQ);
+			let newestDoc;
+
+			newestDocSnap.forEach(doc => {
+				newestDoc = doc.data();
+			});
+
+			// Fetch the locally saved newest
+			const localNewest = JSON.parse(localStorage.getItem('newestUser'));
+
+			if (localNewest) {
+				// check if the local newest update is now older than the last thing updated on the server
+				if (localNewest.seconds < newestDoc.lastModified.seconds) {
+					let newDocsQ = query(usersRef, where('lastModified', '>', new Date(localNewest.seconds * 1000)));
+					await getDocs(newDocsQ); // simply getDocs so it updates our cache
+
+					localStorage.setItem('newestUser', JSON.stringify(newestDoc.lastModified));
+				}
+			} else {
+				// Users first time/ no localNewest saved, fetch all builds so they're cached
+				console.log(`No local stored timestamp`);
+				const userProfilesRef = collection(db, 'userProfiles');
+				await getDocs(userProfilesRef);
+				localStorage.setItem('newestUser', JSON.stringify(newestDoc.lastModified));
 			}
 		} catch (error) {
 			console.log(error);
@@ -533,13 +632,22 @@ const useAuth = () => {
 			const notificationsRef = collection(db, 'users', auth.currentUser.uid, 'notifications');
 			const q = query(notificationsRef, orderBy('timestamp', 'desc', limit(process.env.REACT_APP_NOTIFS_FETCH_NUM)), startAfter(lastFetchedNotification), limit(process.env.REACT_APP_NOTIFS_FETCH_NUM));
 
-			const notifsSnap = await getDocs(q);
-
+			const notifsSnap = await getDocsFromCache(q);
 			let notifs = [];
-			notifsSnap.forEach(doc => {
-				const notif = doc.data();
-				notifs.push(notif);
-			});
+
+			if (!notifsSnap.empty) {
+				notifsSnap.forEach(doc => {
+					const notif = doc.data();
+					notifs.push(notif);
+				});
+			} else {
+				const notifsSnap = await getDocs(q);
+
+				notifsSnap.forEach(doc => {
+					const notif = doc.data();
+					notifs.push(notif);
+				});
+			}
 
 			dispatchAuth({
 				type: 'UPDATE_USER',
@@ -734,12 +842,12 @@ const useAuth = () => {
 
 				dispatchAuth({ type: 'UPDATE_FETCHED_USERS_PROFILE', payload: { followers: newFollowers } });
 
-				await updateDoc(doc(db, 'userProfiles', fetchedUserProfile.uid), { followers: newFollowers });
+				await updateDoc(doc(db, 'userProfiles', fetchedUserProfile.uid), { followers: newFollowers, lastModified: serverTimestamp() });
 			} else {
 				newFollowers.push(user.uid);
 				dispatchAuth({ type: 'UPDATE_FETCHED_USERS_PROFILE', payload: { followers: newFollowers } });
 
-				await updateDoc(doc(db, 'userProfiles', fetchedUserProfile.uid), { followers: newFollowers });
+				await updateDoc(doc(db, 'userProfiles', fetchedUserProfile.uid), { followers: newFollowers, lastModified: serverTimestamp() });
 			}
 		} catch (error) {
 			console.log(error);
@@ -1078,6 +1186,18 @@ const useAuth = () => {
 	};
 
 	/**
+	 * Handles setting the newSub state
+	 */
+	const setNewSub = () => {
+		dispatchAuth({
+			type: 'SET_AUTH',
+			payload: {
+				newSub: false,
+			},
+		});
+	};
+
+	/**
 	 * Handles blocking a user.
 	 *
 	 */
@@ -1093,23 +1213,23 @@ const useAuth = () => {
 					const index = newBlockList.indexOf(userToBlock);
 					newBlockList.splice(index, 1);
 
-					updateUserDb({ blockList: newBlockList });
-					await updateDoc(doc(db, 'userProfiles', user.uid), { blockList: newBlockList });
+					updateUserDb({ blockList: newBlockList, lastModified: serverTimestamp() });
+					await updateDoc(doc(db, 'userProfiles', user.uid), { blockList: newBlockList, lastModified: serverTimestamp() });
 
 					toast.success('User unblocked.');
 				} else {
 					newBlockList.push(userToBlock);
 
-					updateUserDb({ blockList: newBlockList });
-					await updateDoc(doc(db, 'userProfiles', user.uid), { blockList: newBlockList });
+					updateUserDb({ blockList: newBlockList, lastModified: serverTimestamp() });
+					await updateDoc(doc(db, 'userProfiles', user.uid), { blockList: newBlockList, lastModified: serverTimestamp() });
 
 					toast.success('User blocked.');
 				}
 			} else {
 				newBlockList = [userToBlock];
 
-				updateUserDb({ blockList: newBlockList });
-				await updateDoc(doc(db, 'userProfiles', user.uid), { blockList: newBlockList });
+				updateUserDb({ blockList: newBlockList, lastModified: serverTimestamp() });
+				await updateDoc(doc(db, 'userProfiles', user.uid), { blockList: newBlockList, lastModified: serverTimestamp() });
 
 				toast.success('User blocked.');
 			}
@@ -1128,6 +1248,21 @@ const useAuth = () => {
 		}
 	};
 
+	/**
+	 * handles saving the username color
+	 */
+	const updateUsernameColor = async color => {
+		try {
+			await updateDoc(doc(db, 'users', user.uid), { customUsernameColor: color, lastModified: serverTimestamp() });
+			await updateDoc(doc(db, 'userProfiles', user.uid), { customUsernameColor: color, lastModified: serverTimestamp() });
+
+			toast.success('Color updated!');
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong, please try again');
+		}
+	};
+
 	return {
 		handleVoting,
 		handleDeleteNotification,
@@ -1140,6 +1275,7 @@ const useAuth = () => {
 		setNewSignup,
 		setNotificationsRead,
 		setEditingProfile,
+		setNewSub,
 		setMessageTab,
 		setAccountToDelete,
 		setReport,
@@ -1151,11 +1287,13 @@ const useAuth = () => {
 		updateUserProfiles,
 		updateUserDbProfilePic,
 		updateUserProfilePicture,
+		updateUsernameColor,
 		deleteUserAccount,
 		deleteConversation,
 		fetchUsersProfile,
 		fetchConversation,
 		fetchMoreNotifications,
+		fetchLastUpdatedUsers,
 		uploadProfilePicture,
 		createNewUserAccount,
 		loginWithGoogle,

@@ -1,11 +1,15 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const cheerio = require('cheerio');
+const firestore = require('firebase/firestore');
 const axios = require('axios');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 admin.initializeApp();
 const { TwitterApi } = require('twitter-api-v2');
 const { firebase } = require('googleapis/build/src/apis/firebase');
+const stripe = require('stripe')(process.env.REACT_APP_STRIPE_SECRET);
+const endpointSecret = process.env.REACT_APP_STRIPE_SUCCESS_ENDPOINT_PROD;
+// const endpointSecret = 'whsec_ba90833eb62f59831b3b58cd308b311dbeee87a326899886ccdeb196e450e96d';
 
 // Gets the news articles
 exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context => {
@@ -91,6 +95,7 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 /**
  * handles posting a tweet
  */
+/*
 exports.postTweet = functions.https.onRequest(async (req, res) => {
 	try {
 		let accessToken;
@@ -120,10 +125,12 @@ exports.postTweet = functions.https.onRequest(async (req, res) => {
 		functions.logger.log(error);
 	}
 });
+*/
 
 /**
  * handles initial twitter verifications setup. Need to visit link on google cloud functions logger to start verifications.
  */
+/*
 exports.startTwitterVerify = functions.https.onRequest(async (req, res) => {
 	try {
 		// INITIAL VERIFYING
@@ -149,10 +156,12 @@ exports.startTwitterVerify = functions.https.onRequest(async (req, res) => {
 		functions.logger.log(error);
 	}
 });
+*/
 
 /**
  * Handles verifying the twitter account and getting us the proper tokens to access it
  */
+/*
 exports.verifyTwitter = functions.https.onRequest(async (req, res) => {
 	try {
 		let codeVerifier;
@@ -195,10 +204,12 @@ exports.verifyTwitter = functions.https.onRequest(async (req, res) => {
 		functions.logger.log(error);
 	}
 });
+*/
 
 /**
  * handles refreshing the twitter auth so we stay logged in
  */
+/*
 exports.refreshTwitterAuth = functions.pubsub.schedule('every 2 hours').onRun(async context => {
 	try {
 		let refreshTokenOld;
@@ -229,6 +240,7 @@ exports.refreshTwitterAuth = functions.pubsub.schedule('every 2 hours').onRun(as
 		functions.logger.log(error);
 	}
 });
+*/
 
 /**
  * handles clearing the weekly upvoted craft, for the new week
@@ -297,6 +309,124 @@ exports.generateBuildOfTheWeek = functions.https.onRequest(async (req, res) => {
 			// Fetch it from the DB ---------------------------------------------------------------------------------------------------//
 			// Create a new 'weekly best build' doc ---------------------------------------------------------------------------------------------------//
 		});
+	} catch (error) {
+		functions.logger.log(error);
+	}
+});
+
+/**
+ * Handles listening for stripe
+ */
+exports.handleStripePayments = functions.https.onRequest(async (req, res) => {
+	try {
+		let event = req.rawBody;
+		// Only verify the event if you have an endpoint secret defined.
+		// Otherwise use the basic event deserialized with JSON.parse
+		if (endpointSecret) {
+			// Get the signature sent by Stripe
+			const signature = req.headers['stripe-signature'];
+			try {
+				event = stripe.webhooks.constructEvent(req.rawBody, signature, endpointSecret);
+			} catch (err) {
+				console.log(`⚠️  Webhook signature verification failed.`, err.message);
+				return res.sendStatus(400);
+			}
+		}
+
+		// Handle the event
+		switch (event.type) {
+			case 'payment_intent.succeeded':
+				const paymentIntent = event.data.object;
+				break;
+			case 'checkout.session.async_payment_succeeded':
+				const checkoutSessionAsyncPaymentSucceeded = event.data.object;
+			case 'customer.subscription.created':
+				const subscriptionObj = event.data.object;
+				break;
+			case 'checkout.session.completed':
+				const checkoutObj = event.data.object;
+
+				functions.logger.log(`User (KSPB ID:${checkoutObj.client_reference_id}, STRIPE ID: ${checkoutObj.customer}) subscribed!`);
+
+				if (checkoutObj.status === 'complete') {
+					const userRef = admin.firestore().doc(`users/${checkoutObj.client_reference_id}`);
+					const userProfileRef = admin.firestore().doc(`userProfiles/${checkoutObj.client_reference_id}`);
+
+					await userRef.update({
+						subscribed: `tier${checkoutObj.metadata.tier}`,
+						subscriptionDate: new Date(),
+						stripeCustomerID: checkoutObj.customer,
+						lastModified: admin.firestore.FieldValue.serverTimestamp(),
+					});
+					await userProfileRef.update({
+						subscribed: `tier${checkoutObj.metadata.tier}`,
+						subscriptionDate: new Date(),
+						stripeCustomerID: checkoutObj.customer,
+						lastModified: admin.firestore.FieldValue.serverTimestamp(),
+					});
+				}
+				break;
+			case 'customer.subscription.deleted':
+				const subscriptionDeleted = event.data.object;
+				functions.logger.log(`user ${subscriptionDeleted.customer} subscription expired`);
+
+				await admin
+					.firestore()
+					.collection(`users`)
+					.where('stripeCustomerID', '==', subscriptionDeleted.customer)
+					.get()
+					.then(snap => {
+						snap.forEach(userSnap => {
+							const id = userSnap.id;
+							const userRef = admin.firestore().doc(`users/${id}`);
+
+							const updateUser = async () => {
+								try {
+									await userRef.update({
+										subscribed: null,
+										subscriptionDate: null,
+										customUsernameColor: null,
+									});
+								} catch (error) {
+									throw new Error(error);
+								}
+							};
+							updateUser();
+						});
+					});
+				await admin
+					.firestore()
+					.collection(`userProfiles`)
+					.where('stripeCustomerID', '==', subscriptionDeleted.customer)
+					.get()
+					.then(snap => {
+						snap.forEach(userSnap => {
+							const id = userSnap.id;
+							const userprofilesRef = admin.firestore().doc(`userProfiles/${id}`);
+
+							const updateUser = async () => {
+								try {
+									await userprofilesRef.update({
+										subscribed: null,
+										subscriptionDate: null,
+										customUsernameColor: null,
+									});
+								} catch (error) {
+									throw new Error(error);
+								}
+							};
+							updateUser();
+						});
+					});
+
+				break;
+			default:
+				// Unexpected event type
+				console.log(`Unhandled event type ${event.type}.`);
+		}
+
+		// Return a 200 res to acknowledge receipt of the event
+		res.send();
 	} catch (error) {
 		functions.logger.log(error);
 	}

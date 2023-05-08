@@ -8,6 +8,7 @@ import NewAccountModal from './NewAccountModal';
 import DeleteAccount from './DeleteAccount';
 import ReportModal from './ReportModal';
 import BlockModal from './BlockModal';
+import SubscribeModal from './SubscribeModal';
 
 function Modals() {
 	return (
@@ -21,6 +22,7 @@ function Modals() {
 			<ReportModal />
 			<DeleteAccount />
 			<BlockModal />
+			<SubscribeModal />
 		</>
 	);
 }

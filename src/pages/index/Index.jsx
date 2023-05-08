@@ -20,7 +20,7 @@ function Index() {
 				<title>KSP Builds - Home</title>
 				<link rel="canonical" href={`https://kspbuilds.com`} />
 			</Helmet>
-			<Builds />;
+			<Builds />
 		</>
 	);
 }

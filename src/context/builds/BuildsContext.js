@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useReducer } from 'react';
 import BuildsReducer from './BuildsReducer';
-import { getDoc, doc } from 'firebase/firestore';
+import { getDoc, doc, getDocFromCache, getDocs, query, where, orderBy, limit, collection } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { compact } from 'lodash';
 
@@ -23,69 +23,43 @@ export const BuildsProvider = ({ children }) => {
 	};
 
 	useEffect(() => {
-		/*	
-		// Fetch all of the weekly featured builds
-		const fetchWeeklyFeaturedBuilds = async () => {
+		const fetchServerWeeklyFeatured = async () => {
 			try {
-				// Get the featured builds
-				const weeklyFeaturedBuildsSnap = await getDoc(doc(db, 'kspInfo', 'weeklyFeaturedBuilds'));
-				const weeklyFeaturedBuildsData = weeklyFeaturedBuildsSnap.data();
+				const snap = await getDoc(doc(db, 'kspInfo', 'weeklyFeaturedBuild'));
+				const data = snap.data();
 
-				let batches = [];
-				let buildsArr = [];
-
-				// Loop over them and fetch them from the db
-				for (const build in weeklyFeaturedBuildsData) {
-					buildsArr.push({ id: build, dateAdded: weeklyFeaturedBuildsData[build].dateAdded });
-				}
-
-				buildsArr.sort((a, b) => {
-					return a.dateAdded.seconds < b.dateAdded.seconds ? 1 : -1;
-				});
-
-				const buildsToFetch = buildsArr.slice(0, 10);
-
-				buildsToFetch.map(build => {
-					if (process.env.REACT_APP_ENV === 'DEV') {
-						batches.push(getDoc(doc(db, 'testBuilds', build.id)).then(res => res.data()));
-					} else {
-						batches.push(getDoc(doc(db, 'builds', build.id)).then(res => res.data()));
-					}
-					build.dateAdded = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(build.dateAdded.seconds * 1000);
-				});
-
-				const fetchedFeaturedBuilds = await Promise.all(batches);
-
-				let newArr = compact(fetchedFeaturedBuilds);
-
-				dispatchBuilds({
-					type: 'SET_FEATURED_BUILDS',
-					payload: newArr,
-				});
+				await fetchCacheBuild(data.id);
 			} catch (error) {
-				console.log(error);
+				console.log(`Couldn't find BotW`);
+				dispatchBuilds({
+					type: 'SET_LOADING_BUILD_OF_THE_WEEK',
+					payload: false,
+				});
 			}
 		};
-		fetchWeeklyFeaturedBuilds();
-		*/
 
-		// Fetch currently build of the week
-		const fetchWeeklyFeaturedBuilds = async () => {
+		const fetchCacheBuild = async id => {
 			try {
-				// Get the featured builds
-				const weeklyFeaturedBuildSnap = await getDoc(doc(db, 'kspInfo', 'weeklyFeaturedBuild'));
-				const weeklyFeaturedBuildData = weeklyFeaturedBuildSnap.data();
-				let weeklyFeaturedBuild;
-
-				if (process.env.REACT_APP_ENV === 'DEV') {
-					await getDoc(doc(db, 'testBuilds', weeklyFeaturedBuildData.id)).then(res => (weeklyFeaturedBuild = res.data()));
-				} else {
-					await getDoc(doc(db, 'builds', weeklyFeaturedBuildData.id)).then(res => (weeklyFeaturedBuild = res.data()));
-				}
+				const buildSnap = await getDocFromCache(doc(db, 'builds', id));
+				const buildSnapData = buildSnap.data();
 
 				dispatchBuilds({
 					type: 'SET_BUILD_OF_THE_WEEK',
-					payload: weeklyFeaturedBuild,
+					payload: buildSnapData,
+				});
+			} catch (error) {
+				fetchServerBuild(id);
+			}
+		};
+
+		const fetchServerBuild = async id => {
+			try {
+				const buildSnap = await getDoc(doc(db, 'builds', id));
+				const buildSnapData = buildSnap.data();
+
+				dispatchBuilds({
+					type: 'SET_BUILD_OF_THE_WEEK',
+					payload: buildSnapData,
 				});
 			} catch (error) {
 				console.log(error);
@@ -95,7 +69,8 @@ export const BuildsProvider = ({ children }) => {
 				});
 			}
 		};
-		fetchWeeklyFeaturedBuilds();
+
+		fetchServerWeeklyFeatured();
 	}, []);
 
 	const [state, dispatchBuilds] = useReducer(BuildsReducer, initialState);

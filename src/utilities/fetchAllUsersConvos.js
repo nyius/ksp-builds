@@ -28,6 +28,7 @@ const fetchAllUsersConvos = async usersConvos => {
 					if (userData?.blockList?.includes(auth.currentUser.uid)) blocked = true;
 					fetchedConvoData.userProfilePic = userData.profilePicture;
 					fetchedConvoData.username = userData.username;
+					fetchedConvoData.uid = userFetch.id;
 					fetchedConvoData.otherUser = userToFetch;
 					fetchedConvoData.messages = [];
 					fetchedConvoData.blocked = blocked;

@@ -156,6 +156,7 @@ export const AuthProvider = ({ children }) => {
 
 					fetchedNewConvo.userProfilePic = userData.profilePicture;
 					fetchedNewConvo.username = userData.username;
+					fetchedNewConvo.uid = userToFetch;
 					fetchedNewConvo.newMessage = true;
 					fetchedNewConvo.messages = [];
 

@@ -52,7 +52,7 @@ function BuildCard({ build }) {
 					<div className="flex flex-col w-full p-4 2k:p-6 place-content-between">
 						<div className="flex flex-col gap-2 w-full">
 							{/* Name */}
-							<h2 className="card-title text-white 2k:text-4xl mb-2 2k:mb-4">{build.name}</h2>
+							<h2 className="card-title text-white 2k:text-3xl mb-2 2k:mb-4">{build.name}</h2>
 
 							<div className="flex flex-row place-content-between mb-2 2k:mb-4">
 								{/* Uploaded */}

@@ -251,6 +251,61 @@ const useBuilds = () => {
 			throw new Error(error);
 		}
 	};
+	/**
+	 * Handles fetching specific builds
+	 * @param {*} buildsToFetch
+	 */
+	const fetchBuildsById = async buildsToFetch => {
+		const buildsToFetchCopy = cloneDeep(buildsToFetch);
+		try {
+			dispatchBuilds({
+				type: 'SET_FETCHED_BUILDS',
+				payload: {
+					fetchedBuilds: [],
+					loadingBuilds: true,
+				},
+			});
+
+			const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
+			let q;
+
+			const batches = [];
+
+			// because firestore only allows query 'in' by groups of 10, we have to break it up into chunks of 10
+			// by using splice, we alter the original input 'buildsToFetchCopy' arr by removing 10 at a time
+			while (buildsToFetchCopy.length) {
+				const batch = buildsToFetchCopy.splice(0, 10);
+				const constraints = [where('id', 'in', batch), where('visibility', '==', 'public')];
+
+				// if the builds were fetching isnt the current users, only fetch builds that are listed as public
+				if (sortBy == 'views_most') constraints.unshift(orderBy('views', 'desc'));
+				if (sortBy == 'date_newest') constraints.unshift(orderBy('timestamp', 'desc'));
+				if (sortBy == 'date_oldest') constraints.unshift(orderBy('timestamp', 'asc'));
+				if (sortBy == 'upVotes') constraints.unshift(orderBy('upVotes', 'desc'));
+				if (sortBy == 'comments') constraints.unshift(orderBy('commentCount', 'desc'));
+				q = query(buildsRef, ...constraints);
+
+				// this gets all of the docs from our query, then loops over them and returns the raw data to our array
+				batches.push(getDocs(q).then(res => res.docs.map(res => res.data())));
+			}
+
+			// now we resolve all of the promises
+			const builds = await Promise.all(batches);
+			const buildsFlat = builds.flat();
+
+			dispatchBuilds({
+				type: 'SET_FETCHED_BUILDS',
+				payload: {
+					fetchedBuilds: buildsFlat,
+					loadingBuilds: false,
+				},
+			});
+		} catch (error) {
+			console.log(error);
+			dispatchBuilds({ type: 'SET_FETCHED_BUILDS_LOADING', payload: false });
+			throw new Error(error);
+		}
+	};
 
 	/**
 	 * Handles removing the build from the fetched builds list
@@ -344,7 +399,7 @@ const useBuilds = () => {
 		}
 	};
 
-	return { removeBuildFromFetchedBuilds, fetchBuilds, fetchUsersBuilds, fetchMoreBuilds, setBuildsLoading, setFetchAmount, setCurrentPage, clearFetchedBuilds, goBackPage, goToStartPage };
+	return { removeBuildFromFetchedBuilds, fetchBuildsById, fetchBuilds, fetchUsersBuilds, fetchMoreBuilds, setBuildsLoading, setFetchAmount, setCurrentPage, clearFetchedBuilds, goBackPage, goToStartPage };
 };
 
 export default useBuilds;

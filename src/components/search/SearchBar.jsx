@@ -8,7 +8,7 @@ function SearchBar() {
 	const index = searchClient.initIndex('builds');
 	const [searchTerm, setSearchTerm] = useState('');
 
-	const { fetchBuilds } = useBuilds();
+	const { fetchBuilds, fetchBuildsById } = useBuilds();
 
 	/**
 	 * Handles searching algolia for our craft
@@ -22,13 +22,14 @@ function SearchBar() {
 					return;
 				}
 				index.search(searchTerm).then(({ hits }) => {
+					console.log(hits);
 					let ids = [];
 
 					hits.map(hit => {
 						ids.push(hit.objectID);
 					});
 
-					fetchBuilds(ids);
+					fetchBuildsById(ids);
 				});
 			}
 		} catch (error) {

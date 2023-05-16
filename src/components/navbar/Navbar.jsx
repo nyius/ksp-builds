@@ -72,7 +72,7 @@ function NavBar() {
 						<Button type="ahref" href="/news" css="text-white hidden lg:flex" text="News" icon="news" />
 						<Button type="ahref" href="/challenges" css="text-white hidden lg:flex" text="Challenges" icon="mountain" />
 						<Button text="How to upload" icon="info" color="text-white" css="hidden lg:flex" htmlFor="how-to-copy-build-modal" />
-						{!authLoading && user?.username && <>{!user?.subscribed && <Button text="Subscribe" icon="outline-star" htmlFor="subscribe-modal" color="text-white" css="hidden md:flex" />}</>}
+						{!authLoading && user?.username && <>{!user?.subscribed && <Button text="Support" icon="outline-star" htmlFor="subscribe-modal" color="text-white" css="hidden md:flex" />}</>}
 					</ul>
 				</div>
 

@@ -44,7 +44,7 @@ function BuildCard({ build }) {
 
 						{/* Image */}
 						<div className="flex relative w-full items-center justify-center">
-							<img src={build.thumbnail ? build.thumbnail : build.images[0]} alt={build.name} />
+							<img src={build.thumbnail ? build.thumbnail : build.images[0]} alt={build.name} loading="lazy" />
 						</div>
 					</figure>
 

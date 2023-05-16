@@ -21,6 +21,7 @@ import CantFind from '../../components/cantFind/CantFind';
 import Button from '../../components/buttons/Button';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import BotwBadge from '../../assets/BotW_badge2.png';
+import UsernameLink from '../../components/buttons/UsernameLink';
 //---------------------------------------------------------------------------------------------------//
 import checkIfJson from '../../utilities/checkIfJson';
 
@@ -49,6 +50,7 @@ function VisitProfile() {
 	useEffect(() => {
 		// Check if we found the users profile
 		if (fetchedUserProfile) {
+			console.log(fetchedUserProfile);
 			fetchUsersBuilds(fetchedUserProfile.builds, fetchedUserProfile.uid);
 			setDateCreated(new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(fetchedUserProfile.dateCreated.seconds * 1000));
 
@@ -141,10 +143,10 @@ function VisitProfile() {
 									{/* Username/bio/created */}
 									<div className="flex flex-col gap-3 2k:gap-6 w-full md:w-3/4">
 										<p className="text-xl 2k:text-3xl text-white">
-											<span className="text-slate-500 2k:text-2xl italic">Username: </span> {fetchedUserProfile.username}
+											<span className="text-slate-500 2k:text-2xl italic">Username: </span> <UsernameLink noHoverUi={true} username={fetchedUserProfile.username} uid={fetchedUserProfile.uid} />
 										</p>
 
-										<div className="flex flex-row gap-2">
+										<div className="flex flex-row gap-2 text-white">
 											<Editor editorState={bioState} readOnly={true} toolbarHidden={true} />
 										</div>
 									</div>

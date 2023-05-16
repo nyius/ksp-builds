@@ -10,6 +10,7 @@ import BotwBadge from '../../assets/BotW_badge2.png';
 import Tier1Badge from '../../assets/badges/tier1/tier1_badge36.png';
 import Tier2Badge from '../../assets/badges/tier2/tier2_badge36.png';
 import Tier3Badge from '../../assets/badges/tier3/tier3_badge36.png';
+import Intercept_Logo from '../../assets/ig_logo_192.png';
 
 function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 	const { user, hoverUser } = useContext(AuthContext);
@@ -87,6 +88,11 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 						<div id="userlink" className={`text-2xl 2k:text-3xl link link-hover link-accent flex flex-row gap-2 items-center`} onClick={() => navigate(`/profile/${username}`)} style={{ color: `${usersProfile?.customUsernameColor}` }}>
 							{username}
 							{username === 'nyius' && <BsFillPatchCheckFill />}
+							{username === 'interceptgames' && (
+								<div className="tooltip" data-tip="Official KSP2 Developer">
+									<img src={Intercept_Logo} className="w-12" alt="" />
+								</div>
+							)}
 
 							{usersProfile?.subscribed === 'tier1' && (
 								<div className="tooltip" data-tip="Tier 1 Subscriber">

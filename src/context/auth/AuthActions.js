@@ -1,6 +1,6 @@
 import { useContext, useEffect } from 'react';
 import { db } from '../../firebase.config';
-import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter, where, getDocFromCache, getDocsFromCache } from 'firebase/firestore';
+import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter, where, getDocFromCache, getDocsFromCache, increment } from 'firebase/firestore';
 import { signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 import { googleProvider } from '../../firebase.config';
 import { auth } from '../../firebase.config';
@@ -203,6 +203,8 @@ const useAuth = () => {
 
 					updateUserDb({ upVotes: newUpVotes });
 					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1), lastModified: serverTimestamp() });
+					await updateDoc(doc(db, 'users', build.uid), { rocketReputation: increment(-1) });
+					await updateDoc(doc(db, 'userProfiles', build.uid), { rocketReputation: increment(-1) });
 
 					await updateWeeklyUpvoted(build.id, 'remove');
 				} else {
@@ -211,6 +213,8 @@ const useAuth = () => {
 
 					updateUserDb({ upVotes: newUpVotes });
 					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes += 1), lastModified: serverTimestamp() });
+					await updateDoc(doc(db, 'users', build.uid), { rocketReputation: increment(1) });
+					await updateDoc(doc(db, 'userProfiles', build.uid), { rocketReputation: increment(1) });
 
 					if (build.uid !== user.uid) {
 						await updateWeeklyUpvoted(build.id, 'add');
@@ -225,6 +229,8 @@ const useAuth = () => {
 
 						updateUserDb({ downVotes: newDownVotes });
 						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1), lastModified: serverTimestamp() });
+						await updateDoc(doc(db, 'users', build.uid), { rocketReputation: increment(1) });
+						await updateDoc(doc(db, 'userProfiles', build.uid), { rocketReputation: increment(1) });
 					}
 				}
 			}
@@ -238,12 +244,16 @@ const useAuth = () => {
 
 					updateUserDb({ downVotes: newDownVotes });
 					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1), lastModified: serverTimestamp() });
+					await updateDoc(doc(db, 'users', build.uid), { rocketReputation: increment(1) });
+					await updateDoc(doc(db, 'userProfiles', build.uid), { rocketReputation: increment(1) });
 				} else {
 					newDownVotes.push(build.id);
 					dispatchAuth({ type: 'UPDATE_USER', payload: { downVotes: newDownVotes } });
 
 					updateUserDb({ downVotes: newDownVotes });
 					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes += 1), lastModified: serverTimestamp() });
+					await updateDoc(doc(db, 'users', build.uid), { rocketReputation: increment(-1) });
+					await updateDoc(doc(db, 'userProfiles', build.uid), { rocketReputation: increment(-1) });
 
 					await updateWeeklyUpvoted(build.id, 'remove');
 
@@ -256,6 +266,8 @@ const useAuth = () => {
 
 						updateUserDb({ upVotes: newUpVotes });
 						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1), lastModified: serverTimestamp() });
+						await updateDoc(doc(db, 'users', build.uid), { rocketReputation: increment(-1) });
+						await updateDoc(doc(db, 'userProfiles', build.uid), { rocketReputation: increment(-1) });
 					}
 				}
 			}

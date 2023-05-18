@@ -8,6 +8,7 @@ const standardUserProfile = {
 	bio: '',
 	followers: [],
 	lastModified: serverTimestamp(),
+	rocketReputation: 0,
 };
 
 export default standardUserProfile;

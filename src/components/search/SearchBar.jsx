@@ -22,7 +22,6 @@ function SearchBar() {
 					return;
 				}
 				index.search(searchTerm).then(({ hits }) => {
-					console.log(hits);
 					let ids = [];
 
 					hits.map(hit => {

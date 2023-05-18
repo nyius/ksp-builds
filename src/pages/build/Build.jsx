@@ -33,6 +33,7 @@ import UsernameLink from '../../components/buttons/UsernameLink';
 import Favorite from '../../components/buttons/Favorite';
 import TextEditor from '../../components/textEditor/TextEditor';
 import BotwBadge from '../../assets/BotW_badge2.png';
+import BuildInfoCard from '../../components/cards/BuildInfoCard';
 //---------------------------------------------------------------------------------------------------//
 
 function Build() {
@@ -92,6 +93,15 @@ function Build() {
 		setReport('build', loadedBuild);
 	};
 
+	/**
+	 * Handles copying the URL to clipboard for sharing
+	 */
+	const handleShareBuild = () => {
+		let url = document.location.href;
+		navigator.clipboard.writeText(url);
+		toast.success('Copied URL to clipboard!');
+	};
+
 	if (editingBuild) return <Create />;
 
 	//---------------------------------------------------------------------------------------------------//
@@ -118,34 +128,31 @@ function Build() {
 
 								{/* Author/Uploaded/version */}
 								<div className="flex flex-row flex-wrap gap-2 2k:gap-4 bg-base-900 w-full justify-center p-2 2k:p-4 mb-6 2k:mb-12 rounded-xl">
-									<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
-										<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Author</p>
+									<BuildInfoCard title="Author">
 										<UsernameLink username={loadedBuild.author} uid={loadedBuild.uid} />
-									</div>
-									<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
-										<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Date Created</p>
+									</BuildInfoCard>
+									<BuildInfoCard title="Date Created">
 										<p className="text-xl 2k:text-3xl text-accent">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.timestamp.seconds * 1000)}</p>
-									</div>
-									<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
-										<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">KSP Version</p>
-										<p className="text-xl 2k:text-3xl text-accent ">{loadedBuild.kspVersion}</p>
-									</div>
-									<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
-										<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Uses Mods</p>
-										<p className="text-xl 2k:text-3xl text-accent ">{loadedBuild.modsUsed ? 'Yes' : 'None'}</p>
-									</div>
-									<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
-										<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Downloads</p>
-										<p className="text-xl 2k:text-3xl text-accent ">{loadedBuild.downloads}</p>
-									</div>
+									</BuildInfoCard>
+									<BuildInfoCard title="Last Updated">
+										<p className="text-xl 2k:text-3xl text-accent">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.lastModified.seconds * 1000)}</p>
+									</BuildInfoCard>
+									<BuildInfoCard title="KSP Version">
+										<p className="text-xl 2k:text-3xl text-accent">{loadedBuild.kspVersion}</p>
+									</BuildInfoCard>
+									<BuildInfoCard title="Uses Mods">
+										<p className="text-xl 2k:text-3xl text-accent">{loadedBuild.modsUsed ? 'Yes' : 'None'}</p>
+									</BuildInfoCard>
+									<BuildInfoCard title="Downloads">
+										<p className="text-xl 2k:text-3xl text-accent">{loadedBuild.downloads}</p>
+									</BuildInfoCard>
 									{loadedBuild.buildOfTheWeek && (
-										<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
+										<BuildInfoCard title="Build of the Week">
 											<img src={BotwBadge} alt="" className="w-22 2k:w-44" />
-											<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Build of the Week</p>
-											<p className="text-lg xl:text-2xl 2k:text-4xl italic text-slate-500 ">
+											<p className="text-lg xl:text-xl 2k:text-3xl italic text-slate-500 ">
 												{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.buildOfTheWeek.seconds * 1000)}
 											</p>
-										</div>
+										</BuildInfoCard>
 									)}
 									{loadedBuild.forChallenge && (
 										<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 w-44  lg:w-96 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
@@ -180,6 +187,7 @@ function Build() {
 											<AiFillEye />
 											<span className="text-lg 2k:text-3xl"> {loadedBuild.views}</span>
 										</p>
+										<Button tooltip="Share" color="btn-ghost text-accent" icon="share" onClick={handleShareBuild} />
 									</div>
 								</div>
 
@@ -201,15 +209,15 @@ function Build() {
 
 								{/* Buttons */}
 								<div className="flex flex-col md:flex-row place-content-between">
-									<div className="flex flex-col sm:flex-row flex-wrap gap-4 mb-10">
+									<div className="flex flex-col sm:flex-row flex-wrap items-center gap-4 mb-10">
 										{loadedBuild.build ? <Button color="btn-primary" icon="export" onClick={copyBuildToClipboard} text="Export to KSP 2" /> : <Button text="Build not found!" color="btn-error" icon="cancel" />}
-										<Button text="How to import into KSP" color="bg-base-900" htmlFor="how-to-paste-build-modal" icon="info" />
-										<Button htmlFor="report-modal" color="btn-error" icon="report" text="Report" onClick={handleSetReport} />
+										<Button tooltip="How to import into KSP" color="btn-info" htmlFor="how-to-paste-build-modal" icon="info" />
+										<Button tooltip="Report" htmlFor="report-modal" color="bg-base-800" icon="report" onClick={handleSetReport} />
 									</div>
 									{!authLoading && (user?.uid === loadedBuild.uid || user?.siteAdmin) && (
 										<div className="flex flex-row flex-wrap gap-4">
-											<Button text="Edit Build" icon="edit" color="btn-info" onClick={() => setEditingBuild(loadedBuild)} />
-											<Button htmlFor="delete-build-modal" color="btn-error" icon="delete" text="Delete Build" />
+											<Button tooltip="Edit Build" icon="edit" color="btn-info" onClick={() => setEditingBuild(loadedBuild)} />
+											<Button htmlFor="delete-build-modal" color="btn-error" icon="delete" tooltip="Delete Build" />
 										</div>
 									)}
 								</div>

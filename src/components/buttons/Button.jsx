@@ -2,7 +2,7 @@ import React from 'react';
 import { GiCancel, GiPeaks } from 'react-icons/gi';
 import { ImCloudUpload } from 'react-icons/im';
 import { FaSave, FaUserAstronaut, FaCogs, FaHome } from 'react-icons/fa';
-import { FiLogOut } from 'react-icons/fi';
+import { FiLogOut, FiShare2 } from 'react-icons/fi';
 import { TiExport, TiPlusOutline } from 'react-icons/ti';
 import { RiDeleteBin2Fill, RiEditFill, RiLoginCircleLine } from 'react-icons/ri';
 import { BsFillPatchQuestionFill, BsFillArrowDownSquareFill, BsFillArrowLeftSquareFill, BsFillArrowRightSquareFill, BsCaretRightFill, BsCaretLeftFill, BsTwitter } from 'react-icons/bs';
@@ -26,6 +26,7 @@ import Tier3Badge from '../../assets/badges/tier3/tier3_badge36.png';
  * @param {*} css - any extra inline tailwind/diasyui styling
  * @param {*} style - eg btn-circle
  * @param {*} position - used for absolute
+ * @param {*} tooltip - text for tooltip
  * @param {*} htmlFor - enter this if used to ope a modal
  * @param {*} margin - enter any margin
  * @param {*} href - href if its a link to a page (like profile, settings)
@@ -34,7 +35,7 @@ import Tier3Badge from '../../assets/badges/tier3/tier3_badge36.png';
  * @param {*} type - enter 'submit' for submitting a form, 'button' to make it not submit, 'ahref' for a link to a page for google, leave blank for 'label'
  * @returns
  */
-function Button({ text, onClick, color, size, icon, css, style, position, htmlFor, margin, type, href, target, tabIndex, price }) {
+function Button({ text, onClick, color, size, icon, css, style, position, htmlFor, margin, type, href, target, tabIndex, tooltip }) {
 	const buttonIcon = () => {
 		if (icon === 'cancel') return <GiCancel />;
 		if (icon === 'upload') return <ImCloudUpload />;
@@ -63,6 +64,7 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 		if (icon === 'fill-heart') return <AiFillHeart />;
 		if (icon === 'outline-heart') return <AiOutlineHeart />;
 		if (icon === 'report') return <MdReport />;
+		if (icon === 'share') return <FiShare2 />;
 		if (icon === 'info') return <AiOutlineBulb />;
 		if (icon === 'mountain') return <GiPeaks />;
 		if (icon === 'twitter') return <BsTwitter />;
@@ -78,25 +80,31 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 	if (type) {
 		if (type === 'ahref') {
 			return (
-				<Link to={href} target={target} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
-					{icon && <span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
-					{text !== '' && text}
-				</Link>
+				<div className={tooltip ? 'tooltip' : ''} data-tip={tooltip ? tooltip : ''}>
+					<Link to={href} target={target} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
+						{icon && <span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
+						{text !== '' && text}
+					</Link>
+				</div>
 			);
 		} else {
 			return (
-				<button type={type} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
-					{icon && <span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
-					{text !== '' && text}
-				</button>
+				<div className={tooltip ? 'tooltip' : ''} data-tip={tooltip ? tooltip : ''}>
+					<button type={type} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
+						{icon && <span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
+						{text !== '' && text}
+					</button>
+				</div>
 			);
 		}
 	} else {
 		return (
-			<label type={type} tabIndex={tabIndex} htmlFor={htmlFor} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
-				{icon && <span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
-				{text !== '' && text}
-			</label>
+			<div className={tooltip ? 'tooltip' : ''} data-tip={tooltip ? tooltip : ''}>
+				<label type={type} tabIndex={tabIndex} htmlFor={htmlFor} className={`btn 2k:btn-lg 2k:text-2xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
+					{icon && <span className={`text-2xl 2k:text-4xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
+					{text !== '' && text}
+				</label>
+			</div>
 		);
 	}
 }

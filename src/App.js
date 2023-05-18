@@ -22,12 +22,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
+Modify build loading so that its quicker - maybe have different loading variables for the raw build and the firebase build, and comments? so all 3 can be done at their own pace
+pagination allowing user to jump right to a page? might result in a large amount of firebase calls
 thumbnails scale down
-fix 512 and 192 logos
 competitions/ways to give users accolades
 allow cookies popup
 quick copy by just hovering over a build on the main tab... this may result in a lot of AWS calls
-t-shirts
+t-shirts, merch
 Volunteer positions (moderate, write posts, create challenges, etc) - this will include all the features they may need to see/have access to
 build folders on personal profile
 twitch sidebar

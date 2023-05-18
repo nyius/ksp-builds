@@ -22,7 +22,7 @@ function BuildCard({ build }) {
 	 * @param {*} e
 	 */
 	const handleNavigate = e => {
-		if (e.target.id !== 'upVote' && e.target.id !== 'downVote' && e.target.parentElement.id !== 'upVote' && e.target.parentElement.id !== 'downVote' && e.target.id !== 'userlink') navigate(`/build/${build.id}`);
+		if (e.target.id !== 'upVote' && e.target.id !== 'downVote' && e.target.parentElement.id !== 'upVote' && e.target.parentElement.id !== 'downVote' && e.target.id !== 'userlink') navigate(`/build/${build.urlName}`);
 	};
 
 	//---------------------------------------------------------------------------------------------------//

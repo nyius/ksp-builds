@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, getDocs, serverTimestamp, getDocsFromCache, getDocFromCache } from 'firebase/firestore';
+import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, where, getDocs, serverTimestamp, getDocsFromCache, getDocFromCache } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -41,54 +41,95 @@ const useBuild = () => {
 		dispatchBuild({ type: 'LOADING_BUILD', payload: true });
 
 		try {
-			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, id);
-			let response, rawBuildData, parsedBuild;
+			const regExSpace = new RegExp(' ', 'g');
+			const regExHash = new RegExp('#', 'g');
+			const regExSlash = new RegExp('/', 'g');
+
+			const newId = id.replace(regExSpace, '-').replace(regExHash, '%23').replace(regExSlash, '%2F');
+
+			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, newId);
 
 			// get the build from the db
 			const fetchedBuild = await getDoc(buildRef);
 
-			// Get the raw build from aws
-			if (process.env.REACT_APP_ENV !== 'DEV') {
-				try {
-					const command = new GetObjectCommand({
-						Bucket: process.env.REACT_APP_BUCKET,
-						Key: `${id}.json`,
-					});
-
-					response = await s3Client.send(command);
-					rawBuildData = await response.Body.transformToString();
-
-					// If we have an older uncompressed buildFile
-					if (rawBuildData.includes('AssemblyOABConfig')) {
-						parsedBuild = JSON.parse(rawBuildData);
-					} else {
-						const decompress = decompressFromEncodedURIComponent(rawBuildData);
-						parsedBuild = JSON.parse(decompress);
-					}
-				} catch (error) {
-					console.log(error);
-				}
-			}
-
 			if (fetchedBuild.exists()) {
+				let parsedBuild = await fetchBuildFromAWS(newId);
+
 				let build = fetchedBuild.data();
 
 				// fetch comments and update the view count
-				await fetchComments(id);
-				await updateViewCount(build, id);
+				await fetchComments(newId);
+				await updateViewCount(build, newId);
 				build.build = parsedBuild;
 
 				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: build, loadingBuild: false } });
 			} else {
-				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: '', loadingBuild: false } });
+				// maybe the URL isn't the id, but instead the builds name. Search for that next
+				const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
 
-				throw new Error("Couldn't find that build!");
+				let q = query(buildsRef, where('urlName', '==', newId));
+
+				const fetchedBuilds = await getDocs(q);
+
+				let build;
+
+				fetchedBuilds.forEach(doc => {
+					build = doc.data();
+				});
+
+				if (build) {
+					let parsedBuild = await fetchBuildFromAWS(build.id);
+
+					// fetch comments and update the view count
+					await fetchComments(build.id);
+					await updateViewCount(build, build.id);
+					build.build = parsedBuild;
+
+					dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: build, loadingBuild: false } });
+				} else {
+					dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: '', loadingBuild: false } });
+
+					throw new Error("Couldn't find that build!");
+				}
 			}
 		} catch (error) {
 			dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: '', loadingBuild: false } });
 			console.log(error);
 			throw new Error(`Error fetching build: ${error}`);
 		}
+	};
+
+	/**
+	 * Handles fetching a raw build from AWS. Takes in an id
+	 * @param {*} id
+	 * @returns build json
+	 */
+	const fetchBuildFromAWS = async id => {
+		let response, rawBuildData, parsedBuild;
+		// Get the raw build from aws
+		if (process.env.REACT_APP_ENV !== 'DEV') {
+			try {
+				const command = new GetObjectCommand({
+					Bucket: process.env.REACT_APP_BUCKET,
+					Key: `${id}.json`,
+				});
+
+				response = await s3Client.send(command);
+				rawBuildData = await response.Body.transformToString();
+
+				// If we have an older uncompressed buildFile
+				if (rawBuildData.includes('AssemblyOABConfig')) {
+					parsedBuild = JSON.parse(rawBuildData);
+				} else {
+					const decompress = decompressFromEncodedURIComponent(rawBuildData);
+					parsedBuild = JSON.parse(decompress);
+				}
+			} catch (error) {
+				console.log(error);
+			}
+		}
+
+		return parsedBuild;
 	};
 
 	/**
@@ -187,6 +228,13 @@ const useBuild = () => {
 
 			if (build.thumbnail !== build.images[0]) {
 				build.thumbnail = build.images[0];
+			}
+
+			if (loadedBuild.name !== build.name) {
+				const regExSpace = new RegExp(' ', 'g');
+				const regExHash = new RegExp('#', 'g');
+				const regExSlash = new RegExp('/', 'g');
+				build.urlName = build.name.replace(regExSpace, '-').replace(regExHash, '%23').replace(regExSlash, '%2F');
 			}
 
 			build.lastModified = serverTimestamp();
@@ -630,7 +678,11 @@ const useBuild = () => {
 			setUploadingBuild(true);
 
 			const buildId = uuidv4().slice(0, 30);
+			const regExSpace = new RegExp(' ', 'g');
+			const regExHash = new RegExp('#', 'g');
+			const regExSlash = new RegExp('/', 'g');
 			build.id = buildId;
+			build.urlName = build.name.replace(regExSpace, '-').replace(regExHash, '%23').replace(regExSlash, '%2F');
 
 			// Stringify the json build and remove it from the main build object so it doesnt get uploaded to firebase (as its huge)
 			// It will be uploaded to ASW S3 instead

@@ -235,8 +235,8 @@ function AdminPanel() {
 
 			usersSnap.forEach(user => {
 				const data = user.data();
-				updateDoc(doc(db, 'users', user.id), { lastModified: data.dateCreated });
-				updateDoc(doc(db, 'userProfiles', user.id), { lastModified: data.dateCreated });
+				updateDoc(doc(db, 'users', user.id), { rocketReputation: 0 });
+				updateDoc(doc(db, 'userProfiles', user.id), { rocketReputation: 0 });
 			});
 
 			toast.success('All users updated!');
@@ -257,9 +257,14 @@ function AdminPanel() {
 				const buildRef = doc(db, 'builds', buildDoc.id);
 				const build = buildDoc.data();
 
+				const regExSpace = new RegExp(' ', 'g');
+				const regExHash = new RegExp('#', 'g');
+				const regExSlash = new RegExp('/', 'g');
+				const urlName = build.name.replace(regExSpace, '-').replace(regExHash, '%23').replace(regExSlash, '%2F');
+
 				const updateBuild = async () => {
 					try {
-						await updateDoc(buildRef, { lastModified: build.timestamp });
+						await updateDoc(buildRef, { urlName });
 					} catch (error) {
 						console.log(error);
 					}

@@ -26,6 +26,7 @@ import MiddleContainer from '../../components/containers/middleContainer/MiddleC
 import PlanetHeader from '../../components/header/PlanetHeader';
 import TextEditor from '../../components/textEditor/TextEditor';
 import BotwBadge from '../../assets/BotW_badge2.png';
+import BuildInfoCard from '../../components/cards/BuildInfoCard';
 
 /**
  * Displays the users own profile
@@ -181,19 +182,20 @@ function Profile() {
 
 							{/* User Details */}
 							<div className="flex flex-row flex-wrap gap-2 2k:gap-4 bg-base-900 w-full justify-center p-2 2k:p-4 rounded-xl">
-								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
-									<p className="text-lg xl:text-2xl 2k:text-3xl font-bold">Joined</p>
+								<BuildInfoCard title="Joined">
 									<p className="text-xl 2k:text-3xl text-accent">{dateCreated}</p>
-								</div>
-								<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
-									<p className="text-lg xl:text-2xl 2k:text-3xl font-bold">Total Builds</p>
+								</BuildInfoCard>
+								<BuildInfoCard title="Total Builds">
 									<p className="text-xl 2k:text-3xl text-accent">{sortedBuilds.length}</p>
-								</div>
+								</BuildInfoCard>
+								<BuildInfoCard title="Rocket Reputation">
+									<p className="text-xl 2k:text-3xl text-accent">{user.rocketReputation}</p>
+								</BuildInfoCard>
 								{user?.username && user?.buildOfTheWeekWinner && (
-									<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
+									<BuildInfoCard>
 										<img src={BotwBadge} alt="" className="w-22 2k:w-44" />
 										<p className="text-lg xl:text-2xl 2k:text-3xl font-bold">Build of the Week Winner</p>
-									</div>
+									</BuildInfoCard>
 								)}
 							</div>
 						</div>

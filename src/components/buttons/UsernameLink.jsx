@@ -93,7 +93,6 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 									<img src={Intercept_Logo} className="w-12" alt="" />
 								</div>
 							)}
-
 							{usersProfile?.subscribed === 'tier1' && (
 								<div className="tooltip" data-tip="Tier 1 Subscriber">
 									<img src={Tier1Badge} className="w-8 h-8 drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]" />
@@ -118,20 +117,29 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 								} cursor-auto bg-base-900 p-2 shadow ${color ? color : 'bg-base-100'}  rounded-box w-130 2k:w-160`}
 							>
 								<div className="flex flex-col p-3 w-full">
-									<div className="flex flex-row gap-2 2k:gap-4 mb-2 items-center">
+									<div className="flex flex-row gap-3 2k:gap-5 mb-2 items-center">
 										<div className="btn btn-circle w-14 h-14 2k:w-20 2k:h-20 2k:btn-lg avatar">
 											{!loadingProfile && usersProfile && (
-												<div className="w-10 2k:w-20 rounded-full">
+												<div className="w-10 2k:w-20 rounded-full" onClick={() => navigate(`/profile/${username}`)}>
 													<img src={usersProfile.profilePicture} alt="" />
 												</div>
 											)}
 										</div>
-										<p className="text-xl 2k:text-2xl text-white font-bold" style={{ color: `${usersProfile?.customUsernameColor}` }}>
-											{username}
-										</p>
-										{!loadingProfile && usersProfile && (
-											<p className="text-xl 2k:text-2xl text-slate-400 italic">joined {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(usersProfile.dateCreated.seconds * 1000)}</p>
-										)}
+										<div className="flex flex-col gap-2">
+											<div className="flex flex-row gap-2">
+												<p className="text-xl 2k:text-2xl text-white font-bold" style={{ color: `${usersProfile?.customUsernameColor}` }}>
+													{username}
+												</p>
+												{!loadingProfile && usersProfile && (
+													<p className="text-xl 2k:text-2xl text-slate-400 italic">
+														joined {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(usersProfile.dateCreated.seconds * 1000)}
+													</p>
+												)}
+											</div>
+											<p className="text-xl 2k:text-2xl text-slate-400">
+												Rocket Reputation: <span className="text-white">{usersProfile.rocketReputation}</span>
+											</p>
+										</div>
 									</div>
 
 									<div className="flex flex-row gap-2 2k:gap-4 w-full items-end">
@@ -164,9 +172,11 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 										<div className="flex flex-row items-center flex-wrap gap-4 2k:gap-6 w-full">
 											{user?.username && user?.username !== username && <Button id="userLinkMessage" text="Message" icon="message" color="btn-primary" size="w-fit" onClick={e => fetchConversation({ username, uid })} />}
 											<Button text="Visit" color="btn-primary" size="w-fit" icon="export" type="ahref" href={`/profile/${username}`} />
-											<div className="tooltip" data-tip={`${usersProfile?.followers?.includes(user.uid) ? 'Unfollow' : 'Follow'}`}>
-												<Button icon={`${usersProfile?.followers?.includes(user.uid) ? 'fill-heart' : 'outline-heart'}`} color="btn-primary" onClick={() => handleFollowingUser()} />
-											</div>
+											{user?.username && user?.username !== username && (
+												<div className="tooltip" data-tip={`${usersProfile?.followers?.includes(user?.uid) ? 'Unfollow' : 'Follow'}`}>
+													<Button icon={`${usersProfile?.followers?.includes(user?.uid) ? 'fill-heart' : 'outline-heart'}`} color="btn-primary" onClick={() => handleFollowingUser()} />
+												</div>
+											)}
 										</div>
 										<div className="flex flex-row items-center flex-wrap gap-2 2k:gap-4 w-full">
 											{user?.username && user?.username !== username && <Button htmlFor="report-modal" color="btn-ghost" icon="report" size="!btn-sm w-fit" text="Report" onClick={handleSetReport} />}

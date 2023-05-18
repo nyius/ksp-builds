@@ -20,6 +20,7 @@ function Favorite({ id }) {
 					css={user.favorites?.includes(id ? id : loadedBuild.id) && 'text-secondary'}
 					onClick={() => handleFavoriting(id ? id : loadedBuild.id)}
 					color="btn-ghost"
+					tooltip="Favorite"
 					icon={user.favorites?.includes(id ? id : loadedBuild.id) ? 'fill-heart' : 'outline-heart'}
 				/>
 			);

@@ -28,15 +28,15 @@ function MobileHamburger() {
 				</svg>
 			</label>
 			<ul tabIndex={1} className="mt-3 p-2 gap-2 shadow menu menu-compact dropdown-content bg-base-500 rounded-box w-96">
-				<Button type="ahref" href="/" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="home" text="Home" />
-				{!authLoading && !user?.username && <Button type="ahref" href="/sign-up" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Create Account" />}
-				{!authLoading && user?.username && <Button type="ahref" href="/favorites" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" />}
-				{!authLoading && user?.username && <>{!user?.subscribed && <Button text="Subscribe" icon="outline-star" htmlFor="subscribe-modal" css="border-2 border-solid border-slate-500 space-between" color="btn-ghost" />}</>}
-				<Button type="ahref" href="/upload" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="plus" text="Upload" onClick={handleUploadNavigate} />
-				<Button type="ahref" href="/challenges" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="Challenges" icon="mountain" />
-				<Button type="ahref" href="/faq" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="F.A.Q" icon="help" />
-				<Button type="ahref" href="/news" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="News" icon="news" />
-				<Button type="ahref" href="/contact" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="Contact" icon="email" />
+				<Button size="w-full" type="ahref" href="/" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="home" text="Home" />
+				{!authLoading && !user?.username && <Button size="w-full" type="ahref" href="/sign-up" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Create Account" />}
+				{!authLoading && user?.username && <Button size="w-full" type="ahref" href="/favorites" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" />}
+				{!authLoading && user?.username && <>{!user?.subscribed && <Button size="w-full" text="Subscribe" icon="outline-star" htmlFor="subscribe-modal" css="border-2 border-solid border-slate-500 space-between" color="btn-ghost" />}</>}
+				<Button size="w-full" type="ahref" href="/upload" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="plus" text="Upload" onClick={handleUploadNavigate} />
+				<Button size="w-full" type="ahref" href="/challenges" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="Challenges" icon="mountain" />
+				<Button size="w-full" type="ahref" href="/faq" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="F.A.Q" icon="help" />
+				<Button size="w-full" type="ahref" href="/news" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="News" icon="news" />
+				<Button size="w-full" type="ahref" href="/contact" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" text="Contact" icon="email" />
 			</ul>
 		</div>
 	);

@@ -87,11 +87,11 @@ function NavBar() {
 									</div>
 								</label>
 								<ul tabIndex={0} className="mt-3 p-5 2k:p-6 shadow menu dropdown-content gap-2 bg-base-500 rounded-box w-96">
-									<Button type="ahref" href="/profile" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Profile" />
-									{user.siteAdmin && <Button type="ahref" href="/admin-panel" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Admin Panel" />}
-									<Button type="ahref" href="/favorites" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" />
-									<Button type="ahref" href="/settings" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Settings" />
-									<Button color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="logout" text="Logout" onClick={() => signOut()} />
+									<Button type="ahref" href="/profile" size="w-full" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="head" text="Profile" />
+									{user.siteAdmin && <Button type="ahref" size="w-full" href="/admin-panel" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Admin Panel" />}
+									<Button type="ahref" href="/favorites" size="w-full" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="fill-heart" text="Favorites" />
+									<Button type="ahref" href="/settings" size="w-full" color="btn-ghost" css="border-2 border-solid border-slate-500 space-between" icon="settings" text="Settings" />
+									<Button color="btn-ghost" size="w-full" css="border-2 border-solid border-slate-500 space-between" icon="logout" text="Logout" onClick={() => signOut()} />
 								</ul>
 							</div>
 						</>

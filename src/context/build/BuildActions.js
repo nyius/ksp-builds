@@ -62,7 +62,7 @@ const useBuild = () => {
 			} else {
 				// maybe the URL isn't the id, but instead the builds name. Search for that next
 				const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
-				console.log(newId);
+				console.log(newId, id);
 
 				let q = query(buildsRef, where('urlName', '==', newId));
 

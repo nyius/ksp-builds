@@ -22,8 +22,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
-Modify build loading so that its quicker - maybe have different loading variables for the raw build and the firebase build, and comments? so all 3 can be done at their own pace
 pagination allowing user to jump right to a page? might result in a large amount of firebase calls
+make the build of the week/banner much prettier
+maybe remove some info from build cards
 thumbnails scale down
 competitions/ways to give users accolades
 allow cookies popup

@@ -15,6 +15,7 @@ import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from
 import { uploadImage } from '../../utilities/uploadImage';
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
 import standardNotifications from '../../utilities/standardNotifications';
+import { buildNameToUrl } from '../../utilities/buildNameToUrl';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from './BuildContext';
 import BuildsContext from '../builds/BuildsContext';
@@ -41,11 +42,7 @@ const useBuild = () => {
 		dispatchBuild({ type: 'LOADING_BUILD', payload: true });
 
 		try {
-			const regExSpace = new RegExp(' ', 'g');
-			const regExHash = new RegExp('#', 'g');
-			const regExSlash = new RegExp('/', 'g');
-
-			const newId = id.replace(regExSpace, '-').replace(regExHash, '%23').replace(regExSlash, '%2F');
+			const newId = buildNameToUrl(id);
 
 			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, newId);
 
@@ -53,19 +50,19 @@ const useBuild = () => {
 			const fetchedBuild = await getDoc(buildRef);
 
 			if (fetchedBuild.exists()) {
-				let parsedBuild = await fetchBuildFromAWS(newId);
-
 				let build = fetchedBuild.data();
+				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: build, loadingBuild: false } });
+
+				let parsedBuild = await fetchBuildFromAWS(newId);
+				dispatchBuild({ type: 'SET_LOADED_RAW_BUILD', payload: parsedBuild });
 
 				// fetch comments and update the view count
 				await fetchComments(newId);
 				await updateViewCount(build, newId);
-				build.build = parsedBuild;
-
-				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: build, loadingBuild: false } });
 			} else {
 				// maybe the URL isn't the id, but instead the builds name. Search for that next
 				const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
+				console.log(newId);
 
 				let q = query(buildsRef, where('urlName', '==', newId));
 
@@ -78,14 +75,14 @@ const useBuild = () => {
 				});
 
 				if (build) {
+					dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: build, loadingBuild: false } });
+
 					let parsedBuild = await fetchBuildFromAWS(build.id);
+					dispatchBuild({ type: 'SET_LOADED_RAW_BUILD', payload: parsedBuild });
 
 					// fetch comments and update the view count
 					await fetchComments(build.id);
 					await updateViewCount(build, build.id);
-					build.build = parsedBuild;
-
-					dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: build, loadingBuild: false } });
 				} else {
 					dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: '', loadingBuild: false } });
 
@@ -231,10 +228,7 @@ const useBuild = () => {
 			}
 
 			if (loadedBuild.name !== build.name) {
-				const regExSpace = new RegExp(' ', 'g');
-				const regExHash = new RegExp('#', 'g');
-				const regExSlash = new RegExp('/', 'g');
-				build.urlName = build.name.replace(regExSpace, '-').replace(regExHash, '%23').replace(regExSlash, '%2F');
+				build.urlName = buildNameToUrl(build.name);
 			}
 
 			build.lastModified = serverTimestamp();
@@ -678,11 +672,9 @@ const useBuild = () => {
 			setUploadingBuild(true);
 
 			const buildId = uuidv4().slice(0, 30);
-			const regExSpace = new RegExp(' ', 'g');
-			const regExHash = new RegExp('#', 'g');
-			const regExSlash = new RegExp('/', 'g');
+
 			build.id = buildId;
-			build.urlName = build.name.replace(regExSpace, '-').replace(regExHash, '%23').replace(regExSlash, '%2F');
+			build.urlName = buildNameToUrl(build.name);
 
 			// Stringify the json build and remove it from the main build object so it doesnt get uploaded to firebase (as its huge)
 			// It will be uploaded to ASW S3 instead

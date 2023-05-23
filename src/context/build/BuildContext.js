@@ -8,6 +8,7 @@ export const BuildProvider = ({ children }) => {
 	// Initial state
 	const initialState = {
 		loadingBuild: true,
+		loadingRawBuild: true,
 		editingBuild: false,
 		editingComment: false,
 		replyingComment: null,

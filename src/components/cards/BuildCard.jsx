@@ -31,7 +31,7 @@ function BuildCard({ build }) {
 			<div className="card card-compact card-sizing grow bg-base-400 shadow-lg hover:shadow-xl cursor-pointer">
 				<DeleteBuildAdmin style="circle" id={build.id} userID={build.uid} />
 
-				<div className="flex flex-col rounded-2xl buildCardHover hover:rounded-2xl w-full" onClick={handleNavigate}>
+				<a href={`/build/${build.urlName}`} className="flex flex-col rounded-2xl buildCardHover hover:rounded-2xl w-full">
 					{/* Image */}
 					<figure className="bg-base-900 relative">
 						{/* Views */}
@@ -95,7 +95,7 @@ function BuildCard({ build }) {
 							})}
 						</div>
 					</div>
-				</div>
+				</a>
 
 				{/* Voting/comments/downloads/favorite */}
 				<div className="flex flex-row flex-wrap absolute bottom-0 rounded-b-xl left-0 bg-base-800 w-full p-2 xl:p-4 2k:p-4">

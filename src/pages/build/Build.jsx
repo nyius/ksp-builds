@@ -39,7 +39,7 @@ import BuildInfoCard from '../../components/cards/BuildInfoCard';
 function Build() {
 	//---------------------------------------------------------------------------------------------------//
 	const { fetchBuild, setComment, addComment, updateDownloadCount, setEditingBuild, setReplyingComment, setBuildOfTheWeek } = useBuild();
-	const { loadingBuild, loadedBuild, commentsLoading, comments, editingBuild, replyingComment } = useContext(BuildContext);
+	const { loadingBuild, loadingRawBuild, loadedBuild, commentsLoading, comments, editingBuild, replyingComment } = useContext(BuildContext);
 	const { user, authLoading, fetchedUserProfile } = useContext(AuthContext);
 	const [buildDesc, setBuildDesc] = useState(null);
 
@@ -210,7 +210,7 @@ function Build() {
 								{/* Buttons */}
 								<div className="flex flex-col md:flex-row place-content-between">
 									<div className="flex flex-col sm:flex-row flex-wrap items-center gap-4 mb-10">
-										{loadedBuild.build ? <Button color="btn-primary" icon="export" onClick={copyBuildToClipboard} text="Export to KSP 2" /> : <Button text="Build not found!" color="btn-error" icon="cancel" />}
+										{loadedBuild.build && !loadingRawBuild ? <Button color="btn-primary" icon="export" onClick={copyBuildToClipboard} text="Export to KSP 2" /> : <Button text="Build not found!" color="btn-error" icon="cancel" />}
 										<Button tooltip="How to import into KSP" color="btn-info" htmlFor="how-to-paste-build-modal" icon="info" />
 										<Button tooltip="Report" htmlFor="report-modal" color="bg-base-800" icon="report" onClick={handleSetReport} />
 									</div>

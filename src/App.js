@@ -22,7 +22,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
-Builds with the same name will have a messed up url
+bundle craft together, multiple download buttons per folder
 pagination allowing user to jump right to a page? might result in a large amount of firebase calls
 make the build of the week/banner much prettier
 maybe remove some info from build cards

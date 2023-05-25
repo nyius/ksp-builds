@@ -261,7 +261,7 @@ const useBuild = () => {
 
 			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, build.id);
 
-			// get the build from the db
+			// get the build from the db so we get new timestamps
 			const fetchedBuild = await getDoc(buildRef);
 
 			dispatchBuild({
@@ -678,24 +678,45 @@ const useBuild = () => {
 			const buildId = uuidv4().slice(0, 30);
 
 			build.id = buildId;
-			build.urlName = buildNameToUrl(build.name);
 
-			//check if urlName exists
-			// const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
+			// check if urlName exists and recursively look through each number until we get a free name
+			// for example, if a ship is named 'test' and we try to name our new one 'test', this will return '1' so we can append '1' to the new url name to make it 'test-1'
+			// this is so we dont have competing URLs from same named builds
+			const searchBuilds = async num => {
+				try {
+					const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
+					let q;
 
-			// let q = query(buildsRef, where('urlName', '==', buildNameToUrl(build.name)));
+					if (num === 0) {
+						q = query(buildsRef, where('urlName', '==', buildNameToUrl(build.name)));
+					} else {
+						q = query(buildsRef, where('urlName', '==', buildNameToUrl(`${build.name}-${num}`)));
+					}
 
-			// const fetchedBuilds = await getDocs(q);
+					const fetchedBuilds = await getDocs(q);
+					const builds = [];
 
-			// const builds = [];
+					fetchedBuilds.forEach(doc => {
+						builds.push(doc.data());
+					});
 
-			// fetchedBuilds.forEach(doc => {
-			// 	builds.push(doc.data());
-			// });
+					if (builds.length > 0) {
+						return searchBuilds(num + 1);
+					} else {
+						return num;
+					}
+				} catch (error) {
+					throw new Error(error);
+				}
+			};
 
-			// console.log(builds);
+			const availableNameNum = await searchBuilds(0);
 
-			// return;
+			if (availableNameNum === 0) {
+				build.urlName = buildNameToUrl(build.name);
+			} else {
+				build.urlName = `${buildNameToUrl(build.name)}-${availableNameNum}`;
+			}
 
 			// Stringify the json build and remove it from the main build object so it doesnt get uploaded to firebase (as its huge)
 			// It will be uploaded to ASW S3 instead

@@ -62,7 +62,6 @@ const useBuild = () => {
 			} else {
 				// maybe the URL isn't the id, but instead the builds name. Search for that next
 				const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
-				console.log(newId, id);
 
 				let q = query(buildsRef, where('urlName', '==', newId));
 
@@ -260,13 +259,18 @@ const useBuild = () => {
 				build.build = JSON.parse(buildJSON);
 			}
 
+			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, build.id);
+
+			// get the build from the db
+			const fetchedBuild = await getDoc(buildRef);
+
 			dispatchBuild({
 				type: 'SET_BUILD',
 				payload: {
 					savingBuild: false,
 					editingBuild: false,
 					uploadingBuild: false,
-					loadedBuild: build,
+					loadedBuild: fetchedBuild.data(),
 					resetTextEditor: true,
 				},
 			});
@@ -675,6 +679,23 @@ const useBuild = () => {
 
 			build.id = buildId;
 			build.urlName = buildNameToUrl(build.name);
+
+			//check if urlName exists
+			// const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
+
+			// let q = query(buildsRef, where('urlName', '==', buildNameToUrl(build.name)));
+
+			// const fetchedBuilds = await getDocs(q);
+
+			// const builds = [];
+
+			// fetchedBuilds.forEach(doc => {
+			// 	builds.push(doc.data());
+			// });
+
+			// console.log(builds);
+
+			// return;
 
 			// Stringify the json build and remove it from the main build object so it doesnt get uploaded to firebase (as its huge)
 			// It will be uploaded to ASW S3 instead

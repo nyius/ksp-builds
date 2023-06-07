@@ -236,8 +236,8 @@ function AdminPanel() {
 
 			usersSnap.forEach(user => {
 				const data = user.data();
-				updateDoc(doc(db, 'users', user.id), { rocketReputation: 0 });
-				updateDoc(doc(db, 'userProfiles', user.id), { rocketReputation: 0 });
+				updateDoc(doc(db, 'users', user.id), { folders: [] });
+				updateDoc(doc(db, 'userProfiles', user.id), { folders: [] });
 			});
 
 			toast.success('All users updated!');

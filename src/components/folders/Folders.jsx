@@ -94,7 +94,7 @@ function Folders({ usersFolders, editable, hideOwnFolder }) {
 
 				{/* View buttons */}
 				<div className="flex flex-row text-3xl 2k:text-4xl">
-					{openedFolder && (currentLocation !== 'user' || addToFolderModalOpen) ? (
+					{openedFolder && (currentLocation !== 'user' || addToFolderModalOpen) && openedFolder.id !== 'your-builds' ? (
 						<Button
 							tooltip="Rename Folder"
 							color="btn-ghost"
@@ -105,7 +105,9 @@ function Folders({ usersFolders, editable, hideOwnFolder }) {
 							}}
 						/>
 					) : null}
-					{openedFolder && (currentLocation !== 'user' || addToFolderModalOpen) ? <Button tooltip="Delete Folder" color="btn-ghost" icon="delete" onClick={() => setDeleteFolderId(dispatchFolders, openedFolder.id)} /> : null}
+					{openedFolder && (currentLocation !== 'user' || addToFolderModalOpen) && openedFolder.id !== 'your-builds' ? (
+						<Button tooltip="Delete Folder" color="btn-ghost" icon="delete" onClick={() => setDeleteFolderId(dispatchFolders, openedFolder.id)} />
+					) : null}
 					<Button tooltip="List View" color={`btn-ghost ${folderView === 'list' ? 'text-white' : ''}`} icon="list" onClick={() => setFolderView(dispatchFolders, 'list')} />
 					<Button tooltip="Grid View" color={`btn-ghost ${folderView === 'grid' ? 'text-white' : ''}`} icon="grid" onClick={() => setFolderView(dispatchFolders, 'grid')} />
 					{openedFolder ? <Button tooltip="Share Folder" color="btn-ghost" icon="share" onClick={() => handleShareFolder(currentUser, openedFolder.urlName)} /> : null}
@@ -119,16 +121,10 @@ function Folders({ usersFolders, editable, hideOwnFolder }) {
 				<div className={`flex ${folderView === 'grid' && 'flex-row'} ${folderView === 'list' && 'flex-col'}  flex-wrap gap-2 w-full`}>
 					{usersFolders ? (
 						<>
-							{usersFolders?.length > 0 ? (
-								<>
-									{currentLocation === 'user' ? <Folder folder={usersBuildsFolder} editable={false} /> : null}
-									{usersFolders?.map(folder => {
-										return <Folder key={folder.id} folder={folder} editable={editable} />;
-									})}
-								</>
-							) : (
-								<p className="text-lg 2k:text-xl">User doesn't have any folders yet</p>
-							)}
+							{currentLocation === 'user' ? <Folder folder={usersBuildsFolder} editable={false} /> : null}
+							{usersFolders?.map(folder => {
+								return <Folder key={folder.id} folder={folder} editable={editable} />;
+							})}
 						</>
 					) : (
 						<>
@@ -140,7 +136,7 @@ function Folders({ usersFolders, editable, hideOwnFolder }) {
 
 							{makingNewFolder ? <Folder type="new" /> : null}
 
-							{user?.folders?.length <= 20 ? (
+							{user?.folders?.length <= 20 && !openedFolder ? (
 								<div className="tooltip" data-tip="New Folder">
 									<label
 										className={`text-5xl flex flex-col items-center justify-center cursor-pointer ${folderView === 'list' ? 'h-fit w-full py-2 bg-base-400 ' : 'h-28 aspect-square'} hover:bg-base-200 rounded-xl`}

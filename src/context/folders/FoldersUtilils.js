@@ -36,7 +36,7 @@ export const checkIfBuildInFolder = (buildId, folderId, user) => {
  * @param {obj} user - The current logged in user
  */
 export const checkIfBuildInAllFolders = (buildId, user) => {
-	const folderIndex = user.folders.findIndex(folder => folder.builds.includes(buildId));
+	const folderIndex = user?.folders?.findIndex(folder => folder.builds.includes(buildId));
 
 	return folderIndex >= 0 ? true : false;
 };

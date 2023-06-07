@@ -22,6 +22,9 @@ import './App.css';
 
 /*TODO
 subscribe modal button fix
+sorting searched builds is bugged (fetches new builds from server)
+	-url should change to the search
+	- search bar should clear when entered
 drag and drop your own builds into a folder?
 deleting comment popup to clarify
 when launching the app, it should loop over the localstorage and check all of the stored builds to see their age

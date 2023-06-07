@@ -26,24 +26,15 @@ function PatchNotes() {
 	useEffect(() => {
 		const fetchPatchNotes = async () => {
 			try {
-				const patchSnap = await getDocsFromCache(collection(db, 'patchNotes'));
 				let data = [];
 
-				if (!patchSnap.empty) {
-					patchSnap.forEach(note => {
-						const noteData = note.data();
-						noteData.id = note.id;
-						data.push(noteData);
-					});
-				} else {
-					const patchSnap = await getDocs(collection(db, 'patchNotes'));
+				const patchSnap = await getDocs(collection(db, 'patchNotes'));
 
-					patchSnap.forEach(note => {
-						const noteData = note.data();
-						noteData.id = note.id;
-						data.push(noteData);
-					});
-				}
+				patchSnap.forEach(note => {
+					const noteData = note.data();
+					noteData.id = note.id;
+					data.push(noteData);
+				});
 
 				const sortedPatchNotes = data.sort((a, b) => {
 					let aDate = a.timestamp.seconds;

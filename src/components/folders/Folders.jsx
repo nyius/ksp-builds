@@ -5,10 +5,10 @@ import AuthContext from '../../context/auth/AuthContext';
 import FoldersContext from '../../context/folders/FoldersContext';
 import { setMakingNewFolder, setFolderView, setDeleteFolderId, setEditingFolderName, setEditingFolder, setOpenedFolder } from '../../context/folders/FoldersActions';
 import { handleShareFolder } from '../../context/folders/FoldersUtilils';
-import Folder from './Folder';
 import { buildNameToUrl } from '../../utilities/buildNameToUrl';
 import Button from '../buttons/Button';
 import useBuilds from '../../context/builds/BuildsActions';
+import Folder from './Folder';
 
 /**
  * Displays a styled list of users folders

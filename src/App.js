@@ -21,8 +21,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
-build folders on personal profile
-	drag and drop your own builds into a folder?
+subscribe modal button fix
+drag and drop your own builds into a folder?
 deleting comment popup to clarify
 when launching the app, it should loop over the localstorage and check all of the stored builds to see their age
 	if theyre older than like a week, they should be removed from storage
@@ -32,6 +32,8 @@ clicking a username inside of a build card should go to the user, not the build
 fix hover effect on builds card at 2k res
 userprofiles should local store just like builds
 builds fetched by ID need to be paginated. break them up into folders and then iterate over them
+twitch sidebar
+discord
 bundle craft together, multiple download buttons per folder
 refactor all functions to be prettier/cleaner - move components into their own files, etc
 make type searching work for your own builds/visiting a users builds
@@ -42,8 +44,6 @@ thumbnails scale down
 competitions/ways to give users accolades
 t-shirts, merch
 Volunteer positions (moderate, write posts, create challenges, etc) - this will include all the features they may need to see/have access to
-twitch sidebar
-discord
 Quick share builds (without needing to create a whole build)
 Mission generation page - would get destroyed by chatGPT charges so maybe in the future
 create backup database on an entirely new firebase instance - updates once a week

@@ -1187,3 +1187,15 @@ export const updateUserState = (dispatchAuth, update) => {
 		payload: update,
 	});
 };
+
+/**
+ * handles setting if the convos are open in the messaging tab, context
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {bool} bool - true or false
+ */
+export const setConvosOpen = (dispatchAuth, bool) => {
+	dispatchAuth({
+		type: 'SET_AUTH',
+		payload: { convosOpen: bool },
+	});
+};

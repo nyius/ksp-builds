@@ -130,6 +130,7 @@ export const AuthProvider = ({ children }) => {
 		deleteConvoId: null,
 		userToBlock: null,
 		newSub: false,
+		convosOpen: false,
 	};
 
 	// Set up the reducer

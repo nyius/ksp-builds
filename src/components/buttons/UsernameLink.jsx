@@ -2,7 +2,7 @@ import React, { useEffect, useContext, useState } from 'react';
 import { BsFillPatchCheckFill } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 import Button from './Button';
-import { setUserToBlock, setReport, useHandleFollowingUser, useFetchConversation } from '../../context/auth/AuthActions';
+import { setUserToBlock, setReport, useHandleFollowingUser, useFetchConversation, setConvosOpen } from '../../context/auth/AuthActions';
 import AuthContext from '../../context/auth/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase.config';
@@ -173,7 +173,19 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 									{/* ------------------------------------------ Buttons ------------------------------------------ */}
 									<div className="flex flex-col flex-wrap gap-2 2k:gap-4 w-full">
 										<div className="flex flex-row items-center flex-wrap gap-4 2k:gap-6 w-full">
-											{user?.username && user?.username !== username && <Button id="userLinkMessage" text="Message" icon="message" color="btn-primary" size="w-fit" onClick={e => fetchConversation({ username, uid })} />}
+											{user?.username && user?.username !== username && (
+												<Button
+													id="userLinkMessage"
+													text="Message"
+													icon="message"
+													color="btn-primary"
+													size="w-fit"
+													onClick={e => {
+														fetchConversation({ username, uid });
+														setConvosOpen(dispatchAuth, true);
+													}}
+												/>
+											)}
 											<Button text="Visit" color="btn-primary" size="w-fit" icon="export" type="ahref" href={`/user/${username}`} />
 											{user?.username && user?.username !== username && (
 												<div className="tooltip" data-tip={`${usersProfile?.followers?.includes(user?.uid) ? 'Unfollow' : 'Follow'}`}>

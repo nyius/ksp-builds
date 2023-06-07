@@ -4,15 +4,14 @@ import AuthContext from '../../context/auth/AuthContext';
 import Button from '../buttons/Button';
 import Conversation from './Conversation';
 import Conversations from './Conversations';
-import { setConvoTab, useSendMessage } from '../../context/auth/AuthActions';
+import { setConvoTab, useSendMessage, setConvosOpen } from '../../context/auth/AuthActions';
 import DeleteConversationModal from '../modals/DeleteConversationModal';
 
 function Messaging() {
 	const [message, setMessage] = useState('');
-	const [convosOpen, setConvosOpen] = useState(false);
 	const { sendMessage } = useSendMessage();
 	const [newMessages, setNewMessages] = useState(0);
-	const { dispatchAuth, authLoading, user, messageTab, conversations } = useContext(AuthContext);
+	const { dispatchAuth, authLoading, user, messageTab, conversations, convosOpen } = useContext(AuthContext);
 	const sendMessageBox = document.getElementById('sendMessageBox');
 
 	/**
@@ -65,7 +64,7 @@ function Messaging() {
 					<div className="fixed bottom-0 right-10 z-100">
 						<div className="indicator">
 							{newMessages !== 0 && <span className="indicator-item badge badge-secondary z-100 text-xl p-4">{newMessages}</span>}
-							<Button onClick={() => setConvosOpen(true)} text={'chat'} icon={'message'} color="bg-base-900 text-white" css="shadow-xl font-bold !text-3xl" />
+							<Button onClick={() => setConvosOpen(dispatchAuth, true)} text={'chat'} icon={'message'} color="bg-base-900 text-white" css="shadow-xl font-bold !text-3xl" />
 						</div>
 					</div>
 
@@ -75,9 +74,9 @@ function Messaging() {
 							<div className="relative w-full h-full flex flex-col">
 								<div className="flex flex-row place-content-between h-10 items-center">
 									{messageTab ? <Button icon="left2" style="btn-circle" color="btn-primary" onClick={() => setConvoTab(dispatchAuth, null)} /> : <div className="text-xl 2k:text-2xl pixel-font">Messages</div>}
-									<Button onClick={() => setConvosOpen(false)} icon="chevron-down" style="btn-circle" color="btn-primary" />
+									<Button onClick={() => setConvosOpen(dispatchAuth, false)} icon="chevron-down" style="btn-circle" color="btn-primary" />
 								</div>
-								<div className="w-full h-120 overflow-auto scrollbar flex-nowrap absolute bottom-0 border-t-2 border-dashed border-slate-500">{messageTab ? <Conversation /> : <Conversations />}</div>
+								<div className="w-full conversation-size overflow-auto scrollbar flex-nowrap absolute bottom-0 border-t-2 border-dashed border-slate-500">{messageTab ? <Conversation /> : <Conversations />}</div>
 							</div>
 						</div>
 					) : null}

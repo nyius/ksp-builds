@@ -37,7 +37,7 @@ function VerticalTypeLink({ text }) {
 			}}
 			id={text}
 		>
-			<div id={text} className="bg-primary w-12 2k:w-20 h-20 2k:h-32 flex items-center justify-center rounded-l-lg 2k:rounded-l-xl">
+			<div id={text} className="bg-primary w-12 2k:w-20 h-20 2k:h-26 flex items-center justify-center rounded-l-lg 2k:rounded-l-xl">
 				{text === 'Interplanetary' && (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<BiPlanet />
@@ -104,14 +104,14 @@ function VerticalTypeLink({ text }) {
 					</span>
 				)}
 			</div>
-			<div id={text} className="relative overflow-hidden h-20 2k:h-32 flex flex-row w-full">
+			<div id={text} className="relative overflow-hidden h-20 2k:h-26 flex flex-row w-full bg-base-400">
 				<div
 					id={text}
-					className={`relative rounded-none rounded-r-lg 2k:rounded-r-xl flex flex-row h-20 2k:h-32 gap-12 lg:gap-6 2k:gap-16 variable-font-size font-light btn btn-block justify-start 2k:h-20 ${
-						typeFilter === text ? 'bg-primary hover:bg-violet-900' : 'bg-base-400'
+					className={`relative rounded-none rounded-r-lg 2k:rounded-r-xl flex flex-row h-20 2k:h-32 hover:bg-violet-700 gap-12 lg:gap-6 2k:gap-16 variable-font-size font-light btn btn-block justify-start 2k:h-20 ${
+						typeFilter === text ? 'bg-primary hover:bg-violet-900' : ' '
 					} text-slate-300`}
 				>
-					<p id={text} className="z-60 font-bold">
+					<p id={text} className="z-60 pixel-font">
 						{text}
 					</p>
 				</div>

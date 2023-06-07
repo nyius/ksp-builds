@@ -14,7 +14,7 @@ import BuildCard from '../../components/cards/BuildCard';
 import useResetStates from '../../utilities/useResetStates';
 //---------------------------------------------------------------------------------------------------//
 import useFilters from '../../context/filters/FiltersActions';
-import useBuilds from '../../context/builds/BuildsActions';
+import useBuilds, { setBuildsLoading, setClearFetchedBuilds } from '../../context/builds/BuildsActions';
 import BuildsContext from '../../context/builds/BuildsContext';
 import FiltersContext from '../../context/filters/FiltersContext';
 import AuthContext from '../../context/auth/AuthContext';
@@ -26,11 +26,11 @@ import AuthContext from '../../context/auth/AuthContext';
 function Favorites() {
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	//---------------------------------------------------------------------------------------------------//
-	const { fetchedBuilds, loadingBuilds } = useContext(BuildsContext);
+	const { dispatchBuilds, fetchedBuilds, loadingBuilds } = useContext(BuildsContext);
 	const { authLoading, user } = useContext(AuthContext);
 	const { sortBy } = useContext(FiltersContext);
 	//---------------------------------------------------------------------------------------------------//
-	const { fetchBuilds, setBuildsLoading, clearFetchedBuilds } = useBuilds();
+	const { fetchBuilds } = useBuilds();
 	const { filterBuilds, resetFilters } = useFilters();
 	const { resetStates } = useResetStates();
 	//---------------------------------------------------------------------------------------------------//
@@ -43,17 +43,17 @@ function Favorites() {
 	}, []);
 
 	useEffect(() => {
-		clearFetchedBuilds();
+		setClearFetchedBuilds(dispatchBuilds);
 
 		if (!authLoading) {
 			if (user?.username) {
 				if (user?.favorites.length > 0) {
 					fetchBuilds(user.favorites);
 				} else {
-					setBuildsLoading(false);
+					setBuildsLoading(dispatchBuilds, false);
 				}
 			} else {
-				setBuildsLoading(false);
+				setBuildsLoading(dispatchBuilds, false);
 			}
 		}
 	}, [authLoading]);

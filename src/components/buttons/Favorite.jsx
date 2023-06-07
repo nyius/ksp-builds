@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import Button from './Button';
 import AuthContext from '../../context/auth/AuthContext';
 import BuildContext from '../../context/build/BuildContext';
-import useAuth from '../../context/auth/AuthActions';
+import { useHandleFavoriting } from '../../context/auth/AuthActions';
 
 /**
  * Handles favoriting a build
@@ -11,7 +11,7 @@ import useAuth from '../../context/auth/AuthActions';
 function Favorite({ id }) {
 	const { authLoading, user } = useContext(AuthContext);
 	const { loadedBuild } = useContext(BuildContext);
-	const { handleFavoriting } = useAuth();
+	const { handleFavoriting } = useHandleFavoriting();
 
 	if (!authLoading) {
 		if (user?.username && user?.favorites) {

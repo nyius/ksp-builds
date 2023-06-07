@@ -1,11 +1,10 @@
 import React, { useContext } from 'react';
 import AuthContext from '../../context/auth/AuthContext';
-import useBuild from '../../context/build/BuildActions';
+import { useDeleteBuild } from '../../context/build/BuildActions';
 
 function DeleteBuildAdmin({ style, id, userID }) {
 	const { user, authLoading } = useContext(AuthContext);
-
-	const { deleteBuild } = useBuild();
+	const { deleteBuild } = useDeleteBuild();
 
 	//---------------------------------------------------------------------------------------------------//
 	if (!authLoading) {

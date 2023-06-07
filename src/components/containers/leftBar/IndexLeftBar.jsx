@@ -51,7 +51,7 @@ function IndexLeftBar({ text }) {
 
 				{/* Version */}
 				<LeftBarTitle text="KSP Version" />
-				<select id="versionsSelect" onChange={setVersionFilter} className="select select-bordered w-full 2k:select-lg 2k:text-2xl mb-6 2k:mb-12">
+				<select id="versionsSelect" onChange={setVersionFilter} className="select select-bordered w-full 2k:select-lg 2k:text-xl mb-6 2k:mb-12">
 					<optgroup>
 						<option value="any">Any</option>
 						{!filtersLoading &&
@@ -67,7 +67,7 @@ function IndexLeftBar({ text }) {
 
 				{/* Mods */}
 				<LeftBarTitle text="Uses Mods" />
-				<select id="modsSelect" onChange={setModsFilter} className="select select-bordered w-full 2k:select-lg 2k:text-2xl mb-6 2k:mb-12">
+				<select id="modsSelect" onChange={setModsFilter} className="select select-bordered w-full 2k:select-lg 2k:text-xl mb-6 2k:mb-12">
 					<optgroup>
 						<option value="any">Any</option>
 						<option value="yes">Yes</option>
@@ -77,7 +77,7 @@ function IndexLeftBar({ text }) {
 
 				{/* Challenges */}
 				<LeftBarTitle text="KSP Challenges" />
-				<select id="challengesSelect" onChange={setChallengeFilter} className="select select-bordered w-full 2k:select-lg 2k:text-2xl mb-6 2k:mb-12">
+				<select id="challengesSelect" onChange={setChallengeFilter} className="select select-bordered w-full 2k:select-lg 2k:text-xl mb-6 2k:mb-12">
 					<optgroup>
 						<option value="any">Any</option>
 						{!articlesLoading &&

@@ -1,6 +1,4 @@
-import { clone, cloneDeep } from 'lodash';
-import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
-import { db, auth } from '../../firebase.config';
+import { cloneDeep } from 'lodash';
 
 const AuthReducer = (state, action) => {
 	switch (action.type) {

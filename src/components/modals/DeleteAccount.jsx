@@ -3,11 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../buttons/Button';
 import PlanetHeader from '../header/PlanetHeader';
 import AuthContext from '../../context/auth/AuthContext';
-import useAuth from '../../context/auth/AuthActions';
+import { deleteUserAccount } from '../../context/auth/AuthUtils';
 
 function DeleteAccount() {
 	const navigate = useNavigate();
-	const { deleteUserAccount } = useAuth();
 	const { authLoading, user, accountToDelete } = useContext(AuthContext);
 
 	/**
@@ -15,7 +14,7 @@ function DeleteAccount() {
 	 * @returns
 	 */
 	const handleDeleteUser = async () => {
-		await deleteUserAccount(accountToDelete);
+		await deleteUserAccount(accountToDelete, user.uid);
 		navigate('/');
 	};
 

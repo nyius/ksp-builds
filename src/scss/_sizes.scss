@@ -130,6 +130,12 @@
 	}
 }
 
+@media (min-width: 1921px) {
+	.left-bar {
+		width: 12%;
+	}
+}
+
 .carousel {
 	width: 100%;
 	aspect-ratio: 16/9;
@@ -148,5 +154,17 @@
 @media (min-width: 1025px) {
 	.banner {
 		height: 30rem;
+	}
+}
+
+@media (min-width: 1921px) {
+	.banner {
+		height: 40rem;
+	}
+}
+
+@media (min-width: 2561px) {
+	.banner {
+		height: 45rem;
 	}
 }

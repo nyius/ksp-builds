@@ -56,16 +56,15 @@ const BuildReducer = (state, action) => {
 		case 'SET_BUILD_OF_THE_WEEK':
 			return {
 				...state,
-				settingBuildOfTheWeek: action.payload,
+				buildOfTheWeek: action.payload,
 			};
 		case 'SET_LOADED_RAW_BUILD':
 			return {
 				...state,
-				loadedBuild: {
-					...state.loadedBuild,
-					build: action.payload,
+				fetchedRawBuilds: {
+					...state.fetchedRawBuilds,
+					[action.payload.id]: action.payload.rawBuild,
 				},
-				loadingRawBuild: false,
 			};
 		default:
 			return state;

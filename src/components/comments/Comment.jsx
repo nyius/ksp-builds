@@ -1,9 +1,10 @@
 import React, { useContext, useState } from 'react';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
-import useBuild from '../../context/build/BuildActions';
+import useBuild, { setReplyingComment, setEditingComment, useComment } from '../../context/build/BuildActions';
+import { updateComment } from '../../context/build/BuildUtils';
 import BuildContext from '../../context/build/BuildContext';
-import useAuth from '../../context/auth/AuthActions';
+import { setReport } from '../../context/auth/AuthActions';
 //---------------------------------------------------------------------------------------------------//
 import { convertFromRaw, EditorState } from 'draft-js';
 import TextEditor from '../textEditor/TextEditor';
@@ -14,17 +15,17 @@ import UsernameLink from '../buttons/UsernameLink';
 
 /**
  * Handles displaying a comment
- * @param {*} comment
+ * @param {obj} comment
  * @returns
  */
 function Comment({ comment }) {
-	const { loadedBuild, editingComment } = useContext(BuildContext);
-	const { user, authLoading, fetchedUserProfile } = useContext(AuthContext);
+	const { dispatchBuild, loadedBuild, editingComment } = useContext(BuildContext);
+	const { dispatchAuth, user, authLoading, fetchedUserProfile } = useContext(AuthContext);
 	//---------------------------------------------------------------------------------------------------//
 	const [editedComment, setEditedComment] = useState('');
 	//---------------------------------------------------------------------------------------------------//
-	const { deleteComment, updateComment, fetchComments, setEditingComment, setReplyingComment } = useBuild();
-	const { setReport } = useAuth();
+	const { fetchComments } = useBuild();
+	const { deleteComment } = useComment();
 
 	const date = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(comment.timestamp.seconds * 1000);
 	const editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(comment.comment)));
@@ -34,9 +35,9 @@ function Comment({ comment }) {
 	 * @param {*} e
 	 */
 	const handleSaveCommentEdit = async e => {
-		await updateComment(editedComment, comment.id);
+		await updateComment(editedComment, comment.id, loadedBuild.id);
 		setEditedComment(false);
-		setEditingComment(false);
+		setEditingComment(dispatchBuild, false);
 		await fetchComments(loadedBuild.id);
 	};
 
@@ -44,7 +45,7 @@ function Comment({ comment }) {
 	 * Handles setting the reported comment
 	 */
 	const handleSetReport = () => {
-		setReport('comment', comment);
+		setReport(dispatchAuth, 'comment', comment);
 	};
 
 	//---------------------------------------------------------------------------------------------------//
@@ -79,7 +80,7 @@ function Comment({ comment }) {
 					{!editingComment && user?.username && (
 						<>
 							{!fetchedUserProfile?.blockList?.includes(user.uid) && (
-								<a href={`#add-comment`} onClick={() => setReplyingComment(comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
+								<a href={`#add-comment`} onClick={() => setReplyingComment(dispatchBuild, comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
 									Reply
 								</a>
 							)}
@@ -93,12 +94,12 @@ function Comment({ comment }) {
 								</p>
 							)}
 							{editingComment && editingComment.id === comment.id && (
-								<p onClick={() => setEditingComment(false)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
+								<p onClick={() => setEditingComment(dispatchBuild, false)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
 									Cancel
 								</p>
 							)}
 							{!editingComment && (
-								<p onClick={() => setEditingComment(comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
+								<p onClick={() => setEditingComment(dispatchBuild, comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
 									Edit
 								</p>
 							)}

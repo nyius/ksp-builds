@@ -1,4 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react';
+import { resetCookieConsentValue } from 'react-cookie-consent';
 import { Helmet } from 'react-helmet';
 import { toast } from 'react-toastify';
 import { TwitterPicker } from 'react-color';
@@ -7,13 +8,14 @@ import MiddleContainer from '../../components/containers/middleContainer/MiddleC
 import useResetStates from '../../utilities/useResetStates';
 import Button from '../../components/buttons/Button';
 import AuthContext from '../../context/auth/AuthContext';
-import useAuth from '../../context/auth/AuthActions';
+import { updateUsernameColor } from '../../context/auth/AuthUtils';
+import { setAccountToDelete, useUpdateProfile } from '../../context/auth/AuthActions';
 
 function Settings() {
 	const [usernameColor, setUsernameColor] = useState(null);
 	const { resetStates } = useResetStates();
-	const { user, authLoading } = useContext(AuthContext);
-	const { setAccountToDelete, updateUserDb, updateUserDbBlockedNotifs, updateUserProfiles, updateUsernameColor } = useAuth();
+	const { user, authLoading, dispatchAuth } = useContext(AuthContext);
+	const { updateUserDb, updateUserProfilesAndDb } = useUpdateProfile();
 
 	useEffect(() => {
 		resetStates();
@@ -67,12 +69,10 @@ function Settings() {
 	 */
 	const handleMessagingChange = e => {
 		if (user.allowPrivateMessaging !== undefined) {
-			updateUserDb({ allowPrivateMessaging: !user.allowPrivateMessaging });
-			updateUserProfiles({ allowPrivateMessaging: !user.allowPrivateMessaging });
+			updateUserProfilesAndDb({ allowPrivateMessaging: !user.allowPrivateMessaging });
 			toast.success('Saved');
 		} else {
-			updateUserDb({ allowPrivateMessaging: false });
-			updateUserProfiles({ allowPrivateMessaging: false });
+			updateUserProfilesAndDb({ allowPrivateMessaging: false });
 			toast.success('Saved');
 		}
 	};
@@ -153,7 +153,7 @@ function Settings() {
 							</div>
 						</div>
 						{user?.subscribed ? (
-							<> {usernameColor && <Button text="Save" icon="save" color="btn-accent" size="w-fit" onClick={() => updateUsernameColor(usernameColor)} />} </>
+							<> {usernameColor && <Button text="Save" icon="save" color="btn-accent" size="w-fit" onClick={() => updateUsernameColor(user.uid, usernameColor)} />} </>
 						) : (
 							<div className="text-2xl 2k:text-3xl">Subscribe to change your username color! </div>
 						)}
@@ -223,9 +223,27 @@ function Settings() {
 								<span className="label-text text-xl 2k:text-2xl">Allow private messages</span>
 							</label>
 						</div>
+
+						{/* ----------------------------------- Messaging ----------------------------------- */}
+						<div className="divider"></div>
+						<div className="flex flex-col gap-2 2k:gap-4">
+							<div className="text-xl 2k:text-3xl text-white font-bold">Cookies</div>
+							<p className="text-xl 2k:text-2xl text-white">Reset your cookie consent choice.</p>
+							<Button
+								text="Reset"
+								color="btn-accent"
+								icon="reset"
+								onClick={() => {
+									resetCookieConsentValue();
+									toast.success('Consent reset! Reload the page to choose again.');
+								}}
+							/>
+						</div>
+
+						{/* ----------------------------------- Delete Account ----------------------------------- */}
 						<div className="divider"></div>
 						<p className="text-xl 2k:text-2xl text-slate-400 italic">Delete Account</p>
-						<Button text="Delete Account" htmlFor="delete-account-modal" onClick={() => setAccountToDelete(user.uid)} size="w-fit" icon="delete" color="btn-error" />
+						<Button text="Delete Account" htmlFor="delete-account-modal" onClick={() => setAccountToDelete(dispatchAuth, user.uid)} size="w-fit" icon="delete" color="btn-error" />
 					</>
 				)}
 			</MiddleContainer>

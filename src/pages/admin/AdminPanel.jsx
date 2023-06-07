@@ -10,10 +10,12 @@ import axios from 'axios';
 import { storage } from '../../firebase.config';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
-import useAuth from '../../context/auth/AuthActions';
+import { sendNotification } from '../../context/auth/AuthUtils';
 //---------------------------------------------------------------------------------------------------//
 import standardNotifications from '../../utilities/standardNotifications';
 import { uploadImages } from '../../utilities/uploadImage';
+import getBuildPartCount from '../../utilities/getBuildPartCount';
+import fetchBuildFromAWS from '../../utilities/fetchBuildFromAws';
 //---------------------------------------------------------------------------------------------------//
 import TextInput from '../../components/input/TextInput';
 import Button from '../../components/buttons/Button';
@@ -25,7 +27,6 @@ import UsernameLink from '../../components/buttons/UsernameLink';
 
 function AdminPanel() {
 	const { user } = useContext(AuthContext);
-	const { sendNotification } = useAuth();
 	//---------------------------------------------------------------------------------------------------//
 	const [uploadingChallengeImage, setUploadingChallengeImage] = useState(false);
 	const [reportRepliedFilter, setReportRepliedFilter] = useState(false);
@@ -255,22 +256,27 @@ function AdminPanel() {
 
 			buildsSnap.forEach(buildDoc => {
 				const buildRef = doc(db, 'builds', buildDoc.id);
-				const build = buildDoc.data();
 
-				const regExSpace = new RegExp(' ', 'g');
-				const regExHash = new RegExp('#', 'g');
-				const regExSlash = new RegExp('/', 'g');
-				const urlName = build.name.replace(regExSpace, '-').replace(regExHash, '%23').replace(regExSlash, '%2F');
-
-				const updateBuild = async () => {
+				const getBuild = async () => {
 					try {
-						await updateDoc(buildRef, { urlName });
+						let parsedBuild = await fetchBuildFromAWS(buildDoc.id);
+						let partCount = getBuildPartCount(parsedBuild);
+
+						const updateBuild = async () => {
+							try {
+								await updateDoc(buildRef, { partCount });
+							} catch (error) {
+								console.log(error);
+							}
+						};
+
+						await updateBuild();
 					} catch (error) {
-						console.log(error);
+						throw new Error(error);
 					}
 				};
 
-				updateBuild();
+				getBuild();
 			});
 
 			toast.success('All Builds updated!');

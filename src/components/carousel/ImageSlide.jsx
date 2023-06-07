@@ -1,22 +1,25 @@
 import React from 'react';
 
-function ImageSlide({ length, image, i }) {
-	const slideNum = (i += 1);
+/**
+ * Displays a slide image.
+ * @param {str} image - image url
+ * @param {i} i - index, used for Key
+ * @returns
+ */
+function ImageSlide({ image, i }) {
+	const imageStyle = {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundSize: 'cover',
+		backgroundRepeat: 'no-repeat',
+		aspectRatio: '16/9',
+	};
+
+	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div id={`slide${slideNum}`} className="carousel-item relative w-full">
-			<img src={image} className="w-full object-contain" />
-			<div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-				{length > 1 && (
-					<>
-						<a href={slideNum === 1 ? `#slide${length}` : `#slide${slideNum - 1}`} className="btn btn-circle 2k:btn-lg 2k:text-4xl bg-base-600 z-100 drop-shadow-lg z-50">
-							❮
-						</a>
-						<a href={slideNum === length ? `#slide1` : `#slide${slideNum + 1}`} className="btn btn-circle 2k:btn-lg 2k:text-4xl bg-base-600 z-100 drop-shadow-lg z-50">
-							❯
-						</a>
-					</>
-				)}
-			</div>
+		<div key={i}>
+			<div className="w-full border-dashed border-2 border-slate-700 rounded-lg bg-base-500" style={{ ...imageStyle, backgroundImage: `url(${image})` }}></div>
 		</div>
 	);
 }

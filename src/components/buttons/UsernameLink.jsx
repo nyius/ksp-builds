@@ -2,7 +2,7 @@ import React, { useEffect, useContext, useState } from 'react';
 import { BsFillPatchCheckFill } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 import Button from './Button';
-import useAuth from '../../context/auth/AuthActions';
+import { setUserToBlock, setReport, useHandleFollowingUser, useFetchConversation } from '../../context/auth/AuthActions';
 import AuthContext from '../../context/auth/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase.config';
@@ -13,9 +13,10 @@ import Tier3Badge from '../../assets/badges/tier3/tier3_badge36.png';
 import Intercept_Logo from '../../assets/ig_logo_192.png';
 
 function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
-	const { user, hoverUser } = useContext(AuthContext);
+	const { user, dispatchAuth } = useContext(AuthContext);
 	const navigate = useNavigate();
-	const { fetchConversation, setReport, setUserToBlock, handleFollowingUser } = useAuth();
+	const { fetchConversation } = useFetchConversation();
+	const { handleFollowingUser } = useHandleFollowingUser();
 	const [hover, setHover] = useState(false);
 	const [usersProfile, setUsersProfile] = useState(null);
 	const [loadingProfile, setLoadingProfile] = useState(true);
@@ -51,14 +52,14 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 	 * Handles setting the reported comment
 	 */
 	const handleSetReport = () => {
-		setReport('user', { uid, username });
+		setReport(dispatchAuth, 'user', { uid, username });
 	};
 
 	/**
 	 * handles setting the user to blocks id for the modal
 	 */
 	const handleSetUserToBlock = () => {
-		setUserToBlock(uid);
+		setUserToBlock(dispatchAuth, uid);
 	};
 
 	useEffect(() => {
@@ -82,10 +83,11 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<div className="dropdown z-100" onMouseEnter={handleHover} onMouseLeave={e => handleBlur(e)} onClick={e => e.stopPropagation()}>
+			<div className="dropdown" onMouseEnter={handleHover} onMouseLeave={e => handleBlur(e)} onClick={e => e.stopPropagation()}>
 				{!loadingProfile && (
 					<>
-						<div id="userlink" className={`text-2xl 2k:text-3xl link link-hover link-accent flex flex-row gap-2 items-center`} onClick={() => navigate(`/profile/${username}`)} style={{ color: `${usersProfile?.customUsernameColor}` }}>
+						{/* Username */}
+						<div id="userlink" className={`text-2xl z-10 2k:text-2xl link link-hover link-accent flex flex-row gap-2 items-center`} onClick={() => navigate(`/user/${username}`)} style={{ color: `${usersProfile?.customUsernameColor}` }}>
 							{username}
 							{username === 'nyius' && <BsFillPatchCheckFill />}
 							{username === 'interceptgames' && (
@@ -110,17 +112,18 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 							)}
 						</div>
 
+						{/* Popup Hover */}
 						{!noHoverUi && hover && (
 							<div
 								className={`absolute z-50 -top-0 -translate-x-1/3 -translate-y-full ${hoverPosition === 'right' && '!-translate-x-0'} ${hoverPosition === 'bottom-right' && '!top-6 !translate-y-0 !-translate-x-0'} ${
 									hoverPosition === 'top-left' && '!-translate-x-3/4'
-								} cursor-auto bg-base-900 p-2 shadow ${color ? color : 'bg-base-100'}  rounded-box w-130 2k:w-160`}
+								} ${hoverPosition === 'bottom' && '!top-6 !translate-y-0 '} cursor-auto bg-base-900 p-2 shadow ${color ? color : 'bg-base-100'}  rounded-box w-130 2k:w-160`}
 							>
 								<div className="flex flex-col p-3 w-full">
 									<div className="flex flex-row gap-3 2k:gap-5 mb-2 items-center">
 										<div className="btn btn-circle w-14 h-14 2k:w-20 2k:h-20 2k:btn-lg avatar">
 											{!loadingProfile && usersProfile && (
-												<div className="w-10 2k:w-20 rounded-full" onClick={() => navigate(`/profile/${username}`)}>
+												<div className="w-10 2k:w-20 rounded-full" onClick={() => navigate(`/user/${username}`)}>
 													<img src={usersProfile.profilePicture} alt="" />
 												</div>
 											)}
@@ -171,7 +174,7 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 									<div className="flex flex-col flex-wrap gap-2 2k:gap-4 w-full">
 										<div className="flex flex-row items-center flex-wrap gap-4 2k:gap-6 w-full">
 											{user?.username && user?.username !== username && <Button id="userLinkMessage" text="Message" icon="message" color="btn-primary" size="w-fit" onClick={e => fetchConversation({ username, uid })} />}
-											<Button text="Visit" color="btn-primary" size="w-fit" icon="export" type="ahref" href={`/profile/${username}`} />
+											<Button text="Visit" color="btn-primary" size="w-fit" icon="export" type="ahref" href={`/user/${username}`} />
 											{user?.username && user?.username !== username && (
 												<div className="tooltip" data-tip={`${usersProfile?.followers?.includes(user?.uid) ? 'Unfollow' : 'Follow'}`}>
 													<Button icon={`${usersProfile?.followers?.includes(user?.uid) ? 'fill-heart' : 'outline-heart'}`} color="btn-primary" onClick={() => handleFollowingUser()} />

@@ -5,17 +5,17 @@ import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { convertFromRaw, EditorState, ContentState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
-
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
-import useAuth from '../../context/auth/AuthActions';
+import { setUserToBlock, setReport, useHandleFollowingUser, useFetchConversation, setAccountToDelete, useFetchUser } from '../../context/auth/AuthActions';
 import BuildsContext from '../../context/builds/BuildsContext';
 import FiltersContext from '../../context/filters/FiltersContext';
 import useFilters from '../../context/filters/FiltersActions';
+import FoldersContext from '../../context/folders/FoldersContext';
 import useBuilds from '../../context/builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
 import Spinner1 from '../../components/spinners/Spinner1';
-import BuildCard from '../../components/cards/BuildCard';
+import { setBuildToAddToFolder, setOpenedFolder } from '../../context/folders/FoldersActions';
 import Sort from '../../components/sort/Sort';
 import CantFind from '../../components/cantFind/CantFind';
 import Button from '../../components/buttons/Button';
@@ -23,27 +23,35 @@ import MiddleContainer from '../../components/containers/middleContainer/MiddleC
 import BotwBadge from '../../assets/BotW_badge2.png';
 import UsernameLink from '../../components/buttons/UsernameLink';
 import BuildInfoCard from '../../components/cards/BuildInfoCard';
+import Builds from '../../components/builds/Builds';
+import Folders from '../../components/folders/Folders';
 //---------------------------------------------------------------------------------------------------//
 import checkIfJson from '../../utilities/checkIfJson';
 
 function VisitProfile() {
 	const usersId = useParams().id;
+	const folderId = useParams().folderId;
 	const navigate = useNavigate();
 	//---------------------------------------------------------------------------------------------------//
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 	const [dateCreated, setDateCreated] = useState(null);
 	const [bioState, setBioState] = useState(null);
 	//---------------------------------------------------------------------------------------------------//
-	const { typeFilter, versionFilter, searchTerm, tagsSearch, modsFilter, challengeFilter, sortBy } = useContext(FiltersContext);
-	const { fetchedBuilds, loadingBuilds, lastFetchedBuild } = useContext(BuildsContext);
-	const { fetchedUserProfile, fetchingProfile, user, authLoading } = useContext(AuthContext);
+	const { sortBy } = useContext(FiltersContext);
+	const { fetchedBuilds } = useContext(BuildsContext);
+	const { dispatchAuth, fetchedUserProfile, fetchingProfile, user, authLoading } = useContext(AuthContext);
+	const { dispatchFolders, openedFolder } = useContext(FoldersContext);
 	//---------------------------------------------------------------------------------------------------//
-	const { fetchUsersProfile, setAccountToDelete, handleFollowingUser, setUserToBlock, fetchConversation, setReport } = useAuth();
-	const { filterBuilds, resetFilters } = useFilters();
-	const { fetchUsersBuilds } = useBuilds();
+	const { fetchUsersProfile } = useFetchUser();
+	const { handleFollowingUser } = useHandleFollowingUser();
+	const { fetchConversation } = useFetchConversation();
+	const { filterBuilds } = useFilters();
+	const { fetchBuildsById } = useBuilds();
 
 	// Fetches the users profile first so we know what builds they have
 	useEffect(() => {
+		setOpenedFolder(dispatchFolders, null);
+		setBuildToAddToFolder(dispatchFolders, null, user);
 		fetchUsersProfile(usersId);
 	}, []);
 
@@ -51,13 +59,30 @@ function VisitProfile() {
 	useEffect(() => {
 		// Check if we found the users profile
 		if (fetchedUserProfile) {
-			fetchUsersBuilds(fetchedUserProfile.builds, fetchedUserProfile.uid);
 			setDateCreated(new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(fetchedUserProfile.dateCreated.seconds * 1000));
-
 			if (checkIfJson(fetchedUserProfile?.bio)) {
 				setBioState(EditorState.createWithContent(convertFromRaw(JSON.parse(fetchedUserProfile?.bio))));
 			} else {
 				setBioState(EditorState.createWithContent(ContentState.createFromText(fetchedUserProfile?.bio)));
+			}
+
+			if (folderId) {
+				const folderToFetchId = fetchedUserProfile.folders?.filter(folder => folder.id === folderId);
+
+				if (folderToFetchId.length > 0) {
+					setOpenedFolder(dispatchFolders, folderToFetchId[0]);
+				} else {
+					const folderToFetchName = fetchedUserProfile.folders?.filter(folder => folder.urlName === folderId);
+
+					if (folderToFetchName.length > 0) {
+						setOpenedFolder(dispatchFolders, folderToFetchName[0]);
+					} else {
+						navigate(`/user/${usersId}`);
+						fetchBuildsById(fetchedUserProfile.builds, fetchedUserProfile.uid, 'user');
+					}
+				}
+			} else {
+				fetchBuildsById(fetchedUserProfile.builds, fetchedUserProfile.uid, 'user');
 			}
 		}
 	}, [fetchedUserProfile]);
@@ -68,20 +93,6 @@ function VisitProfile() {
 
 		setSortedBuilds(filterBuilds(newFetchedBuilds));
 	}, [fetchedBuilds, sortBy]);
-
-	/**
-	 * Handles setting the reported comment
-	 */
-	const handleSetReport = () => {
-		setReport('user', fetchedUserProfile);
-	};
-
-	/**
-	 * handles setting the user to blocks id for the modal
-	 */
-	const handleSetUserToBlock = () => {
-		setUserToBlock(fetchedUserProfile.uid);
-	};
 
 	//---------------------------------------------------------------------------------------------------//
 	if (fetchingProfile) {
@@ -98,7 +109,7 @@ function VisitProfile() {
 					</Helmet>
 
 					<MiddleContainer color="none">
-						{!authLoading && user?.siteAdmin && <Button htmlFor="delete-account-modal" text="Delete Account (admin)" onClick={() => setAccountToDelete(usersId)} />}
+						{!authLoading && user?.siteAdmin && <Button htmlFor="delete-account-modal" text="Delete Account (admin)" onClick={() => setAccountToDelete(dispatchAuth, usersId)} />}
 
 						<div className="flex flex-col relative gap-14 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
 							<div className="flex flex-col gap-14 w-full">
@@ -130,11 +141,18 @@ function VisitProfile() {
 												</div>
 
 												<div className="tooltip" data-tip="Block">
-													<Button htmlFor="block-modal" color="btn-error" size="w-full" icon="cancel" text={user?.blockList?.includes(fetchedUserProfile.uid) ? 'Unblock' : 'Block'} onClick={handleSetUserToBlock} />
+													<Button
+														htmlFor="block-modal"
+														color="btn-error"
+														size="w-full"
+														icon="cancel"
+														text={user?.blockList?.includes(fetchedUserProfile.uid) ? 'Unblock' : 'Block'}
+														onClick={() => setUserToBlock(dispatchAuth, fetchedUserProfile.uid)}
+													/>
 												</div>
 
 												<div className="tooltip" data-tip="Report">
-													<Button htmlFor="report-modal" color="btn-dark" size="w-full" icon="report" text="Report" onClick={handleSetReport} />
+													<Button htmlFor="report-modal" color="btn-dark" size="w-full" icon="report" text="Report" onClick={() => setReport(dispatchAuth, 'user', fetchedUserProfile)} />
 												</div>
 											</>
 										)}
@@ -173,30 +191,16 @@ function VisitProfile() {
 							</div>
 						</div>
 
+						{/* Folders */}
+						<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">{fetchedUserProfile.username}'s Folders</h2>
+						<Folders usersFolders={fetchedUserProfile.folders ? fetchedUserProfile.folders : []} editable={false} />
+
 						{/* Builds */}
-						<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4">{fetchedUserProfile.username}'s Builds</h2>
-						<Sort />
-						<div className="flex flex-row flex-wrap w-full items-stretch justify-center md:justify-items-center mb-6 p-6 md:p-0">
-							{loadingBuilds ? (
-								<div className="flex flex-row w-full justify-center items-center">
-									<div className="w-20">
-										<Spinner1 />
-									</div>
-								</div>
-							) : (
-								<>
-									{fetchedBuilds.length === 0 ? (
-										<CantFind text="This user has no builds yet :(" />
-									) : (
-										<>
-											{sortedBuilds.map((build, i) => {
-												return <BuildCard key={i} i={i} build={build} />;
-											})}
-										</>
-									)}
-								</>
-							)}
+						<div className="flex flex-row flex-wrap gap-4 w-full place-content-between sm:mb-4">
+							<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">{openedFolder ? openedFolder?.folderName : `${fetchedUserProfile.username}'s Builds`}</h2>
+							<Sort />
 						</div>
+						<Builds buildsToDisplay={sortedBuilds} />
 					</MiddleContainer>
 				</>
 			);

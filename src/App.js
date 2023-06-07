@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-
+import CookieConsent from 'react-cookie-consent';
 import ContextsProvider from './context/ContextProvider';
 import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoute';
@@ -16,31 +16,37 @@ import Stars from './components/stars/Stars';
 import LeftBar from './components/containers/leftBar/LeftBar';
 import Modals from './components/modals/Modals';
 import Messaging from './components/Messaging/Messaging';
-import AdBannerTop from './components/ads/AdBannerTop';
 //---------------------------------------------------------------------------------------------------//
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
+build folders on personal profile
+	drag and drop your own builds into a folder?
+deleting comment popup to clarify
+when launching the app, it should loop over the localstorage and check all of the stored builds to see their age
+	if theyre older than like a week, they should be removed from storage
+break apart loading the user in the context so that as soon as we first load the users profile, we set loading to false.
+	create separate loading for notifs, convos, etc
+clicking a username inside of a build card should go to the user, not the build
+fix hover effect on builds card at 2k res
+userprofiles should local store just like builds
+builds fetched by ID need to be paginated. break them up into folders and then iterate over them
 bundle craft together, multiple download buttons per folder
+refactor all functions to be prettier/cleaner - move components into their own files, etc
+make type searching work for your own builds/visiting a users builds
+go through all JSX and remove all instances of && and replace with ?:
+implement react-popper to replace tooltips and username hover
 pagination allowing user to jump right to a page? might result in a large amount of firebase calls
-make the build of the week/banner much prettier
-maybe remove some info from build cards
 thumbnails scale down
 competitions/ways to give users accolades
-allow cookies popup
-quick copy by just hovering over a build on the main tab... this may result in a lot of AWS calls
 t-shirts, merch
 Volunteer positions (moderate, write posts, create challenges, etc) - this will include all the features they may need to see/have access to
-build folders on personal profile
 twitch sidebar
-button closing notifications tab when clicked
+discord
 Quick share builds (without needing to create a whole build)
-features from intercepts end that would help: knowing when new KSP versions are up, a point to ping to for news/challenges
-email verification?
 Mission generation page - would get destroyed by chatGPT charges so maybe in the future
 create backup database on an entirely new firebase instance - updates once a week
-Twitter post weekly best build - not possible through API
  */
 
 //---------------------------------------------------------------------------------------------------//
@@ -54,18 +60,21 @@ function App() {
 					<div className="planet" style={{ backgroundImage: `url("${backgroundplanet}")` }}>
 						{/* Navbar/ notifications */}
 						<Navbar />
+						<CookieConsent flipButtons enableDeclineButton declineButtonText="Decline">
+							This website uses cookies to enhance the user experience.
+						</CookieConsent>
 						<ToastContainer theme="dark" />
 
 						{/* Main layout sizing */}
 						<div className="main-container flex w-full justify-center mb-6 min-h-screen">
 							{/* Content Layout*/}
-							<div className="flex flex-col md:grid md:grid-cols-6 gap-4 xl:gap-20 2k:gap-32 w-full mt-20 xl:mt-32 m-2">
+							<div className="flex flex-col md:grid md:grid-cols-6 2k:grid-cols-8 gap-4 xl:gap-20 2k:gap-32 w-full mt-20 xl:mt-24 2k:mt-32">
 								{/* xl:w-5/6  */}
 								<div className="md:col-start-1 md:col-end-3 lg:col-end-2">
 									<LeftBar />
 								</div>
 								{/* Center Content */}
-								<div className="md:col-start-3 md:col-end-7 lg:col-start-2 xl:col-end-6">
+								<div className="md:col-start-3 md:col-end-7 lg:col-start-2 xl:col-end-6 2k:col-end-8">
 									<ScrollToTop />
 									<Routes>
 										<Route exact path="/" element={<Index />} />
@@ -79,7 +88,8 @@ function App() {
 										<Route exact path="/challenges/:id" element={<Challenge />} />
 										<Route exact path="/challenges" element={<Challenges />} />
 										<Route exact path="/patch-notes" element={<PatchNotes />} />
-										<Route exact path="/profile/:id" element={<VisitProfile />} />
+										<Route exact path="/user/:id" element={<VisitProfile />} />
+										<Route exact path="/user/:id/folder/:folderId" element={<VisitProfile />} />
 										<Route exact path="/build/:id" element={<Build />} />
 										<Route
 											exact

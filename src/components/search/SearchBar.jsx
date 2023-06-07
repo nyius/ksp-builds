@@ -28,7 +28,7 @@ function SearchBar() {
 						ids.push(hit.objectID);
 					});
 
-					fetchBuildsById(ids);
+					fetchBuildsById(ids, null, 'public');
 				});
 			}
 		} catch (error) {
@@ -40,7 +40,7 @@ function SearchBar() {
 	return (
 		<div className="flex flex-row gap-1 items-center">
 			<input onChange={e => setSearchTerm(e.target.value)} onKeyUp={e => handleSearch(e)} type="text" placeholder="Search" className="input input-bordered bg-base-900 hidden sm:block 2k:input-lg 2k:text-2xl" />
-			<div className="btn btn-circle text-xl 2k:text-3xl text-slate-300 bg-base-900" onClick={e => handleSearch(e)}>
+			<div className="btn btn-circle text-xl 2k:text-2xl text-slate-300 bg-base-900" onClick={e => handleSearch(e)}>
 				<RiSearchEyeFill />
 			</div>
 		</div>

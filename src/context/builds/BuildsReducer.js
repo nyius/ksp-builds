@@ -5,6 +5,14 @@ const BuildsReducer = (state, action) => {
 				...state,
 				...action.payload,
 			};
+		case 'SET_ALL_FETCHED_BUILDS':
+			return {
+				...state,
+				allFetchedBuilds: {
+					...state.allFetchedBuilds,
+					[action.payload.id]: action.payload,
+				},
+			};
 		case 'SET_FETCHED_BUILDS_LOADING':
 			return {
 				...state,

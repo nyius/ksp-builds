@@ -12,17 +12,16 @@ import KspImage5 from '../../assets/kspimage-5.jpg';
 import Button from './Button';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
-import BuildsContext from '../../context/builds/BuildsContext';
+import BuildContext from '../../context/build/BuildContext';
+import useBuild, { setUploadingBuild, useUploadBuild } from '../../context/build/BuildActions';
 //---------------------------------------------------------------------------------------------------//
-import ShipBuildTest from '../../utilities/shipBuildTest.json';
 import shipBuildTestMedium from '../../utilities/shipBuildTestMedium.json';
 import { standardBuild } from '../../utilities/standardBuild';
-import useBuild from '../../context/build/BuildActions';
 
 function CreateBuildAdmin() {
 	const { user } = useContext(AuthContext);
-	const { dispatchBuilds } = useContext(BuildsContext);
-	const { uploadBuild, setUploadingBuild } = useBuild();
+	const { dispatchBuild } = useContext(BuildContext);
+	const { uploadBuild } = useUploadBuild();
 	const types = ['Interplanetary', 'Interstellar', 'Satellite', 'Space Station', 'Lander', 'Rover', 'SSTO', 'Spaceplane', 'Probe'];
 	/**
 	 * handles creating a new fully done build
@@ -49,7 +48,7 @@ function CreateBuildAdmin() {
 		build.views = Math.round(Math.random() * 10000);
 
 		await uploadBuild(build);
-		setUploadingBuild(false);
+		setUploadingBuild(dispatchBuild, false);
 	};
 
 	//---------------------------------------------------------------------------------------------------//

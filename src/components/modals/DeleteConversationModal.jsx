@@ -1,13 +1,13 @@
 import React, { useContext } from 'react';
-import useAuth from '../../context/auth/AuthActions';
+import { useDeleteConversation } from '../../context/auth/AuthActions';
 import Button from '../buttons/Button';
-import { useEffect } from 'react';
 import AuthContext from '../../context/auth/AuthContext';
 
 function DeleteConversationModal() {
-	const { deleteConversation } = useAuth();
+	const { deleteConversation } = useDeleteConversation();
 	const { deleteConvoId } = useContext(AuthContext);
 
+	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
 			<input type="checkbox" id="delete-conversation-modal" className="modal-toggle" />

@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { auth } from '../../firebase.config';
 import { toast } from 'react-toastify';
 //---------------------------------------------------------------------------------------------------//
 import AdBannerTop from '../ads/AdBannerTop';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
-import useBuilds from '../../context/builds/BuildsActions';
+import { useChangePage } from '../../context/builds/BuildsActions';
 import useFilters from '../../context/filters/FiltersActions';
 //---------------------------------------------------------------------------------------------------//
 import Logo from '../../assets/logo_light_full.png';
@@ -15,11 +15,11 @@ import LogoIcon from '../../assets/logo_light_icon.png';
 import MobileHamburger from './MobileHamburger';
 import Notifications from './Notifications';
 import Types from '../types/Types';
+
 function NavBar() {
 	const { user, dispatchAuth, authLoading } = useContext(AuthContext);
 	const { resetFilters } = useFilters();
-	const { goToStartPage } = useBuilds();
-	const navigate = useNavigate();
+	const { goToStartPage } = useChangePage();
 
 	/**
 	 * Function to handle signing out

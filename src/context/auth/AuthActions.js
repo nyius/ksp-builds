@@ -4,33 +4,22 @@ import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTi
 import { signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 import { googleProvider } from '../../firebase.config';
 import { auth } from '../../firebase.config';
-import { deleteUser, getAuth } from 'firebase/auth';
-import { cloneDeep, update } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { toast } from 'react-toastify';
-import { compressAccurately } from 'image-conversion';
 import { v4 as uuidv4 } from 'uuid';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from './AuthContext';
 import BuildContext from '../build/BuildContext';
+import { updateWeeklyUpvoted } from './AuthUtils';
 //---------------------------------------------------------------------------------------------------//
 import standardUser from '../../utilities/standardUser';
 import standardNotifications from '../../utilities/standardNotifications';
 import standardUserProfile from '../../utilities/standardUserProfile';
-import { uploadImage } from '../../utilities/uploadImage';
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
 import subscribeToConvo from '../../utilities/subscribeToConvo';
 
 const useAuth = () => {
-	const { dispatchAuth, user, accountToDelete, newUsername, messageTab, reportingContent, reportType, fetchedUserProfile, lastFetchedNotification, newConvo, conversations, userToBlock } = useContext(AuthContext);
-	const { loadedBuild } = useContext(BuildContext);
-
-	/**
-	 * Handles when a user signs up with google and neeeds to enter a username
-	 * @param {*} value
-	 */
-	const setNewSignup = value => {
-		dispatchAuth({ type: 'SET_NEW_SIGNUP', payload: value });
-	};
+	const { dispatchAuth } = useContext(AuthContext);
 
 	/**
 	 * Handles creating a new users account on the DB. Sets up a 'users' doc, a 'usersProfile' doc, and their 'notifications' doc.
@@ -78,7 +67,7 @@ const useAuth = () => {
 
 			notification.id = notifId;
 
-			updateUserState({
+			updateUserState(dispatchAuth, {
 				notifications: [notification],
 			});
 		} catch (error) {
@@ -87,298 +76,87 @@ const useAuth = () => {
 	};
 
 	/**
-	 * Handles updating the users state
-	 * @param {*} update
+	 * handles logging in with Google
 	 */
-	const updateUserState = update => {
-		dispatchAuth({ type: 'UPDATE_USER', payload: update });
-	};
-
-	/**
-	 * Handles updating the user on the DB
-	 * @param {*} update
-	 */
-	const updateUserDb = async update => {
+	const loginWithGoogle = async () => {
 		try {
-			await updateDoc(doc(db, 'users', user.uid), update);
-			dispatchAuth({
-				type: 'UPDATE_USER',
-				payload: { ...update },
+			const userCredential = await signInWithPopup(auth, googleProvider).catch(err => {
+				console.log(err);
+				toast.error('Something went wrong. Please try again');
+				return;
 			});
-		} catch (error) {
-			console.log(error);
-			toast.error('Something went wrong. Please try again');
-		}
-	};
 
-	/**
-	 * handles updating a users public profile
-	 * @param {*} update
-	 */
-	const updateUserProfiles = async update => {
-		try {
-			await updateDoc(doc(db, 'userProfiles', user.uid), update);
-		} catch (error) {
-			console.log(error);
-		}
-	};
+			// Get user information.
+			const uid = userCredential.user.uid;
+			const name = userCredential.user.displayName;
+			const email = userCredential.user.email;
+			const createdAt = serverTimestamp();
 
-	/**
-	 * Handles updating the users profile picture on the server
-	 * @param {*} picture
-	 */
-	const updateUserProfilePicture = async profilePicture => {
-		try {
-			await updateDoc(doc(db, 'users', user.uid), { profilePicture, lastModified: serverTimestamp() });
-			await updateDoc(doc(db, 'userProfiles', user.uid), { profilePicture, lastModified: serverTimestamp() });
+			const userRef = doc(db, 'users', uid);
+			const userSnap = await getDoc(userRef);
 
-			dispatchAuth({
-				type: 'UPDATE_USER',
-				payload: { profilePicture },
-			});
-		} catch (error) {
-			console.log(error);
-			toast.error('Something went wrong. Please try again');
-		}
-	};
-
-	/**
-	 * Handles updating the users bio on the server
-	 * @param {*} bio
-	 */
-	const updateUserDbBio = async bio => {
-		try {
-			await updateDoc(doc(db, 'users', user.uid), { bio, lastModified: serverTimestamp() });
-			await updateDoc(doc(db, 'userProfiles', user.uid), { bio, lastModified: serverTimestamp() });
-
-			toast.success('Bio updated!');
-			dispatchAuth({
-				type: 'UPDATE_USER',
-				payload: { bio },
-			});
-		} catch (error) {
-			console.log(error);
-			toast.error('Something went wrong. Please try again');
-		}
-	};
-
-	/**
-	 * Handles updating the users profile picture on the server
-	 * @param {*} profilePicture
-	 */
-	const updateUserDbProfilePic = async profilePicture => {
-		try {
-			await updateDoc(doc(db, 'users', user.uid), { profilePicture, lastModified: serverTimestamp() });
-			await updateDoc(doc(db, 'userProfiles', user.uid), { profilePicture, lastModified: serverTimestamp() });
-
-			toast.success('Profile Picture updated!');
-			dispatchAuth({
-				type: 'UPDATE_USER',
-				payload: { profilePicture },
-			});
-		} catch (error) {
-			console.log(error);
-			toast.error('Something went wrong. Please try again');
-		}
-	};
-
-	/**
-	 * Handles updating the users voting on the server. Updates the builds vote count and the current users voted
-	 * @param {*} type
-	 * @param {*} build
-	 */
-	const handleVoting = async (type, build) => {
-		try {
-			if (!user?.username) return;
-			let newUpVotes = cloneDeep(user.upVotes);
-			let newDownVotes = cloneDeep(user.downVotes);
-
-			if (type === 'upVote') {
-				// Check if we already upvoted this (and if so, unupvote it)
-				if (newUpVotes.includes(build.id)) {
-					const index = newUpVotes.indexOf(build.id);
-					newUpVotes.splice(index, 1);
-
-					dispatchAuth({ type: 'UPDATE_USER', payload: { upVotes: newUpVotes } });
-
-					updateUserDb({ upVotes: newUpVotes });
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1), lastModified: serverTimestamp() });
-					await updateDoc(doc(db, 'users', build.uid), { rocketReputation: increment(-1) });
-					await updateDoc(doc(db, 'userProfiles', build.uid), { rocketReputation: increment(-1) });
-
-					await updateWeeklyUpvoted(build.id, 'remove');
-				} else {
-					newUpVotes.push(build.id);
-					dispatchAuth({ type: 'UPDATE_USER', payload: { upVotes: newUpVotes } });
-
-					updateUserDb({ upVotes: newUpVotes });
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes += 1), lastModified: serverTimestamp() });
-					await updateDoc(doc(db, 'users', build.uid), { rocketReputation: increment(1) });
-					await updateDoc(doc(db, 'userProfiles', build.uid), { rocketReputation: increment(1) });
-
-					if (build.uid !== user.uid) {
-						await updateWeeklyUpvoted(build.id, 'add');
-					}
-
-					// If the user has this downvoted but wants to upvote it, remove the downvote
-					if (newDownVotes.includes(build.id)) {
-						const index = newDownVotes.indexOf(build.id);
-						newDownVotes.splice(index, 1);
-
-						dispatchAuth({ type: 'UPDATE_USER', payload: { downVotes: newDownVotes } });
-
-						updateUserDb({ downVotes: newDownVotes });
-						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1), lastModified: serverTimestamp() });
-						await updateDoc(doc(db, 'users', build.uid), { rocketReputation: increment(1) });
-						await updateDoc(doc(db, 'userProfiles', build.uid), { rocketReputation: increment(1) });
-					}
-				}
-			}
-			if (type === 'downVote') {
-				// Check if we already downvoted this (and if so, undownvote it)
-				if (newDownVotes.includes(build.id)) {
-					const index = newDownVotes.indexOf(build.id);
-					newDownVotes.splice(index, 1);
-
-					dispatchAuth({ type: 'UPDATE_USER', payload: { downVotes: newDownVotes } });
-
-					updateUserDb({ downVotes: newDownVotes });
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1), lastModified: serverTimestamp() });
-					await updateDoc(doc(db, 'users', build.uid), { rocketReputation: increment(1) });
-					await updateDoc(doc(db, 'userProfiles', build.uid), { rocketReputation: increment(1) });
-				} else {
-					newDownVotes.push(build.id);
-					dispatchAuth({ type: 'UPDATE_USER', payload: { downVotes: newDownVotes } });
-
-					updateUserDb({ downVotes: newDownVotes });
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes += 1), lastModified: serverTimestamp() });
-					await updateDoc(doc(db, 'users', build.uid), { rocketReputation: increment(-1) });
-					await updateDoc(doc(db, 'userProfiles', build.uid), { rocketReputation: increment(-1) });
-
-					await updateWeeklyUpvoted(build.id, 'remove');
-
-					// If the user has this upvoted but wants to downvote it, remove the upvote
-					if (newUpVotes.includes(build.id)) {
-						const index = newUpVotes.indexOf(build.id);
-						newUpVotes.splice(index, 1);
-
-						dispatchAuth({ type: 'UPDATE_USER', payload: { upVotes: newUpVotes } });
-
-						updateUserDb({ upVotes: newUpVotes });
-						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1), lastModified: serverTimestamp() });
-						await updateDoc(doc(db, 'users', build.uid), { rocketReputation: increment(-1) });
-						await updateDoc(doc(db, 'userProfiles', build.uid), { rocketReputation: increment(-1) });
-					}
-				}
-			}
-		} catch (error) {
-			console.log(error);
-			toast.error('Something went wrong D:');
-		}
-	};
-
-	/**
-	 * handles adding or removing the users id from the ships upvotes
-	 * @param {*} id build id
-	 * @param {*} type 'add' or 'remove'
-	 */
-	const updateWeeklyUpvoted = async (id, type) => {
-		try {
-			// Change the weekly upvoted amount for this build
-			const weeklyUpvotedData = await getDoc(doc(db, 'kspInfo', 'weeklyUpvoted'));
-			const weeklyUpvoted = weeklyUpvotedData.data();
-
-			if (type === 'add') {
-				if (weeklyUpvotedData.exists()) {
-					if (weeklyUpvoted[id]) {
-						weeklyUpvoted[id].push(user.uid);
-					} else {
-						weeklyUpvoted[id] = [user.uid];
-					}
-					await updateDoc(doc(db, 'kspInfo', 'weeklyUpvoted'), weeklyUpvoted);
-				} else {
-					await setDoc(doc(db, 'kspInfo', 'weeklyUpvoted'), { [id]: [user.uid] });
-				}
-			} else if (type === 'remove') {
-				if (weeklyUpvotedData.exists()) {
-					if (weeklyUpvoted[id]) {
-						if (weeklyUpvoted[id].includes(user.uid)) {
-							const index = weeklyUpvoted[id].indexOf(user.uid);
-							weeklyUpvoted[id].splice(index, 1);
-							await updateDoc(doc(db, 'kspInfo', 'weeklyUpvoted'), weeklyUpvoted);
-						}
-					}
-				}
-			}
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	/**
-	 * Handles a user favoriting a buildprofile
-	 * @param {*} id
-	 */
-	const handleFavoriting = async id => {
-		try {
-			let newFavorites = cloneDeep(user.favorites);
-
-			// Check if we already upvoted this (and if so, unupvote it)
-			if (newFavorites.includes(id)) {
-				const index = newFavorites.indexOf(id);
-				newFavorites.splice(index, 1);
-
-				dispatchAuth({ type: 'UPDATE_USER', payload: { favorites: newFavorites } });
-
-				updateUserDb({ favorites: newFavorites });
+			// Check if the user exists
+			if (userSnap.exists()) {
+				return 'success';
 			} else {
-				newFavorites.push(id);
-				dispatchAuth({ type: 'UPDATE_USER', payload: { favorites: newFavorites } });
-
-				updateUserDb({ favorites: newFavorites });
+				setNewSignup(dispatchAuth, true);
+				createNewUserAccount(name, email, uid, createdAt);
 			}
 		} catch (error) {
 			console.log(error);
+			toast.error('Something went wrong. Please try again');
 		}
 	};
 
 	/**
-	 * Handles adding a new build to the current users state. takes in a build id
-	 * @param {*} buildId
+	 * Handles creating a new email account
+	 * @param {obj} newUser - takes in the formdata for a new user
 	 */
-	const addbuildToUser = buildId => {
-		dispatchAuth({ type: 'ADD_BUILD', payload: buildId });
+	const newEmailAccount = async newUser => {
+		try {
+			const userCredential = await createUserWithEmailAndPassword(auth, newUser.email, newUser.password).catch(err => {
+				if (err.code.includes('already-in-use')) {
+					toast.error('Account already exists!');
+					throw new Error('exists');
+				}
+				return;
+			});
+
+			const email = userCredential.user.email;
+			const uid = userCredential.user.uid;
+			const name = '';
+			const createdAt = serverTimestamp();
+
+			setNewSignup(dispatchAuth, true);
+			createNewUserAccount(name, email, uid, createdAt);
+		} catch (error) {
+			console.log(error);
+			return error;
+		}
 	};
 
-	/**
-	 * Handles setting if the user is editing their profile
-	 * @param {*} editing
-	 */
-	const setEditingProfile = editing => {
-		dispatchAuth({
-			type: 'SET_EDITING_PROFILE',
-			payload: editing,
-		});
+	return {
+		createNewUserAccount,
+		loginWithGoogle,
+		newEmailAccount,
 	};
+};
 
-	/**
-	 * Updates the context if we are fetching a users profile
-	 * @param {*} bool
-	 */
-	const setFetchingProfile = bool => {
-		dispatchAuth({
-			type: 'SET_FETCHING_PROFILE',
-			payload: bool,
-		});
-	};
+export default useAuth;
 
+/**
+ * Hook with functions for fetching profiles
+ * @returns
+ */
+export const useFetchUser = () => {
+	const { dispatchAuth } = useContext(AuthContext);
 	/**
 	 * Handles fetching a profile from the userProfiles DB.
-	 * @param {*} id
+	 * @param {string} id - the id of the user to fetch
 	 */
 	const fetchUsersProfile = async id => {
 		try {
-			setFetchingProfile(true);
+			setFetchingProfile(dispatchAuth, true);
 
 			const fetchedProfile = await getDoc(doc(db, 'userProfiles', id));
 
@@ -390,7 +168,7 @@ const useAuth = () => {
 					payload: profile,
 				});
 
-				setFetchingProfile(false);
+				setFetchingProfile(dispatchAuth, false);
 			} else {
 				// Check if we can find it by username
 				const userCol = collection(db, 'userProfiles');
@@ -404,22 +182,6 @@ const useAuth = () => {
 					profiles.push(userProfile);
 				});
 
-				// if (!fetchedProfiles.empty) {
-				// 	fetchedProfiles.forEach(profile => {
-				// 		let userProfile = profile.data();
-				// 		userProfile.uid = profile.id;
-				// 		profiles.push(userProfile);
-				// 	});
-				// } else {
-				// 	const fetchedProfiles = await getDocs(q);
-
-				// 	fetchedProfiles.forEach(profile => {
-				// 		let userProfile = profile.data();
-				// 		userProfile.uid = profile.id;
-				// 		profiles.push(userProfile);
-				// 	});
-				// }
-
 				if (profiles.length > 0) {
 					const profile = profiles[0];
 
@@ -428,9 +190,9 @@ const useAuth = () => {
 						payload: profile,
 					});
 
-					setFetchingProfile(false);
+					setFetchingProfile(dispatchAuth, false);
 				} else {
-					setFetchingProfile(false);
+					setFetchingProfile(dispatchAuth, false);
 					throw new Error(`Couldn't find profile!`);
 				}
 			}
@@ -441,7 +203,7 @@ const useAuth = () => {
 
 	/**
 	 * handles fetching the profile from the server if for some reason fetching from the cache fails
-	 * @param {*} id
+	 * @param {string} id - id of the user to fetch
 	 */
 	const fetchUsersProfileServer = async id => {
 		try {
@@ -455,7 +217,7 @@ const useAuth = () => {
 					payload: profile,
 				});
 
-				setFetchingProfile(false);
+				setFetchingProfile(dispatchAuth, false);
 			} else {
 				// Check if we can find it by username
 				const userCol = collection(db, 'userProfiles');
@@ -477,9 +239,9 @@ const useAuth = () => {
 						payload: profile,
 					});
 
-					setFetchingProfile(false);
+					setFetchingProfile(dispatchAuth, false);
 				} else {
-					setFetchingProfile(false);
+					setFetchingProfile(dispatchAuth, false);
 					throw new Error(`Couldn't find profile!`);
 				}
 			}
@@ -526,97 +288,194 @@ const useAuth = () => {
 		}
 	};
 
-	/**
-	 * Handles uploading a profile picture. Adds the URL to a state when its down
-	 * @param {*} e
-	 * @param {*} setState
-	 * @returns
-	 */
-	const uploadProfilePicture = async (e, setUploadingState) => {
-		let convertProfilePic;
-
-		// Shrink the file size
-		if (e.target.files) {
-			convertProfilePic = await compressAccurately(e.target.files[0], 200);
-		}
-
-		return new Promise((resolve, reject) => {
-			// make sure we have a file uploaded
-			if (e.target.files) {
-				const profilePicture = e.target.files[0];
-
-				if (profilePicture.size > 2097152) {
-					toast.error('Image is too big! Must be smaller than 2mb');
-					e.target.value = null;
-					return;
-				}
-
-				uploadImage(convertProfilePic, setUploadingState, user.uid).then(url => {
-					console.log(url);
-					resolve(url);
-				});
-			}
-		});
-	};
+	return { fetchUsersProfile };
+};
+/**
+ * Hook with functions to handle voting on builds
+ * @returns
+ */
+export const useHandleVoting = () => {
+	const { user } = useContext(AuthContext);
+	const { updateUserDb, updateUserProfilesAndDb } = useUpdateProfile();
 
 	/**
-	 * Handles a user requesting to reset their password. Shows the reset password modal
-	 * @param {*} bool
+	 * Handles updating the users voting on the server. Updates the builds vote count and the current users voted
+	 * @param {string} type - the type of vote. 'upVote' or 'downVote'
+	 * @param {obj} build - the build to vote on
 	 */
-	const setResetPassword = bool => {
-		dispatchAuth({
-			type: 'SET_RESET_PASSWORD',
-			payload: bool,
-		});
-	};
-
-	/**
-	 * Handles setting notifications as 'read' on the DB and in the state
-	 */
-	const setNotificationsRead = async () => {
+	const handleVoting = async (type, build) => {
 		try {
-			let newNotifs = [];
+			if (!user?.username) return;
+			let newUpVotes = cloneDeep(user.upVotes);
+			let newDownVotes = cloneDeep(user.downVotes);
 
-			await user.notifications.map(notif => {
-				if (!notif.read) {
-					const updateNotif = async () => {
-						notif.read = true;
-						newNotifs.push(notif);
-						await updateDoc(doc(db, 'users', user.uid, 'notifications', notif.id), notif).catch(err => console.log(err));
-					};
+			if (type === 'upVote') {
+				// Check if we already upvoted this (and if so, unupvote it)
+				if (newUpVotes.includes(build.id)) {
+					const index = newUpVotes.indexOf(build.id);
+					newUpVotes.splice(index, 1);
 
-					updateNotif();
+					await updateUserDb({ upVotes: newUpVotes });
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1), lastModified: serverTimestamp() });
+					await updateUserProfilesAndDb({ rocketReputation: increment(-1) }, build.uid);
+					await updateWeeklyUpvoted(build.id, 'remove', user.uid);
 				} else {
-					newNotifs.push(notif);
-				}
-			});
+					newUpVotes.push(build.id);
 
+					await updateUserDb({ upVotes: newUpVotes });
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes += 1), lastModified: serverTimestamp() });
+					await updateUserProfilesAndDb({ rocketReputation: increment(1) }, build.uid);
+
+					if (build.uid !== user.uid) {
+						await updateWeeklyUpvoted(build.id, 'add', user.uid);
+					}
+
+					// If the user has this downvoted but wants to upvote it, remove the downvote
+					if (newDownVotes.includes(build.id)) {
+						const index = newDownVotes.indexOf(build.id);
+						newDownVotes.splice(index, 1);
+
+						await updateUserDb({ downVotes: newDownVotes });
+						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1), lastModified: serverTimestamp() });
+						await updateUserProfilesAndDb({ rocketReputation: increment(1) }, build.uid);
+					}
+				}
+			}
+			if (type === 'downVote') {
+				// Check if we already downvoted this (and if so, undownvote it)
+				if (newDownVotes.includes(build.id)) {
+					const index = newDownVotes.indexOf(build.id);
+					newDownVotes.splice(index, 1);
+
+					await updateUserDb({ downVotes: newDownVotes });
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1), lastModified: serverTimestamp() });
+					await updateUserProfilesAndDb({ rocketReputation: increment(1) }, build.uid);
+				} else {
+					newDownVotes.push(build.id);
+
+					await updateUserDb({ downVotes: newDownVotes });
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes += 1), lastModified: serverTimestamp() });
+					await updateUserProfilesAndDb({ rocketReputation: increment(-1) }, build.uid);
+					await updateWeeklyUpvoted(build.id, 'remove', user.uid);
+
+					// If the user has this upvoted but wants to downvote it, remove the upvote
+					if (newUpVotes.includes(build.id)) {
+						const index = newUpVotes.indexOf(build.id);
+						newUpVotes.splice(index, 1);
+
+						await updateUserDb({ upVotes: newUpVotes });
+						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1), lastModified: serverTimestamp() });
+						await updateUserProfilesAndDb({ rocketReputation: increment(-1) }, build.uid);
+						await updateUserProfilesAndDb({ rocketReputation: increment(-1) }, build.uid);
+					}
+				}
+			}
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong D:');
+		}
+	};
+
+	return { handleVoting };
+};
+/**
+ * Hook with functions for updating a users profile
+ * @returns
+ */
+export const useUpdateProfile = () => {
+	const { user, dispatchAuth } = useContext(AuthContext);
+	/**
+	 * Handles updating the users profile picture on the server and context
+	 * @param {*} profilePicture
+	 */
+	const updateUserProfilePic = async profilePicture => {
+		try {
+			updateUserProfilesAndDb({ profilePicture, lastModified: serverTimestamp() });
+
+			toast.success('Profile Picture updated!');
 			dispatchAuth({
 				type: 'UPDATE_USER',
-				payload: { notifications: newNotifs },
+				payload: { profilePicture },
 			});
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong. Please try again');
+		}
+	};
+
+	/**
+	 * Handles updating the users bio on the server and context
+	 * @param {string} bio - the new bio to set
+	 */
+	const updateUserBio = async bio => {
+		try {
+			updateUserProfilesAndDb({ bio, lastModified: serverTimestamp() });
+
+			toast.success('Bio updated!');
+			dispatchAuth({
+				type: 'UPDATE_USER',
+				payload: { bio },
+			});
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong. Please try again');
+		}
+	};
+
+	/**
+	 * Handles updating the user on the DB. Also updates state
+	 * @param {obj} update - The object with updates
+	 * @param {string} userUid - The uid of the user to update. If null, uses logged in user
+	 */
+	const updateUserDb = async (update, userUid) => {
+		try {
+			await updateDoc(doc(db, 'users', userUid ? userUid : user.uid), update);
+			dispatchAuth({
+				type: 'UPDATE_USER',
+				payload: { ...update },
+			});
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong. Please try again');
+		}
+	};
+
+	/**
+	 * handles updating a users public profile
+	 * @param {obj} update - the object with updates
+	 * @param {string} userUid - The uid of the user to update. If null, uses logged in user
+	 */
+	const updateUserProfiles = async (update, userUid) => {
+		try {
+			await updateDoc(doc(db, 'userProfiles', userUid ? userUid : user.uid), update);
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
 	/**
-	 * handles deleting a notification
-	 * @param {*} i - index position
-	 * @param {*} id -id
+	 * Handles updating a users DB and userProfile at the same time.
+	 * Also Updates the user state
+	 * @param {obj} update - Takes in the update
+	 * @param {string} userUid - The uid of the user to update. If null, uses logged in user
 	 */
-	const handleDeleteNotification = async (index, id) => {
+	const updateUserProfilesAndDb = async (update, userUid) => {
 		try {
-			let newNotifs = cloneDeep(user.notifications);
-			newNotifs.splice(index, 1);
-
-			await deleteDoc(doc(db, 'users', user.uid, 'notifications', id)).catch(err => console.log(err));
-			dispatchAuth({ type: 'UPDATE_USER', payload: { notifications: newNotifs } });
+			await updateUserDb(update, userUid ? userUid : user.uid);
+			await updateUserProfiles(update, userUid ? userUid : user.uid);
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
+	return { updateUserProfilePic, updateUserBio, updateUserDb, updateUserProfilesAndDb };
+};
+
+/**
+ * Hook with functions for notifications
+ */
+export const useHandleNotifications = () => {
+	const { user, dispatchAuth, lastFetchedNotification } = useContext(AuthContext);
 	/**
 	 * Handles deleting all of a users notifications
 	 * @returns
@@ -629,10 +488,27 @@ const useAuth = () => {
 				};
 				deleteNotif();
 			});
-			dispatchAuth({ type: 'UPDATE_USER', payload: { notifications: [] } });
+			setNotifications(dispatchAuth, []);
 		} catch (error) {
 			console.log(error);
 			return;
+		}
+	};
+
+	/**
+	 * handles deleting a notification
+	 * @param {int} index - index position
+	 * @param {string} id - notification of the id to delete
+	 */
+	const handleDeleteNotification = async (index, id) => {
+		try {
+			let newNotifs = cloneDeep(user.notifications);
+			newNotifs.splice(index, 1);
+
+			await deleteDoc(doc(db, 'users', user.uid, 'notifications', id)).catch(err => console.log(err));
+			setNotifications(dispatchAuth, newNotifs);
+		} catch (error) {
+			console.log(error);
 		}
 	};
 
@@ -656,25 +532,7 @@ const useAuth = () => {
 				notifs.push(notif);
 			});
 
-			// if (!notifsSnap.empty) {
-			// 	notifsSnap.forEach(doc => {
-			// 		const notif = doc.data();
-			// 		notifs.push(notif);
-			// 	});
-			// } else {
-			// 	const notifsSnap = await getDocs(q);
-
-			// 	notifsSnap.forEach(doc => {
-			// 		const notif = doc.data();
-			// 		notifs.push(notif);
-			// 	});
-			// }
-
-			dispatchAuth({
-				type: 'UPDATE_USER',
-				payload: { notifications: [...user.notifications, ...notifs] },
-			});
-
+			setNotifications(dispatchAuth, [...user.notifications, ...notifs]);
 			dispatchAuth({
 				type: 'SET_AUTH',
 				payload: { lastFetchedNotification: notifsSnap.docs.length < process.env.REACT_APP_NOTIFS_FETCH_NUM ? 'end' : notifsSnap.docs[notifsSnap.docs.length - 1], notificationsLoading: false },
@@ -685,49 +543,44 @@ const useAuth = () => {
 	};
 
 	/**
-	 * handles deleting a user
-	 * @param {*} id
+	 * Handles setting notifications as 'read' on the DB and in the state
 	 */
-	const deleteUserAccount = async uid => {
+	const setNotificationsRead = async () => {
 		try {
-			// Delete the notifications
-			const notifQuery = query(collection(db, 'users', uid, 'notifications'));
-			const notifQuerySnapshot = await getDocs(notifQuery);
-			notifQuerySnapshot.forEach(notif => {
-				deleteDoc(doc(db, 'users', uid, 'notifications', notif.id));
+			let newNotifs = [];
+
+			await user.notifications.map(notif => {
+				if (!notif.read) {
+					const updateNotif = async () => {
+						notif.read = true;
+						newNotifs.push(notif);
+						await updateDoc(doc(db, 'users', user.uid, 'notifications', notif.id), notif).catch(err => console.log(err));
+					};
+
+					updateNotif();
+				} else {
+					newNotifs.push(notif);
+				}
 			});
 
-			const userRef = await getDoc(doc(db, 'users', uid));
-			const userData = userRef.data();
-
-			// Delete the users username
-			await deleteDoc(doc(db, 'usernames', userData.username));
-			// Delete the users profile
-			await deleteDoc(doc(db, 'userProfiles', uid));
-			// Delete the user
-			await deleteDoc(doc(db, 'users', uid));
-
-			const userAuth = getAuth();
-
-			if (accountToDelete === user.uid) {
-				await deleteUser(accountToDelete);
-			} else {
-				await setDoc(doc(db, 'BlockList', accountToDelete), { timestamp: serverTimestamp() });
-			}
-
-			const statsData = await getDoc(doc(db, 'adminPanel', 'stats'));
-			const stats = statsData.data();
-			await updateDoc(doc(db, 'adminPanel', 'stats'), { users: (stats.users -= 1) });
-
-			toast.success('Account Deleted.');
+			setNotifications(dispatchAuth, newNotifs);
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
+	return { handleDeleteAllNotifications, handleDeleteNotification, fetchMoreNotifications, setNotificationsRead };
+};
+
+/**
+ * Hook with functions for deleting a conversation
+ * @returns
+ */
+export const useDeleteConversation = () => {
+	const { user, dispatchAuth, conversations } = useContext(AuthContext);
 	/**
 	 * Handles removing a conversation from a user. Doesn't delete the actual conversation
-	 * @param {*} id
+	 * @param {string} id - id of the convo to delete
 	 */
 	const deleteConversation = async id => {
 		try {
@@ -750,144 +603,15 @@ const useAuth = () => {
 		}
 	};
 
-	/**
-	 * Handles setting the id for the convo to delete
-	 * @param {*} id
-	 */
-	const handleDeleteConversationId = id => {
-		dispatchAuth({
-			type: 'SET_DELETE_CONVO_ID',
-			payload: id,
-		});
-	};
-
-	/**
-	 * handles logging in with Google
-	 */
-	const loginWithGoogle = async () => {
-		try {
-			const userCredential = await signInWithPopup(auth, googleProvider).catch(err => {
-				console.log(err);
-				toast.error('Something went wrong. Please try again');
-				return;
-			});
-
-			// Get user information.
-			const uid = userCredential.user.uid;
-			const name = userCredential.user.displayName;
-			const email = userCredential.user.email;
-			const createdAt = serverTimestamp();
-
-			const userRef = doc(db, 'users', uid);
-			const userSnap = await getDoc(userRef);
-
-			// Check if the user exists
-			if (userSnap.exists()) {
-				return 'success';
-			} else {
-				setNewSignup(true);
-				createNewUserAccount(name, email, uid, createdAt);
-			}
-		} catch (error) {
-			console.log(error);
-			toast.error('Something went wrong. Please try again');
-		}
-	};
-
-	/**
-	 * Handles creating a new email account
-	 * @param {*} newUser - takes in the formdata for a new user
-	 */
-	const newEmailAccount = async newUser => {
-		try {
-			const userCredential = await createUserWithEmailAndPassword(auth, newUser.email, newUser.password).catch(err => {
-				if (err.code.includes('already-in-use')) {
-					toast.error('Account already exists!');
-					throw new Error('exists');
-				}
-				return;
-			});
-
-			const email = userCredential.user.email;
-			const uid = userCredential.user.uid;
-			const name = '';
-			const createdAt = serverTimestamp();
-
-			setNewSignup(true);
-			createNewUserAccount(name, email, uid, createdAt);
-		} catch (error) {
-			console.log(error);
-			return error;
-		}
-	};
-
-	/**
-	 * Sets the id of the account to delete
-	 * @param {*} id
-	 */
-	const setAccountToDelete = id => {
-		dispatchAuth({
-			type: 'SET_ACCOUNT_TO_DELETE',
-			payload: id,
-		});
-	};
-
-	/**
-	 * handles sending a user a notification
-	 * @param {*} uid
-	 * @param {*} notification
-	 */
-	const sendNotification = async (uid, notification) => {
-		try {
-			const userRef = collection(db, 'users', uid, 'notifications');
-			await addDoc(userRef, notification);
-		} catch (error) {
-			console.log(error);
-			return;
-		}
-	};
-
-	/**
-	 * Handles following a users
-	 * @param {*} uid
-	 * @returns
-	 */
-	const handleFollowingUser = async () => {
-		try {
-			let newFollowers = fetchedUserProfile.followers ? cloneDeep(fetchedUserProfile.followers) : [];
-
-			// Check if we are already following this (and if so, unupvote it)
-			if (newFollowers.includes(user.uid)) {
-				const index = newFollowers.indexOf(user.uid);
-				newFollowers.splice(index, 1);
-
-				dispatchAuth({ type: 'UPDATE_FETCHED_USERS_PROFILE', payload: { followers: newFollowers } });
-
-				await updateDoc(doc(db, 'userProfiles', fetchedUserProfile.uid), { followers: newFollowers, lastModified: serverTimestamp() });
-			} else {
-				newFollowers.push(user.uid);
-				dispatchAuth({ type: 'UPDATE_FETCHED_USERS_PROFILE', payload: { followers: newFollowers } });
-
-				await updateDoc(doc(db, 'userProfiles', fetchedUserProfile.uid), { followers: newFollowers, lastModified: serverTimestamp() });
-			}
-		} catch (error) {
-			console.log(error);
-			return;
-		}
-	};
-
-	/**
-	 * Handles setting a report
-	 */
-	const setReport = (type, content) => {
-		dispatchAuth({
-			type: 'SET_REPORT',
-			payload: {
-				reportingContent: content,
-				reportType: type,
-			},
-		});
-	};
+	return { deleteConversation };
+};
+/**
+ * Hook with functions to handle submitting a report
+ * @returns
+ */
+export const useSubmitReport = () => {
+	const { user, reportType, reportingContent } = useContext(AuthContext);
+	const { loadedBuild } = useContext(BuildContext);
 
 	/**
 	 * Handles submitting a report. Takes in an optional message
@@ -958,11 +682,18 @@ const useAuth = () => {
 		}
 	};
 
+	return { submitReport };
+};
+
+/**
+ * Hook with functions for sending a user a message
+ * @returns
+ */
+export const useSendMessage = () => {
+	const { user, dispatchAuth, messageTab } = useContext(AuthContext);
 	/**
 	 * Handles sending a message to a user
-	 * @param {*} id
-	 * @param {*} uid
-	 * @param {*} message
+	 * @param {string} message - the message to send
 	 */
 	const sendMessage = async message => {
 		try {
@@ -1001,10 +732,7 @@ const useAuth = () => {
 					await subscribeToConvo(messageTab.id, dispatchAuth);
 
 					await setDoc(doc(db, 'users', user.uid, 'messages', messageTab.id), { id: messageTab.id, newMessage: false, lastMessage: serverTimestamp() });
-					dispatchAuth({
-						type: 'SET_MESSAGE_TAB',
-						payload: convoData,
-					});
+					setConvoTab(dispatchAuth, convoData);
 				}
 
 				// Check if the other user has this conversation or not
@@ -1046,10 +774,7 @@ const useAuth = () => {
 
 				conversation.messaages = [messageToSend];
 
-				dispatchAuth({
-					type: 'SET_MESSAGE_TAB',
-					payload: conversation,
-				});
+				setConvoTab(dispatchAuth, conversation);
 			}
 		} catch (error) {
 			toast.error('Something went wrong. Please try again');
@@ -1057,9 +782,18 @@ const useAuth = () => {
 		}
 	};
 
+	return { sendMessage };
+};
+/**
+ * Hook for fetching a conversation
+ * @returns
+ */
+export const useFetchConversation = () => {
+	const { conversations, user, dispatchAuth } = useContext(AuthContext);
+
 	/**
 	 * Handles checking if we have a conversation with this user, or if its a new one
-	 * @param {*} userProfile
+	 * @param {obj} userProfile - the user we want to fetch conversation
 	 * @returns
 	 */
 	const fetchConversation = userProfile => {
@@ -1073,7 +807,7 @@ const useAuth = () => {
 			});
 
 			if (foundConvo) {
-				setMessageTab(foundConvo);
+				setConvoTab(dispatchAuth, foundConvo);
 				conversationBox.classList.add('dropdown-open');
 				messageBox.focus();
 			} else {
@@ -1139,11 +873,11 @@ const useAuth = () => {
 							type: 'NEW_CONVO',
 							payload: foundConvo,
 						});
-						setMessageTab(foundConvo);
+						setConvoTab(dispatchAuth, foundConvo);
 						messageBox.focus();
 						conversationBox.classList.add('dropdown-open');
 					} else {
-						setMessageTab({
+						setConvoTab(dispatchAuth, {
 							users: [user.uid, userProfile.uid],
 							lastMessage: null,
 							messages: [],
@@ -1161,62 +895,90 @@ const useAuth = () => {
 		}
 	};
 
+	return { fetchConversation };
+};
+
+/**
+ * Hook with functions to handle following a user
+ * @returns
+ */
+export const useHandleFollowingUser = () => {
+	const { dispatchAuth, fetchedUserProfile, user } = useContext(AuthContext);
 	/**
-	 * Handles setting the current covnersation message
-	 * @param {*} convo
+	 * Handles following a users
+	 * @param {*} uid
+	 * @returns
 	 */
-	const setMessageTab = convo => {
-		dispatchAuth({
-			type: 'SET_MESSAGE_TAB',
-			payload: {
-				messageTab: convo,
-			},
-		});
+	const handleFollowingUser = async () => {
+		try {
+			let newFollowers = fetchedUserProfile.followers ? cloneDeep(fetchedUserProfile.followers) : [];
+
+			// Check if we are already following this (and if so, unupvote it)
+			if (newFollowers.includes(user.uid)) {
+				const index = newFollowers.indexOf(user.uid);
+				newFollowers.splice(index, 1);
+
+				dispatchAuth({ type: 'UPDATE_FETCHED_USERS_PROFILE', payload: { followers: newFollowers } });
+
+				await updateDoc(doc(db, 'userProfiles', fetchedUserProfile.uid), { followers: newFollowers, lastModified: serverTimestamp() });
+			} else {
+				newFollowers.push(user.uid);
+				dispatchAuth({ type: 'UPDATE_FETCHED_USERS_PROFILE', payload: { followers: newFollowers } });
+
+				await updateDoc(doc(db, 'userProfiles', fetchedUserProfile.uid), { followers: newFollowers, lastModified: serverTimestamp() });
+			}
+		} catch (error) {
+			console.log(error);
+			return;
+		}
 	};
 
+	return { handleFollowingUser };
+};
+
+/**
+ * Hook with functions to handle favoriting a build
+ * @returns
+ */
+export const useHandleFavoriting = () => {
+	const { user, dispatchAuth } = useContext(AuthContext);
+	const { updateUserDb } = useUpdateProfile();
+
 	/**
-	 * Handles when a user has 'read' a new message
+	 * Handles a user favoriting a build
+	 * @param {string} buildId - id of the build to favorite
 	 */
-	const readMessage = async convo => {
+	const handleFavoriting = async buildId => {
 		try {
-			await updateDoc(doc(db, 'users', user.uid, 'messages', convo.id), { newMessage: false });
+			let newFavorites = cloneDeep(user.favorites);
+
+			// Check if we already upvoted this (and if so, unupvote it)
+			if (newFavorites.includes(buildId)) {
+				const index = newFavorites.indexOf(buildId);
+				newFavorites.splice(index, 1);
+
+				setUserfavorites(dispatchAuth, newFavorites);
+				updateUserDb({ favorites: newFavorites });
+			} else {
+				newFavorites.push(buildId);
+				setUserfavorites(dispatchAuth, newFavorites);
+				updateUserDb({ favorites: newFavorites });
+			}
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
-	/**
-	 * Handles setting a report
-	 */
-	const setHoverUser = value => {
-		dispatchAuth({
-			type: 'SET_HOVER_USER',
-			payload: value,
-		});
-	};
+	return { handleFavoriting };
+};
 
-	/**
-	 * Handles setting the id of the user we want to block.
-	 * @param {*} id
-	 */
-	const setUserToBlock = id => {
-		dispatchAuth({
-			type: 'SET_USER_TO_BLOCK',
-			payload: id,
-		});
-	};
-
-	/**
-	 * Handles setting the newSub state
-	 */
-	const setNewSub = () => {
-		dispatchAuth({
-			type: 'SET_AUTH',
-			payload: {
-				newSub: false,
-			},
-		});
-	};
+/**
+ * Hook with functions to handle blocking a user
+ * @returns
+ */
+export const useBlockUser = () => {
+	const { user, dispatchAuth, userToBlock } = useContext(AuthContext);
+	const { updateUserProfilesAndDb } = useUpdateProfile();
 
 	/**
 	 * Handles blocking a user.
@@ -1234,24 +996,16 @@ const useAuth = () => {
 					const index = newBlockList.indexOf(userToBlock);
 					newBlockList.splice(index, 1);
 
-					updateUserDb({ blockList: newBlockList, lastModified: serverTimestamp() });
-					await updateDoc(doc(db, 'userProfiles', user.uid), { blockList: newBlockList, lastModified: serverTimestamp() });
-
+					updateUserProfilesAndDb({ blockList: newBlockList, lastModified: serverTimestamp() });
 					toast.success('User unblocked.');
 				} else {
 					newBlockList.push(userToBlock);
-
-					updateUserDb({ blockList: newBlockList, lastModified: serverTimestamp() });
-					await updateDoc(doc(db, 'userProfiles', user.uid), { blockList: newBlockList, lastModified: serverTimestamp() });
-
+					updateUserProfilesAndDb({ blockList: newBlockList, lastModified: serverTimestamp() });
 					toast.success('User blocked.');
 				}
 			} else {
 				newBlockList = [userToBlock];
-
-				updateUserDb({ blockList: newBlockList, lastModified: serverTimestamp() });
-				await updateDoc(doc(db, 'userProfiles', user.uid), { blockList: newBlockList, lastModified: serverTimestamp() });
-
+				updateUserProfilesAndDb({ blockList: newBlockList, lastModified: serverTimestamp() });
 				toast.success('User blocked.');
 			}
 
@@ -1260,70 +1014,176 @@ const useAuth = () => {
 				payload: { blockList: newBlockList },
 			});
 
-			dispatchAuth({
-				type: 'SET_USER_TO_BLOCK',
-				payload: null,
-			});
+			setUserToBlock(dispatchAuth, null);
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
-	/**
-	 * handles saving the username color
-	 */
-	const updateUsernameColor = async color => {
-		try {
-			await updateDoc(doc(db, 'users', user.uid), { customUsernameColor: color, lastModified: serverTimestamp() });
-			await updateDoc(doc(db, 'userProfiles', user.uid), { customUsernameColor: color, lastModified: serverTimestamp() });
-
-			toast.success('Color updated!');
-		} catch (error) {
-			console.log(error);
-			toast.error('Something went wrong, please try again');
-		}
-	};
-
-	return {
-		handleVoting,
-		handleDeleteNotification,
-		handleDeleteAllNotifications,
-		handleFavoriting,
-		handleFollowingUser,
-		handleDeleteConversationId,
-		addbuildToUser,
-		setResetPassword,
-		setNewSignup,
-		setNotificationsRead,
-		setEditingProfile,
-		setNewSub,
-		setMessageTab,
-		setAccountToDelete,
-		setReport,
-		setHoverUser,
-		setUserToBlock,
-		updateUserState,
-		updateUserDbBio,
-		updateUserDb,
-		updateUserProfiles,
-		updateUserDbProfilePic,
-		updateUserProfilePicture,
-		updateUsernameColor,
-		deleteUserAccount,
-		deleteConversation,
-		fetchUsersProfile,
-		fetchConversation,
-		fetchMoreNotifications,
-		uploadProfilePicture,
-		createNewUserAccount,
-		loginWithGoogle,
-		newEmailAccount,
-		sendNotification,
-		sendMessage,
-		submitReport,
-		readMessage,
-		blockUser,
-	};
+	return { blockUser };
 };
 
-export default useAuth;
+// State Updaters ---------------------------------------------------------------------------------------------------//
+/**
+ * Handles setting the newSub state in context
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {bool} bool - True or false
+ */
+export const setNewSub = (dispatchAuth, bool) => {
+	dispatchAuth({
+		type: 'SET_AUTH',
+		payload: {
+			newSub: false,
+		},
+	});
+};
+
+/**
+ * Handles setting the id of the user we want to block in context.
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {string} id - Id of the user to block
+ */
+export const setUserToBlock = (dispatchAuth, id) => {
+	dispatchAuth({
+		type: 'SET_USER_TO_BLOCK',
+		payload: id,
+	});
+};
+
+/**
+ * Handles setting the current covnersation message in context
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {object} convo - the current conversation
+ */
+export const setConvoTab = (dispatchAuth, convo) => {
+	dispatchAuth({
+		type: 'SET_MESSAGE_TAB',
+		payload: {
+			messageTab: convo,
+		},
+	});
+};
+
+/**
+ * Handles setting a report in context
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {string} type - the type of the report (comment, build, user)
+ * @param {obj} content - the content of the report
+ */
+export const setReport = (dispatchAuth, type, content) => {
+	dispatchAuth({
+		type: 'SET_REPORT',
+		payload: {
+			reportingContent: content,
+			reportType: type,
+		},
+	});
+};
+
+/**
+ * Sets the id of the account to delete in context
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {id} id - id of the account to delete
+ */
+export const setAccountToDelete = (dispatchAuth, id) => {
+	dispatchAuth({
+		type: 'SET_ACCOUNT_TO_DELETE',
+		payload: id,
+	});
+};
+
+/**
+ * Handles when a user signs up with google and neeeds to enter a username. Sets context
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {string} username
+ */
+export const setNewSignup = (dispatchAuth, username) => {
+	dispatchAuth({
+		type: 'SET_NEW_SIGNUP',
+		payload: username,
+	});
+};
+
+/**
+ * Handles setting the id for the convo to delete in the context
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {string} id - id of the convo to delete
+ */
+export const setDeleteConversationId = (dispatchAuth, id) => {
+	dispatchAuth({
+		type: 'SET_DELETE_CONVO_ID',
+		payload: id,
+	});
+};
+
+/**
+ * Handles setting the state for notifications in the context
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {arr} notifications - an array of notifications to set in the context
+ */
+export const setNotifications = (dispatchAuth, notifications) => {
+	dispatchAuth({
+		type: 'UPDATE_USER',
+		payload: { notifications },
+	});
+};
+
+/**
+ * Handles setting the reset password option in context. If set to true, Shows the reset password modal
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {bool} bool - true or false
+ */
+export const setResetPassword = (dispatchAuth, bool) => {
+	dispatchAuth({
+		type: 'SET_RESET_PASSWORD',
+		payload: bool,
+	});
+};
+
+/**
+ * Updates the context if we are fetching a users profile
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {bool} bool - true or false
+ */
+export const setFetchingProfile = (dispatchAuth, bool) => {
+	dispatchAuth({
+		type: 'SET_FETCHING_PROFILE',
+		payload: bool,
+	});
+};
+
+/**
+ * Handles setting if the user is editing their profile in context
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {*} value - the value for editing the profile. False to stop editing, or an object if editing.
+ */
+export const setEditingProfile = (dispatchAuth, value) => {
+	dispatchAuth({
+		type: 'SET_EDITING_PROFILE',
+		payload: value,
+	});
+};
+
+/**
+ * Handles setting the users favorites in the context
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {arr} favorites - an array of the users favorite builds
+ */
+export const setUserfavorites = (dispatchAuth, favorites) => {
+	dispatchAuth({
+		type: 'UPDATE_USER',
+		payload: { favorites: favorites },
+	});
+};
+
+/**
+ * Handles updating the users state in context
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {obj} update - The updates for the user
+ */
+export const updateUserState = (dispatchAuth, update) => {
+	dispatchAuth({
+		type: 'UPDATE_USER',
+		payload: update,
+	});
+};

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import useAuth from '../../context/auth/AuthActions';
+import useAuth, { setResetPassword } from '../../context/auth/AuthActions';
+import AuthContext from '../../context/auth/AuthContext';
 import useResetStates from '../../utilities/useResetStates';
 import { Helmet } from 'react-helmet';
 //---------------------------------------------------------------------------------------------------//
@@ -9,6 +10,7 @@ import TextInput from '../../components/input/TextInput';
 import Button from '../../components/buttons/Button';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import AstrobiffRide from '../../assets/astrobiff-ride.png';
+import { useContext } from 'react';
 
 function SignUp() {
 	const [newUser, setNewUser] = useState({
@@ -17,8 +19,8 @@ function SignUp() {
 		password: '',
 	});
 	const [accountExists, setAccountExists] = useState(false);
-	const { setResetPassword, newEmailAccount, loginWithGoogle } = useAuth();
-
+	const { newEmailAccount, loginWithGoogle } = useAuth();
+	const { dispatchAuth } = useContext(AuthContext);
 	const { resetStates } = useResetStates();
 
 	useEffect(() => {
@@ -113,7 +115,7 @@ function SignUp() {
 									<p className="text-xl 2k:text-2xl text-red-300">Account already exists! Try signing in, or reset your password</p>
 									<div className="flex flex-row gap-4 2k:gap-6">
 										<Button htmlFor="login-modal" text="Login" color="btn-primary" icon="login" />
-										<Button onClick={() => setResetPassword(true)} text="Reset Password" color="btn-accent" icon="reset" />
+										<Button onClick={() => setResetPassword(dispatchAuth, true)} text="Reset Password" color="btn-accent" icon="reset" />
 									</div>
 								</div>
 							)}

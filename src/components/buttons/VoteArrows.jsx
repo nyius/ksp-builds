@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import AuthContext from '../../context/auth/AuthContext';
-import useAuth from '../../context/auth/AuthActions';
+import { useHandleVoting } from '../../context/auth/AuthActions';
 import { GoArrowUp, GoArrowDown } from 'react-icons/go';
 
 /**
@@ -9,7 +9,7 @@ import { GoArrowUp, GoArrowDown } from 'react-icons/go';
  * @returns
  */
 function VoteArrows({ build }) {
-	const { handleVoting } = useAuth();
+	const { handleVoting } = useHandleVoting();
 	const { user, authLoading } = useContext(AuthContext);
 
 	/**
@@ -44,7 +44,7 @@ function VoteArrows({ build }) {
 	};
 
 	return (
-		<div className="flex flex-row gap-5 items-center">
+		<div className="flex flex-row gap-1 items-center">
 			<span className="text-lg 2k:text-2xl">{calculateVoteCount()}</span>
 			<span id="upVote" onClick={() => handleVoting('upVote', build)} className={`vote-arrow cursor-pointer hover:text-orange-600 ${checkIfVoted('upVote', build.id)}`}>
 				<GoArrowUp id="upVote" />

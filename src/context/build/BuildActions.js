@@ -3,40 +3,38 @@ import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, w
 import { db } from '../../firebase.config';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { s3Client } from '../../S3.config';
 import { toast } from 'react-toastify';
 import { compressAccurately } from 'image-conversion';
 import { auth } from '../../firebase.config';
-import { profanity } from '@2toad/profanity';
 import { cloneDeep } from 'lodash';
-import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
+import { compressToEncodedURIComponent } from 'lz-string';
 //---------------------------------------------------------------------------------------------------//
 import { uploadImage } from '../../utilities/uploadImage';
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
 import standardNotifications from '../../utilities/standardNotifications';
 import { buildNameToUrl } from '../../utilities/buildNameToUrl';
+import getBuildPartCount from '../../utilities/getBuildPartCount';
+import fetchBuildFromAWS from '../../utilities/fetchBuildFromAws';
+import { setLocalStoredBuild, getBuildFromLocalStorage, checkLocalBuildAge, getBuildFromLocalStorageByName } from '../../utilities/buildLocalStorage';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from './BuildContext';
 import BuildsContext from '../builds/BuildsContext';
 import AuthContext from '../auth/AuthContext';
-import useAuth from '../auth/AuthActions';
+import { useUpdateProfile, useHandleVoting } from '../auth/AuthActions';
+import { sendNotification } from '../auth/AuthUtils';
 import FiltersContext from '../filters/FiltersContext';
-import useBuilds from '../builds/BuildsActions';
+import { updateDownloadCount, updateViewCount, makeBuildReadyToUpload, searchBuilds } from './BuildUtils';
+import { useAddBuildToFolder } from '../folders/FoldersActions';
 //---------------------------------------------------------------------------------------------------//
 
 const useBuild = () => {
-	const navigate = useNavigate();
-	const { dispatchBuild, replyingComment, comments, loadedBuild, comment, settingBuildOfTheWeek } = useContext(BuildContext);
-	const { dispatchBuilds } = useContext(BuildsContext);
-	const { kspVersions } = useContext(FiltersContext);
-	const { user } = useContext(AuthContext);
-	const { fetchLastUpdatedBuilds } = useBuilds();
-	const { addbuildToUser, handleVoting, sendNotification } = useAuth();
+	const { dispatchBuild } = useContext(BuildContext);
 
 	/**
-	 * Fetches the build from the server and dispatches the result.
-	 * @param {*} id
+	 * Fetches the build and dispatches the result. First checks local storage. If no build is found or is out of date, fetches from server.
+	 * @param {string} id - id of the build to fetch
 	 */
 	const fetchBuild = async id => {
 		dispatchBuild({ type: 'LOADING_BUILD', payload: true });
@@ -44,389 +42,96 @@ const useBuild = () => {
 		try {
 			const newId = buildNameToUrl(id);
 
-			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, newId);
+			let localBuildById = getBuildFromLocalStorage(newId);
 
-			// get the build from the db
-			const fetchedBuild = await getDoc(buildRef);
-
-			if (fetchedBuild.exists()) {
-				let build = fetchedBuild.data();
-				dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: build, loadingBuild: false } });
-
-				let parsedBuild = await fetchBuildFromAWS(newId);
-				dispatchBuild({ type: 'SET_LOADED_RAW_BUILD', payload: parsedBuild });
-
-				// fetch comments and update the view count
-				await fetchComments(newId);
-				await updateViewCount(build, newId);
-			} else {
-				// maybe the URL isn't the id, but instead the builds name. Search for that next
-				const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
-
-				let q = query(buildsRef, where('urlName', '==', newId));
-
-				const fetchedBuilds = await getDocs(q);
-
-				let build;
-
-				fetchedBuilds.forEach(doc => {
-					build = doc.data();
-				});
-
-				if (build) {
-					dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: build, loadingBuild: false } });
-
-					let parsedBuild = await fetchBuildFromAWS(build.id);
-					dispatchBuild({ type: 'SET_LOADED_RAW_BUILD', payload: parsedBuild });
-
-					// fetch comments and update the view count
-					await fetchComments(build.id);
-					await updateViewCount(build, build.id);
+			if (localBuildById) {
+				if (checkLocalBuildAge(localBuildById.lastFetchedTimestamp, 10)) {
+					await fetchBuildFromServer(localBuildById.id);
 				} else {
-					dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: '', loadingBuild: false } });
+					setLoadedBuild(dispatchBuild, localBuildById);
+					await fetchComments(newId);
+					await updateViewCount(localBuildById);
+					return;
+				}
+			} else {
+				let localBuildByName = getBuildFromLocalStorageByName(newId);
 
-					throw new Error("Couldn't find that build!");
+				if (localBuildByName) {
+					if (checkLocalBuildAge(localBuildByName.lastFetchedTimestamp, 10)) {
+						await fetchBuildFromServer(localBuildByName.id);
+					} else {
+						setLoadedBuild(dispatchBuild, localBuildByName);
+						await fetchComments(localBuildByName.id);
+						await updateViewCount(localBuildByName);
+						return;
+					}
+				} else {
+					await fetchBuildFromServer(id);
 				}
 			}
 		} catch (error) {
-			dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: '', loadingBuild: false } });
+			setLoadedBuild(dispatchBuild, '');
 			console.log(error);
 			throw new Error(`Error fetching build: ${error}`);
 		}
 	};
 
 	/**
-	 * Handles fetching a raw build from AWS. Takes in an id
-	 * @param {*} id
-	 * @returns build json
+	 * handles fetching a build from the server
+	 * @param {string} id - the id of the build to fetch from the server
 	 */
-	const fetchBuildFromAWS = async id => {
-		let response, rawBuildData, parsedBuild;
-		// Get the raw build from aws
-		if (process.env.REACT_APP_ENV !== 'DEV') {
-			try {
-				const command = new GetObjectCommand({
-					Bucket: process.env.REACT_APP_BUCKET,
-					Key: `${id}.json`,
-				});
-
-				response = await s3Client.send(command);
-				rawBuildData = await response.Body.transformToString();
-
-				// If we have an older uncompressed buildFile
-				if (rawBuildData.includes('AssemblyOABConfig')) {
-					parsedBuild = JSON.parse(rawBuildData);
-				} else {
-					const decompress = decompressFromEncodedURIComponent(rawBuildData);
-					parsedBuild = JSON.parse(decompress);
-				}
-			} catch (error) {
-				console.log(error);
-			}
-		}
-
-		return parsedBuild;
-	};
-
-	/**
-	 * Hadles saving the new build to the server
-	 */
-	const makeBuildReadyToUpload = async build => {
+	const fetchBuildFromServer = async id => {
 		try {
-			const rawBuild = JSON.stringify(build.build);
+			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, id);
 
-			if (build.name.length === 0) {
-				toast.error('Please enter a build name');
-				return;
-			}
-
-			if (build.name.length > 50) {
-				toast.error('Build name too long');
-				return;
-			}
-
-			if (profanity.exists(build.name)) {
-				toast.error('Build name is unacceptable!');
-				return;
-			}
-
-			if (!user) {
-				toast.error('Please log in or create an account to save a build');
-				return;
-			}
-
-			if (build.type.length === 0) {
-				toast.error('You forgot to give your build a type!');
-				return;
-			}
-
-			if (build.images.length > 6) {
-				toast.error('Too many build images! Max 6');
-				return;
-			}
-
-			if (process.env.REACT_APP_ENV !== 'DEV') {
-				if (build.build.trim() === '') {
-					toast.error('You forgot to include the build!');
-					return;
-				}
-				if (!rawBuild.includes(`OwnerPlayerGuidString`) && !rawBuild.includes(`AssemblyOABConfig`)) {
-					toast.error('Uh oh, It seems like you have entered an invalid craft! Check out the "How?" Button to see how to properly copy & paste your craft.');
-					return;
-				}
-				try {
-					const json = JSON.parse(rawBuild);
-				} catch (error) {
-					toast.error('Uh oh, It seems like you have entered an invalid craft! Check out the "How?" Button to see how to properly copy & paste your craft.');
-					return;
-				}
-			}
-
-			if (build.kspVersion === 'any') {
-				build.kspVersion = kspVersions[0];
-			}
-
-			let newTags = [];
-			let tagProfanity = false;
-			build.tags.map(tag => {
-				if (profanity.exists(tag)) {
-					tagProfanity = true;
-				}
-				newTags.push(tag.trim());
-			});
-
-			if (tagProfanity) {
-				toast.error('Tags contain unacceptable words!');
-				return;
-			}
-
-			build.searchName = build.name.toLowerCase();
-
-			return build;
-		} catch (error) {
-			throw new Error(`Error in makeBuildReadyToUpload: ${error}`);
-		}
-	};
-
-	/**
-	 * Handles updating the build in the database
-	 * @param {*} ()
-	 */
-	const updateBuild = async build => {
-		try {
-			const buildStatus = await makeBuildReadyToUpload(build);
-			if (!buildStatus) return;
-
-			setUploadingBuild(true);
-
-			const buildJSON = JSON.stringify(build.build);
-			delete build.build;
-
-			if (build.thumbnail !== build.images[0]) {
-				build.thumbnail = build.images[0];
-			}
-
-			if (loadedBuild.name !== build.name) {
-				build.urlName = buildNameToUrl(build.name);
-			}
-
-			build.lastModified = serverTimestamp();
-
-			// update the document
-			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), {
-				...build,
-			}).catch(err => {
-				setSavingBuild(false);
-				throw new Error(err);
-			});
-
-			// if the build changed, update AWS
-			if (process.env.REACT_APP_ENV !== 'DEV') {
-				const compressedBuild = compressToEncodedURIComponent(buildJSON);
-
-				// update the raw build on aws
-				const command = new PutObjectCommand({
-					Bucket: process.env.REACT_APP_BUCKET,
-					Key: `${build.id}.json`,
-					Body: compressedBuild,
-					ContentEncoding: 'base64',
-					ContentType: 'application/json',
-					ACL: 'public-read',
-				});
-
-				const response = await s3Client.send(command);
-
-				build.build = JSON.parse(buildJSON);
-			}
-
-			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, build.id);
-
-			// get the build from the db so we get new timestamps
+			// get the build from the db
 			const fetchedBuild = await getDoc(buildRef);
 
-			dispatchBuild({
-				type: 'SET_BUILD',
-				payload: {
-					savingBuild: false,
-					editingBuild: false,
-					uploadingBuild: false,
-					loadedBuild: fetchedBuild.data(),
-					resetTextEditor: true,
-				},
-			});
+			if (fetchedBuild.exists()) {
+				let build = fetchedBuild.data();
+				setLocalStoredBuild(build);
+				setLoadedBuild(dispatchBuild, build);
 
-			toast.success('Build updated');
-			setUploadingBuild(false);
-		} catch (error) {
-			setUploadingBuild(false);
-			setSavingBuild(false);
-			throw new Error(error);
-		}
-	};
-
-	/**
-	 * handles deleting a build
-	 */
-	const deleteBuild = async (id, userId) => {
-		try {
-			// Delete the comments
-			const commentsQuery = query(collection(db, process.env.REACT_APP_BUILDSDB, id, 'comments'));
-			const commentsQuerySnapshot = await getDocs(commentsQuery);
-			commentsQuerySnapshot.forEach(comment => {
-				deleteDoc(doc(db, process.env.REACT_APP_BUILDSDB, id, 'comments', comment.id));
-			});
-
-			// Delete the build
-			await deleteDoc(doc(db, process.env.REACT_APP_BUILDSDB, id));
-
-			// delete it from aws
-			const command = new DeleteObjectCommand({
-				Bucket: process.env.REACT_APP_BUCKET,
-				Key: `${id}.json`,
-			});
-
-			const response = await s3Client.send(command);
-
-			// If the build being deleted belongs to the current user, remove it
-			if (userId === user.uid) {
-				const newBuildsArr = [
-					...user.builds.filter(build => {
-						return build !== id;
-					}),
-				];
-				// remove it from the user
-				await updateDoc(doc(db, 'users', userId), { builds: newBuildsArr });
-
-				// remove it from the users userProfile
-				await updateDoc(doc(db, 'userProfiles', userId), { builds: newBuildsArr });
+				// fetch comments and update the view count
+				await fetchComments(id);
+				await updateViewCount(build);
 			} else {
-				// if its not, this is an admin deleting it and we have to fetch that users profile first, and then remove it from their builds
-				const fetchedProfile = await getDoc(doc(db, 'users', userId));
-				const userData = fetchedProfile.data();
+				// maybe the URL isn't the id, but instead the builds name. Search for that next
+				const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
 
-				const newBuildsArr = [
-					...userData.builds.filter(build => {
-						return build !== id;
-					}),
-				];
+				let q = query(buildsRef, where('urlName', '==', id));
+				const fetchedBuilds = await getDocs(q);
 
-				await updateDoc(doc(db, 'users', userId), { builds: newBuildsArr });
-				await updateDoc(doc(db, 'userProfiles', userId), { builds: newBuildsArr });
-			}
-
-			navigate('/');
-
-			// Filter the deleted build out of the loaded builds
-			// dispatchBuilds({
-			// 	type: 'DELETE_BUILD',
-			// 	payload: id,
-			// });
-
-			toast.success(`Build Deleted!`);
-		} catch (error) {
-			toast.error('Something went wrong deleting this build');
-			throw new Error(error);
-		}
-	};
-
-	/**
-	 * Handles setting up deleting a comment
-	 * @param {*} type (delete, cancel)
-	 */
-	const setDeletingComment = (commentId, type) => {
-		if (type === 'delete') {
-			dispatchBuild({
-				type: 'SET_BUILD',
-				payload: {
-					deletingComment: true,
-					deletingCommentId: commentId,
-				},
-			});
-		} else if (type === 'cancel') {
-			dispatchBuild({
-				type: 'SET_BUILD',
-				payload: {
-					deletingComment: false,
-					deletingCommentId: '',
-				},
-			});
-		}
-	};
-
-	/**
-	 * handles deleting a comment
-	 * @param {*} commentId
-	 */
-	const deleteComment = async commentId => {
-		try {
-			// Delete the comments
-			await deleteDoc(doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id, 'comments', commentId));
-			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id), { commentCount: (loadedBuild.commentCount -= 1) })
-				.then(() => {
-					//Filter the deleted comment from the comments array
-					const newComments = comments.filter(comment => comment.id !== commentId);
-
-					dispatchBuild({
-						type: 'SET_BUILD',
-						payload: {
-							deletingComment: false,
-							deletingCommentId: '',
-							comments: newComments,
-						},
-					});
-
-					toast.success('Comment deleted');
-				})
-				.catch(err => {
-					dispatchBuild({
-						type: 'SET_BUILD',
-						payload: {
-							deletingComment: false,
-							deletingCommentId: '',
-						},
-					});
-					toast.error(`Something went wrong deleting the comment`);
-					throw new Error(err);
+				let build;
+				fetchedBuilds.forEach(doc => {
+					build = doc.data();
 				});
+
+				if (build) {
+					setLoadedBuild(dispatchBuild, build);
+
+					// fetch comments and update the view count
+					await fetchComments(build.id);
+					await updateViewCount(build);
+				} else {
+					setLoadedBuild(dispatchBuild, '');
+					throw new Error("Couldn't find that build!");
+				}
+			}
 		} catch (error) {
-			dispatchBuild({
-				type: 'SET_BUILD',
-				payload: {
-					deletingComment: false,
-					deletingCommentId: '',
-				},
-			});
-			throw new Error(error);
+			setLoadedBuild(dispatchBuild, '');
+			console.log(error);
+			throw new Error(`Error fetching build: ${error}`);
 		}
 	};
 
 	/**
 	 * Fetches a builds comments
-	 * @param {*} id a builds Id
+	 * @param {string} buildId - the builds Id
 	 */
-	const fetchComments = async id => {
+	const fetchComments = async buildId => {
 		try {
-			const commentsRef = collection(db, process.env.REACT_APP_BUILDSDB, id, 'comments');
+			const commentsRef = collection(db, process.env.REACT_APP_BUILDSDB, buildId, 'comments');
 			const commentsSnapshot = await getDocs(commentsRef);
 
 			const commentsList = commentsSnapshot.docs.map(doc => {
@@ -451,54 +156,76 @@ const useBuild = () => {
 		}
 	};
 
-	/**
-	 * Handles setting saving build state
-	 * @param {*} value
-	 */
-	const setSavingBuild = value => {
-		dispatchBuild({
-			type: 'SAVING_BUILD',
-			payload: value,
-		});
+	return {
+		fetchComments,
+		fetchBuild,
 	};
+};
+
+export default useBuild;
+
+/**
+ * Hook for making a build of the week
+ * @returns
+ */
+export const useMakeBuildOfTheWeek = () => {
+	const { buildOfTheWeek } = useBuild();
+	const { user } = useContext(AuthContext);
 
 	/**
-	 * Handles cancelling a build edit. Reverts it to prev state
-	 * @param {*} build
+	 * handles making a build the build of the week
+	 * @param {*} notification - the notification to send to the user who wins
 	 */
-	const cancelBuilEdit = backupBuild => {
-		dispatchBuild({
-			type: 'SET_BUILD',
-			payload: {
-				editingBuild: false,
-				loadedBuild: backupBuild,
-			},
-		});
+	const makeBuildOfTheWeek = async notification => {
+		try {
+			if (notification === '') {
+				throw new Error('Forgot to change notification');
+			}
+			await updateDoc(doc(db, 'kspInfo', 'weeklyFeaturedBuilds'), { [buildOfTheWeek.id]: { dateAdded: serverTimestamp() } });
+			await updateDoc(doc(db, 'kspInfo', 'weeklyFeaturedBuild'), { id: buildOfTheWeek.id, dateAdded: serverTimestamp() });
+
+			if (process.env.REACT_APP_ENV !== 'DEV') {
+				await updateDoc(doc(db, 'builds', buildOfTheWeek.id), { buildOfTheWeek: serverTimestamp() });
+			} else {
+				await updateDoc(doc(db, 'testBuilds', buildOfTheWeek.id), { buildOfTheWeek: serverTimestamp() });
+			}
+
+			// Notify the author
+			const newNotif = cloneDeep(standardNotifications);
+			newNotif.uid = user.uid;
+			newNotif.username = user.username;
+			newNotif.timestamp = new Date();
+			newNotif.profilePicture = user.profilePicture;
+			newNotif.message = notification;
+			newNotif.type = 'buildOfTheWeek';
+			newNotif.buildId = buildOfTheWeek.id;
+			newNotif.buildName = buildOfTheWeek.name;
+			delete newNotif.comment;
+			delete newNotif.commentId;
+
+			await sendNotification(buildOfTheWeek.uid, newNotif);
+
+			// Update the author to have 'build of the week' badge
+			await updateDoc(doc(db, 'users', buildOfTheWeek.uid), { buildOfTheWeekWinner: true });
+			await updateDoc(doc(db, 'userProfiles', buildOfTheWeek.uid), { buildOfTheWeekWinner: true });
+
+			toast.success('Made build of the week!');
+		} catch (error) {
+			console.log(error);
+			toast.error(`Whoops... Something went wrong: ${error} `);
+		}
 	};
 
-	/**
-	 * Handles cancelling a build edit. Reverts it to prev state
-	 * @param {*} build
-	 */
-	const setEditingBuild = build => {
-		dispatchBuild({
-			type: 'EDITING_BUILD',
-			payload: build,
-		});
-	};
+	return { makeBuildOfTheWeek };
+};
 
-	/**
-	 * Resets the build state
-	 */
-	const setBaseBuild = () => {
-		dispatchBuild({
-			type: 'SET_BUILD',
-			payload: {
-				editingBuild: true,
-				loadingBuild: false,
-			},
-		});
-	};
+/**
+ * Hook with functions for handling interaction with comments
+ * @returns
+ */
+export const useComment = () => {
+	const { dispatchBuild, comments, comment, loadedBuild, replyingComment } = useContext(BuildContext);
+	const { user } = useContext(AuthContext);
 
 	/**
 	 * Handles adding a new comment
@@ -589,8 +316,8 @@ const useBuild = () => {
 	};
 
 	/**
-	 * Handles setting a comment while writing
-	 * @param {*} e
+	 * Handles setting a comment in the context while writing
+	 * @param {string} comment
 	 */
 	const setComment = comment => {
 		dispatchBuild({
@@ -602,115 +329,297 @@ const useBuild = () => {
 	};
 
 	/**
-	 * Handles editing a comment
-	 * @param {*} comment
+	 * handles deleting a comment
+	 * @param {string} commentId - id of the comment to delete
 	 */
-	const setEditingComment = comment => {
-		dispatchBuild({
-			type: 'EDITING_COMMENT',
-			payload: comment,
-		});
-	};
-
-	/**
-	 * Handles editing a comment
-	 * @param {*} comment
-	 */
-	const setReplyingComment = comment => {
-		dispatchBuild({
-			type: 'REPLYING_COMMENT',
-			payload: comment,
-		});
-	};
-
-	/**
-	 * Handles upading the comment on the DB
-	 */
-	const updateComment = async (comment, commentId) => {
+	const deleteComment = async commentId => {
 		try {
-			const ref = doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id, 'comments', commentId);
+			// Delete the comments
+			await deleteDoc(doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id, 'comments', commentId));
+			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id), { commentCount: (loadedBuild.commentCount -= 1) })
+				.then(() => {
+					//Filter the deleted comment from the comments array
+					const newComments = comments.filter(comment => comment.id !== commentId);
 
-			await updateDoc(ref, { comment });
+					dispatchBuild({
+						type: 'SET_BUILD',
+						payload: {
+							deletingComment: false,
+							deletingCommentId: '',
+							comments: newComments,
+						},
+					});
 
-			toast.success('Comment Edited');
+					toast.success('Comment deleted');
+				})
+				.catch(err => {
+					dispatchBuild({
+						type: 'SET_BUILD',
+						payload: {
+							deletingComment: false,
+							deletingCommentId: '',
+						},
+					});
+					toast.error(`Something went wrong deleting the comment`);
+					throw new Error(err);
+				});
 		} catch (error) {
-			console.log(error);
-			toast.error('Something went wrong with editing your comment. Please try again');
+			dispatchBuild({
+				type: 'SET_BUILD',
+				payload: {
+					deletingComment: false,
+					deletingCommentId: '',
+				},
+			});
+			throw new Error(error);
 		}
 	};
 
+	return { addComment, setComment, deleteComment };
+};
+
+export const useCopyBuildToClipboard = () => {
+	const { dispatchBuild, fetchedRawBuilds } = useContext(BuildContext);
+
 	/**
-	 * handles updating the builds view count
+	 * handles copying a build to the clipboard. Fetches it from AWS and stores it in context
+	 * @param {function} setLoadingState - a state setter function
+	 * @param {string} buildId - Id of the build to copy
 	 */
-	const updateViewCount = async (build, id) => {
+	const copyBuildToClipboard = async (setLoadingState, buildId) => {
 		try {
-			const ref = doc(db, process.env.REACT_APP_BUILDSDB, id);
-			await updateDoc(ref, { views: (build.views += 1) });
+			if (fetchedRawBuilds[buildId]) {
+				navigator.clipboard.writeText(fetchedRawBuilds[buildId]);
+				toast.success('Build coped to clipboard!');
+
+				await updateDownloadCount(buildId);
+			} else {
+				setLoadingState(true);
+				const build = await fetchBuildFromAWS(buildId);
+
+				if (build) {
+					navigator.clipboard.writeText(build);
+					toast.success('Build coped to clipboard!');
+
+					await updateDownloadCount(buildId);
+					dispatchBuild({
+						type: 'SET_LOADED_RAW_BUILD',
+						payload: { id: buildId, rawBuild: build },
+					});
+				}
+			}
+
+			setLoadingState(false);
 		} catch (error) {
-			console.log(error);
+			throw new Error(error);
+		}
+	};
+	return { copyBuildToClipboard };
+};
+
+/**
+ * Hook for updating a build
+ * @returns
+ */
+export const useUpdateBuild = () => {
+	const { dispatchBuild, loadedBuild } = useContext(BuildContext);
+
+	/**
+	 * Handles updating the build in the database
+	 * @param {obj} build - takes in a build to update on the database
+	 */
+	const updateBuild = async build => {
+		try {
+			const buildStatus = await makeBuildReadyToUpload(build);
+			if (!buildStatus) return;
+
+			setUploadingBuild(dispatchBuild, true);
+
+			const buildJSON = JSON.stringify(build.build);
+			build.partCount = getBuildPartCount(buildJSON);
+			delete build.build;
+
+			if (build.thumbnail !== build.images[0]) {
+				build.thumbnail = build.images[0];
+			}
+
+			// Check if the user changed the name
+			if (loadedBuild.name !== build.name) {
+				const availableNameNum = await searchBuilds(0, build.name);
+
+				if (availableNameNum === 0) {
+					build.urlName = buildNameToUrl(build.name);
+				} else {
+					build.urlName = `${buildNameToUrl(build.name)}-${availableNameNum}`;
+				}
+			}
+
+			build.lastModified = serverTimestamp();
+
+			// update the document
+			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), {
+				...build,
+			}).catch(err => {
+				setSavingBuild(dispatchBuild, false);
+				throw new Error(err);
+			});
+
+			// if the build changed, update AWS
+			if (process.env.REACT_APP_ENV !== 'DEV') {
+				const compressedBuild = compressToEncodedURIComponent(buildJSON);
+
+				// update the raw build on aws
+				const command = new PutObjectCommand({
+					Bucket: process.env.REACT_APP_BUCKET,
+					Key: `${build.id}.json`,
+					Body: compressedBuild,
+					ContentEncoding: 'base64',
+					ContentType: 'application/json',
+					ACL: 'public-read',
+				});
+
+				const response = await s3Client.send(command);
+
+				build.build = JSON.parse(buildJSON);
+			}
+
+			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, build.id);
+
+			// get the build from the db so we get new timestamps
+			const fetchedBuild = await getDoc(buildRef);
+			setLocalStoredBuild(fetchedBuild);
+
+			dispatchBuild({
+				type: 'SET_BUILD',
+				payload: {
+					savingBuild: false,
+					editingBuild: false,
+					uploadingBuild: false,
+					loadedBuild: fetchedBuild.data(),
+					resetTextEditor: true,
+				},
+			});
+
+			toast.success('Build updated');
+			setUploadingBuild(dispatchBuild, false);
+		} catch (error) {
+			setUploadingBuild(dispatchBuild, false);
+			setSavingBuild(dispatchBuild, false);
+			throw new Error(error);
 		}
 	};
 
+	return { updateBuild };
+};
+
+/**
+ * Hook for deleting a build
+ * @returns
+ */
+export const useDeleteBuild = () => {
+	const { user } = useContext(AuthContext);
+	const navigate = useNavigate();
+
 	/**
-	 * handles updating the builds view count
+	 * handles deleting a build
+	 * @param {string} id - id of the build to delete
+	 * @param {string} userId - id of the person deleting the build
 	 */
-	const updateDownloadCount = async (build, id) => {
+	const deleteBuild = async (id, userId) => {
 		try {
-			const ref = doc(db, process.env.REACT_APP_BUILDSDB, id);
-			await updateDoc(ref, { downloads: (build.downloads += 1) });
+			// Delete the comments
+			const commentsQuery = query(collection(db, process.env.REACT_APP_BUILDSDB, id, 'comments'));
+			const commentsQuerySnapshot = await getDocs(commentsQuery);
+			commentsQuerySnapshot.forEach(comment => {
+				deleteDoc(doc(db, process.env.REACT_APP_BUILDSDB, id, 'comments', comment.id));
+			});
+
+			// Delete the build
+			await deleteDoc(doc(db, process.env.REACT_APP_BUILDSDB, id));
+
+			// delete it from aws
+			const command = new DeleteObjectCommand({
+				Bucket: process.env.REACT_APP_BUCKET,
+				Key: `${id}.json`,
+			});
+
+			await s3Client.send(command);
+
+			// If the build being deleted belongs to the current user, remove it
+			if (userId === user.uid) {
+				const newBuildsArr = [
+					...user.builds.filter(build => {
+						return build !== id;
+					}),
+				];
+				// remove it from the user
+				await updateDoc(doc(db, 'users', userId), { builds: newBuildsArr });
+
+				// remove it from the users userProfile
+				await updateDoc(doc(db, 'userProfiles', userId), { builds: newBuildsArr });
+			} else {
+				// if its not, this is an admin deleting it and we have to fetch that users profile first, and then remove it from their builds
+				const fetchedProfile = await getDoc(doc(db, 'users', userId));
+				const userData = fetchedProfile.data();
+
+				const newBuildsArr = [
+					...userData.builds.filter(build => {
+						return build !== id;
+					}),
+				];
+
+				await updateDoc(doc(db, 'users', userId), { builds: newBuildsArr });
+				await updateDoc(doc(db, 'userProfiles', userId), { builds: newBuildsArr });
+			}
+
+			navigate('/');
+
+			// Filter the deleted build out of the loaded builds
+			// dispatchBuilds({
+			// 	type: 'DELETE_BUILD',
+			// 	payload: id,
+			// });
+
+			toast.success(`Build Deleted!`);
 		} catch (error) {
-			console.log(error);
+			toast.error('Something went wrong deleting this build');
+			throw new Error(error);
 		}
 	};
+
+	return { deleteBuild };
+};
+
+/**
+ * Hook for uploading a build
+ * @returns
+ */
+export const useUploadBuild = () => {
+	const { addBuildToFolder } = useAddBuildToFolder();
+	const { dispatchBuild } = useContext(BuildContext);
+	const { user } = useContext(AuthContext);
+	const { updateUserProfilesAndDb } = useUpdateProfile();
+	const { dispatchBuilds } = useContext(BuildsContext);
+	const { kspVersions } = useContext(FiltersContext);
+	const { handleVoting } = useHandleVoting();
 
 	const [loading, setLoading] = useState(null);
+
 	/**
 	 * Handles uploading a build to the server. Takes in a build, and a dispatch function to add the newly created build to
-	 * @param {*} build
+	 * @param {obj} build - the build to upload
 	 */
 	const uploadBuild = async build => {
 		try {
 			const buildStatus = await makeBuildReadyToUpload(build);
 			if (!buildStatus) return;
 
-			setUploadingBuild(true);
+			setUploadingBuild(dispatchBuild, true);
 
-			const buildId = uuidv4().slice(0, 30);
+			const buildId = build.id;
+			if (build.kspVersion === 'any') build.kspVersion = kspVersions[0];
 
-			build.id = buildId;
-
-			// check if urlName exists and recursively look through each number until we get a free name
-			// for example, if a ship is named 'test' and we try to name our new one 'test', this will return '1' so we can append '1' to the new url name to make it 'test-1'
-			// this is so we dont have competing URLs from same named builds
-			const searchBuilds = async num => {
-				try {
-					const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
-					let q;
-
-					if (num === 0) {
-						q = query(buildsRef, where('urlName', '==', buildNameToUrl(build.name)));
-					} else {
-						q = query(buildsRef, where('urlName', '==', buildNameToUrl(`${build.name}-${num}`)));
-					}
-
-					const fetchedBuilds = await getDocs(q);
-					const builds = [];
-
-					fetchedBuilds.forEach(doc => {
-						builds.push(doc.data());
-					});
-
-					if (builds.length > 0) {
-						return searchBuilds(num + 1);
-					} else {
-						return num;
-					}
-				} catch (error) {
-					throw new Error(error);
-				}
-			};
-
-			const availableNameNum = await searchBuilds(0);
+			const availableNameNum = await searchBuilds(0, build.name);
 
 			if (availableNameNum === 0) {
 				build.urlName = buildNameToUrl(build.name);
@@ -721,10 +630,10 @@ const useBuild = () => {
 			// Stringify the json build and remove it from the main build object so it doesnt get uploaded to firebase (as its huge)
 			// It will be uploaded to ASW S3 instead
 			const buildJson = JSON.stringify(build.build);
-			const rawBuild = buildJson;
+			build.partCount = getBuildPartCount(buildJson);
 			delete build.build;
 
-			const compressedBuild = compressToEncodedURIComponent(rawBuild);
+			const compressedBuild = compressToEncodedURIComponent(buildJson);
 
 			// Create the thumbnail
 			if (typeof build.thumbnail !== 'string') {
@@ -739,18 +648,9 @@ const useBuild = () => {
 			});
 
 			// add it to the users 'userProfile' db
-			await updateDoc(doc(db, 'userProfiles', user.uid), { builds: [...user.builds, buildId] }).catch(err => {
-				throw new Error('Error from profile updateDoc', err);
-			});
+			await updateUserProfilesAndDb({ builds: [...user.builds, buildId] });
 
-			// Add it to the users process.env.REACT_APP_BUILDSDB
-			await updateDoc(doc(db, 'users', user.uid), { builds: [...user.builds, buildId] }).catch(err => {
-				throw new Error('Error from user updateDoc', err);
-			});
-
-			addbuildToUser(buildId);
-
-			// now get the document so we can grab its timestamp
+			// Get the document so we can grab its timestamp
 			const ref = doc(db, process.env.REACT_APP_BUILDSDB, buildId);
 			const data = await getDoc(ref);
 
@@ -759,6 +659,7 @@ const useBuild = () => {
 				const loadedBuild = data.data();
 				const newId = data.id;
 				build.timestamp = loadedBuild.timestamp;
+				build.lastModified = loadedBuild.lastModified;
 
 				// add the build to the list of fetched builds
 				dispatchBuilds({
@@ -818,120 +719,155 @@ const useBuild = () => {
 					}
 				}
 
+				// Add the build to the users folders (if they selected to)
+				addBuildToFolder(newId);
+
 				toast.success('Build created!');
 
-				setUploadingBuild(false);
+				setUploadingBuild(dispatchBuild, false);
 
 				return newId;
 			}
 		} catch (error) {
 			console.log(error);
-			setUploadingBuild(false);
+			setUploadingBuild(dispatchBuild, false);
 		}
 	};
 
-	/**
-	 * Handles setting the uploading build state
-	 * @param {*} bool
-	 */
-	const setUploadingBuild = bool => {
-		dispatchBuild({
-			type: 'UPLOADING_BUILD',
-			payload: bool,
-		});
-	};
-
-	/**
-	 * Handles setting the "reset" for the text editor state. True resets it.
-	 * @param {*} bool
-	 */
-	const setResetTextEditorState = bool => {
-		dispatchBuild({
-			type: 'ESET_TEXT_EDITOR',
-			payload: bool,
-		});
-	};
-
-	/**
-	 * handles getting ready to set the build of the week. Saves it to the context
-	 * @param {*} build
-	 */
-	const setBuildOfTheWeek = build => {
-		dispatchBuild({
-			type: 'SET_BUILD_OF_THE_WEEK',
-			payload: build,
-		});
-	};
-
-	/**
-	 * Handles making a build the build of the week
-	 * @param {*} build
-	 */
-	const makeBuildOfTheWeek = async notification => {
-		try {
-			if (notification === '') {
-				throw new Error('Forgot to change notification');
-			}
-			await updateDoc(doc(db, 'kspInfo', 'weeklyFeaturedBuilds'), { [settingBuildOfTheWeek.id]: { dateAdded: serverTimestamp() } });
-			await updateDoc(doc(db, 'kspInfo', 'weeklyFeaturedBuild'), { id: settingBuildOfTheWeek.id, dateAdded: serverTimestamp() });
-
-			if (process.env.REACT_APP_ENV !== 'DEV') {
-				await updateDoc(doc(db, 'builds', settingBuildOfTheWeek.id), { buildOfTheWeek: serverTimestamp() });
-			} else {
-				await updateDoc(doc(db, 'testBuilds', settingBuildOfTheWeek.id), { buildOfTheWeek: serverTimestamp() });
-			}
-
-			// Notify the author
-			const newNotif = cloneDeep(standardNotifications);
-			newNotif.uid = user.uid;
-			newNotif.username = user.username;
-			newNotif.timestamp = new Date();
-			newNotif.profilePicture = user.profilePicture;
-			newNotif.message = notification;
-			newNotif.type = 'buildOfTheWeek';
-			newNotif.buildId = settingBuildOfTheWeek.id;
-			newNotif.buildName = settingBuildOfTheWeek.name;
-			delete newNotif.comment;
-			delete newNotif.commentId;
-
-			await sendNotification(settingBuildOfTheWeek.uid, newNotif);
-
-			// Update the author to have 'build of the week' badge
-			await updateDoc(doc(db, 'users', settingBuildOfTheWeek.uid), { buildOfTheWeekWinner: true });
-			await updateDoc(doc(db, 'userProfiles', settingBuildOfTheWeek.uid), { buildOfTheWeekWinner: true });
-
-			toast.success('Made build of the week!');
-		} catch (error) {
-			console.log(error);
-			toast.error(`Whoops... Something went wrong: ${error} `);
-		}
-	};
-
-	return {
-		setUploadingBuild,
-		setBaseBuild,
-		setEditingBuild,
-		setEditingComment,
-		setReplyingComment,
-		setComment,
-		setSavingBuild,
-		setDeletingComment,
-		setBuildOfTheWeek,
-		setResetTextEditorState,
-		cancelBuilEdit,
-		fetchComments,
-		deleteComment,
-		uploadBuild,
-		deleteBuild,
-		updateBuild,
-		makeBuildReadyToUpload,
-		fetchBuild,
-		addComment,
-		updateComment,
-		updateViewCount,
-		updateDownloadCount,
-		makeBuildOfTheWeek,
-	};
+	return { uploadBuild };
 };
 
-export default useBuild;
+// State Updaters ---------------------------------------------------------------------------------------------------//
+/**
+ * handles getting ready to set the build of the week. Saves it to the context
+ * @param {function} dispatchBuild - The dispatch function
+ * @param {obj} build - the build to make build of the week
+ */
+export const setBuildOfTheWeek = (dispatchBuild, build) => {
+	dispatchBuild({
+		type: 'SET_BUILD_OF_THE_WEEK',
+		payload: build,
+	});
+};
+
+/**
+ * Handles setting the "reset" for the text editor state in context. True resets it.
+ * @param {function} dispatchBuild - The dispatch function
+ * @param {bool} bool - true to reset state
+ */
+export const setResetTextEditorState = (dispatchBuild, bool) => {
+	dispatchBuild({
+		type: 'ESET_TEXT_EDITOR',
+		payload: bool,
+	});
+};
+
+/**
+ * Handles setting the uploading build state in context
+ * @param {function} dispatchBuild - The dispatch function
+ * @param {bool} bool - true or false
+ */
+export const setUploadingBuild = (dispatchBuild, bool) => {
+	dispatchBuild({
+		type: 'UPLOADING_BUILD',
+		payload: bool,
+	});
+};
+
+/**
+ * Handles setting the replying comment in context
+ * @param {function} dispatchBuild - The dispatch function
+ * @param {obj} comment - the comment thats being replied to
+ */
+export const setReplyingComment = (dispatchBuild, comment) => {
+	dispatchBuild({
+		type: 'REPLYING_COMMENT',
+		payload: comment,
+	});
+};
+
+/**
+ * Handles setting the comment being edited in context
+ * @param {function} dispatchBuild - The dispatch function
+ * @param {obj} comment - comment to be edited
+ */
+export const setEditingComment = (dispatchBuild, comment) => {
+	dispatchBuild({
+		type: 'EDITING_COMMENT',
+		payload: comment,
+	});
+};
+
+/**
+ * Handles setting the build to edit in the context
+ * @param {function} dispatchBuild - The dispatch function
+ * @param {obj} build - the build to be edited
+ */
+export const setEditingBuild = (dispatchBuild, build) => {
+	dispatchBuild({
+		type: 'EDITING_BUILD',
+		payload: build,
+	});
+};
+
+/**
+ * Handles cancelling a build edit. Reverts it to prev state
+ * @param {function} dispatchBuild - The dispatch function
+ * @param {obj} backupBuild - the backup build to reset the state to
+ */
+export const setCancelBuilEdit = (dispatchBuild, backupBuild) => {
+	dispatchBuild({
+		type: 'SET_BUILD',
+		payload: {
+			editingBuild: false,
+			loadedBuild: backupBuild,
+		},
+	});
+};
+
+/**
+ * Handles setting saving build state in the context
+ * @param {function} dispatchBuild - The dispatch function
+ * @param {bool} bool - true or false
+ */
+export const setSavingBuild = (dispatchBuild, bool) => {
+	dispatchBuild({
+		type: 'SAVING_BUILD',
+		payload: bool,
+	});
+};
+
+/**
+ * Handles setting up deleting a comment
+ * @param {function} dispatchBuild - The dispatch function
+ * @param {string} commentId - The Id of the comment to delete
+ * @param {string} type (delete, cancel)
+ */
+export const setDeletingComment = (dispatchBuild, commentId, type) => {
+	if (type === 'delete') {
+		dispatchBuild({
+			type: 'SET_BUILD',
+			payload: {
+				deletingComment: true,
+				deletingCommentId: commentId,
+			},
+		});
+	} else if (type === 'cancel') {
+		dispatchBuild({
+			type: 'SET_BUILD',
+			payload: {
+				deletingComment: false,
+				deletingCommentId: '',
+			},
+		});
+	}
+};
+
+/**
+ * Handles setting the loaded build in context
+ * @param {function} dispatchBuild - The dispatch function
+ * @param {obj} loadedBuild - the loaded build
+ */
+export const setLoadedBuild = (dispatchBuild, loadedBuild) => {
+	dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: loadedBuild, loadingBuild: false } });
+};

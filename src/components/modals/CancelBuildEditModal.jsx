@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import Button from '../buttons/Button';
-import useBuild from '../../context/build/BuildActions';
+import { setCancelBuilEdit } from '../../context/build/BuildActions';
 import BuildContext from '../../context/build/BuildContext';
 
 /**
@@ -8,8 +8,7 @@ import BuildContext from '../../context/build/BuildContext';
  * @returns
  */
 function CancelBuildEditModal() {
-	const { cancelBuilEdit } = useBuild();
-	const { loadedBuild } = useContext(BuildContext);
+	const { dispatchBuild, loadedBuild } = useContext(BuildContext);
 
 	return (
 		<>
@@ -21,7 +20,7 @@ function CancelBuildEditModal() {
 
 					<div className="flex flex-row gap-2 w-full items-center justify-center">
 						<Button htmlFor="cancel-build-edit" text="No, Stay" color="btn-success" icon="done" />
-						<Button htmlFor="cancel-build-edit" text="Yes, Cancel" color="btn-error" icon="cancel" onClick={() => cancelBuilEdit(loadedBuild)} />
+						<Button htmlFor="cancel-build-edit" text="Yes, Cancel" color="btn-error" icon="cancel" onClick={() => setCancelBuilEdit(dispatchBuild, loadedBuild)} />
 					</div>
 				</div>
 			</div>

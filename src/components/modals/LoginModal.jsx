@@ -6,15 +6,15 @@ import TextInput from '../input/TextInput';
 import emailLogin from '../../utilities/emailLogin';
 import { toast } from 'react-toastify';
 import AuthContext from '../../context/auth/AuthContext';
-import useAuth from '../../context/auth/AuthActions';
+import useAuth, { setResetPassword } from '../../context/auth/AuthActions';
 
 function LoginModal() {
 	const navigate = useNavigate();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [wrongLogin, setWrongLogin] = useState('');
-	const { user, authLoading, resetPasswordState } = useContext(AuthContext);
-	const { setResetPassword, loginWithGoogle } = useAuth();
+	const { user, authLoading, resetPasswordState, dispatchAuth } = useContext(AuthContext);
+	const { loginWithGoogle } = useAuth();
 
 	/**
 	 * Handles a user starting the login process
@@ -58,7 +58,7 @@ function LoginModal() {
 							{wrongLogin && wrongLogin.includes('password') && <p className="text-xl 2k-text-2xl text-red-300 italic">Invalid Password</p>}
 							<div className="flex flex-row gap-4 flex-wrap">
 								<Button onClick={handleEmailLogin} text="Login" icon="login" margin="mt-4 2k:mt-10 mb-5 2k:mb-10" />
-								<Button onClick={() => setResetPassword(true)} text="Reset Password" icon="reset" margin="mt-4 2k:mt-10 mb-5 2k:mb-10" />
+								<Button onClick={() => setResetPassword(dispatchAuth, true)} text="Reset Password" icon="reset" margin="mt-4 2k:mt-10 mb-5 2k:mb-10" />
 							</div>
 						</form>
 

@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { cloneDeep, update } from 'lodash';
-import { profanity } from '@2toad/profanity';
+import { cloneDeep } from 'lodash';
+import { Helmet } from 'react-helmet';
+import { v4 as uuidv4 } from 'uuid';
 //---------------------------------------------------------------------------------------------------//
 import { FiCameraOff } from 'react-icons/fi';
 //---------------------------------------------------------------------------------------------------//
@@ -10,10 +11,14 @@ import { uploadImages } from '../../utilities/uploadImage';
 import { standardBuild } from '../../utilities/standardBuild';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
-import useBuild from '../../context/build/BuildActions';
+import { useUpdateBuild, useUploadBuild } from '../../context/build/BuildActions';
 import FiltersContext from '../../context/filters/FiltersContext';
+import FoldersContext from '../../context/folders/FoldersContext';
+import { setBuildToAddToFolder } from '../../context/folders/FoldersActions';
+import BuildsContext from '../../context/builds/BuildsContext';
 import NewsContext from '../../context/news/NewsContext';
 import BuildContext from '../../context/build/BuildContext';
+import useFilters from '../../context/filters/FiltersActions';
 //---------------------------------------------------------------------------------------------------//
 import Spinner1 from '../../components/spinners/Spinner1';
 import LogoBackground from '../../assets/logo_bg_dark.png';
@@ -23,7 +28,8 @@ import MiddleContainer from '../../components/containers/middleContainer/MiddleC
 import CancelBuildEditModal from '../../components/modals/CancelBuildEditModal';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import TextEditor from '../../components/textEditor/TextEditor';
-import { Helmet } from 'react-helmet';
+import Builds from '../../components/builds/Builds';
+import Folders from '../../components/folders/Folders';
 
 /**
  * Handles displaying the container for creating & editing a build.
@@ -31,11 +37,16 @@ import { Helmet } from 'react-helmet';
  * @returns
  */
 function Upload() {
-	const { user } = useContext(AuthContext);
-	const { uploadBuild, updateBuild, setUploadingBuild } = useBuild();
+	const buildId = uuidv4().slice(0, 30);
+	const { user, authLoading } = useContext(AuthContext);
+	const { uploadBuild } = useUploadBuild();
+	const { updateBuild } = useUpdateBuild();
 	const { editingBuild, uploadingBuild } = useContext(BuildContext);
-	const { filtersLoading, kspVersions, kspChallenges } = useContext(FiltersContext);
+	const { filtersLoading, kspVersions, sortBy } = useContext(FiltersContext);
+	const { openedFolder, dispatchFolders } = useContext(FoldersContext);
 	const { challenges, articlesLoading } = useContext(NewsContext);
+	const { fetchedBuilds } = useContext(BuildsContext);
+	const { filterBuilds } = useFilters();
 	//---------------------------------------------------------------------------------------------------//
 	const [description, setDescription] = useState(editingBuild ? editingBuild.description : `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`);
 	const [newBuild, setNewBuild] = useState(editingBuild ? cloneDeep(editingBuild) : cloneDeep(standardBuild));
@@ -44,9 +55,16 @@ function Upload() {
 	const [nameLength, setNameLength] = useState(50);
 	const [hoverImage, setHoverImage] = useState(false);
 	const [challengeParam, setChallengeParam] = useState(null);
+	const [sortedBuilds, setSortedBuilds] = useState([]);
 	//---------------------------------------------------------------------------------------------------//
 	const navigate = useNavigate();
 	const params = useParams().id;
+
+	useEffect(() => {
+		if (!authLoading && user?.username) {
+			setBuildToAddToFolder(dispatchFolders, buildId, user);
+		}
+	}, [authLoading]);
 
 	useEffect(() => {
 		if (params) {
@@ -62,6 +80,13 @@ function Upload() {
 			}
 		}
 	}, [articlesLoading]);
+
+	// Listen for changes to the sorting and filter the builds accordingly
+	useEffect(() => {
+		let newFetchedBuilds = cloneDeep(fetchedBuilds);
+
+		setSortedBuilds(filterBuilds(newFetchedBuilds));
+	}, [fetchedBuilds, sortBy]);
 
 	/**
 	 * Handles setting the new name
@@ -171,6 +196,7 @@ function Upload() {
 				newTags.push(tag.trim());
 			});
 
+			buildToUpload.id = buildId;
 			buildToUpload.name = newBuild.name.trim();
 			buildToUpload.tags = newTags;
 			buildToUpload.images.length === 0 ? (buildToUpload.images = [LogoBackground]) : (buildToUpload.images = newBuild.images);
@@ -351,39 +377,40 @@ function Upload() {
 
 								<form onSubmit={submitBuild} method="POST" encType="multipart/form-data">
 									{/* Build Image */}
-									{newBuild.images.length === 0 && (
+									{newBuild.images.length === 0 ? (
 										<div className="flex items-center justify-center w-36 h-36 rounded-xl bg-base-300 border-dashed border-2 border-slate-400">
 											<p className="text-4xl">{<FiCameraOff />}</p>
 										</div>
-									)}
+									) : null}
 
 									{/* Image Carousel */}
 									<div className="flex flex-row flex-wrap gap-2 2k:gap-4 mb-5 2k:mb-10">
-										{newBuild.images.length > 0 &&
-											newBuild.images.map((image, i) => {
-												return (
-													<div
-														key={i}
-														className={`relative flex items-center justify-center w-36 h-36 2k:w-52 2k:h-52 hover:bg-base-100 overflow-hidden rounded-xl bg-base-300 border-dashed border-2 ${
-															i === 0 ? 'border-blue-700' : 'border-slate-700'
-														} `}
-														onDrop={e => drop(e)}
-														onDragOver={e => allowDrop(e)}
-														onDragLeave={e => dragExit(e)}
-														id={`square-` + i}
-														style={squareStyle(i)}
-													>
-														<Button onClick={() => removeImage(i)} text="X" css="hover:bg-red-500" color="btn-error" size="btn-sm" style="btn-circle" position="right-0 top-0 absolute z-50" />
-														{i === 0 && <div className="badge badge-sm absolute bottom-1 left-1 text-lg 2k:text-xl p-2 2k:p-3">Thumbnail</div>}
-														<img id={i} src={image} className="w-full object-scale-down cursor-pointer" alt="" draggable={true} onDragStart={e => drag(e)} />
-													</div>
-												);
-											})}
-										{uploadingImage && <Spinner1 />}
+										{newBuild.images.length > 0
+											? newBuild.images.map((image, i) => {
+													return (
+														<div
+															key={i}
+															className={`relative flex items-center justify-center w-36 h-36 2k:w-52 2k:h-52 hover:bg-base-100 overflow-hidden rounded-xl bg-base-300 border-dashed border-2 ${
+																i === 0 ? 'border-blue-700' : 'border-slate-700'
+															} `}
+															onDrop={e => drop(e)}
+															onDragOver={e => allowDrop(e)}
+															onDragLeave={e => dragExit(e)}
+															id={`square-` + i}
+															style={squareStyle(i)}
+														>
+															<Button onClick={() => removeImage(i)} text="X" css="hover:bg-red-500" color="btn-error" size="btn-sm" style="btn-circle" position="right-0 top-0 absolute z-50" />
+															{i === 0 && <div className="badge badge-sm absolute bottom-1 left-1 text-lg 2k:text-xl p-2 2k:p-3">Thumbnail</div>}
+															<img id={i} src={image} className="w-full object-scale-down cursor-pointer" alt="" draggable={true} onDragStart={e => drag(e)} />
+														</div>
+													);
+											  })
+											: null}
+										{uploadingImage ? <Spinner1 /> : null}
 									</div>
 
 									{/* Upload build image */}
-									{newBuild.images.length < 6 && (
+									{newBuild.images.length < 6 ? (
 										<div className="flex flex-row gap-4 w-full mb-2 2k:mb-4">
 											<input type="file" id="build-image" max="6" accept=".jpg,.png,.jpeg" multiple className="file-input w-full max-w-xs mb-6 2k:file-input-lg text-slate-200" onChange={e => handleAddBuildImages(e)} />
 											<div className="flex flex-col">
@@ -391,7 +418,7 @@ function Upload() {
 												<p className="text-slate-400 2k:text-2xl">For best results images should be 16/9</p>
 											</div>
 										</div>
-									)}
+									) : null}
 
 									{/* Name/versions/visibility/mods */}
 									<div className="flex flex-row flex-wrap gap-16 mb-10 2k:mb-20">
@@ -414,14 +441,15 @@ function Upload() {
 											<select onChange={setVersion} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
 												<optgroup>
 													<option value="any">Any</option>
-													{!filtersLoading &&
-														kspVersions.map((version, i) => {
-															return (
-																<option key={i} value={version}>
-																	{version} {i === 0 && '(Current)'}
-																</option>
-															);
-														})}
+													{!filtersLoading
+														? kspVersions.map((version, i) => {
+																return (
+																	<option key={i} value={version}>
+																		{version} {i === 0 ? '(Current)' : null}
+																	</option>
+																);
+														  })
+														: null}
 												</optgroup>
 											</select>
 										</div>
@@ -484,20 +512,35 @@ function Upload() {
 									<h3 className="text-slate-200 text-xl 2k:text-3xl mb-2 2k:mb-4">Build Type (3 max)</h3>
 									<BuildTypes typesArr={newBuild.type} setBuildState={setNewBuild} />
 
-									{/* Tags */}
-									<div className="flex flex-row gap-4 items-center mb-2 2k:mb-4 mt-8 2k:mt-18">
-										<h3 className="text-slate-200 text-xl 2k:text-3xl">Tags (3 max)</h3>
-										<h4 className="text-slate-400 text-lg italic 2k:text-2xl">Press ',' to add a new tag</h4>
+									<div className="flex flex-row flex-wrap gap-10 2k:gap-16 mb-10 2k:mb-20">
+										{/* Tags */}
+										<div className="flex flex-col gap-2 2k:gap-4">
+											<div className="flex flex-row gap-4 items-center mb-2 2k:mb-4 mt-8 2k:mt-18">
+												<h3 className="text-slate-200 text-xl 2k:text-3xl">Tags (3 max)</h3>
+												<h4 className="text-slate-400 text-lg italic 2k:text-2xl">Press ',' to add a new tag</h4>
+											</div>
+											<input
+												id="tagsField"
+												disabled={newBuild.tags.length === 3}
+												onChange={setTags}
+												type="text"
+												placeholder="Tags"
+												className="input 2k:input-lg 2k:text-2xl 2k:mb-6 input-bordered w-96 max-w-lg text-slate-200"
+												maxLength="30"
+											/>
+										</div>
+
+										{/* Folder */}
+										<div className="flex flex-col w-full gap-2 2k:gap-4">
+											<div className="flex flex-row gap-4 items-center mb-2 2k:mb-4 mt-8 2k:mt-18">
+												<h3 className="text-slate-200 text-xl 2k:text-3xl">Save to Folder</h3>
+											</div>
+											<Folders hideOwnFolder={true} editable={true} />
+
+											{openedFolder ? <Builds buildsToDisplay={sortedBuilds} /> : null}
+										</div>
 									</div>
-									<input
-										id="tagsField"
-										disabled={newBuild.tags.length === 3}
-										onChange={setTags}
-										type="text"
-										placeholder="Tags"
-										className="input 2k:input-lg 2k:text-2xl 2k:mb-6 input-bordered w-96 max-w-lg text-slate-200"
-										maxLength="30"
-									/>
+
 									<div className="flex flex-row gap-10 2k:mb-10">
 										{newBuild.tags.map((tag, i) => {
 											return (

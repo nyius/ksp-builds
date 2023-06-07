@@ -1,20 +1,16 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Button from '../buttons/Button';
 import PlanetHeader from '../header/PlanetHeader';
 import TextInput from '../input/TextInput';
 import { toast } from 'react-toastify';
 import resetPassword from '../../utilities/resetPassword';
 import AuthContext from '../../context/auth/AuthContext';
-import useAuth from '../../context/auth/AuthActions';
+import { setResetPassword } from '../../context/auth/AuthActions';
 
 function ResetPassword() {
-	const navigate = useNavigate();
 	const [email, setEmail] = useState('');
 	const [emailSent, setEmailSent] = useState('');
-	const { resetPasswordState } = useContext(AuthContext);
-	const { setResetPassword } = useAuth();
-
+	const { resetPasswordState, dispatchAuth } = useContext(AuthContext);
 	/**
 	 * Handles a user starting the login process
 	 * @returns
@@ -28,7 +24,7 @@ function ResetPassword() {
 
 		const status = await resetPassword(email);
 		setEmailSent(true);
-		setResetPassword(false);
+		setResetPassword(dispatchAuth, false);
 	};
 
 	if (resetPasswordState) {
@@ -38,7 +34,7 @@ function ResetPassword() {
 				<input type="checkbox" checked={resetPasswordState} id="reset-password" className="modal-toggle" />
 				<div className="modal">
 					<div className="modal-box relative">
-						<Button htmlFor="reset-password" onClick={() => setResetPassword(false)} style="btn-circle" size="absolute right-2 top-2 z-50" text="X" />
+						<Button htmlFor="reset-password" onClick={() => setResetPassword(dispatchAuth, false)} style="btn-circle" size="absolute right-2 top-2 z-50" text="X" />
 						<PlanetHeader text="Reset Password" />
 
 						{/* Email Login */}

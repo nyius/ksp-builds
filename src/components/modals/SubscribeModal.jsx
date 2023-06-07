@@ -5,12 +5,11 @@ import Tier1Badge from '../../assets/badges/tier1/tier1_badge36.png';
 import Tier2Badge from '../../assets/badges/tier2/tier2_badge36.png';
 import Tier3Badge from '../../assets/badges/tier3/tier3_badge36.png';
 import AuthContext from '../../context/auth/AuthContext';
-import useAuth from '../../context/auth/AuthActions';
+import { setNewSub } from '../../context/auth/AuthActions';
 import { FaHeart } from 'react-icons/fa';
 
-function SubscribeModal({ id, userID }) {
-	const { user, authLoading, newSub } = useContext(AuthContext);
-	const { setNewSub } = useAuth();
+function SubscribeModal() {
+	const { dispatchAuth, user, authLoading, newSub } = useContext(AuthContext);
 
 	return (
 		<>
@@ -19,7 +18,7 @@ function SubscribeModal({ id, userID }) {
 					<input type="checkbox" id="subscribe-modal" className="modal-toggle" />
 					<div className="modal">
 						<div className="modal-box relative">
-							<Button htmlFor="subscribe-modal" style="btn-circle" position="absolute right-2 top-2" text="X" onClick={setNewSub} />
+							<Button htmlFor="subscribe-modal" style="btn-circle" position="absolute right-2 top-2" text="X" onClick={() => setNewSub(dispatchAuth, false)} />
 							<h3 className="text-xl 2k:text-3xl font-bold text-center mb-4 2k:mb-6 text-white">Subscribe</h3>
 							<img src={AstrobiffHeart} alt="Astrobiff" className="rounded-xl mb-3 2k:mb-6" />
 
@@ -119,7 +118,7 @@ function SubscribeModal({ id, userID }) {
 									</div>
 
 									<div className="flex flex-row items-center justify-end gap-4 2k:gap-10 mt-10">
-										<Button htmlFor="subscribe-modal" color="btn-ghost" text="Cancel" icon="cancel" onClick={setNewSub} />
+										<Button htmlFor="subscribe-modal" color="btn-ghost" text="Cancel" icon="cancel" onClick={() => setNewSub(dispatchAuth, false)} />
 									</div>
 								</>
 							)}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../buttons/Button';
-import useAuth from '../../context/auth/AuthActions';
+import { useHandleNotifications } from '../../context/auth/AuthActions';
 import UsernameLink from '../buttons/UsernameLink';
 import { convertFromRaw, EditorState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
@@ -9,7 +9,7 @@ import { Editor } from 'react-draft-wysiwyg';
 function Notification({ i, notif }) {
 	const [timestamp, setTimestamp] = useState(null);
 	const navigate = useNavigate();
-	const { handleDeleteNotification } = useAuth();
+	const { handleDeleteNotification } = useHandleNotifications();
 	let editorState;
 
 	if (notif.type === 'message' || notif.type === 'welcome' || notif.type === 'update' || notif.type === 'buildOfTheWeek') editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(notif.message)));

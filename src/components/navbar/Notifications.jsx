@@ -2,14 +2,14 @@ import React, { useContext, useState, useEffect } from 'react';
 import AuthContext from '../../context/auth/AuthContext';
 import { MdOutlineNotificationsNone } from 'react-icons/md';
 import Notification from './Notification';
-import useAuth from '../../context/auth/AuthActions';
+import { useHandleNotifications } from '../../context/auth/AuthActions';
 import Button from '../buttons/Button';
 import Spinner1 from '../spinners/Spinner1';
 
 function Notifications() {
 	const { authLoading, user, notificationsLoading, lastFetchedNotification } = useContext(AuthContext);
 	const [totalUnread, setTotalUnread] = useState(0);
-	const { setNotificationsRead, handleDeleteAllNotifications, fetchMoreNotifications } = useAuth();
+	const { handleDeleteAllNotifications, fetchMoreNotifications, setNotificationsRead } = useHandleNotifications();
 
 	/**
 	 * Calculates total unread notifications

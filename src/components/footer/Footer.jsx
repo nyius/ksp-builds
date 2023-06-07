@@ -7,7 +7,7 @@ function Footer() {
 	const navigate = useNavigate();
 
 	return (
-		<footer className="footer items-center p-4 bg-neutral grid-flow-row xl:grid-flow-col text-neutral-content z-60 relative">
+		<footer className="footer items-center p-4 bg-neutral grid-flow-row xl:grid-flow-col text-neutral-content z-20 relative">
 			<div className="flex flex-col gap-3 2k:gap-6">
 				<div className="items-center flex-row flex flex-wrap lg:grid-flow-col gap-5 2k:gap-10">
 					<div className="flex flex-col text-center">

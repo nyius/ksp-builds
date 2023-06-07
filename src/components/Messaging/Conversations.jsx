@@ -1,12 +1,12 @@
 import React, { useState, useContext, useEffect, useRef, Fragment } from 'react';
 import AuthContext from '../../context/auth/AuthContext';
-import useAuth from '../../context/auth/AuthActions';
+import { setConvoTab, setDeleteConversationId } from '../../context/auth/AuthActions';
+import { readMessage } from '../../context/auth/AuthUtils';
 import Button from '../buttons/Button';
 
 function Conversations() {
-	const { conversations, user } = useContext(AuthContext);
+	const { dispatchAuth, conversations, user } = useContext(AuthContext);
 	const messagesTopTef = useRef(null);
-	const { setMessageTab, readMessage, handleDeleteConversationId } = useAuth();
 	const [convos, setConvos] = useState(null);
 
 	const scrollToTop = () => {
@@ -33,10 +33,10 @@ function Conversations() {
 	 */
 	const handleOpenConvo = (convo, e) => {
 		if (!e.target.htmlFor) {
-			setMessageTab(convo);
-			readMessage(convo);
+			setConvoTab(dispatchAuth, convo);
+			readMessage(convo.id, user.uid);
 		} else {
-			handleDeleteConversationId(convo.id);
+			setDeleteConversationId(dispatchAuth, convo.id);
 		}
 	};
 

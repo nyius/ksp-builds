@@ -2,11 +2,11 @@ import React, { useContext, useState } from 'react';
 import AuthContext from '../../context/auth/AuthContext';
 import Button from '../buttons/Button';
 import PlanetHeader from '../header/PlanetHeader';
-import useAuth from '../../context/auth/AuthActions';
+import { setUserToBlock, useBlockUser } from '../../context/auth/AuthActions';
 
 function BlockModal() {
-	const { reportType, reportingContent, user, userToBlock } = useContext(AuthContext);
-	const { blockUser, setUserToBlock } = useAuth();
+	const { dispatchAuth, user, userToBlock } = useContext(AuthContext);
+	const { blockUser } = useBlockUser();
 
 	/**
 	 * Handles blocking a user
@@ -19,7 +19,7 @@ function BlockModal() {
 	 * handles closing the modal and clearing the id of the user to block
 	 */
 	const handleCloseModal = () => {
-		setUserToBlock(null);
+		setUserToBlock(dispatchAuth, null);
 	};
 
 	//---------------------------------------------------------------------------------------------------//

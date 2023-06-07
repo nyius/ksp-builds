@@ -16,7 +16,7 @@ function Sort() {
 	};
 
 	return (
-		<select onChange={handleChangeSort} className="select select-bordered 2k:select-lg 2k:text-3xl 2k:font-thin max-w-xs bg-base-900 mr-6 md:mr-0">
+		<select onChange={handleChangeSort} className="select select-bordered 2k:select-lg 2k:text-2xl 2k:font-thin max-w-xs bg-base-900 mr-6 md:mr-0">
 			<optgroup>
 				<option selected={sortBy === 'views_most' ? true : false} value="views_most">
 					Views

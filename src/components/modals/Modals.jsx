@@ -9,7 +9,13 @@ import DeleteAccount from './DeleteAccount';
 import ReportModal from './ReportModal';
 import BlockModal from './BlockModal';
 import SubscribeModal from './SubscribeModal';
+import AddBuildToFolderModal from './AddBuildToFolderModal';
+import DeleteFolderModal from './DeleteFolderModal';
 
+/**
+ * Stores (mostly) all modals
+ * @returns
+ */
 function Modals() {
 	return (
 		<>
@@ -21,8 +27,10 @@ function Modals() {
 			<ResetPassword />
 			<ReportModal />
 			<DeleteAccount />
+			<DeleteFolderModal />
 			<BlockModal />
 			<SubscribeModal />
+			<AddBuildToFolderModal />
 		</>
 	);
 }

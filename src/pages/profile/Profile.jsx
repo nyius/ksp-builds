@@ -2,44 +2,46 @@ import React, { useContext, useEffect, useState } from 'react';
 import { cloneDeep } from 'lodash';
 import { toast } from 'react-toastify';
 import { AiFillCamera } from 'react-icons/ai';
-import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { convertFromRaw, EditorState, ContentState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
-
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
 import BuildsContext from '../../context/builds/BuildsContext';
-import useBuilds from '../../context/builds/BuildsActions';
+import useBuilds, { setBuildsLoading, setClearFetchedBuilds } from '../../context/builds/BuildsActions';
 import useFilters from '../../context/filters/FiltersActions';
 import FiltersContext from '../../context/filters/FiltersContext';
-import useAuth from '../../context/auth/AuthActions';
+import { setEditingProfile, useUpdateProfile } from '../../context/auth/AuthActions';
+import { setSelectedFolder, setBuildToAddToFolder } from '../../context/folders/FoldersActions';
+import FoldersContext from '../../context/folders/FoldersContext';
+import { uploadProfilePicture } from '../../context/auth/AuthUtils';
+//---------------------------------------------------------------------------------------------------//
 import useResetStates from '../../utilities/useResetStates';
 import checkIfJson from '../../utilities/checkIfJson';
 //---------------------------------------------------------------------------------------------------//
-import BuildCard from '../../components/cards/BuildCard';
 import Spinner1 from '../../components/spinners/Spinner1';
 import Sort from '../../components/sort/Sort';
 import Button from '../../components/buttons/Button';
-import CantFind from '../../components/cantFind/CantFind';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import TextEditor from '../../components/textEditor/TextEditor';
 import BotwBadge from '../../assets/BotW_badge2.png';
 import BuildInfoCard from '../../components/cards/BuildInfoCard';
+import Builds from '../../components/builds/Builds';
+import Folders from '../../components/folders/Folders';
 
 /**
  * Displays the users own profile
  * @returns
  */
 function Profile() {
-	const navigate = useNavigate();
-	const { typeFilter, versionFilters, searchTerm, tagsSearch, sortBy } = useContext(FiltersContext);
-	const { fetchedBuilds, loadingBuilds } = useContext(BuildsContext);
-	const { user, authLoading, editingProfile } = useContext(AuthContext);
+	const { sortBy } = useContext(FiltersContext);
+	const { dispatchBuilds, fetchedBuilds } = useContext(BuildsContext);
+	const { user, authLoading, editingProfile, dispatchAuth } = useContext(AuthContext);
+	const { dispatchFolders, openedFolder } = useContext(FoldersContext);
 	//---------------------------------------------------------------------------------------------------//
-	const { setEditingProfile, updateUserDbBio, uploadProfilePicture, updateUserDbProfilePic } = useAuth();
-	const { fetchUsersBuilds, setBuildsLoading, clearFetchedBuilds } = useBuilds();
+	const { fetchBuildsById } = useBuilds();
+	const { updateUserProfilePic, updateUserBio } = useUpdateProfile();
 	const { filterBuilds, resetFilters } = useFilters();
 	//---------------------------------------------------------------------------------------------------//
 	const [uploadingProfilePhoto, setUploadingProfilePhoto] = useState(false);
@@ -57,21 +59,22 @@ function Profile() {
 
 	const { resetStates } = useResetStates();
 
-	// Reset edidtingBuild/editingComment stats on page load
 	useEffect(() => {
+		setSelectedFolder(dispatchFolders, null);
+		setBuildToAddToFolder(dispatchFolders, null, user);
 		resetStates();
 		resetFilters();
 	}, []);
 
 	useEffect(() => {
-		clearFetchedBuilds();
+		setClearFetchedBuilds(dispatchBuilds);
 
 		if (!authLoading) {
 			if (user?.username && user?.builds.length > 0) {
-				fetchUsersBuilds(user.builds, user.uid);
+				fetchBuildsById(user.builds, user.uid, 'user');
 				setBioLength(user.bio.length);
 			} else {
-				setBuildsLoading(false);
+				setBuildsLoading(dispatchBuilds, false);
 			}
 
 			if (checkIfJson(user?.bio)) {
@@ -94,11 +97,11 @@ function Profile() {
 	 */
 	const handleSubmitBioUpdate = async () => {
 		if (editedBio) {
-			await updateUserDbBio(editedBio);
-			setEditingProfile(false);
+			await updateUserBio(editedBio);
+			setEditingProfile(dispatchAuth, false);
 			setBioState(EditorState.createWithContent(convertFromRaw(JSON.parse(editedBio))));
 		} else {
-			setEditingProfile(false);
+			setEditingProfile(dispatchAuth, false);
 		}
 	};
 
@@ -107,9 +110,9 @@ function Profile() {
 	 * @param {*} e
 	 */
 	const handleNewProfilePhoto = async e => {
-		await uploadProfilePicture(e, setUploadingProfilePhoto)
+		await uploadProfilePicture(e, setUploadingProfilePhoto, user.uid)
 			.then(url => {
-				updateUserDbProfilePic(url);
+				updateUserProfilePic(url);
 				setUploadingProfilePhoto(false);
 			})
 			.catch(err => {
@@ -130,7 +133,7 @@ function Profile() {
 
 			<MiddleContainer color="none">
 				<PlanetHeader text="Profile" />
-				{!authLoading && user?.username && (
+				{!authLoading && user?.username ? (
 					<>
 						<div className="flex flex-col gap-20 mb-10 bg-base-400 border-2 border-dashed border-slate-700 rounded-xl p-6 2k:p-12">
 							<div className="flex flex-col md:flex-row gap-20 items-center">
@@ -151,7 +154,7 @@ function Profile() {
 								<div className="flex flex-col gap-3 2k:gap-6 w-full">
 									{/* Username */}
 									<p className="text-xl 2k:text-3xl font-thin text-white">
-										<span className="text-slate-500 text-xl 2k:text-2xl italic">Username: </span> {user.username}
+										<span className="text-slate-400 text-xl 2k:text-2xl italic">Username: </span> {user.username}
 									</p>
 
 									{editingProfile ? (
@@ -161,26 +164,27 @@ function Profile() {
 
 											{/* Buttons */}
 											<div className="flex flex-row gap-4">
-												<Button text="Save" icon="save" onClick={handleSubmitBioUpdate} size="w-fit" />
-												<Button text="Cancel" icon="cancel" onClick={() => setEditingProfile(false)} size="w-fit" />
+												<Button text="Save" color="btn-success" icon="save" onClick={handleSubmitBioUpdate} size="w-fit" />
+												<Button text="Cancel" color="btn-error" icon="cancel" onClick={() => setEditingProfile(dispatchAuth, false)} size="w-fit" />
 											</div>
 										</>
 									) : (
-										<div>
+										<>
 											<div className="flex flex-row gap-2">
 												{/* Bio */}
 												<Editor editorState={bioState} readOnly={true} toolbarHidden={true} />
 											</div>
-											<Button text="Edit Bio" icon="edit" onClick={() => setEditingProfile({ bio: user.bio })} size="btn-sm 2k:btn-md w-fit" margin="mt-3 2k:mt-6 mb-4" />
-										</div>
+											<Button text="Edit Bio" icon="edit" color="bg-base-900" onClick={() => setEditingProfile(dispatchAuth, { bio: user.bio })} size="btn-sm 2k:btn-md w-fit" margin="mt-3 2k:mt-6 mb-4" />
+										</>
 									)}
-									<p className="text-xl 2k:text-3xl">
-										<span className="text-slate-500 text-xl 2k:text-2xl italic">Email:</span> {user.email}
+
+									<p className="text-xl 2k:text-3xl mt-4 text-white">
+										<span className="text-slate-400 text-xl 2k:text-2xl italic">Email:</span> {user.email}
 									</p>
 								</div>
 							</div>
 
-							{/* User Details */}
+							{/* User Card Details */}
 							<div className="flex flex-row flex-wrap gap-2 2k:gap-4 bg-base-900 w-full justify-center p-2 2k:p-4 rounded-xl">
 								<BuildInfoCard title="Joined">
 									<p className="text-xl 2k:text-3xl text-accent">{dateCreated}</p>
@@ -200,35 +204,18 @@ function Profile() {
 							</div>
 						</div>
 
-						{/* Builds */}
-						<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4">Your Builds</h2>
+						{/* Folders */}
+						<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">Your Folders</h2>
+						<Folders editable={true} />
 
-						<Sort />
-						<div className="flex flex-row flex-wrap w-full items-stretch justify-center md:justify-items-center mb-6 p-6 md:p-0">
-							{loadingBuilds ? (
-								<div className="flex flex-row w-full justify-center items-center">
-									<div className="w-20">
-										<Spinner1 />
-									</div>
-								</div>
-							) : (
-								<>
-									{fetchedBuilds.length === 0 ? (
-										<CantFind text="You have no builds yet!">
-											<Button text="Create your first" icon="plus" onClick={() => navigate('/upload')} color="btn-primary" />
-										</CantFind>
-									) : (
-										<>
-											{sortedBuilds.map((build, i) => {
-												return <BuildCard key={i} i={i} build={build} />;
-											})}
-										</>
-									)}
-								</>
-							)}
+						{/* Builds */}
+						<div className="flex flex-row flex-wrap gap-4 w-full place-content-between sm:mb-4">
+							<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">{openedFolder ? openedFolder?.folderName : 'Your Builds'}</h2>
+							<Sort />
 						</div>
+						<Builds buildsToDisplay={sortedBuilds} />
 					</>
-				)}
+				) : null}
 			</MiddleContainer>
 		</>
 	);

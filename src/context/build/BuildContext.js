@@ -8,8 +8,8 @@ export const BuildProvider = ({ children }) => {
 	// Initial state
 	const initialState = {
 		loadingBuild: true,
-		loadingRawBuild: true,
 		editingBuild: false,
+		fetchedRawBuilds: {},
 		editingComment: false,
 		replyingComment: null,
 		uploadingBuild: false,
@@ -21,7 +21,7 @@ export const BuildProvider = ({ children }) => {
 		commentsLoading: true,
 		comment: '',
 		resetTextEditor: '',
-		settingBuildOfTheWeek: null,
+		buildOfTheWeek: null,
 	};
 
 	const [state, dispatchBuild] = useReducer(BuildReducer, initialState);

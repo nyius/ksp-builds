@@ -1,9 +1,9 @@
 import React from 'react';
-import useBuild from '../../context/build/BuildActions';
+import { useDeleteBuild } from '../../context/build/BuildActions';
 import Button from '../buttons/Button';
 
 function DeleteBuildModal({ id, userID }) {
-	const { deleteBuild } = useBuild();
+	const { deleteBuild } = useDeleteBuild();
 
 	return (
 		<>

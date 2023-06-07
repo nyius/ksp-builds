@@ -6,10 +6,11 @@ import { toast } from 'react-toastify';
 import Astrobiff from '../../assets/astrobiff.png';
 import Spinner1 from '../spinners/Spinner1';
 import AuthContext from '../../context/auth/AuthContext';
-import useAuth from '../../context/auth/AuthActions';
+import { setNewSignup, useUpdateProfile, updateUserState } from '../../context/auth/AuthActions';
 import Button from '../buttons/Button';
 import { profanity } from '@2toad/profanity';
 import TextInput from '../input/TextInput';
+import { uploadProfilePicture } from '../../context/auth/AuthUtils';
 
 function NewAccountModal() {
 	const navigate = useNavigate();
@@ -17,8 +18,8 @@ function NewAccountModal() {
 	const [uploadingImage, setUploadingImage] = useState(false);
 	const [newProfilePicture, setNewProfilePicture] = useState(Astrobiff);
 
-	const { user, newSignup } = useContext(AuthContext);
-	const { setNewSignup, updateUserState, uploadProfilePicture, updateUserDbProfilePic } = useAuth();
+	const { user, newSignup, dispatchAuth } = useContext(AuthContext);
+	const { updateUserProfilePic } = useUpdateProfile();
 	const newAccountModal = document.querySelector('#new-account-modal');
 
 	/**
@@ -75,8 +76,8 @@ function NewAccountModal() {
 
 					await updateDoc(doc(db, 'users', user.uid), updateUser)
 						.then(() => {
-							setNewSignup(false);
-							updateUserState(updateUser);
+							setNewSignup(dispatchAuth, false);
+							updateUserState(dispatchAuth, updateUser);
 							toast.success('Account Created!');
 						})
 						.catch(err => {
@@ -114,10 +115,10 @@ function NewAccountModal() {
 	 * @param {*} e
 	 */
 	const handleNewProfilePhoto = async e => {
-		await uploadProfilePicture(e, setUploadingImage)
+		await uploadProfilePicture(e, setUploadingImage, user.uid)
 			.then(url => {
 				setNewProfilePicture(url);
-				updateUserDbProfilePic(url);
+				updateUserProfilePic(url);
 				setUploadingImage(false);
 			})
 			.catch(err => {

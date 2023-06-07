@@ -1,12 +1,10 @@
 import React, { useContext, useState, useRef, useEffect, Fragment } from 'react';
 import AuthContext from '../../context/auth/AuthContext';
 import UsernameLink from '../buttons/UsernameLink';
-import useAuth from '../../context/auth/AuthActions';
 
 function Conversation() {
 	const { user, messageTab } = useContext(AuthContext);
 	const messagesEndRef = useRef(null);
-	const { readMessage } = useAuth();
 
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView();
@@ -18,7 +16,7 @@ function Conversation() {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="w-full h-full flex flex-col">
+		<div className="w-full sm:w-158 h-full flex flex-col">
 			{messageTab.messages?.length === 0 ? (
 				<p className="text-xl 2k:text-3xl text-center">No messages with {messageTab.username} yet! Be the first to send one</p>
 			) : (

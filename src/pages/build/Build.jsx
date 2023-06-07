@@ -7,7 +7,6 @@ import { Editor } from 'react-draft-wysiwyg';
 import { Helmet } from 'react-helmet';
 //---------------------------------------------------------------------------------------------------//
 import { AiFillEye } from 'react-icons/ai';
-import { RiMedalFill } from 'react-icons/ri';
 //---------------------------------------------------------------------------------------------------//
 import youtubeLinkConverter from '../../utilities/youtubeLinkConverter';
 import useResetStates from '../../utilities/useResetStates';
@@ -15,8 +14,11 @@ import draftJsToPlainText from '../../utilities/draftJsToPlainText';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from '../../context/build/BuildContext';
 import AuthContext from '../../context/auth/AuthContext';
-import useBuild from '../../context/build/BuildActions';
-import useAuth from '../../context/auth/AuthActions';
+import useBuild, { setBuildOfTheWeek, setReplyingComment, setEditingBuild, useComment, useCopyBuildToClipboard } from '../../context/build/BuildActions';
+import { setReport, useFetchUser } from '../../context/auth/AuthActions';
+import FoldersContext from '../../context/folders/FoldersContext';
+import { setAddBuildToFolderModal, setBuildToAddToFolder } from '../../context/folders/FoldersActions';
+import { checkIfBuildInAllFolders } from '../../context/folders/FoldersUtilils';
 //---------------------------------------------------------------------------------------------------//
 import VoteArrows from '../../components/buttons/VoteArrows';
 import Spinner1 from '../../components/spinners/Spinner1';
@@ -38,12 +40,16 @@ import BuildInfoCard from '../../components/cards/BuildInfoCard';
 
 function Build() {
 	//---------------------------------------------------------------------------------------------------//
-	const { fetchBuild, setComment, addComment, updateDownloadCount, setEditingBuild, setReplyingComment, setBuildOfTheWeek } = useBuild();
-	const { loadingBuild, loadingRawBuild, loadedBuild, commentsLoading, comments, editingBuild, replyingComment } = useContext(BuildContext);
-	const { user, authLoading, fetchedUserProfile } = useContext(AuthContext);
+	const { fetchBuild } = useBuild();
+	const { copyBuildToClipboard } = useCopyBuildToClipboard();
+	const { setComment, addComment } = useComment();
+	const { dispatchBuild, loadingBuild, loadedBuild, commentsLoading, comments, editingBuild, replyingComment } = useContext(BuildContext);
+	const { dispatchFolders } = useContext(FoldersContext);
+	const { dispatchAuth, user, authLoading, fetchedUserProfile } = useContext(AuthContext);
 	const [buildDesc, setBuildDesc] = useState(null);
+	const [fetchingRawBuild, setFetchingRawBuild] = useState(false);
 
-	const { setReport, fetchUsersProfile } = useAuth();
+	const { fetchUsersProfile } = useFetchUser();
 	const { resetStates } = useResetStates();
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -70,19 +76,10 @@ function Build() {
 	}, [loadingBuild, loadedBuild]);
 
 	/**
-	 * Handles copying the build to the clipboard
-	 */
-	const copyBuildToClipboard = async () => {
-		navigator.clipboard.writeText(loadedBuild.build);
-		await updateDownloadCount(loadedBuild, loadedBuild.id);
-		toast.success('Build coped to clipboard!');
-	};
-
-	/**
 	 * Handles clearing the comment contents/replying context
 	 */
 	const handleClearComment = () => {
-		setReplyingComment(null);
+		setReplyingComment(dispatchBuild, null);
 		setComment(null);
 	};
 
@@ -90,7 +87,7 @@ function Build() {
 	 * Handles setting the reported comment
 	 */
 	const handleSetReport = () => {
-		setReport('build', loadedBuild);
+		setReport(dispatchAuth, 'build', loadedBuild);
 	};
 
 	/**
@@ -122,58 +119,66 @@ function Build() {
 					<>
 						{loadedBuild ? (
 							<div className="flex flex-col gap-4 w-full">
-								{user && user?.siteAdmin && <Button text="Make build of the week" color="btn-primary" icon="fill-star" htmlFor="build-of-the-week-modal" onClick={() => setBuildOfTheWeek(loadedBuild)} />}
+								{user && user?.siteAdmin ? <Button text="Make build of the week" color="btn-primary" icon="fill-star" htmlFor="build-of-the-week-modal" onClick={() => setBuildOfTheWeek(dispatchBuild, loadedBuild)} /> : null}
 								{/* Images */}
 								<Carousel images={loadedBuild.images} />
 
 								{/* Author/Uploaded/version */}
-								<div className="flex flex-row flex-wrap gap-2 2k:gap-4 bg-base-900 w-full justify-center p-2 2k:p-4 mb-6 2k:mb-12 rounded-xl">
+								<div className="flex flex-row flex-wrap gap-4 2k:gap-5 bg-base-900 w-full justify-center p-2 2k:p-4 mb-6 2k:mb-12 rounded-xl">
 									<BuildInfoCard title="Author">
 										<UsernameLink username={loadedBuild.author} uid={loadedBuild.uid} />
 									</BuildInfoCard>
 									<BuildInfoCard title="Date Created">
-										<p className="text-xl 2k:text-3xl text-accent">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.timestamp.seconds * 1000)}</p>
+										<p className="text-xl 2k:text-2xl text-accent">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.timestamp.seconds * 1000)}</p>
 									</BuildInfoCard>
 									<BuildInfoCard title="Last Updated">
-										<p className="text-xl 2k:text-3xl text-accent">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.lastModified.seconds * 1000)}</p>
+										<p className="text-xl 2k:text-2xl text-accent">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.lastModified.seconds * 1000)}</p>
 									</BuildInfoCard>
 									<BuildInfoCard title="KSP Version">
-										<p className="text-xl 2k:text-3xl text-accent">{loadedBuild.kspVersion}</p>
+										<p className="text-xl 2k:text-2xl text-accent">{loadedBuild.kspVersion}</p>
+									</BuildInfoCard>
+									<BuildInfoCard title="Part Count">
+										<p className="text-xl 2k:text-2xl text-accent">{loadedBuild.partCount}</p>
 									</BuildInfoCard>
 									<BuildInfoCard title="Uses Mods">
-										<p className="text-xl 2k:text-3xl text-accent">{loadedBuild.modsUsed ? 'Yes' : 'None'}</p>
+										<p className="text-xl 2k:text-2xl text-accent">{loadedBuild.modsUsed ? 'Yes' : 'None'}</p>
 									</BuildInfoCard>
 									<BuildInfoCard title="Downloads">
-										<p className="text-xl 2k:text-3xl text-accent">{loadedBuild.downloads}</p>
+										<p className="text-xl 2k:text-2xl text-accent">{loadedBuild.downloads}</p>
 									</BuildInfoCard>
-									{loadedBuild.buildOfTheWeek && (
+									{loadedBuild.buildOfTheWeek ? (
 										<BuildInfoCard title="Build of the Week">
-											<img src={BotwBadge} alt="" className="w-22 2k:w-44" />
-											<p className="text-lg xl:text-xl 2k:text-3xl italic text-slate-500 ">
+											<img src={BotwBadge} alt="" className="w-22 2k:w-30" />
+											<p className="text-lg xl:text-xl 2k:text-2xl italic text-slate-500 ">
 												{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.buildOfTheWeek.seconds * 1000)}
 											</p>
 										</BuildInfoCard>
-									)}
-									{loadedBuild.forChallenge && (
-										<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 w-44  lg:w-96 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
-											<p className="text-lg xl:text-2xl 2k:text-4xl font-bold">Challenge</p>
+									) : null}
+									{loadedBuild.forChallenge ? (
+										<BuildInfoCard title="Challenge">
 											<Button
 												type="ahref"
 												href={`/challenges/${loadedBuild.forChallenge}`}
 												color="btn-ghost text-accent"
 												css="single-line-truncat"
 												text={loadedBuild.challengeTitle}
-												size="!text-xl 2k:!text-3xl font-thin !normal-case !h-fit"
+												size="!text-xl 2k:!text-2xl font-thin !normal-case !h-fit"
 											/>
-											{/* <p className="text-xl 2k:text-3xl text-accent multi-line-truncate">{loadedBuild.challengeTitle}</p> */}
-										</div>
-									)}
+										</BuildInfoCard>
+									) : null}
 								</div>
 
 								{/* Build Name/ Fav/ Voting/ Views */}
-								<div className="flex flex-row place-content-between">
-									<h1 className="text-slate-200 text-3xl font-bold 2k:text-5xl">{loadedBuild.name}</h1>
+								<h1 className="text-slate-200 text-3xl font-bold 2k:text-4xl pixel-font">{loadedBuild.name}</h1>
 
+								{/* Voting/Views/Types */}
+								<div className="flex flex-row place-content-between flex-wrap mb-8 2k:mb-16">
+									{/* Types */}
+									<div className="flex flex-row flex-wrap gap-2">
+										{loadedBuild.type.map(type => {
+											return <TypeBadge key={type} type={type} />;
+										})}
+									</div>
 									<div className="flex-row flex gap-4 2k:gap-8">
 										{/* Fave */}
 										<Favorite />
@@ -183,21 +188,11 @@ function Build() {
 										</div>
 
 										{/* Views */}
-										<p className="flex flex-row text-2xl items-center gap-4 2k:text-4xl">
+										<p className="flex flex-row text-2xl items-center gap-2 2k:text-4xl">
 											<AiFillEye />
-											<span className="text-lg 2k:text-3xl"> {loadedBuild.views}</span>
+											<span className="text-lg 2k:text-3xl">{loadedBuild.views}</span>
 										</p>
 										<Button tooltip="Share" color="btn-ghost text-accent" icon="share" onClick={handleShareBuild} />
-									</div>
-								</div>
-
-								{/* Voting/Views/Types */}
-								<div className="flex flex-row place-content-between mb-8 2k:mb-16">
-									{/* Types */}
-									<div className="flex flex-row flex-wrap gap-2">
-										{loadedBuild.type.map((type, i) => {
-											return <TypeBadge key={i} type={type} />;
-										})}
 									</div>
 								</div>
 
@@ -209,20 +204,33 @@ function Build() {
 
 								{/* Buttons */}
 								<div className="flex flex-col md:flex-row place-content-between">
-									<div className="flex flex-col sm:flex-row flex-wrap items-center gap-4 mb-10">
-										{loadedBuild.build && !loadingRawBuild ? <Button color="btn-primary" icon="export" onClick={copyBuildToClipboard} text="Export to KSP 2" /> : <Button text="Build not found!" color="btn-error" icon="cancel" />}
+									<div className="flex flex-col sm:flex-row flex-wrap items-center gap-4 mb-10 w-full">
+										<Button color="btn-primary" icon="export" onClick={() => copyBuildToClipboard(setFetchingRawBuild, loadedBuild.id)} text={fetchingRawBuild ? 'Copying...' : `Export to KSP 2`} />
 										<Button tooltip="How to import into KSP" color="btn-info" htmlFor="how-to-paste-build-modal" icon="info" />
-										<Button tooltip="Report" htmlFor="report-modal" color="bg-base-800" icon="report" onClick={handleSetReport} />
+										{!authLoading && user?.username ? (
+											<Button
+												onClick={() => {
+													setBuildToAddToFolder(dispatchFolders, loadedBuild.id, user);
+													setAddBuildToFolderModal(dispatchFolders, true);
+												}}
+												color="btn-secondary"
+												text={checkIfBuildInAllFolders(loadedBuild.id, user) ? `Saved` : `Save build to folder`}
+												htmlFor="add-build-to-folder-modal"
+												icon="save"
+											/>
+										) : null}
+										<Button tooltip="Report" htmlFor="report-modal" color="bg-base-800 text-error" icon="report" onClick={handleSetReport} />
 									</div>
-									{!authLoading && (user?.uid === loadedBuild.uid || user?.siteAdmin) && (
-										<div className="flex flex-row flex-wrap gap-4">
-											<Button tooltip="Edit Build" icon="edit" color="btn-info" onClick={() => setEditingBuild(loadedBuild)} />
+
+									{!authLoading && (user?.uid === loadedBuild.uid || user?.siteAdmin) ? (
+										<div className="flex flex-row gap-4">
+											<Button tooltip="Edit Build" icon="edit" color="btn-info" onClick={() => setEditingBuild(dispatchBuild, loadedBuild)} />
 											<Button htmlFor="delete-build-modal" color="btn-error" icon="delete" tooltip="Delete Build" />
 										</div>
-									)}
+									) : null}
 								</div>
 
-								<div className="mb-6">{loadedBuild.video && <iframe src={youtubeLinkConverter(loadedBuild.video)}></iframe>}</div>
+								<div className="mb-6">{loadedBuild.video ? <iframe src={youtubeLinkConverter(loadedBuild.video)}></iframe> : null}</div>
 
 								{/* --------------------------- Comments ---------------------- */}
 								<p id="comments" className="text-2xl 2k:text-3xl">
@@ -237,14 +245,15 @@ function Build() {
 											<p className="2k:btn-lg 2k:text-2xl mb-20">No comments yet! Be the first to leave one</p>
 										) : (
 											<div className="flex flex-col gap-4 2k:gap-8 mb-20">
-												{comments.map((comment, i) => {
+												{comments.map(comment => {
 													return <Comment key={comment.id} comment={comment} />;
 												})}
 											</div>
 										)}
 									</>
 								)}
-								{!authLoading && user?.username && (
+
+								{!authLoading && user?.username ? (
 									<>
 										{!fetchedUserProfile?.blockList?.includes(user.uid) && (
 											<>
@@ -268,7 +277,7 @@ function Build() {
 											</>
 										)}
 									</>
-								)}
+								) : null}
 							</div>
 						) : (
 							<CantFind text="Oops.. Build not found">
@@ -277,8 +286,8 @@ function Build() {
 						)}
 					</>
 				)}
-				{loadedBuild && <DeleteBuildModal id={loadedBuild.id} userID={loadedBuild.uid} />}
-				{loadedBuild && user?.siteAdmin && <MakeBuildOfTheWeekModal />}
+				{loadedBuild ? <DeleteBuildModal id={loadedBuild.id} userID={loadedBuild.uid} /> : null}
+				{loadedBuild ? user?.siteAdmin && <MakeBuildOfTheWeekModal /> : null}
 			</MiddleContainer>
 		</>
 	);

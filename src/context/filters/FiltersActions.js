@@ -1,12 +1,13 @@
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FiltersContext from './FiltersContext';
-import useBuilds from '../builds/BuildsActions';
+import { setCurrentPage } from '../builds/BuildsActions';
+import BuildsContext from '../builds/BuildsContext';
 
 const useFilters = () => {
-	const { sortBy, typeFilter, versionFilter, challengeFilter, searchTerm, tagsSearch, dispatchBuildFilters, modsFilter } = useContext(FiltersContext);
-	const { setCurrentPage } = useBuilds();
+	const { sortBy, typeFilter, versionFilter, challengeFilter, dispatchBuildFilters, modsFilter } = useContext(FiltersContext);
 	const navigate = useNavigate();
+	const { dispatchBuilds } = useContext(BuildsContext);
 
 	/**
 	 * Handles setting search term
@@ -34,7 +35,7 @@ const useFilters = () => {
 				value: e.target.value,
 			},
 		});
-		setCurrentPage(0);
+		setCurrentPage(dispatchBuilds, 0);
 	};
 
 	/**
@@ -62,7 +63,7 @@ const useFilters = () => {
 				},
 			});
 		}
-		setCurrentPage(0);
+		setCurrentPage(dispatchBuilds, 0);
 	};
 
 	/**
@@ -77,7 +78,7 @@ const useFilters = () => {
 				value: e.target.value,
 			},
 		});
-		setCurrentPage(0);
+		setCurrentPage(dispatchBuilds, 0);
 	};
 
 	/**
@@ -92,7 +93,7 @@ const useFilters = () => {
 				value: e.target.value,
 			},
 		});
-		setCurrentPage(0);
+		setCurrentPage(dispatchBuilds, 0);
 	};
 
 	/**
@@ -107,22 +108,7 @@ const useFilters = () => {
 				value: e?.target?.value ? e.target.value : e,
 			},
 		});
-		setCurrentPage(0);
-	};
-
-	/**
-	 * Handles setting tags search term
-	 * @param {*} e
-	 */
-	const setTagSearchFilter = tag => {
-		dispatchBuildFilters({
-			type: 'SET_FILTERS',
-			payload: {
-				filter: 'tagsSearch',
-				value: tag,
-			},
-		});
-		setCurrentPage(0);
+		setCurrentPage(dispatchBuilds, 0);
 	};
 
 	/**
@@ -161,12 +147,6 @@ const useFilters = () => {
 				} else if (!build.modsUsed && modsFilter === 'no') {
 					return build;
 				}
-			})
-			.filter(build => {
-				if (tagsSearch === '') return build;
-
-				const checkTags = build?.tags?.filter(tag => tag.toLowerCase().includes(tagsSearch.toLowerCase()));
-				if (checkTags.length > 0) return build;
 			});
 	};
 
@@ -179,7 +159,7 @@ const useFilters = () => {
 		});
 	};
 
-	return { setSearchFilter, setTagSearchFilter, filterBuilds, setSortFilter, setTypeFilter, setVersionFilter, resetFilters, setModsFilter, setChallengeFilter };
+	return { setSearchFilter, filterBuilds, setSortFilter, setTypeFilter, setVersionFilter, resetFilters, setModsFilter, setChallengeFilter };
 };
 
 export default useFilters;

@@ -1,6 +1,6 @@
 {
 	"name": "ksp2-builds",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"private": true,
 	"dependencies": {
 		"@2toad/profanity": "^2.2.0",

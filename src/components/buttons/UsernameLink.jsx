@@ -83,7 +83,15 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color }) {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<div className="dropdown" onMouseEnter={handleHover} onMouseLeave={e => handleBlur(e)} onClick={e => e.stopPropagation()}>
+			<div
+				className="dropdown username-link"
+				onMouseEnter={handleHover}
+				onMouseLeave={e => handleBlur(e)}
+				onClick={e => {
+					e.stopPropagation();
+					e.preventDefault();
+				}}
+			>
 				{!loadingProfile && (
 					<>
 						{/* Username */}

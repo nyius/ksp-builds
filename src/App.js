@@ -27,7 +27,6 @@ sorting searched builds is bugged (fetches new builds from server)
 drag and drop your own builds into a folder?
 when launching the app, it should loop over the localstorage and check all of the stored builds to see their age
 	if theyre older than like a week, they should be removed from storage
-clicking a username inside of a build card should go to the user, not the build
 fix hover effect on builds card at 2k res
 userprofiles should local store just like builds
 builds fetched by ID need to be paginated. break them up into folders and then iterate over them

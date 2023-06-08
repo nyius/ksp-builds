@@ -69,7 +69,6 @@ export const FiltersProvider = ({ children }) => {
 		versionFilter: 'any',
 		modsFilter: 'any',
 		challengeFilter: 'any',
-		searchTerm: '',
 		sortBy: 'views_most',
 		kspVersions: [],
 		kspChallenges: [],

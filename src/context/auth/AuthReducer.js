@@ -76,7 +76,6 @@ const AuthReducer = (state, action) => {
 				...state,
 				user: getClearNotificationsState,
 			};
-
 		case 'SET_NEW_USERNAME':
 			return {
 				...state,

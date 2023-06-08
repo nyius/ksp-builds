@@ -4,6 +4,7 @@ import { db } from '../../firebase.config';
 import BuildsContext from './BuildsContext';
 import AuthContext from '../auth/AuthContext';
 import FiltersContext from '../filters/FiltersContext';
+import useFilters from '../filters/FiltersActions';
 import { cloneDeep } from 'lodash';
 import { checkLocalBuildAge, getBuildFromLocalStorage, setLocalStoredBuild } from '../../utilities/buildLocalStorage';
 
@@ -14,6 +15,7 @@ import { checkLocalBuildAge, getBuildFromLocalStorage, setLocalStoredBuild } fro
 const useBuilds = () => {
 	const { dispatchBuilds, currentPage, storedBuilds, fetchAmount } = useContext(BuildsContext);
 	const { createFirestoreQuery } = useCreateFirestoreQuery();
+	const { filterBuilds } = useFilters();
 
 	/**
 	 * Fetches builds from the DB. Takes in an array of build ids to fetch. if no IDs specified, grabs all builds based on filters
@@ -112,8 +114,10 @@ const useBuilds = () => {
 				builds.splice(localBuildsToKeepIndex[i], 0, build);
 			});
 
+			const sortedBuilds = filterBuilds(builds);
+
 			// Now recombine the fetched builds vs local builds
-			setFetchedBuilds(dispatchBuilds, builds);
+			setFetchedBuilds(dispatchBuilds, sortedBuilds);
 		} catch (error) {
 			console.log(error);
 			setBuildsLoading(dispatchBuilds, false);
@@ -282,7 +286,7 @@ export const useCreateFirestoreQuery = () => {
 
 		// Public builds Filter
 		if (type === 'public') constraints.unshift(where('visibility', '==', 'public'));
-		if (type === 'user' && fetchUid !== user.uid) constraints.unshift(where('visibility', '==', 'public'));
+		if (type === 'user' && fetchUid !== user?.uid) constraints.unshift(where('visibility', '==', 'public'));
 
 		return query(collection(db, process.env.REACT_APP_BUILDSDB), ...constraints);
 	};

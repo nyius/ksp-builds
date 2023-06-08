@@ -1,5 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import { Helmet } from 'react-helmet';
+import { useSearchParams } from 'react-router-dom';
+import algoliasearch from 'algoliasearch/lite';
 //---------------------------------------------------------------------------------------------------//
 import useBuilds from '../../context/builds/BuildsActions';
 import FiltersContext from '../../context/filters/FiltersContext';
@@ -15,7 +17,10 @@ import useResetStates from '../../utilities/useResetStates';
 //---------------------------------------------------------------------------------------------------//
 
 function Index() {
-	const { fetchBuilds } = useBuilds();
+	const { fetchBuilds, fetchBuildsById } = useBuilds();
+	const [searchParams] = useSearchParams();
+	const searchClient = algoliasearch('ASOR7A703R', process.env.REACT_APP_ALGOLIA_KEY);
+	const index = searchClient.initIndex('builds');
 
 	const { resetStates } = useResetStates();
 
@@ -23,13 +28,27 @@ function Index() {
 		resetStates();
 	}, []);
 
-	const { typeFilter, versionFilter, searchTerm, sortBy, modsFilter, challengeFilter } = useContext(FiltersContext);
+	const { typeFilter, versionFilter, sortBy, modsFilter, challengeFilter } = useContext(FiltersContext);
 	const { fetchAmount } = useContext(BuildsContext);
 
 	// listens for filters and fetches builds based on filter
 	useEffect(() => {
-		fetchBuilds();
-	}, [typeFilter, searchTerm, modsFilter, versionFilter, challengeFilter, sortBy, fetchAmount]);
+		const searchQuery = searchParams.get('search_query');
+
+		if (searchQuery) {
+			index.search(searchQuery).then(({ hits }) => {
+				let ids = [];
+
+				hits.map(hit => {
+					ids.push(hit.objectID);
+				});
+
+				fetchBuildsById(ids, null, 'public');
+			});
+		} else {
+			fetchBuilds();
+		}
+	}, [typeFilter, searchParams, modsFilter, versionFilter, challengeFilter, sortBy, fetchAmount]);
 
 	//---------------------------------------------------------------------------------------------------//
 	return (

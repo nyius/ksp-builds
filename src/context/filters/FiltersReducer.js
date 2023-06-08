@@ -10,7 +10,6 @@ const FiltersReducer = (state, action) => {
 				...state,
 				typeFilter: '',
 				versionFilter: 'any',
-				searchTerm: '',
 				modsFilter: 'any',
 				challengeFilter: 'any',
 			};

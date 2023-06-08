@@ -21,9 +21,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
-sorting searched builds is bugged (fetches new builds from server)
-	-url should change to the search
-	- search bar should clear when entered
 drag and drop your own builds into a folder?
 when launching the app, it should loop over the localstorage and check all of the stored builds to see their age
 	if theyre older than like a week, they should be removed from storage
@@ -75,6 +72,7 @@ function App() {
 									<ScrollToTop />
 									<Routes>
 										<Route exact path="/" element={<Index />} />
+										<Route exact path="/*" element={<Index />} />
 										<Route exact path="/builds/:id" element={<Index />} />
 										<Route exact path="/privacy" element={<Privacy />} />
 										<Route exact path="/terms" element={<Terms />} />

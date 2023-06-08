@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import algoliasearch from 'algoliasearch/lite';
 import useBuilds from '../../context/builds/BuildsActions';
 import { RiSearchEyeFill } from 'react-icons/ri';
@@ -7,8 +8,9 @@ function SearchBar() {
 	const searchClient = algoliasearch('ASOR7A703R', process.env.REACT_APP_ALGOLIA_KEY);
 	const index = searchClient.initIndex('builds');
 	const [searchTerm, setSearchTerm] = useState('');
+	const navigate = useNavigate();
 
-	const { fetchBuilds, fetchBuildsById } = useBuilds();
+	const { fetchBuilds } = useBuilds();
 
 	/**
 	 * Handles searching algolia for our craft
@@ -18,18 +20,12 @@ function SearchBar() {
 		try {
 			if (e.key === 'Enter' || e.type === 'click') {
 				if (searchTerm === '') {
+					navigate(`/`);
 					fetchBuilds();
 					return;
+				} else {
+					navigate(`/results?search_query=${searchTerm}`);
 				}
-				index.search(searchTerm).then(({ hits }) => {
-					let ids = [];
-
-					hits.map(hit => {
-						ids.push(hit.objectID);
-					});
-
-					fetchBuildsById(ids, null, 'public');
-				});
 			}
 		} catch (error) {
 			console.log(error);

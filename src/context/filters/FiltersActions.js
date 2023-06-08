@@ -10,20 +10,6 @@ const useFilters = () => {
 	const { dispatchBuilds } = useContext(BuildsContext);
 
 	/**
-	 * Handles setting search term
-	 * @param {*} e
-	 */
-	const setSearchFilter = e => {
-		dispatchBuildFilters({
-			type: 'SET_FILTERS',
-			payload: {
-				filter: 'searchTerm',
-				value: e.target.value,
-			},
-		});
-	};
-
-	/**
 	 * Handles setting the sorting for builds
 	 * @param {*} e
 	 */
@@ -159,7 +145,7 @@ const useFilters = () => {
 		});
 	};
 
-	return { setSearchFilter, filterBuilds, setSortFilter, setTypeFilter, setVersionFilter, resetFilters, setModsFilter, setChallengeFilter };
+	return { filterBuilds, setSortFilter, setTypeFilter, setVersionFilter, resetFilters, setModsFilter, setChallengeFilter };
 };
 
 export default useFilters;

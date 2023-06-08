@@ -76,21 +76,7 @@ const AuthReducer = (state, action) => {
 				...state,
 				user: getClearNotificationsState,
 			};
-		case 'SET_BUILD_NOTIFICATIONS':
-			const getSetDeckNotifications = [...state.user.disabledNotifications];
-			if (getSetDeckNotifications.includes(action.payload)) {
-				getSetDeckNotifications.splice(getSetDeckNotifications.indexOf(action.payload), 1);
-			} else {
-				getSetDeckNotifications.push(action.payload);
-			}
 
-			return {
-				...state,
-				user: {
-					...state.user,
-					disabledNotifications: getSetDeckNotifications,
-				},
-			};
 		case 'SET_NEW_USERNAME':
 			return {
 				...state,
@@ -169,6 +155,7 @@ const AuthReducer = (state, action) => {
 			return {
 				...state,
 				conversations: action.payload,
+				convosLoading: false,
 			};
 		case 'INCOMING_NEW_CONVO':
 			const checkIfConvoIncoming = state.conversations.filter(convo => {

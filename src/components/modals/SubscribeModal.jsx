@@ -17,7 +17,7 @@ function SubscribeModal() {
 				<>
 					<input type="checkbox" id="subscribe-modal" className="modal-toggle" />
 					<div className="modal">
-						<div className="modal-box relative">
+						<div className="modal-box relative !min-w-1/4">
 							<Button htmlFor="subscribe-modal" style="btn-circle" position="absolute right-2 top-2" text="X" onClick={() => setNewSub(dispatchAuth, false)} />
 							<h3 className="text-xl 2k:text-3xl font-bold text-center mb-4 2k:mb-6 text-white">Subscribe</h3>
 							<img src={AstrobiffHeart} alt="Astrobiff" className="rounded-xl mb-3 2k:mb-6" />
@@ -89,7 +89,7 @@ function SubscribeModal() {
 												icon="tier1"
 												size="w-3/4"
 											/>
-											<p className="text-lg 2k:text-2xl text-white font-bold bg-base-500 rounded-xl flex items-center justify-center w-full px-6 2k:px-8 h-12 2k:h-16">US$3.66</p>
+											<p className="text-lg 2k:text-2xl text-white font-bold bg-base-500 rounded-xl flex items-center justify-center w-60 px-6 2k:px-8 h-12 2k:h-16">US$3.66</p>
 										</div>
 										<div className="flex flex-row items-center">
 											<Button
@@ -101,7 +101,7 @@ function SubscribeModal() {
 												icon="tier2"
 												size="w-3/4"
 											/>
-											<p className="text-lg 2k:text-2xl text-white font-bold bg-base-500 rounded-xl flex items-center justify-center w-full px-6 2k:px-8 h-12 2k:h-16">US$7.33</p>
+											<p className="text-lg 2k:text-2xl text-white font-bold bg-base-500 rounded-xl flex items-center justify-center w-60 px-6 2k:px-8 h-12 2k:h-16">US$7.33</p>
 										</div>
 										<div className="flex flex-row items-center">
 											<Button
@@ -113,7 +113,7 @@ function SubscribeModal() {
 												icon="tier3"
 												size="w-3/4"
 											/>
-											<p className="text-lg 2k:text-2xl text-white font-bold bg-base-500 rounded-xl text-center w-full flex justify-center items-center px-6 2k:px-8 h-12 2k:h-16">US$14.68</p>
+											<p className="text-lg 2k:text-2xl text-white font-bold bg-base-500 rounded-xl text-center w-60 flex justify-center items-center px-6 2k:px-8 h-12 2k:h-16">US$14.68</p>
 										</div>
 									</div>
 

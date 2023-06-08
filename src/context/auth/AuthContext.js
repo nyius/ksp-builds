@@ -28,7 +28,27 @@ export const AuthProvider = ({ children }) => {
 			// Check if the user exists
 			if (docSnapUser.exists()) {
 				const user = docSnapUser.data();
-				user.notifications = await fetchNotifications(user, dispatchAuth); // Set the notifs
+				setAuthLoading(false);
+				// Dispatch the user
+				dispatchAuth({
+					type: 'SET_USER',
+					payload: user,
+				});
+
+				// if the user exists but they dont have a username, must be a new account so prompt for a new one
+				if (!user.username) {
+					console.log('No username!');
+					dispatchAuth({ type: 'SET_NEW_SIGNUP', payload: true });
+					setAuthLoading(false);
+				}
+
+				let notifications = await fetchNotifications(user, dispatchAuth);
+
+				dispatchAuth({
+					type: 'UPDATE_USER',
+					payload: { notifications },
+				});
+
 				let usersConvos = await fetchAllUserMessages();
 				let fetchedConvos = await fetchAllUsersConvos(usersConvos);
 
@@ -66,18 +86,8 @@ export const AuthProvider = ({ children }) => {
 					type: 'SET_CONVOS',
 					payload: fetchedConvos,
 				});
-				// Dispatch the user
-				dispatchAuth({
-					type: 'SET_USER',
-					payload: user,
-				});
-
-				// if the user exists but they dont have a username, must be a new account so prompt for a new one
-				if (!user.username) {
-					console.log('No username!');
-					dispatchAuth({ type: 'SET_NEW_SIGNUP', payload: true });
-				}
 			} else {
+				setAuthLoading(false);
 				throw new Error('User does not exist');
 			}
 		} catch (error) {
@@ -94,7 +104,7 @@ export const AuthProvider = ({ children }) => {
 					type: 'LOGIN',
 					payload: auth.currentUser,
 				});
-				getUser().then(() => setAuthLoading(false));
+				getUser();
 			} else {
 				dispatchAuth({
 					type: 'LOGOUT',
@@ -131,6 +141,7 @@ export const AuthProvider = ({ children }) => {
 		userToBlock: null,
 		newSub: false,
 		convosOpen: false,
+		convosLoading: true,
 	};
 
 	// Set up the reducer

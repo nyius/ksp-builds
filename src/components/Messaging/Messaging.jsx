@@ -11,7 +11,7 @@ function Messaging() {
 	const [message, setMessage] = useState('');
 	const { sendMessage } = useSendMessage();
 	const [newMessages, setNewMessages] = useState(0);
-	const { dispatchAuth, authLoading, user, messageTab, conversations, convosOpen } = useContext(AuthContext);
+	const { dispatchAuth, authLoading, user, messageTab, conversations, convosOpen, convosLoading } = useContext(AuthContext);
 	const sendMessageBox = document.getElementById('sendMessageBox');
 
 	/**
@@ -56,7 +56,7 @@ function Messaging() {
 	}, [conversations]);
 
 	//---------------------------------------------------------------------------------------------------//
-	if (!authLoading && user?.username) {
+	if (!authLoading && user?.username && !convosLoading) {
 		return (
 			<>
 				<div>

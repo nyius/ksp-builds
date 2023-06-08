@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
-import useBuild, { setReplyingComment, setEditingComment, useComment } from '../../context/build/BuildActions';
+import useBuild, { setReplyingComment, setEditingComment, setDeletingComment } from '../../context/build/BuildActions';
 import { updateComment } from '../../context/build/BuildUtils';
 import BuildContext from '../../context/build/BuildContext';
 import { setReport } from '../../context/auth/AuthActions';
@@ -25,10 +25,9 @@ function Comment({ comment }) {
 	const [editedComment, setEditedComment] = useState('');
 	//---------------------------------------------------------------------------------------------------//
 	const { fetchComments } = useBuild();
-	const { deleteComment } = useComment();
 
 	const date = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(comment.timestamp.seconds * 1000);
-	const editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(comment.comment)));
+	const editorState = comment.comment !== 'deleted' && EditorState.createWithContent(convertFromRaw(JSON.parse(comment.comment)));
 
 	/**
 	 * Handles when a user saves changes to their comment
@@ -75,11 +74,17 @@ function Comment({ comment }) {
 					</div>
 					<p className="2k:text-2xl">{date}</p>
 				</div>
-				<div className="text-white">{editingComment.id === comment.id ? <TextEditor setState={setEditedComment} /> : <Editor editorState={editorState} readOnly={true} toolbarHidden={true} />}</div>
+				<div className="">
+					{editingComment.id === comment.id ? (
+						<TextEditor setState={setEditedComment} />
+					) : (
+						<>{comment.comment === 'deleted' ? <span className="italic">Comment Deleted</span> : <Editor editorState={editorState} readOnly={true} toolbarHidden={true} />}</>
+					)}
+				</div>
 				<div className="flex flex-row gap-4 2k:gap-8">
 					{!editingComment && user?.username && (
 						<>
-							{!fetchedUserProfile?.blockList?.includes(user.uid) && (
+							{!fetchedUserProfile?.blockList?.includes(user.uid) && comment.comment !== 'deleted' && (
 								<a href={`#add-comment`} onClick={() => setReplyingComment(dispatchBuild, comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
 									Reply
 								</a>
@@ -98,19 +103,26 @@ function Comment({ comment }) {
 									Cancel
 								</p>
 							)}
-							{!editingComment && (
+							{!editingComment && comment.comment !== 'deleted' && (
 								<p onClick={() => setEditingComment(dispatchBuild, comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
 									Edit
 								</p>
 							)}
-							<p onClick={() => deleteComment(comment.id)} className="text-slate-500 hover:text-red-300 cursor-pointer 2k:text-2xl">
-								Delete
-							</p>
+							{comment.comment !== 'deleted' && (
+								<p onClick={() => setDeletingComment(dispatchBuild, comment.id)} htmlFor="delete-comment-modal" className="text-slate-500 hover:text-red-300 cursor-pointer 2k:text-2xl">
+									Delete
+								</p>
+							)}
 						</>
 					)}
-					<label htmlFor="report-modal" className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl" onClick={handleSetReport}>
-						Report
-					</label>
+					{comment.comment !== 'deleted' && (
+						<label htmlFor="report-modal" className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl" onClick={handleSetReport}>
+							Report
+						</label>
+					)}
+					{comment.edited ? (
+						<div className="2k:text-2xl italic">edited {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(comment.edited.seconds * 1000)}</div>
+					) : null}
 				</div>
 			</div>
 		</div>

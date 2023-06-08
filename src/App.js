@@ -21,16 +21,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
-subscribe modal button fix
 sorting searched builds is bugged (fetches new builds from server)
 	-url should change to the search
 	- search bar should clear when entered
 drag and drop your own builds into a folder?
-deleting comment popup to clarify
 when launching the app, it should loop over the localstorage and check all of the stored builds to see their age
 	if theyre older than like a week, they should be removed from storage
-break apart loading the user in the context so that as soon as we first load the users profile, we set loading to false.
-	create separate loading for notifs, convos, etc
 clicking a username inside of a build card should go to the user, not the build
 fix hover effect on builds card at 2k res
 userprofiles should local store just like builds

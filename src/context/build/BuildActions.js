@@ -335,42 +335,37 @@ export const useComment = () => {
 	const deleteComment = async commentId => {
 		try {
 			// Delete the comments
-			await deleteDoc(doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id, 'comments', commentId));
-			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id), { commentCount: (loadedBuild.commentCount -= 1) })
-				.then(() => {
-					//Filter the deleted comment from the comments array
-					const newComments = comments.filter(comment => comment.id !== commentId);
+			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id, 'comments', commentId), {
+				comment: `deleted`,
+				deleted: true,
+			});
+			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, loadedBuild.id), { commentCount: (loadedBuild.commentCount -= 1) });
 
-					dispatchBuild({
-						type: 'SET_BUILD',
-						payload: {
-							deletingComment: false,
-							deletingCommentId: '',
-							comments: newComments,
-						},
-					});
+			const newComments = comments.map(comment => {
+				if (comment.id === commentId) {
+					comment.comment = `deleted`;
+					comment.deleted = true;
+				}
+				return comment;
+			});
 
-					toast.success('Comment deleted');
-				})
-				.catch(err => {
-					dispatchBuild({
-						type: 'SET_BUILD',
-						payload: {
-							deletingComment: false,
-							deletingCommentId: '',
-						},
-					});
-					toast.error(`Something went wrong deleting the comment`);
-					throw new Error(err);
-				});
+			dispatchBuild({
+				type: 'SET_BUILD',
+				payload: {
+					deletingCommentId: null,
+					comments: newComments,
+				},
+			});
+
+			toast.success('Comment deleted');
 		} catch (error) {
 			dispatchBuild({
 				type: 'SET_BUILD',
 				payload: {
-					deletingComment: false,
-					deletingCommentId: '',
+					deletingCommentId: null,
 				},
 			});
+			toast.error(`Something went wrong deleting the comment`);
 			throw new Error(error);
 		}
 	};
@@ -378,6 +373,10 @@ export const useComment = () => {
 	return { addComment, setComment, deleteComment };
 };
 
+/**
+ * Hook for copying a build to a clipboard
+ * @returns
+ */
 export const useCopyBuildToClipboard = () => {
 	const { dispatchBuild, fetchedRawBuilds } = useContext(BuildContext);
 
@@ -841,26 +840,14 @@ export const setSavingBuild = (dispatchBuild, bool) => {
  * Handles setting up deleting a comment
  * @param {function} dispatchBuild - The dispatch function
  * @param {string} commentId - The Id of the comment to delete
- * @param {string} type (delete, cancel)
  */
-export const setDeletingComment = (dispatchBuild, commentId, type) => {
-	if (type === 'delete') {
-		dispatchBuild({
-			type: 'SET_BUILD',
-			payload: {
-				deletingComment: true,
-				deletingCommentId: commentId,
-			},
-		});
-	} else if (type === 'cancel') {
-		dispatchBuild({
-			type: 'SET_BUILD',
-			payload: {
-				deletingComment: false,
-				deletingCommentId: '',
-			},
-		});
-	}
+export const setDeletingComment = (dispatchBuild, commentId) => {
+	dispatchBuild({
+		type: 'SET_BUILD',
+		payload: {
+			deletingCommentId: commentId,
+		},
+	});
 };
 
 /**
@@ -869,5 +856,8 @@ export const setDeletingComment = (dispatchBuild, commentId, type) => {
  * @param {obj} loadedBuild - the loaded build
  */
 export const setLoadedBuild = (dispatchBuild, loadedBuild) => {
-	dispatchBuild({ type: 'SET_BUILD', payload: { loadedBuild: loadedBuild, loadingBuild: false } });
+	dispatchBuild({
+		type: 'SET_BUILD',
+		payload: { loadedBuild: loadedBuild, loadingBuild: false },
+	});
 };

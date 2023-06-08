@@ -1,4 +1,4 @@
-import { doc, updateDoc, increment, query, where, getDocs, collection } from 'firebase/firestore';
+import { doc, updateDoc, increment, query, where, getDocs, collection, serverTimestamp } from 'firebase/firestore';
 import { buildNameToUrl } from '../../utilities/buildNameToUrl';
 import { db } from '../../firebase.config';
 import { toast } from 'react-toastify';
@@ -40,7 +40,7 @@ export const updateComment = async (comment, commentId, buildId) => {
 	try {
 		const ref = doc(db, process.env.REACT_APP_BUILDSDB, buildId, 'comments', commentId);
 
-		await updateDoc(ref, { comment });
+		await updateDoc(ref, { comment, edited: serverTimestamp() });
 
 		toast.success('Comment Edited');
 	} catch (error) {

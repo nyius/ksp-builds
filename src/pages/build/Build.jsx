@@ -36,6 +36,7 @@ import Favorite from '../../components/buttons/Favorite';
 import TextEditor from '../../components/textEditor/TextEditor';
 import BotwBadge from '../../assets/BotW_badge2.png';
 import BuildInfoCard from '../../components/cards/BuildInfoCard';
+import DeleteCommentModal from '../../components/modals/DeleteCommentModal';
 //---------------------------------------------------------------------------------------------------//
 
 function Build() {
@@ -43,7 +44,7 @@ function Build() {
 	const { fetchBuild } = useBuild();
 	const { copyBuildToClipboard } = useCopyBuildToClipboard();
 	const { setComment, addComment } = useComment();
-	const { dispatchBuild, loadingBuild, loadedBuild, commentsLoading, comments, editingBuild, replyingComment } = useContext(BuildContext);
+	const { dispatchBuild, loadingBuild, loadedBuild, commentsLoading, comments, editingBuild, replyingComment, deletingCommentId } = useContext(BuildContext);
 	const { dispatchFolders } = useContext(FoldersContext);
 	const { dispatchAuth, user, authLoading, fetchedUserProfile } = useContext(AuthContext);
 	const [buildDesc, setBuildDesc] = useState(null);
@@ -288,6 +289,7 @@ function Build() {
 				)}
 				{loadedBuild ? <DeleteBuildModal id={loadedBuild.id} userID={loadedBuild.uid} /> : null}
 				{loadedBuild ? user?.siteAdmin && <MakeBuildOfTheWeekModal /> : null}
+				{loadedBuild && deletingCommentId ? <DeleteCommentModal /> : null}
 			</MiddleContainer>
 		</>
 	);

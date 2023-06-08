@@ -14,7 +14,7 @@ export const BuildProvider = ({ children }) => {
 		replyingComment: null,
 		uploadingBuild: false,
 		savingBuild: false,
-		deletingCommentId: '',
+		deletingCommentId: null,
 		deletingComment: false,
 		loadedBuild: null,
 		comments: [],

@@ -3,7 +3,7 @@ import { FaFolder, FaPlus } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AuthContext from '../../context/auth/AuthContext';
 import FoldersContext from '../../context/folders/FoldersContext';
-import { setMakingNewFolder, setFolderView, setDeleteFolderId, setEditingFolderName, setEditingFolder, setOpenedFolder } from '../../context/folders/FoldersActions';
+import { setMakingNewFolder, setFolderView, setDeleteFolder, setEditingFolderName, setEditingFolder, setOpenedFolder } from '../../context/folders/FoldersActions';
 import { handleShareFolder } from '../../context/folders/FoldersUtilils';
 import { buildNameToUrl } from '../../utilities/buildNameToUrl';
 import Button from '../buttons/Button';
@@ -106,7 +106,7 @@ function Folders({ usersFolders, editable, hideOwnFolder }) {
 						/>
 					) : null}
 					{openedFolder && (currentLocation !== 'user' || addToFolderModalOpen) && openedFolder.id !== 'your-builds' ? (
-						<Button tooltip="Delete Folder" color="btn-ghost" icon="delete" onClick={() => setDeleteFolderId(dispatchFolders, openedFolder.id)} />
+						<Button tooltip="Delete Folder" color="btn-ghost" icon="delete" onClick={() => setDeleteFolder(dispatchFolders, openedFolder.id, openedFolder.folderName)} />
 					) : null}
 					<Button tooltip="List View" color={`btn-ghost ${folderView === 'list' ? 'text-white' : ''}`} icon="list" onClick={() => setFolderView(dispatchFolders, 'list')} />
 					<Button tooltip="Grid View" color={`btn-ghost ${folderView === 'grid' ? 'text-white' : ''}`} icon="grid" onClick={() => setFolderView(dispatchFolders, 'grid')} />

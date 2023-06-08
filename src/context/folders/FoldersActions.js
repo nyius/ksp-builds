@@ -89,7 +89,7 @@ export const useDeleteFolder = () => {
 	const deleteFolder = async () => {
 		try {
 			const newFolders = user.folders.filter(folder => folder.id !== deleteFolderId);
-			setDeleteFolderId(dispatchFolders, null);
+			setDeleteFolder(dispatchFolders, null, null);
 			updateUserState(dispatchAuth, { folders: newFolders });
 
 			await updateDoc(doc(db, 'users', user.uid), { folders: newFolders });
@@ -234,7 +234,7 @@ export const useHandleFolderInteraction = () => {
 					setEditingFolder(dispatchFolders, folder);
 					setEditingFolderName(dispatchFolders, folder.folderName);
 				} else if (e.key === 'Delete') {
-					setDeleteFolderId(dispatchFolders, folder.id);
+					setDeleteFolder(dispatchFolders, folder.id, folder.folderName);
 				} else if (e.key === 'Enter') {
 					setOpenedFolder(dispatchFolders, folder);
 				}
@@ -458,11 +458,12 @@ export const setFolderView = (dispatchFolders, option) => {
  * handles setting the id of the folder to delete
  * @param {function} dispatchFolders - dispatch function
  * @param {string} folderId - id of folder to delete
+ * @param {string} deleteFolderName - name of folder to delete
  */
-export const setDeleteFolderId = (dispatchFolders, folderId) => {
+export const setDeleteFolder = (dispatchFolders, folderId, deleteFolderName) => {
 	dispatchFolders({
 		type: 'SET_FOLDERS',
-		payload: { deleteFolderId: folderId },
+		payload: { deleteFolderId: folderId, deleteFolderName },
 	});
 };
 

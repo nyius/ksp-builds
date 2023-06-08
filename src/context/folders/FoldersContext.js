@@ -16,6 +16,7 @@ export const FoldersProvider = ({ children }) => {
 		makingNewFolder: false,
 		newFolderName: '',
 		deleteFolderId: null,
+		deleteFolderName: null,
 		fetchedFolders: {},
 		folderView: 'grid',
 		addToFolderModalOpen: false,

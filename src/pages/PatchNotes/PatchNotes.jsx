@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { db } from '../../firebase.config';
-import { doc, getDocs, getDocsFromCache, collection, updateDoc } from 'firebase/firestore';
-import { Helmet } from 'react-helmet';
+import { doc, getDocs, collection, updateDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { convertFromRaw, EditorState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
@@ -14,12 +13,18 @@ import CantFind from '../../components/cantFind/CantFind';
 import Button from '../../components/buttons/Button';
 import DeletePatchNotesModal from '../../components/modals/DeletePatchNoteModal';
 import TextEditor from '../../components/textEditor/TextEditor';
+import Helmet from '../../components/Helmet/Helmet';
+import DeletePatchNoteBtn from './Components/Buttons/DeletePatchNoteBtn';
+import CheckCredentials from '../../components/credentials/CheckCredentials';
 
+/**
+ * KSP Builds Patch notes Page
+ * @returns
+ */
 function PatchNotes() {
 	const { user, authLoading } = useContext(AuthContext);
 	const [patchNotes, setPatchNotes] = useState(null);
 	const [loading, setLoading] = useState(true);
-	const [deleteModalId, setDeleteModalId] = useState(null);
 	const [editingPatchNotes, setEditingPatchNotes] = useState(null);
 	const [editedPatchNotes, setEditedPatchNote] = useState(null);
 
@@ -69,45 +74,52 @@ function PatchNotes() {
 		}
 	};
 
+	if (loading) {
+		return (
+			<MiddleContainer>
+				<Spinner1 />
+			</MiddleContainer>
+		);
+	}
+
+	if (!loading && !patchNotes) {
+		return (
+			<MiddleContainer>
+				<CantFind text="No patch notes found" />
+			</MiddleContainer>
+		);
+	}
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Helmet>
-				<meta charSet="utf-8" />
-				<title>KSP Builds - Patch Notes</title>
-				<link rel="canonical" href={`https://kspbuilds.com/patch-notes`} />
-			</Helmet>
+			<Helmet title="Patch Notes" pageLink="https://kspbuilds.com/patch-notes" />
 
 			<MiddleContainer>
 				<PlanetHeader text="KSP Builds Patch Notes" />
 
-				{loading && <Spinner1 />}
+				<div className="flex flex-col gap-4 2k:gap-8">
+					{patchNotes.map((patchNote, i) => {
+						return (
+							<div key={i} className="bg-base-600 rounded-xl p-10 2k:p-16">
+								<h2 className="font-bold text-2xl 2k:text-4xl text-white">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(patchNote.timestamp.seconds * 1000)}</h2>
+								{editingPatchNotes !== patchNote.id && <Editor editorState={EditorState.createWithContent(convertFromRaw(JSON.parse(patchNote.patchNote)))} readOnly={true} toolbarHidden={true} />}
+								{editingPatchNotes === patchNote.id && <TextEditor text={patchNote.patchNote} setState={setEditedPatchNote} />}
 
-				{!loading && !patchNotes && <CantFind text="No patch notes found" />}
-				{!loading && patchNotes && (
-					<div className="flex flex-col gap-4 2k:gap-8">
-						{patchNotes.map((patchNote, i) => {
-							return (
-								<div key={i} className="bg-base-600 rounded-xl p-10 2k:p-16">
-									<h2 className="font-bold text-2xl 2k:text-4xl text-white">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(patchNote.timestamp.seconds * 1000)}</h2>
-									{editingPatchNotes !== patchNote.id && <Editor editorState={EditorState.createWithContent(convertFromRaw(JSON.parse(patchNote.patchNote)))} readOnly={true} toolbarHidden={true} />}
-									{editingPatchNotes === patchNote.id && <TextEditor text={patchNote.patchNote} setState={setEditedPatchNote} />}
-
-									{!authLoading && user?.siteAdmin && (
-										<div className="flex flex-row gap-2 2k:gap-4">
-											<Button htmlFor="delete-patch-note-modal" onClick={() => setDeleteModalId(patchNote.id)} text="Delete" icon="delete" />
-											{editingPatchNotes !== patchNote.id && <Button text="Edit" icon="edit" onClick={() => setEditingPatchNotes(patchNote.id)} />}
-											{editingPatchNotes === patchNote.id && <Button text="Save" color="btn-primary" icon="save" onClick={() => updatePatchNote(patchNote.id)} />}
-											{editingPatchNotes === patchNote.id && <Button text="Cancel" color="btn-error" icon="cancel" onClick={() => setEditingPatchNotes(null)} />}
-										</div>
-									)}
-								</div>
-							);
-						})}
-					</div>
-				)}
+								<CheckCredentials type="admin">
+									<div className="flex flex-row gap-2 2k:gap-4">
+										<DeletePatchNoteBtn id={patchNote.id} />
+										{editingPatchNotes !== patchNote.id && <Button text="Edit" icon="edit" onClick={() => setEditingPatchNotes(patchNote.id)} />}
+										{editingPatchNotes === patchNote.id && <Button text="Save" color="btn-primary" icon="save" onClick={() => updatePatchNote(patchNote.id)} />}
+										{editingPatchNotes === patchNote.id && <Button text="Cancel" color="btn-error" icon="cancel" onClick={() => setEditingPatchNotes(null)} />}
+									</div>
+								</CheckCredentials>
+							</div>
+						);
+					})}
+				</div>
 			</MiddleContainer>
-			{deleteModalId && <DeletePatchNotesModal id={deleteModalId} />}
+			<DeletePatchNotesModal />
 		</>
 	);
 }

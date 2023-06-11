@@ -15,6 +15,11 @@ const NewsReducer = (state, action) => {
 				...state,
 				articlesLoading: action.payload,
 			};
+		case 'SET_DELETE_PATCH_ID':
+			return {
+				...state,
+				deletePatchNoteId: action.payload,
+			};
 		default:
 			return state;
 	}

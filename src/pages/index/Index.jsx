@@ -1,5 +1,4 @@
 import React, { useEffect, useContext } from 'react';
-import { Helmet } from 'react-helmet';
 import { useSearchParams } from 'react-router-dom';
 import algoliasearch from 'algoliasearch/lite';
 //---------------------------------------------------------------------------------------------------//
@@ -12,10 +11,15 @@ import Banner from '../../components/banner/Banner';
 import FetchAmount from '../../components/fetchAmount/FetchAmount';
 import SearchBar from '../../components/search/SearchBar';
 import Sort from '../../components/sort/Sort';
+import Helmet from '../../components/Helmet/Helmet';
 //---------------------------------------------------------------------------------------------------//
 import useResetStates from '../../utilities/useResetStates';
 //---------------------------------------------------------------------------------------------------//
 
+/**
+ * Index page
+ * @returns
+ */
 function Index() {
 	const { fetchBuilds, fetchBuildsById } = useBuilds();
 	const [searchParams] = useSearchParams();
@@ -23,13 +27,12 @@ function Index() {
 	const index = searchClient.initIndex('builds');
 
 	const { resetStates } = useResetStates();
+	const { typeFilter, versionFilter, sortBy, modsFilter, challengeFilter } = useContext(FiltersContext);
+	const { fetchAmount } = useContext(BuildsContext);
 
 	useEffect(() => {
 		resetStates();
 	}, []);
-
-	const { typeFilter, versionFilter, sortBy, modsFilter, challengeFilter } = useContext(FiltersContext);
-	const { fetchAmount } = useContext(BuildsContext);
 
 	// listens for filters and fetches builds based on filter
 	useEffect(() => {
@@ -53,11 +56,7 @@ function Index() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Helmet>
-				<meta charSet="utf-8" />
-				<title>KSP Builds - Home</title>
-				<link rel="canonical" href={`https://kspbuilds.com`} />
-			</Helmet>
+			<Helmet title="Home" pageLink="https://kspbuilds.com" />
 
 			<Banner />
 

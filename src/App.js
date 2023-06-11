@@ -21,6 +21,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
+making a new folder and clicking save/pressing enter has unintended results
 drag and drop your own builds into a folder?
 when launching the app, it should loop over the localstorage and check all of the stored builds to see their age
 	if theyre older than like a week, they should be removed from storage

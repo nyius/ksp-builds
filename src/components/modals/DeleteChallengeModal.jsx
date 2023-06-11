@@ -1,12 +1,13 @@
 import React from 'react';
 import useNews from '../../context/news/NewsActions';
 import Button from '../buttons/Button';
+import CheckCredentials from '../../components/credentials/CheckCredentials';
 
 function DeleteChallengeModal({ id }) {
 	const { deleteChallenge } = useNews();
 
 	return (
-		<>
+		<CheckCredentials type="admin">
 			<input type="checkbox" id="delete-challenge-modal" className="modal-toggle" />
 			<div className="modal">
 				<div className="modal-box relative">
@@ -19,7 +20,7 @@ function DeleteChallengeModal({ id }) {
 					</div>
 				</div>
 			</div>
-		</>
+		</CheckCredentials>
 	);
 }
 

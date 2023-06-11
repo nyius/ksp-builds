@@ -30,6 +30,7 @@ import PlanetHeader from '../../components/header/PlanetHeader';
 import TextEditor from '../../components/textEditor/TextEditor';
 import Builds from '../../components/builds/Builds';
 import Folders from '../../components/folders/Folders';
+import fetchBuildFromAWS from '../../utilities/fetchBuildFromAws';
 
 /**
  * Handles displaying the container for creating & editing a build.
@@ -56,6 +57,8 @@ function Upload() {
 	const [hoverImage, setHoverImage] = useState(false);
 	const [challengeParam, setChallengeParam] = useState(null);
 	const [sortedBuilds, setSortedBuilds] = useState([]);
+	const [loadingRawBuild, setLoadingRawBuild] = useState(true);
+	const [rawBuild, setRawBuild] = useState(null);
 	//---------------------------------------------------------------------------------------------------//
 	const navigate = useNavigate();
 	const params = useParams().id;
@@ -87,6 +90,29 @@ function Upload() {
 
 		setSortedBuilds(filterBuilds(newFetchedBuilds));
 	}, [fetchedBuilds, sortBy]);
+
+	useEffect(() => {
+		if (editingBuild) {
+			setLoadingRawBuild(true);
+
+			const fetchRawBuild = async () => {
+				try {
+					const fetchedRawBuild = await fetchBuildFromAWS(editingBuild.id);
+					return fetchedRawBuild;
+				} catch (error) {
+					console.log(error);
+					toast.error('Something went wrong fetching the Raw build');
+				}
+			};
+
+			fetchRawBuild().then(fetchedRawBuild => {
+				setNewBuild(prevState => {
+					return { ...prevState, build: fetchedRawBuild };
+				});
+				setLoadingRawBuild(false);
+			});
+		}
+	}, [editingBuild]);
 
 	/**
 	 * Handles setting the new name
@@ -561,7 +587,11 @@ function Upload() {
 											How?
 										</label>
 									</div>
-									<textarea onChange={setBuild} defaultValue={editingBuild ? editingBuild.build : ''} className="textarea textarea-bordered 2k:text-2xl mb-6 w-full" placeholder="Paste..." rows="4"></textarea>
+									{editingBuild ? (
+										<>{!loadingRawBuild ? <textarea onChange={setBuild} defaultValue={newBuild.build} className="textarea textarea-bordered 2k:text-2xl mb-6 w-full" placeholder="Paste..." rows="4"></textarea> : null}</>
+									) : (
+										<textarea onChange={setBuild} defaultValue={''} className="textarea textarea-bordered 2k:text-2xl mb-6 w-full" placeholder="Paste..." rows="4"></textarea>
+									)}
 
 									{editingBuild ? (
 										<div className="flex flex-row gap-4 2k:gap-10">

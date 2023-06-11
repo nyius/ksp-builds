@@ -486,7 +486,7 @@ export const useUpdateBuild = () => {
 
 			// get the build from the db so we get new timestamps
 			const fetchedBuild = await getDoc(buildRef);
-			setLocalStoredBuild(fetchedBuild);
+			setLocalStoredBuild(fetchedBuild.data());
 
 			dispatchBuild({
 				type: 'SET_BUILD',

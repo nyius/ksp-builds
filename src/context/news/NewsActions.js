@@ -45,3 +45,15 @@ function useNews() {
 }
 
 export default useNews;
+
+/**
+ * Handles setting the id of the patch note to delete in context
+ * @param {function} dispatchNews - dispatch function
+ * @param {string} id - id of the patch note to delete
+ */
+export const setDeletePatchNoteId = (dispatchNews, id) => {
+	dispatchNews({
+		type: 'SET_DELETE_PATCH_ID',
+		payload: id,
+	});
+};

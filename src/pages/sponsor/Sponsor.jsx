@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import { Helmet } from 'react-helmet';
@@ -7,6 +7,10 @@ import SpaceBiff1 from '../../assets/astrobiff-ride.png';
 import Button from '../../components/buttons/Button';
 import InGameLogo from '../../assets/ingame-logo.png';
 
+/**
+ * Sponsor/Advertise Page
+ * @returns
+ */
 function Sponsor() {
 	//---------------------------------------------------------------------------------------------------//
 	return (

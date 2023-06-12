@@ -15,6 +15,8 @@ import LogoIcon from '../../assets/logo_light_icon.png';
 import MobileHamburger from './MobileHamburger';
 import Notifications from './Notifications';
 import Types from '../types/Types';
+import { BsDiscord } from 'react-icons/bs';
+import { FaDiscord } from 'react-icons/fa';
 
 function NavBar() {
 	const { user, dispatchAuth, authLoading } = useContext(AuthContext);
@@ -77,6 +79,11 @@ function NavBar() {
 				</div>
 
 				<div className="flex-none gap-3">
+					<label className="btn btn-circle w-14 h-14 2k:w-20 2k:h-20 2k:btn-lg avatar">
+						<Link to="https://discord.com/invite/HrNUtgWv?utm_source=Discord%20Widget&utm_medium=Connect" target="_blank" className="w-10 2k:w-20 rounded-full text-4xl items-center justify-center flex">
+							<FaDiscord />
+						</Link>
+					</label>
 					{!authLoading && user?.username && (
 						<>
 							<Notifications />

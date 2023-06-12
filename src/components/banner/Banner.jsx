@@ -29,7 +29,6 @@ function Banner() {
 
 				return aDate < bDate ? 1 : -1;
 			});
-
 			setSlides(arr);
 		}
 	}, [articlesLoading, loadingBuildOfTheWeek]);

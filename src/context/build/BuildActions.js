@@ -169,7 +169,7 @@ export default useBuild;
  * @returns
  */
 export const useMakeBuildOfTheWeek = () => {
-	const { buildOfTheWeek } = useBuild();
+	const { buildOfTheWeek } = useContext(BuildContext);
 	const { user } = useContext(AuthContext);
 
 	/**

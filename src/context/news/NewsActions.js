@@ -57,3 +57,15 @@ export const setDeletePatchNoteId = (dispatchNews, id) => {
 		payload: id,
 	});
 };
+
+/**
+ * Handles setting the id of the patch note to edit in context
+ * @param {function} dispatchNews - dispatch function
+ * @param {string/bool} id - id of the patch note to delete
+ */
+export const setEditingPatchNotes = (dispatchNews, id) => {
+	dispatchNews({
+		type: 'SET_EDITING_PATCH',
+		payload: id,
+	});
+};

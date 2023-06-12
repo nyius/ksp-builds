@@ -8,9 +8,10 @@ import checkIfJson from '../../utilities/checkIfJson';
 
 /**
  * Takes in a setState to set when the text is edited. Also takes in a size that specifies how many toolbar icons are shown. (sm, md, lg). default is lg
- * @param {*} state
+ * @param {*} setState
  * @param {*} size sm, md, lg
  * @param {number} i Takes in an 'i' num if this is used inside of a map, so we know which element to edit
+ * @param {string} text
  * @returns
  */
 const TextEditor = state => {

@@ -8,7 +8,7 @@ import AdminRoute from './routes/AdminRoute';
 import backgroundplanet from './assets/planet.png';
 import ScrollToTop from './routes/ScrollToTop';
 //---------------------------------------------------------------------------------------------------//
-import { Index, SignUp, Build, NotFound, Upload, Profile, Privacy, Terms, VisitProfile, Settings, News, Favorites, Contact, AdminPanel, Challenge, Challenges, Faq, PatchNotes, UnderConstruction, Sponsor } from './pages';
+import { Index, SignUp, Build, NotFound, Upload, Profile, Privacy, Terms, User, Settings, News, Favorites, Contact, AdminPanel, Challenge, Challenges, Faq, PatchNotes, UnderConstruction, Sponsor } from './pages';
 import RightBar from './components/containers/rightBar/RightBar';
 //---------------------------------------------------------------------------------------------------//
 import { Navbar, Footer } from './components';
@@ -28,6 +28,7 @@ when launching the app, it should loop over the localstorage and check all of th
 userprofiles should local store just like builds
 builds fetched by ID need to be paginated. break them up into folders and then iterate over them
 twitch sidebar
+email notifs for botw
 discord
 bundle craft together, multiple download buttons per folder
 refactor all functions to be prettier/cleaner - move components into their own files, etc
@@ -84,8 +85,8 @@ function App() {
 										<Route exact path="/challenges/:id" element={<Challenge />} />
 										<Route exact path="/challenges" element={<Challenges />} />
 										<Route exact path="/patch-notes" element={<PatchNotes />} />
-										<Route exact path="/user/:id" element={<VisitProfile />} />
-										<Route exact path="/user/:id/folder/:folderId" element={<VisitProfile />} />
+										<Route exact path="/user/:id" element={<User />} />
+										<Route exact path="/user/:id/folder/:folderId" element={<User />} />
 										<Route exact path="/build/:id" element={<Build />} />
 										<Route
 											exact

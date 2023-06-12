@@ -3,8 +3,12 @@ import useResetStates from '../../utilities/useResetStates';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import AstroBiff from '../../assets/astrobiff-balloon.png';
-import { Helmet } from 'react-helmet';
+import Helmet from '../../components/Helmet/Helmet';
 
+/**
+ * Privacy Policy Page
+ * @returns
+ */
 function Privacy() {
 	const { resetStates } = useResetStates();
 
@@ -15,15 +19,11 @@ function Privacy() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Helmet>
-				<meta charSet="utf-8" />
-				<title>KSP Builds - Privacy Policy</title>
-				<link rel="canonical" href={`https://kspbuilds.com/privacy`} />
-			</Helmet>
+			<Helmet title="Privacy Policy" pageLink="https://kspbuilds.com/privacy" />
 
 			<MiddleContainer>
 				<PlanetHeader text="Privacy Policy" />
-				<p className="text-lg 2k:text-3xl text-slate-400">
+				<p className="text-lg 2k:text-3xl text-slate-200">
 					We at Kerbal Builds respect the privacy of our users and are committed to protecting it. <br></br>
 					<br></br> This privacy policy explains how we collect, use, and disclose information about our users. <br></br>
 					<br></br> Information We Collect We collect two types of information from our users: personal information and non-personal information. <br></br> &emsp;•Personal information is information that identifies you as an individual,

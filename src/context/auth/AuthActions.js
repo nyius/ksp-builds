@@ -798,7 +798,6 @@ export const useFetchConversation = () => {
 	 */
 	const fetchConversation = userProfile => {
 		try {
-			const messageBox = document.getElementById('messageBox');
 			const conversationBox = document.getElementById('conversationBox');
 
 			let foundConvo = null;
@@ -807,9 +806,9 @@ export const useFetchConversation = () => {
 			});
 
 			if (foundConvo) {
+				setConvosOpen(dispatchAuth, true);
 				setConvoTab(dispatchAuth, foundConvo);
 				conversationBox.classList.add('dropdown-open');
-				messageBox.focus();
 			} else {
 				// If we didnt find the convo in our current list, check the database for an existing one
 				let foundConvo;
@@ -869,14 +868,15 @@ export const useFetchConversation = () => {
 
 				checkForConvo().then(() => {
 					if (foundConvo) {
+						setConvosOpen(dispatchAuth, true);
 						dispatchAuth({
 							type: 'NEW_CONVO',
 							payload: foundConvo,
 						});
 						setConvoTab(dispatchAuth, foundConvo);
-						messageBox.focus();
 						conversationBox.classList.add('dropdown-open');
 					} else {
+						setConvosOpen(dispatchAuth, true);
 						setConvoTab(dispatchAuth, {
 							users: [user.uid, userProfile.uid],
 							lastMessage: null,
@@ -885,7 +885,6 @@ export const useFetchConversation = () => {
 							username: userProfile.username,
 							id: null,
 						});
-						messageBox.focus();
 						conversationBox.classList.add('dropdown-open');
 					}
 				});

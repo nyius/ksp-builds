@@ -13,6 +13,7 @@ export const NewsProvider = ({ children }) => {
 		challenges: [],
 		articlesLoading: true,
 		deletePatchNoteId: null,
+		editingPatchNotes: false,
 	};
 
 	useEffect(() => {

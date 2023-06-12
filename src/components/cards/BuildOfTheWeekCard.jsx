@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { convertFromRaw, EditorState } from 'draft-js';
-import { Editor } from 'react-draft-wysiwyg';
 import UsernameLink from '../buttons/UsernameLink';
 //---------------------------------------------------------------------------------------------------//
 import Button from '../buttons/Button';

@@ -20,6 +20,11 @@ const NewsReducer = (state, action) => {
 				...state,
 				deletePatchNoteId: action.payload,
 			};
+		case 'SET_EDITING_PATCH':
+			return {
+				...state,
+				editingPatchNotes: action.payload,
+			};
 		default:
 			return state;
 	}

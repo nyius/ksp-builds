@@ -148,7 +148,7 @@ export const searchBuilds = async (num, buildName) => {
 		});
 
 		if (builds.length > 0) {
-			return searchBuilds(num + 1);
+			return searchBuilds(num + 1, buildName);
 		} else {
 			return num;
 		}

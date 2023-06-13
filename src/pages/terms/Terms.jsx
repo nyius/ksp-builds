@@ -3,26 +3,27 @@ import MiddleContainer from '../../components/containers/middleContainer/MiddleC
 import PlanetHeader from '../../components/header/PlanetHeader';
 import AstroBiffComputer from '../../assets/astrobiff-computer.png';
 import useResetStates from '../../utilities/useResetStates';
-import { Helmet } from 'react-helmet';
+import Helmet from '../../components/Helmet/Helmet';
 
+/**
+ * Terms of service page
+ * @returns
+ */
 function Terms() {
 	const { resetStates } = useResetStates();
 
 	useEffect(() => {
 		resetStates();
 	}, []);
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Helmet>
-				<meta charSet="utf-8" />
-				<title>KSP Builds - Terms and Conditions</title>
-				<link rel="canonical" href={`https://kspbuilds.com/terms`} />
-			</Helmet>
+			<Helmet title="Terms and Conditions" pageLink="https://kspbuilds.com/terms" />
 
 			<MiddleContainer>
 				<PlanetHeader text="Terms and Conditions" />
-				<p className="text-xl 2k:text-3xl text-slate-400">
+				<p className="text-xl 2k:text-3xl text-slate-300">
 					Welcome to KSP Builds! These terms of service ("Terms") govern your use of our website and the services we provide. By using our website, you agree to these Terms.
 					<br></br>
 					<br></br>

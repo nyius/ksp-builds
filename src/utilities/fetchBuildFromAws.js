@@ -11,26 +11,24 @@ const fetchBuildFromAWS = async id => {
 	let response, rawBuildData, parsedBuild;
 
 	// Get the raw build from aws
-	if (process.env.REACT_APP_ENV !== 'DEV') {
-		try {
-			const command = new GetObjectCommand({
-				Bucket: process.env.REACT_APP_BUCKET,
-				Key: `${id}.json`,
-			});
+	try {
+		const command = new GetObjectCommand({
+			Bucket: process.env.REACT_APP_BUCKET,
+			Key: `${id}.json`,
+		});
 
-			response = await s3Client.send(command);
-			rawBuildData = await response.Body.transformToString();
+		response = await s3Client.send(command);
+		rawBuildData = await response.Body.transformToString();
 
-			// If we have an older uncompressed buildFile
-			if (rawBuildData.includes('AssemblyOABConfig')) {
-				parsedBuild = JSON.parse(rawBuildData);
-			} else {
-				const decompress = decompressFromEncodedURIComponent(rawBuildData);
-				parsedBuild = JSON.parse(decompress);
-			}
-		} catch (error) {
-			throw new Error(error);
+		// If we have an older uncompressed buildFile
+		if (rawBuildData.includes('AssemblyOABConfig')) {
+			parsedBuild = JSON.parse(rawBuildData);
+		} else {
+			const decompress = decompressFromEncodedURIComponent(rawBuildData);
+			parsedBuild = JSON.parse(decompress);
 		}
+	} catch (error) {
+		throw new Error(error);
 	}
 
 	return parsedBuild;

@@ -437,6 +437,7 @@ export const useUpdateBuild = () => {
 			const buildJSON = JSON.stringify(build.build);
 			build.partCount = getBuildPartCount(buildJSON);
 			delete build.build;
+			delete build.rawImageFiles;
 
 			if (build.thumbnail !== build.images[0]) {
 				build.thumbnail = build.images[0];
@@ -619,7 +620,6 @@ export const useUploadBuild = () => {
 			if (build.kspVersion === 'any') build.kspVersion = kspVersions[0];
 
 			const availableNameNum = await searchBuilds(0, build.name);
-
 			if (availableNameNum === 0) {
 				build.urlName = buildNameToUrl(build.name);
 			} else {
@@ -631,6 +631,7 @@ export const useUploadBuild = () => {
 			const buildJson = JSON.stringify(build.build);
 			build.partCount = getBuildPartCount(buildJson);
 			delete build.build;
+			delete build.rawImageFiles;
 
 			const compressedBuild = compressToEncodedURIComponent(buildJson);
 
@@ -859,5 +860,18 @@ export const setLoadedBuild = (dispatchBuild, loadedBuild) => {
 	dispatchBuild({
 		type: 'SET_BUILD',
 		payload: { loadedBuild: loadedBuild, loadingBuild: false },
+	});
+};
+
+/**
+ * Handles setting the new build with a user goes to /upload.
+ * Either takes in the standard new build, or an existing build thats being updated
+ * @param {function} dispatchBuild - The dispatch function
+ * @param {obj} build - The build to set
+ */
+export const setBuildToUpload = (dispatchBuild, build) => {
+	dispatchBuild({
+		type: 'SET_BUILD',
+		payload: { buildToUpload: { ...build } },
 	});
 };

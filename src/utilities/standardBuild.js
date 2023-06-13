@@ -24,4 +24,5 @@ export const standardBuild = {
 	visibility: 'public',
 	forChallenge: false,
 	lastModified: serverTimestamp(),
+	rawImageFiles: [],
 };

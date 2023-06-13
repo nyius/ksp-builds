@@ -15,6 +15,7 @@ function BuildTypes({ typesArr, setBuildState }) {
 	 */
 	const setTypes = newType => {
 		if (typesArr.includes(newType)) {
+			console.log(typesArr, newType);
 			setBuildState(prevState => {
 				return { ...prevState, type: prevState.type.filter(type => type !== newType) };
 			});
@@ -25,6 +26,7 @@ function BuildTypes({ typesArr, setBuildState }) {
 		}
 	};
 
+	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="btn-group mb-6 2k:mb-10">
 			<Button type="button" color="text-slate-300" text="Rocket" onClick={e => setTypes(`Rocket`)} css={`btn 2k:btn-lg 2k:text-2xl 2k:font-thin ${typesArr.includes('Rocket') && 'btn-active bg-primary'}`} />

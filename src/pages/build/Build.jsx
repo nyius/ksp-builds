@@ -94,8 +94,6 @@ function Build() {
 		);
 	}
 
-	console.log(loadedBuild);
-
 	return (
 		<>
 			{!loadingBuild && loadedBuild && <Helmet title={loadedBuild?.name ? loadedBuild?.name : 'Build'} pageLink={`https://kspbuilds.com/build/${location.pathname}`} />}

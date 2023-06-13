@@ -28,8 +28,9 @@ when launching the app, it should loop over the localstorage and check all of th
 userprofiles should local store just like builds
 builds fetched by ID need to be paginated. break them up into folders and then iterate over them
 twitch sidebar
+	on 4k split banner with twitch streams?
+	or show other slides hidden off to the side on left and right
 email notifs for botw
-discord
 bundle craft together, multiple download buttons per folder
 refactor all functions to be prettier/cleaner - move components into their own files, etc
 make type searching work for your own builds/visiting a users builds

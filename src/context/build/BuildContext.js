@@ -1,5 +1,4 @@
 import React, { createContext, useReducer } from 'react';
-import BuildsReducer from '../builds/BuildsReducer';
 import BuildReducer from './BuildReducer';
 
 const BuildContext = createContext();
@@ -22,6 +21,7 @@ export const BuildProvider = ({ children }) => {
 		comment: '',
 		resetTextEditor: '',
 		buildOfTheWeek: null,
+		buildToUpload: null,
 	};
 
 	const [state, dispatchBuild] = useReducer(BuildReducer, initialState);

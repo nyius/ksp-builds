@@ -7,6 +7,7 @@ import { auth } from '../../firebase.config';
 import { cloneDeep } from 'lodash';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
+import { sendNotification } from './AuthUtils';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from './AuthContext';
 import BuildContext from '../build/BuildContext';
@@ -677,6 +678,20 @@ export const useSubmitReport = () => {
 				await addDoc(collection(db, 'reports'), report);
 			}
 			toast.success('Report submitted. Thanks for helping keep the community safe');
+
+			const newNotif = { ...standardNotifications };
+			newNotif.uid = '';
+			newNotif.username = '';
+			newNotif.timestamp = new Date();
+			newNotif.message = '{"blocks":[{"key":"87rfs","text":"New report","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}';
+			newNotif.type = 'message';
+			delete newNotif.profilePicture;
+			delete newNotif.buildId;
+			delete newNotif.buildName;
+			delete newNotif.comment;
+			delete newNotif.commentId;
+
+			await sendNotification('ZyVrojY9BZU5ixp09LftOd240LH3', newNotif);
 		} catch (error) {
 			console.log(error);
 		}

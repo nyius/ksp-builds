@@ -46,6 +46,7 @@ function Upload() {
 	const { dispatchBuild, editingBuild, uploadingBuild, buildToUpload } = useContext(BuildContext);
 	const { dispatchFolders } = useContext(FoldersContext);
 	const { uploadBuild } = useUploadBuild();
+	const logo = 'https://images.ctfassets.net/wn7ipiv9ue5v/7EtYz1F2APPTGOwrfGHRzw/6b6787d46e856aeaac1a305c112500f7/Update_0.1.2.0_Landscape.jpg';
 	//---------------------------------------------------------------------------------------------------//
 	const navigate = useNavigate();
 

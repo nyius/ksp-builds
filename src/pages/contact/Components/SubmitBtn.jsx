@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import { db } from '../../../firebase.config';
 import { cloneDeep } from 'lodash';
 import { addDoc, collection } from 'firebase/firestore';
+import standardNotifications from '../../../utilities/standardNotifications';
+import { sendNotification } from '../../../context/auth/AuthUtils';
 
 /**
  * Button for submitting the submit form
@@ -33,6 +35,20 @@ function SubmitBtn({ formData, setSubmitted }) {
 			await addDoc(collection(db, 'reports'), newFormData);
 			toast.success('Message submitted!');
 			setSubmitted(true);
+
+			const newNotif = { ...standardNotifications };
+			newNotif.uid = '';
+			newNotif.username = '';
+			newNotif.timestamp = new Date();
+			newNotif.message = '{"blocks":[{"key":"87rfs","text":"New website message","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}';
+			newNotif.type = 'message';
+			delete newNotif.profilePicture;
+			delete newNotif.buildId;
+			delete newNotif.buildName;
+			delete newNotif.comment;
+			delete newNotif.commentId;
+
+			await sendNotification('ZyVrojY9BZU5ixp09LftOd240LH3', newNotif);
 		} catch (error) {
 			console.log(error);
 			toast.error('Something went wrong, please try again');

@@ -7,7 +7,7 @@ import FiltersContext from '../../context/filters/FiltersContext';
 import BuildsContext from '../../context/builds/BuildsContext';
 //---------------------------------------------------------------------------------------------------//
 import Builds from '../../components/builds/Builds';
-import Banner from '../../components/banner/Banner';
+import Hero from '../../components/hero/Hero';
 import FetchAmount from '../../components/fetchAmount/FetchAmount';
 import SearchBar from '../../components/search/SearchBar';
 import Sort from '../../components/sort/Sort';
@@ -58,7 +58,7 @@ function Index() {
 		<>
 			<Helmet title="Home" pageLink="https://kspbuilds.com" />
 
-			<Banner />
+			<Hero />
 
 			<div className="flex flex-row flex-wrap gap-4 w-full place-content-end sm:mb-4">
 				<SearchBar />

@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import AuthContext from '../../context/auth/AuthContext';
 import { useHandleVoting } from '../../context/auth/AuthActions';
 import { GoArrowUp, GoArrowDown } from 'react-icons/go';
+import CheckCredentials from '../credentials/CheckCredentials';
 
 /**
  * Shows the arrows to upvote/downvote. Takes in the build
@@ -49,11 +50,11 @@ function VoteArrows({ build }) {
 			<span id="upVote" onClick={() => handleVoting('upVote', build)} className={`vote-arrow cursor-pointer hover:text-orange-600 ${checkIfVoted('upVote', build.id)}`}>
 				<GoArrowUp id="upVote" />
 			</span>
-			{!authLoading && user?.username && (
+			<CheckCredentials type="user">
 				<span id="downVote" onClick={() => handleVoting('downVote', build)} className={`vote-arrow cursor-pointer hover:text-sky-500 ${checkIfVoted('downVote', build.id)}`}>
 					<GoArrowDown id="downVote" />
 				</span>
-			)}
+			</CheckCredentials>
 		</div>
 	);
 }

@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import BuildContext from '../../../context/build/BuildContext';
 import BuildInfoCard from '../../../components/cards/BuildInfoCard';
 import BotwBadge from '../../../assets/BotW_badge2.png';
-import UsernameLink from '../../../components/buttons/UsernameLink';
+import UsernameLink from '../../../components/username/UsernameLink';
 import Button from '../../../components/buttons/Button';
 
 /**

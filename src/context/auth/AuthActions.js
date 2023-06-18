@@ -1,13 +1,13 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { db } from '../../firebase.config';
-import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter, where, getDocFromCache, getDocsFromCache, increment } from 'firebase/firestore';
+import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter, where, increment } from 'firebase/firestore';
 import { signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 import { googleProvider } from '../../firebase.config';
 import { auth } from '../../firebase.config';
 import { cloneDeep } from 'lodash';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
-import { sendNotification } from './AuthUtils';
+import { fetchUserProfileFromServer, sendNotification } from './AuthUtils';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from './AuthContext';
 import BuildContext from '../build/BuildContext';
@@ -18,6 +18,7 @@ import standardNotifications from '../../utilities/standardNotifications';
 import standardUserProfile from '../../utilities/standardUserProfile';
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
 import subscribeToConvo from '../../utilities/subscribeToConvo';
+import { checkLocalUserAge, getUserFromLocalStorage, setLocalStoredUser } from '../../utilities/userLocalStorage';
 
 const useAuth = () => {
 	const { dispatchAuth } = useContext(AuthContext);
@@ -150,146 +151,81 @@ export default useAuth;
  * @returns
  */
 export const useFetchUser = () => {
-	const { dispatchAuth } = useContext(AuthContext);
+	const { dispatchAuth, fetchedUserProfiles } = useContext(AuthContext);
 	/**
-	 * Handles fetching a profile from the userProfiles DB.
+	 * Handles fetching a profile. First check the local storage, then the server
 	 * @param {string} id - the id of the user to fetch
+	 * @param {set function} setLoading - (optional) - a setter function for a loading state
+	 * @returns the found user
 	 */
-	const fetchUsersProfile = async id => {
+	const fetchUsersProfile = async (id, setLoading) => {
 		try {
-			setFetchingProfile(dispatchAuth, true);
+			setLoading ? setLoading(true) : setFetchingProfile(dispatchAuth, true);
 
-			const fetchedProfile = await getDoc(doc(db, 'userProfiles', id));
+			let localUser = getUserFromLocalStorage(id);
 
-			if (fetchedProfile.exists()) {
-				const profile = fetchedProfile.data();
-				profile.uid = fetchedProfile.id;
-				dispatchAuth({
-					type: 'FETCH_USERS_PROFILE',
-					payload: profile,
-				});
-
-				setFetchingProfile(dispatchAuth, false);
-			} else {
-				// Check if we can find it by username
-				const userCol = collection(db, 'userProfiles');
-				const q = query(userCol, where('username', '==', id));
-				const fetchedProfiles = await getDocs(q);
-				let profiles = [];
-
-				fetchedProfiles.forEach(profile => {
-					let userProfile = profile.data();
-					userProfile.uid = profile.id;
-					profiles.push(userProfile);
-				});
-
-				if (profiles.length > 0) {
-					const profile = profiles[0];
-
-					dispatchAuth({
-						type: 'FETCH_USERS_PROFILE',
-						payload: profile,
-					});
-
-					setFetchingProfile(dispatchAuth, false);
+			if (localUser) {
+				if (checkLocalUserAge(localUser.lastFetchedTimestamp, 10)) {
+					const fetchedUser = await handleFetchUserProfileFromServer(id, setLoading);
+					setFetchedUserProfiles(dispatchAuth, localUser, fetchedUserProfiles);
+					return fetchedUser;
 				} else {
-					setFetchingProfile(dispatchAuth, false);
-					throw new Error(`Couldn't find profile!`);
+					setFetchedUserProfiles(dispatchAuth, localUser, fetchedUserProfiles);
+					setLoading ? setLoading(false) : setFetchingProfile(dispatchAuth, false);
+					return localUser;
 				}
+			} else {
+				const fetchedUser = await handleFetchUserProfileFromServer(id, setLoading);
+				setFetchedUserProfiles(dispatchAuth, localUser, fetchedUserProfiles);
+				return fetchedUser;
 			}
 		} catch (error) {
 			console.log(error);
+			return null;
 		}
 	};
 
 	/**
-	 * handles fetching the profile from the server if for some reason fetching from the cache fails
-	 * @param {string} id - id of the user to fetch
+	 * Fetches a user from the server
+	 * @param {string} id - the uid/username to fetch
+	 * @param {set function} setLoading - a loading state (optional)
+	 * @returns
 	 */
-	const fetchUsersProfileServer = async id => {
+	const handleFetchUserProfileFromServer = async (id, setLoading) => {
 		try {
-			const fetchedProfile = await getDoc(doc(db, 'userProfiles', id));
+			const fetchedProfile = await fetchUserProfileFromServer(id);
 
-			if (fetchedProfile.exists()) {
-				const profile = fetchedProfile.data();
-				profile.uid = fetchedProfile.id;
-				dispatchAuth({
-					type: 'FETCH_USERS_PROFILE',
-					payload: profile,
-				});
-
-				setFetchingProfile(dispatchAuth, false);
+			if (fetchedProfile) {
+				setLocalStoredUser(fetchedProfile.uid, fetchedProfile);
+				setLoading ? setLoading(false) : setFetchingProfile(dispatchAuth, false);
+				return fetchedProfile;
 			} else {
-				// Check if we can find it by username
-				const userCol = collection(db, 'userProfiles');
-				const q = query(userCol, where('username', '==', id));
-				const fetchedProfiles = await getDocs(q);
-				let profiles = [];
-
-				fetchedProfiles.forEach(profile => {
-					let userProfile = profile.data();
-					userProfile.uid = profile.id;
-					profiles.push(userProfile);
-				});
-
-				if (profiles.length > 0) {
-					const profile = profiles[0];
-
-					dispatchAuth({
-						type: 'FETCH_USERS_PROFILE',
-						payload: profile,
-					});
-
-					setFetchingProfile(dispatchAuth, false);
-				} else {
-					setFetchingProfile(dispatchAuth, false);
-					throw new Error(`Couldn't find profile!`);
-				}
+				setLoading ? setLoading(false) : setFetchingProfile(dispatchAuth, false);
+				throw new Error(`Couldn't find profile for ${id}!`);
 			}
 		} catch (error) {
 			console.log(error);
+			return null;
 		}
 	};
 
 	/**
-	 * Fetches the lasted added/updated users.  Updates the latest fetched local storage and updates the cache
+	 * Checks if a user is in the 'fetchedUserProfiles' arr in the context
+	 * @param {string} usersId - the users UID or username to find
+	 * @returns
 	 */
-	const fetchLastUpdatedUsers = async () => {
-		try {
-			const usersRef = collection(db, 'userProfiles');
-			// Get the most recently updated doc
-			let newestDocQ = query(usersRef, orderBy('lastModified', 'desc'), limit(1));
-			const newestDocSnap = await getDocs(newestDocQ);
-			let newestDoc;
-
-			newestDocSnap.forEach(doc => {
-				newestDoc = doc.data();
-			});
-
-			// Fetch the locally saved newest
-			const localNewest = JSON.parse(localStorage.getItem('newestUser'));
-
-			if (localNewest) {
-				// check if the local newest update is now older than the last thing updated on the server
-				if (localNewest.seconds < newestDoc.lastModified.seconds) {
-					let newDocsQ = query(usersRef, where('lastModified', '>', new Date(localNewest.seconds * 1000)));
-					await getDocs(newDocsQ); // simply getDocs so it updates our cache
-
-					localStorage.setItem('newestUser', JSON.stringify(newestDoc.lastModified));
-				}
-			} else {
-				// Users first time/ no localNewest saved, fetch all builds so they're cached
-				console.log(`No local stored timestamp`);
-				const userProfilesRef = collection(db, 'userProfiles');
-				await getDocs(userProfilesRef);
-				localStorage.setItem('newestUser', JSON.stringify(newestDoc.lastModified));
+	const checkIfUserInContext = usersId => {
+		let foundProfile;
+		for (let i = 0; i < fetchedUserProfiles.length; i++) {
+			if (fetchedUserProfiles[i].uid === usersId || fetchedUserProfiles[i].username === usersId) {
+				foundProfile = fetchedUserProfiles[i];
+				break;
 			}
-		} catch (error) {
-			console.log(error);
 		}
+		return foundProfile;
 	};
 
-	return { fetchUsersProfile };
+	return { fetchUsersProfile, checkIfUserInContext };
 };
 /**
  * Hook with functions to handle voting on builds
@@ -392,12 +328,8 @@ export const useUpdateProfile = () => {
 	const updateUserProfilePic = async profilePicture => {
 		try {
 			updateUserProfilesAndDb({ profilePicture, lastModified: serverTimestamp() });
-
+			updateUserState(dispatchAuth, { profilePicture });
 			toast.success('Profile Picture updated!');
-			dispatchAuth({
-				type: 'UPDATE_USER',
-				payload: { profilePicture },
-			});
 		} catch (error) {
 			console.log(error);
 			toast.error('Something went wrong. Please try again');
@@ -411,12 +343,8 @@ export const useUpdateProfile = () => {
 	const updateUserBio = async bio => {
 		try {
 			updateUserProfilesAndDb({ bio, lastModified: serverTimestamp() });
-
+			updateUserState(dispatchAuth, { bio });
 			toast.success('Bio updated!');
-			dispatchAuth({
-				type: 'UPDATE_USER',
-				payload: { bio },
-			});
 		} catch (error) {
 			console.log(error);
 			toast.error('Something went wrong. Please try again');
@@ -431,10 +359,8 @@ export const useUpdateProfile = () => {
 	const updateUserDb = async (update, userUid) => {
 		try {
 			await updateDoc(doc(db, 'users', userUid ? userUid : user.uid), update);
-			dispatchAuth({
-				type: 'UPDATE_USER',
-				payload: { ...update },
-			});
+			updateUserState(dispatchAuth, { ...update });
+			setLocalStoredUser(userUid, user);
 		} catch (error) {
 			console.log(error);
 			toast.error('Something went wrong. Please try again');
@@ -611,7 +537,7 @@ export const useDeleteConversation = () => {
  * @returns
  */
 export const useSubmitReport = () => {
-	const { user, reportType, reportingContent } = useContext(AuthContext);
+	const { dispatchAuth, user, reportType, reportingContent } = useContext(AuthContext);
 	const { loadedBuild } = useContext(BuildContext);
 
 	/**
@@ -692,6 +618,7 @@ export const useSubmitReport = () => {
 			delete newNotif.commentId;
 
 			await sendNotification('ZyVrojY9BZU5ixp09LftOd240LH3', newNotif);
+			setReport(dispatchAuth, null, null);
 		} catch (error) {
 			console.log(error);
 		}
@@ -917,29 +844,34 @@ export const useFetchConversation = () => {
  * @returns
  */
 export const useHandleFollowingUser = () => {
-	const { dispatchAuth, fetchedUserProfile, user } = useContext(AuthContext);
+	const { dispatchAuth, user, openProfile } = useContext(AuthContext);
 	/**
 	 * Handles following a users
-	 * @param {*} uid
+	 * @param {obj} userProfile - the profile of the user to follow
 	 * @returns
 	 */
-	const handleFollowingUser = async () => {
+	const handleFollowingUser = async userProfile => {
 		try {
-			let newFollowers = fetchedUserProfile.followers ? cloneDeep(fetchedUserProfile.followers) : [];
+			let updatedUser = cloneDeep(userProfile);
 
-			// Check if we are already following this (and if so, unupvote it)
-			if (newFollowers.includes(user.uid)) {
-				const index = newFollowers.indexOf(user.uid);
-				newFollowers.splice(index, 1);
+			// Check if we are already following this (and if so, unfollow it)
+			if (updatedUser.followers.includes(user.uid)) {
+				const index = updatedUser.followers.indexOf(user.uid);
+				updatedUser.followers.splice(index, 1);
 
-				dispatchAuth({ type: 'UPDATE_FETCHED_USERS_PROFILE', payload: { followers: newFollowers } });
-
-				await updateDoc(doc(db, 'userProfiles', fetchedUserProfile.uid), { followers: newFollowers, lastModified: serverTimestamp() });
+				setUpdateFetchedProfile(dispatchAuth, updatedUser);
+				setLocalStoredUser(updatedUser.uid, updatedUser);
+				if (openProfile?.uid === updatedUser.uid) setUpdateOpenProfile(dispatchAuth, { followers: updatedUser.followers });
+				await updateDoc(doc(db, 'userProfiles', userProfile.uid), { followers: updatedUser.followers, lastModified: serverTimestamp() });
+				toast.success(`Successfully unfollowed ${userProfile.username}.`);
 			} else {
-				newFollowers.push(user.uid);
-				dispatchAuth({ type: 'UPDATE_FETCHED_USERS_PROFILE', payload: { followers: newFollowers } });
+				updatedUser.followers.push(user.uid);
 
-				await updateDoc(doc(db, 'userProfiles', fetchedUserProfile.uid), { followers: newFollowers, lastModified: serverTimestamp() });
+				setUpdateFetchedProfile(dispatchAuth, updatedUser);
+				setLocalStoredUser(updatedUser.uid, updatedUser);
+				if (openProfile?.uid === updatedUser.uid) setUpdateOpenProfile(dispatchAuth, { followers: updatedUser.followers });
+				await updateDoc(doc(db, 'userProfiles', userProfile.uid), { followers: updatedUser.followers, lastModified: serverTimestamp() });
+				toast.success(`Now following ${userProfile.username}!`);
 			}
 		} catch (error) {
 			console.log(error);
@@ -1023,10 +955,7 @@ export const useBlockUser = () => {
 				toast.success('User blocked.');
 			}
 
-			dispatchAuth({
-				type: 'UPDATE_USER',
-				payload: { blockList: newBlockList },
-			});
+			updateUserState(dispatchAuth, { blockList: newBlockList });
 
 			setUserToBlock(dispatchAuth, null);
 		} catch (error) {
@@ -1211,5 +1140,69 @@ export const setConvosOpen = (dispatchAuth, bool) => {
 	dispatchAuth({
 		type: 'SET_AUTH',
 		payload: { convosOpen: bool },
+	});
+};
+
+/**
+ * handles placing the fetched profile in the context
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {obj} profile - the fetched users profile
+ * @param {arr} fetchedUserProfiles - the fetched users profiles to add the new profile to
+ */
+export const setFetchedUserProfiles = (dispatchAuth, profile, fetchedUserProfiles) => {
+	if (profile) {
+		let foundUser;
+		fetchedUserProfiles.map((user, i) => {
+			if (user.uid === profile.uid) {
+				foundUser = i;
+			}
+		});
+
+		if (foundUser) {
+			fetchedUserProfiles.splice(foundUser, 1);
+		} else {
+			fetchedUserProfiles.push(profile);
+		}
+
+		dispatchAuth({
+			type: 'SET_AUTH',
+			payload: { fetchedUserProfiles: fetchedUserProfiles },
+		});
+	}
+};
+
+/**
+ * handles setting the current open profile
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {obj} profile - The current open profile
+ */
+export const setOpenProfile = (dispatchAuth, profile) => {
+	dispatchAuth({
+		type: 'SET_AUTH',
+		payload: { openProfile: profile },
+	});
+};
+
+/**
+ * Updates the currently open profile
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {obj} update - the fields to update
+ */
+export const setUpdateOpenProfile = (dispatchAuth, update) => {
+	dispatchAuth({
+		type: 'UPDATE_OPEN_PROFILE',
+		payload: update,
+	});
+};
+
+/**
+ * Updates a fetched user in the context with a new version
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {obj} updatedUser - the entire updated user to replace the old one
+ */
+export const setUpdateFetchedProfile = (dispatchAuth, updatedUser) => {
+	dispatchAuth({
+		type: 'UPDATE_FETCHED_USERS_PROFILE',
+		payload: updatedUser,
 	});
 };

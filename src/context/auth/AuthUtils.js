@@ -1,4 +1,4 @@
-import { updateDoc, doc, serverTimestamp, collection, addDoc, deleteDoc, getDocs, query, getDoc, setDoc } from 'firebase/firestore';
+import { updateDoc, doc, serverTimestamp, collection, addDoc, deleteDoc, getDocs, query, getDoc, setDoc, where } from 'firebase/firestore';
 import { deleteUser, getAuth } from 'firebase/auth';
 import { toast } from 'react-toastify';
 import { db } from '../../firebase.config';
@@ -162,5 +162,44 @@ export const updateWeeklyUpvoted = async (id, type, userUid) => {
 		}
 	} catch (error) {
 		console.log(error);
+	}
+};
+
+/**
+ * Handles fetching a users userProfile from a server
+ * @param {string} id - the uid or username of the user to fetch
+ * @returns the users profile
+ */
+export const fetchUserProfileFromServer = async id => {
+	try {
+		const fetchedProfile = await getDoc(doc(db, 'userProfiles', id));
+
+		if (fetchedProfile.exists()) {
+			const profile = fetchedProfile.data();
+			profile.uid = fetchedProfile.id;
+			return profile;
+		} else {
+			// Check if we can find it by username
+			const userCol = collection(db, 'userProfiles');
+			const q = query(userCol, where('username', '==', id));
+			const fetchedProfiles = await getDocs(q);
+			let profiles = [];
+
+			fetchedProfiles.forEach(profile => {
+				let userProfile = profile.data();
+				userProfile.uid = profile.id;
+				profiles.push(userProfile);
+			});
+
+			if (profiles.length > 0) {
+				const profile = profiles[0];
+
+				return profile;
+			} else {
+				return null;
+			}
+		}
+	} catch (error) {
+		throw new Error(error);
 	}
 };

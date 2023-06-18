@@ -1,6 +1,7 @@
 import { serverTimestamp } from 'firebase/firestore';
 
 export const standardBuild = {
+	type: 'build',
 	name: '',
 	urlName: '',
 	timestamp: serverTimestamp(),
@@ -13,7 +14,7 @@ export const standardBuild = {
 	upVotes: 0,
 	downVotes: 0,
 	kspVersion: `any`,
-	type: [],
+	types: [],
 	tags: [],
 	commentCount: 0,
 	id: '',

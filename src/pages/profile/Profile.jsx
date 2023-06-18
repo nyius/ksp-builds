@@ -7,7 +7,7 @@ import BuildsContext from '../../context/builds/BuildsContext';
 import useBuilds, { setBuildsLoading, setClearFetchedBuilds } from '../../context/builds/BuildsActions';
 import useFilters from '../../context/filters/FiltersActions';
 import FiltersContext from '../../context/filters/FiltersContext';
-import { setSelectedFolder, setBuildToAddToFolder } from '../../context/folders/FoldersActions';
+import { setSelectedFolder, setBuildToAddToFolder, setFolderLocation } from '../../context/folders/FoldersActions';
 import FoldersContext from '../../context/folders/FoldersContext';
 //---------------------------------------------------------------------------------------------------//
 import useResetStates from '../../utilities/useResetStates';
@@ -41,6 +41,7 @@ function Profile() {
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 
 	useEffect(() => {
+		setFolderLocation(dispatchFolders, 'profile');
 		setSelectedFolder(dispatchFolders, null);
 		setBuildToAddToFolder(dispatchFolders, null, user);
 		resetStates();
@@ -96,7 +97,7 @@ function Profile() {
 				</div>
 
 				<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">Your Folders</h2>
-				<Folders editable={true} />
+				<Folders />
 
 				<div className="flex flex-row flex-wrap gap-4 w-full place-content-between sm:mb-4">
 					<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">{openedFolder ? openedFolder?.folderName : 'Your Builds'}</h2>

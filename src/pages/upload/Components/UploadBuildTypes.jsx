@@ -9,10 +9,10 @@ import BuildTypes from '../../../components/create/BuildTypes';
  */
 function UploadBuildTypes() {
 	const { dispatchBuild, buildToUpload } = useContext(BuildContext);
-	const [types, setTypes] = useState({ type: buildToUpload.type.length > 0 ? buildToUpload.type : [] });
+	const [types, setTypes] = useState(buildToUpload.types.length > 0 ? buildToUpload.types : []);
 
 	useEffect(() => {
-		setBuildToUpload(dispatchBuild, { ...buildToUpload, type: types.type });
+		setBuildToUpload(dispatchBuild, { ...buildToUpload, types });
 	}, [types]);
 
 	//---------------------------------------------------------------------------------------------------//
@@ -20,7 +20,7 @@ function UploadBuildTypes() {
 		return (
 			<>
 				<h3 className="text-slate-200 text-xl 2k:text-3xl mb-2 2k:mb-4">Build Type (3 max)</h3>
-				<BuildTypes typesArr={buildToUpload.type} setBuildState={setTypes} />
+				<BuildTypes typesArr={buildToUpload.types} setBuildState={setTypes} />
 			</>
 		);
 	}

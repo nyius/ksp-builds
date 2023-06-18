@@ -2,12 +2,21 @@ import React, { useState, useContext, useEffect, useRef, Fragment } from 'react'
 import AuthContext from '../../context/auth/AuthContext';
 import { setConvoTab, setDeleteConversationId } from '../../context/auth/AuthActions';
 import { readMessage } from '../../context/auth/AuthUtils';
-import Button from '../buttons/Button';
+import ConvosAvatar from './Components/ConvosAvatar';
+import ConvosTimestamp from './Components/ConvosTimestamp';
+import DeleteConvoBtn from './Buttons/DeleteConvoBtn';
+import NewMessageNotif from './Components/NewMessageNotif';
+import ConvosUsername from './Components/ConvosUsername';
+import ConvosLastMessage from './Components/ConvosLastMessage';
 
+/**
+ * Displays the users list of conversations with other users
+ * @returns
+ */
 function Conversations() {
 	const { dispatchAuth, conversations, user } = useContext(AuthContext);
 	const messagesTopTef = useRef(null);
-	const [convos, setConvos] = useState(null);
+	const [convos, setConvos] = useState([]);
 
 	const scrollToTop = () => {
 		messagesTopTef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,62 +49,36 @@ function Conversations() {
 		}
 	};
 
-	/**
-	 * Handles checking whot he last message was from
-	 * @param {*} message
-	 * @returns
-	 */
-	const checkWhoSentLastMessage = message => {
-		if (message.lastMessageFrom !== user?.uid) {
-			return message.username;
-		} else {
-			return user?.username;
-		}
-	};
+	//---------------------------------------------------------------------------------------------------//
+	if (convos?.length === 0) {
+		return <p className="text-xl 2k:text-3xl text-white text-center">No messages yet!</p>;
+	}
 
 	return (
 		<>
 			<div ref={messagesTopTef} />
-			{convos?.length > 0 ? (
-				<Fragment>
-					{convos.map((message, i) => {
-						return (
-							<Fragment key={i}>
-								{message?.messages?.length > 0 && (
-									<div key={i} className="flex flex-row gap-2 2k:gap-4 items-center rounded-xl py-2 2k:py-4 hover:bg-primary cursor-pointer relative" onClick={e => handleOpenConvo(message, e)}>
-										<div className="avatar">
-											<div className="rounded-full w-24">
-												<img src={message.userProfilePic} alt="" />
-											</div>
+			{convos.map((message, i) => {
+				return (
+					<Fragment key={i}>
+						{message?.messages?.length > 0 && (
+							<div key={i} className="flex flex-row gap-2 2k:gap-4 items-center rounded-xl py-2 2k:py-4 hover:bg-primary cursor-pointer relative" onClick={e => handleOpenConvo(message, e)}>
+								<ConvosAvatar profilePicture={message.userProfilePic} />
+								<div className="flex flex-col w-full">
+									<div className="flex flex-row w-full place-content-between pr-9">
+										<ConvosUsername username={message.username} />
+										<div className="flex flex-row pr-6 shrink-0 items-center">
+											<ConvosTimestamp timestamp={message.lastMessage} />
+											<NewMessageNotif newMessage={message.newMessage} />
 										</div>
-										<div className="flex flex-col w-full">
-											<div className="flex flex-row w-full place-content-between pr-9">
-												<p className="text-xl 2k:text-3xl w-1/2 text-white text-ellipsis overflow-hidden">{message.username}</p>
-												<div className="flex flex-row pr-6 shrink-0 items-center">
-													<p className="text-lg 2k:text-2xl text-slate-500 pr-2">
-														{message.lastMessage?.seconds ? (
-															<>{new Intl.DateTimeFormat('en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(message.lastMessage?.seconds * 1000)} </>
-														) : (
-															<>{message.lastMessage}</>
-														)}
-													</p>
-													{message.newMessage && <div className="bg-sky-500 rounded-full w-4 h-4 shrink-0"></div>}
-												</div>
-											</div>
-											<p className="text-slate-500 conversations-preview-text text-lg 2k:text-2xl">
-												{checkWhoSentLastMessage(message)}: {message.messages[message.messages.length - 1].message}
-											</p>
-										</div>
-										<Button htmlFor="delete-conversation-modal" text="x" style="btn-circle" position="absolute top-1 right-1" size="!btn-sm" />
 									</div>
-								)}
-							</Fragment>
-						);
-					})}
-				</Fragment>
-			) : (
-				<p className="text-xl 2k:text-3xl text-white text-center">No messages yet!</p>
-			)}
+									<ConvosLastMessage message={message} />
+								</div>
+								<DeleteConvoBtn />
+							</div>
+						)}
+					</Fragment>
+				);
+			})}
 		</>
 	);
 }

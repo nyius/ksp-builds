@@ -15,10 +15,12 @@ function ChallengeCard({ challenge, i }) {
 
 	useEffect(() => {
 		if (challenge) {
-			if (challenge.article.model) {
+			if (challenge.article.model.article) {
 				setParsedArticle(findAllByKey(challenge.article.model.article.richText.json, 'value'));
 			} else {
-				setParsedArticle(EditorState.createWithContent(convertFromRaw(JSON.parse(challenge.article))));
+				if (typeof challenge.article !== 'object') {
+					setParsedArticle(EditorState.createWithContent(convertFromRaw(JSON.parse(challenge.article))));
+				}
 			}
 		}
 	}, []);

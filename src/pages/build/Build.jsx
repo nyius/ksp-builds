@@ -29,7 +29,7 @@ import BuildName from './components/BuildName';
 import BuildTypes from './components/BuildTypes';
 import BuildViews from './components/BuildViews';
 import ShareBuildBtn from './components/Buttons/ShareBuildBtn';
-import ExportBuildBtn from './components/Buttons/ExportBuildBtn';
+import ExportBuildBtn from '../../components/buttons/ExportBuildBtn';
 import HowToImportBtn from './components/Buttons/HowToImportBtn';
 import SaveBuildToFolderBtn from './components/Buttons/SaveBuildToFolderBtn';
 import ReportBuildBtn from './components/Buttons/ReportBuildBtn';
@@ -125,7 +125,7 @@ function Build() {
 
 					<div className="flex flex-col md:flex-row place-content-between">
 						<div className="flex flex-col sm:flex-row flex-wrap items-center gap-4 mb-10 w-full">
-							<ExportBuildBtn />
+							<ExportBuildBtn id={loadedBuild.id} />
 							<HowToImportBtn />
 							<SaveBuildToFolderBtn />
 							<ReportBuildBtn />

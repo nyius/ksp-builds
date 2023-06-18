@@ -1,8 +1,7 @@
 import React, { createContext, useEffect, useReducer } from 'react';
 import BuildsReducer from './BuildsReducer';
-import { getDoc, doc, getDocFromCache, getDocs, query, where, orderBy, limit, collection } from 'firebase/firestore';
+import { getDoc, doc, getDocFromCache } from 'firebase/firestore';
 import { db } from '../../firebase.config';
-import { compact } from 'lodash';
 
 const BuildsContext = createContext();
 

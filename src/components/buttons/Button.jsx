@@ -1,7 +1,7 @@
 import React from 'react';
 import { GiCancel, GiPeaks } from 'react-icons/gi';
 import { ImCloudUpload } from 'react-icons/im';
-import { FaSave, FaUserAstronaut, FaCogs, FaHome, FaList } from 'react-icons/fa';
+import { FaSave, FaUserAstronaut, FaCogs, FaHome, FaList, FaDiscord, FaGithub } from 'react-icons/fa';
 import { FiLogOut, FiShare2 } from 'react-icons/fi';
 import { TiExport, TiPlusOutline } from 'react-icons/ti';
 import { RiDeleteBin2Fill, RiEditFill, RiLoginCircleLine } from 'react-icons/ri';
@@ -73,6 +73,8 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 		if (icon === 'info') return <AiOutlineBulb />;
 		if (icon === 'mountain') return <GiPeaks />;
 		if (icon === 'twitter') return <BsTwitter />;
+		if (icon === 'discord') return <FaDiscord />;
+		if (icon === 'github') return <FaGithub />;
 		if (icon === 'message') return <BiCommentAdd />;
 		if (icon === 'fill-star') return <AiFillStar />;
 		if (icon === 'outline-star') return <AiOutlineStar />;
@@ -85,29 +87,35 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 	if (type) {
 		if (type === 'ahref') {
 			return (
-				<div className={`${tooltip ? 'tooltip' : ''} ${size && size}`} data-tip={tooltip ? tooltip : ''}>
-					<Link to={href} target={target} className={`btn 2k:btn-lg 2k:text-xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
-						{icon && <span className={`text-2xl 2k:text-3xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
-						{text !== '' && text}
+				<div className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''}`} data-tip={tooltip ? tooltip : ''}>
+					<Link to={href} target={target} className={`btn 2k:btn-lg 2k:text-xl ${style ? style : ''} ${color ? color : ''} ${css ? css : ''} ${size ? size : ''} ${position ? position : ''} ${margin ? margin : ''} `} onClick={onClick}>
+						{icon ? <span className={`text-2xl 2k:text-3xl ${text ? 'mr-4 2k:mr-6' : ''}`}>{buttonIcon()}</span> : null}
+						{text !== '' ? text : null}
 					</Link>
 				</div>
 			);
 		} else {
 			return (
-				<div className={`${tooltip ? 'tooltip' : ''} ${size && size}`} data-tip={tooltip ? tooltip : ''}>
-					<button type={type} className={`btn 2k:btn-lg 2k:text-xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
-						{icon && <span className={`text-2xl 2k:text-3xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
-						{text !== '' && text}
+				<div className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''}`} data-tip={tooltip ? tooltip : ''}>
+					<button type={type} className={`btn 2k:btn-lg 2k:text-xl ${style ? style : ''} ${color ? color : ''} ${css ? css : ''} ${size ? size : ''} ${position ? position : ''} ${margin ? margin : ''} `} onClick={onClick}>
+						{icon ? <span className={`text-2xl 2k:text-3xl ${text ? 'mr-4 2k:mr-6' : null}`}>{buttonIcon()}</span> : null}
+						{text !== '' ? text : null}
 					</button>
 				</div>
 			);
 		}
 	} else {
 		return (
-			<div className={`${tooltip ? 'tooltip' : ''} ${size && size} ${position && position}`} data-tip={tooltip ? tooltip : ''}>
-				<label type={type} tabIndex={tabIndex} htmlFor={htmlFor} className={`btn 2k:btn-lg 2k:text-xl ${style && style} ${color && color} ${css && css} ${size && size} ${position && position} ${margin && margin} `} onClick={onClick}>
-					{icon && <span className={`text-2xl 2k:text-3xl ${text && 'mr-4 2k:mr-6'}`}>{buttonIcon()}</span>}
-					{text !== '' && text}
+			<div className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''} ${position ? position : ''}`} data-tip={tooltip ? tooltip : ''}>
+				<label
+					type={type}
+					tabIndex={tabIndex}
+					htmlFor={htmlFor}
+					className={`btn 2k:btn-lg 2k:text-xl ${style ? style : ''} ${color ? color : ''} ${css ? css : ''} ${size ? size : ''} ${position ? position : ''} ${margin ? margin : ''} `}
+					onClick={onClick}
+				>
+					{icon ? <span className={`text-2xl 2k:text-3xl ${text ? 'mr-4 2k:mr-6' : ''}`}>{buttonIcon()}</span> : ''}
+					{text !== '' ? text : ''}
 				</label>
 			</div>
 		);

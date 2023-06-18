@@ -21,20 +21,19 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 /*TODO
-making a new folder and clicking save/pressing enter has unintended results
+***Update all profiles to have a type and all builds to have a type before pusing next update - builds need to make their 'type' into 'types' first
 drag and drop your own builds into a folder?
+fix news
 when launching the app, it should loop over the localstorage and check all of the stored builds to see their age
 	if theyre older than like a week, they should be removed from storage
-userprofiles should local store just like builds
 builds fetched by ID need to be paginated. break them up into folders and then iterate over them
 twitch sidebar
 	on 4k split banner with twitch streams?
 	or show other slides hidden off to the side on left and right
 email notifs for botw
 bundle craft together, multiple download buttons per folder
-refactor all functions to be prettier/cleaner - move components into their own files, etc
+use useMemo to improve performance
 make type searching work for your own builds/visiting a users builds
-go through all JSX and remove all instances of && and replace with ?:
 implement react-popper to replace tooltips and username hover
 pagination allowing user to jump right to a page? might result in a large amount of firebase calls
 thumbnails scale down
@@ -42,6 +41,7 @@ competitions/ways to give users accolades
 t-shirts, merch
 Volunteer positions (moderate, write posts, create challenges, etc) - this will include all the features they may need to see/have access to
 Quick share builds (without needing to create a whole build)
+switch to vite?
 Mission generation page - would get destroyed by chatGPT charges so maybe in the future
 create backup database on an entirely new firebase instance - updates once a week
  */

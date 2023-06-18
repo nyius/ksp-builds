@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useFilters from '../../context/filters/FiltersActions';
 import FiltersContext from '../../context/filters/FiltersContext';
 //---------------------------------------------------------------------------------------------------//
+import { GiGalaxy, GiMarsCuriosity, GiRocketFlight } from 'react-icons/gi';
 import { BiPlanet } from 'react-icons/bi';
 import { IoIosRocket } from 'react-icons/io';
 import { ImAirplane } from 'react-icons/im';
 import { FaSatellite } from 'react-icons/fa';
-import { GiGalaxy, GiMarsCuriosity, GiRocketFlight } from 'react-icons/gi';
 import { VscSymbolMisc } from 'react-icons/vsc';
 //---------------------------------------------------------------------------------------------------//
 import SpaceStation from '../../assets/spaceStaion.svg';
@@ -15,8 +15,14 @@ import LunarModule from '../../assets/lunarModule.svg';
 import Probe from '../../assets/probe.svg';
 import Shuttle from '../../assets/space-shuttle-svgrepo-com.svg';
 import Replica from '../../assets/replica-icon.svg';
+//---------------------------------------------------------------------------------------------------//
 import useCheckUrlForType from '../../utilities/useCheckUrlForType';
 
+/**
+ * Displays a craft 'type' link on the left bar
+ * @param {string} text - the text to display on the link
+ * @returns
+ */
 function VerticalTypeLink({ text }) {
 	const [type, setType] = useState('');
 	const { typeFilter } = useContext(FiltersContext);
@@ -38,71 +44,71 @@ function VerticalTypeLink({ text }) {
 			id={text}
 		>
 			<div id={text} className="bg-primary w-12 2k:w-20 h-20 2k:h-26 flex items-center justify-center rounded-l-lg 2k:rounded-l-xl">
-				{text === 'Interplanetary' && (
+				{text === 'Interplanetary' ? (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<BiPlanet />
 					</span>
-				)}
-				{text === 'Interstellar' && (
+				) : null}
+				{text === 'Interstellar' ? (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<GiGalaxy />
 					</span>
-				)}
-				{text === 'Satellite' && (
+				) : null}
+				{text === 'Satellite' ? (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<FaSatellite />
 					</span>
-				)}
-				{text === 'Space Station' && (
+				) : null}
+				{text === 'Space Station' ? (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<img src={SpaceStation} className="h-6 2k:h-10" alt="" />
 					</span>
-				)}
-				{text === 'Lander' && (
+				) : null}
+				{text === 'Lander' ? (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<img src={LunarModule} className="h-6 2k:h-10" alt="" />
 					</span>
-				)}
-				{text === 'Rover' && (
+				) : null}
+				{text === 'Rover' ? (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<GiMarsCuriosity />
 					</span>
-				)}
-				{text === 'SSTO' && (
+				) : null}
+				{text === 'SSTO' ? (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<GiRocketFlight />
 					</span>
-				)}
-				{text === 'Spaceplane' && (
+				) : null}
+				{text === 'Spaceplane' ? (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<ImAirplane />
 					</span>
-				)}
-				{text === 'Probe' && (
+				) : null}
+				{text === 'Probe' ? (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<img src={Probe} className="h-6 2k:h-10" alt="" />
 					</span>
-				)}
-				{text === 'Miscellaneous' && (
+				) : null}
+				{text === 'Miscellaneous' ? (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<VscSymbolMisc />
 					</span>
-				)}
-				{text === 'Rocket' && (
+				) : null}
+				{text === 'Rocket' ? (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<IoIosRocket />
 					</span>
-				)}
-				{text === 'Historic' && (
+				) : null}
+				{text === 'Historic' ? (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<img src={Shuttle} className="h-6 2k:h-10" alt="" />
 					</span>
-				)}
-				{text === 'Replica' && (
+				) : null}
+				{text === 'Replica' ? (
 					<span id={text} className="text-xl 2k:text-3xl text-white z-50">
 						<img src={Replica} className="h-6 2k:h-10" alt="" />
 					</span>
-				)}
+				) : null}
 			</div>
 			<div id={text} className="relative overflow-hidden h-20 2k:h-26 flex flex-row w-full bg-base-400">
 				<div

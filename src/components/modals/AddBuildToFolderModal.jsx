@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Button from '../buttons/Button';
 import PlanetHeader from '../header/PlanetHeader';
-import { toast } from 'react-toastify';
 import Folders from '../folders/Folders';
-import { setBuildToAddToFolder, setSelectedFolder, setOpenedFolder, setAddBuildToFolderModal } from '../../context/folders/FoldersActions';
+import { setBuildToAddToFolder, setSelectedFolder, setOpenedFolder, setAddBuildToFolderModal, setFolderLocation, setMakingNewFolder, setNewFolderName } from '../../context/folders/FoldersActions';
 import { useAddBuildToFolder } from '../../context/folders/FoldersActions';
 import FoldersContext from '../../context/folders/FoldersContext';
 import Builds from '../builds/Builds';
@@ -12,6 +11,7 @@ import BuildsContext from '../../context/builds/BuildsContext';
 import useFilters from '../../context/filters/FiltersActions';
 import FiltersContext from '../../context/filters/FiltersContext';
 import AuthContext from '../../context/auth/AuthContext';
+import Sort from '../sort/Sort';
 
 /**
  * Modal for adding a build to a folder
@@ -46,22 +46,25 @@ function AddBuildToFolderModal() {
 							position="absolute right-2 top-2 z-50"
 							style="btn-circle"
 							onClick={() => {
+								setFolderLocation(dispatchFolders, null);
 								setBuildToAddToFolder(dispatchFolders, null, user);
 								setSelectedFolder(dispatchFolders, null, selectedFolders, buildToAddToFolder);
 								setOpenedFolder(dispatchFolders, null);
 								setAddBuildToFolderModal(dispatchFolders, false);
+								setMakingNewFolder(dispatchFolders, false);
+								setNewFolderName(dispatchFolders, null);
 							}}
 						/>
 						<PlanetHeader text="Save build to folder" />
 
-						<Folders hideOwnFolder={true} editable={true} />
+						<Folders />
 
 						<div className="flex flex-row gap-2 w-full place-content-between mb-5 2k:mb-8">
 							<Button
 								tabIndex={0}
 								id="add-build-to-folder-btn"
 								htmlFor="add-build-to-folder-modal"
-								text={`${openedFolder ? `Save to ${openedFolder.folderName}` : `${selectedFolders.length > 1 ? `Save to ${selectedFolders.length} Folders` : `${selectedFolders.length > 0 ? 'Save to Folder' : 'Save'}`}`}`}
+								text={`${`${selectedFolders.length > 1 ? `Save to ${selectedFolders.length} Folders` : `${selectedFolders.length > 0 ? 'Save to Folder' : 'Save'}`}`}`}
 								icon="save"
 								color="btn-success"
 								onClick={() => addBuildToFolder(buildToAddToFolder)}
@@ -73,14 +76,20 @@ function AddBuildToFolderModal() {
 								color="btn-error"
 								position="place-self-end"
 								onClick={() => {
+									setFolderLocation(dispatchFolders, null);
 									setBuildToAddToFolder(dispatchFolders, null, user);
 									setSelectedFolder(dispatchFolders, null, selectedFolders, buildToAddToFolder);
 									setOpenedFolder(dispatchFolders, null);
 									setAddBuildToFolderModal(dispatchFolders, false);
+									setMakingNewFolder(dispatchFolders, false);
+									setNewFolderName(dispatchFolders, null);
 								}}
 							/>
 						</div>
 
+						<div className="flex flex-row w-full justify-end mb-4">
+							<Sort />
+						</div>
 						{openedFolder ? <Builds buildsToDisplay={sortedBuilds} /> : null}
 					</div>
 				</div>

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { FaFolder } from 'react-icons/fa';
 import { MdOutlineCheckBoxOutlineBlank, MdCheckBox } from 'react-icons/md';
 import FoldersContext from '../../context/folders/FoldersContext';
@@ -11,8 +11,14 @@ import { checkIfFolderSelected } from '../../context/folders/FoldersUtilils';
  * @returns
  */
 function Folder({ folder, editable, type }) {
-	const { dispatchFolders, editingFolder, buildToAddToFolder, folderView, selectedFolders } = useContext(FoldersContext);
+	const { dispatchFolders, editingFolder, buildToAddToFolder, folderView, selectedFolders, folderLocation } = useContext(FoldersContext);
 	const { handleFolderClick, handleFolderLongClick, handleFolderBlur, handleFolderKeyPress, handleNewFolderKeyPress, handleNewFolderBlur, checkIfFolderOpen } = useHandleFolderInteraction();
+
+	useEffect(() => {
+		if (folderLocation === 'upload') {
+			setSelectedFolder(dispatchFolders, { id: 'your-builds', folderName: 'Your Builds', builds: [], urlName: '' }, selectedFolders, buildToAddToFolder);
+		}
+	}, []);
 
 	if (type === 'new' && !folder) {
 		return (
@@ -32,13 +38,15 @@ function Folder({ folder, editable, type }) {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div key={folder.id} className="tooltip" data-tip={folder.folderName}>
+		<div key={folder.id} id={`folder-${folder.id}-tooltip`} className="tooltip" data-tip={folder.folderName}>
 			<div
 				id={`folder-${folder.id}`}
 				tabIndex={0}
 				className={`text-5xl 2k:text-6xl flex ${folderView === 'grid' && `flex-col ${editingFolder && editingFolder.id === folder.id ? 'h-25 2k:h-32 w-60 2k:w-72' : 'w-35 2k:w-45 h-25 2k:h-30'}`}  ${
 					folderView === 'list' && `flex-row gap-4 2k:gap-6 w-full h-fit pl-10`
-				} items-center cursor-pointer relative p-1 ${checkIfFolderOpen(folder.id) ? 'bg-base-100' : ''} ${checkIfFolderSelected(folder.id, selectedFolders) ? 'bg-base-200 hover:bg-base-100' : 'hover:bg-base-200'} rounded-xl`}
+				} items-center cursor-pointer relative p-1 ${checkIfFolderOpen(folder.id) ? 'bg-base-100 border-2 border-dashed border-slate-600' : ''} ${
+					checkIfFolderSelected(folder.id, selectedFolders) ? 'bg-base-200 hover:bg-base-100' : 'hover:bg-base-200'
+				} rounded-xl`}
 				onMouseDown={() => {
 					if (editable && !buildToAddToFolder) {
 						setLongClickStart(dispatchFolders, new Date().getTime());
@@ -62,7 +70,11 @@ function Folder({ folder, editable, type }) {
 				onClick={() => {
 					handleFolderClick(folder);
 					setLastSelectedFolder(dispatchFolders, folder.id);
-					setSelectedFolder(dispatchFolders, folder, selectedFolders, buildToAddToFolder);
+					if (folderLocation === 'upload' && folder.id !== 'your-builds') {
+						setSelectedFolder(dispatchFolders, folder, selectedFolders, buildToAddToFolder);
+					} else if (folderLocation !== 'upload') {
+						setSelectedFolder(dispatchFolders, folder, selectedFolders, buildToAddToFolder);
+					}
 				}}
 			>
 				{buildToAddToFolder ? <span className="absolute top-2 left-2 text-white text-2xl 2k:text-3xl">{checkIfFolderSelected(folder.id, selectedFolders) ? <MdCheckBox /> : <MdOutlineCheckBoxOutlineBlank />}</span> : null}

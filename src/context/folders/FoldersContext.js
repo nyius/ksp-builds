@@ -21,14 +21,20 @@ export const FoldersProvider = ({ children }) => {
 		folderView: 'grid',
 		addToFolderModalOpen: false,
 		lastSelectedFolderId: null,
+		folderLocation: null,
+		usersFolders: null,
+		collapsedFolders: false,
 	};
 
 	useEffect(() => {
 		const folderView = localStorage.getItem('folderView');
-		dispatchFolders({
-			type: 'SET_FOLDERS',
-			payload: { folderView: folderView },
-		});
+
+		if (folderView) {
+			dispatchFolders({
+				type: 'SET_FOLDERS',
+				payload: { folderView: folderView },
+			});
+		}
 	}, []);
 
 	const [state, dispatchFolders] = useReducer(FoldersReducer, initialState);

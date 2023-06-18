@@ -2,7 +2,7 @@ import { toast } from 'react-toastify';
 
 /**
  * Handles copying the folders URL to clipboard for sharing
- * @param {*} username - a users ID/username. If null uses
+ * @param {*} username - a users ID/username.
  * @param {*} folderUrl
  */
 export const handleShareFolder = (username, folderUrlName) => {
@@ -50,4 +50,20 @@ export const checkIfFolderSelected = (folderId, selectedFolders) => {
 	const folderIndex = selectedFolders.findIndex(folder => folder.id === folderId);
 
 	return folderIndex >= 0 ? true : false;
+};
+
+/**
+ * Checks an array of folders and returns the number of times a name appears
+ * @param {arr} folders
+ * @param {string} nameToCheck
+ * @returns
+ */
+export const checkForSameNameFolder = (folders, nameToCheck) => {
+	let sameNameCount = 0;
+	folders.map(folder => {
+		if (folder.folderName === nameToCheck) {
+			sameNameCount++;
+		}
+	});
+	return sameNameCount;
 };

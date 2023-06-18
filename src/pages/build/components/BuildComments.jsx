@@ -6,7 +6,7 @@ import Spinner1 from '../../../components/spinners/Spinner1';
 import Comment from '../../../components/comments/Comment';
 import CheckCredentials from '../../../components/credentials/CheckCredentials';
 import TextEditor from '../../../components/textEditor/TextEditor';
-import UsernameLink from '../../../components/buttons/UsernameLink';
+import UsernameLink from '../../../components/username/UsernameLink';
 import draftJsToPlainText from '../../../utilities/draftJsToPlainText';
 import AddCommentBtn from './Buttons/AddCommentBtn';
 import ClearCommentButton from './Buttons/ClearCommentButton';

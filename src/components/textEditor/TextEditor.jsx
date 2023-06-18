@@ -8,15 +8,14 @@ import checkIfJson from '../../utilities/checkIfJson';
 
 /**
  * Takes in a setState to set when the text is edited. Also takes in a size that specifies how many toolbar icons are shown. (sm, md, lg). default is lg
- * @param {*} setState
- * @param {*} size sm, md, lg
- * @param {number} i Takes in an 'i' num if this is used inside of a map, so we know which element to edit
+ * @param {setter} setState - the state to update with the entered text
+ * @param {int} i Takes in an 'i' num if this is used inside of a map, so we know which element to edit
  * @param {string} text
  * @returns
  */
 const TextEditor = state => {
 	// Handles sending the markup back to the parent
-	const { setState, size, i, reset, text } = state;
+	const { setState, i, text } = state;
 	const { dispatchBuild, editingBuild, editingComment, resetTextEditor, buildOfTheWeek } = useContext(BuildContext);
 	const { editingProfile } = useContext(AuthContext);
 	const emptyState = `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`;

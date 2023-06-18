@@ -61,11 +61,25 @@ const AuthReducer = (state, action) => {
 				fetchedUserProfile: action.payload,
 			};
 		case 'UPDATE_FETCHED_USERS_PROFILE':
-			const getCurrentFetchedProfileState = { ...state.fetchedUserProfile };
-			const updateFetchProfileState = Object.assign(getCurrentFetchedProfileState, action.payload);
+			const getCurrentFetchedProfilesState = cloneDeep(state.fetchedUserProfiles);
+			for (let i = 0; i < getCurrentFetchedProfilesState.length; i++) {
+				if (getCurrentFetchedProfilesState[i].uid === action.payload.uid || getCurrentFetchedProfilesState[i].username === action.payload.username) {
+					getCurrentFetchedProfilesState[i].followers = action.payload.followers;
+					break;
+				}
+			}
+
 			return {
 				...state,
-				fetchedUserProfile: updateFetchProfileState,
+				fetchedUserProfiles: getCurrentFetchedProfilesState,
+			};
+		case 'UPDATE_OPEN_PROFILE':
+			const profileToUpdate = cloneDeep(state.openProfile);
+			const updatedProfile = Object.assign(profileToUpdate, action.payload);
+
+			return {
+				...state,
+				openProfile: updatedProfile,
 			};
 		case 'CLEAR_NOTIFICATIONS':
 			const getClearNotificationsState = { ...state.user };

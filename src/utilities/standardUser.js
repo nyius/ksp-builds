@@ -1,4 +1,5 @@
 const standardUser = {
+	type: 'user',
 	name: '',
 	email: '',
 	username: '',

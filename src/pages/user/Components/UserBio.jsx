@@ -9,16 +9,16 @@ import { convertFromRaw, EditorState, ContentState } from 'draft-js';
  * @returns
  */
 function UserBio() {
-	const { fetchedUserProfile } = useContext(AuthContext);
+	const { openProfile } = useContext(AuthContext);
 	const [bioState, setBioState] = useState(null);
 
 	useEffect(() => {
-		if (checkIfJson(fetchedUserProfile?.bio)) {
-			setBioState(EditorState.createWithContent(convertFromRaw(JSON.parse(fetchedUserProfile?.bio))));
+		if (checkIfJson(openProfile?.bio)) {
+			setBioState(EditorState.createWithContent(convertFromRaw(JSON.parse(openProfile?.bio))));
 		} else {
-			setBioState(EditorState.createWithContent(ContentState.createFromText(fetchedUserProfile?.bio)));
+			setBioState(EditorState.createWithContent(ContentState.createFromText(openProfile?.bio)));
 		}
-	}, [fetchedUserProfile]);
+	}, [openProfile]);
 
 	return (
 		<div className="flex flex-row gap-2 text-white">

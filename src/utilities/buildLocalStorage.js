@@ -3,7 +3,19 @@
  * @param {string} id - the id of the build to get
  */
 export const getBuildFromLocalStorage = id => {
-	const localBuild = localStorage.getItem(id);
+	let localBuild = localStorage.getItem(id);
+	if (!localBuild) {
+		for (let i = 0; i < localStorage.length; i++) {
+			const key = localStorage.key(i);
+			const value = localStorage.getItem(key);
+
+			// Check if desired text exists in the value
+			if (value.includes(`"urlName":"${id}"`) && value.includes(`"type":"build"`)) {
+				localBuild = value;
+				break;
+			}
+		}
+	}
 
 	if (localBuild) {
 		const build = JSON.parse(localBuild);

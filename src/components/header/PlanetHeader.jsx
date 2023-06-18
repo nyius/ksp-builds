@@ -4,7 +4,8 @@ import Stars from '../../assets/stars_bg.png';
 
 /**
  * Displays a header with a planet
- * @param {*} text
+ * @param {string} text - the text to display
+ * @param {*} children
  * @returns
  */
 function PlanetHeader({ children, text }) {

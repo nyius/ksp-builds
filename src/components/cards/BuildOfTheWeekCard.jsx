@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import UsernameLink from '../buttons/UsernameLink';
+import UsernameLink from '../username/UsernameLink';
 //---------------------------------------------------------------------------------------------------//
 import Button from '../buttons/Button';
 import BotwBadge from '../../assets/BotW_badge.png';

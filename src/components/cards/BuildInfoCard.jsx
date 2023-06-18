@@ -2,6 +2,8 @@ import React from 'react';
 
 /**
  * Displays any information for a build, such as author, date created, etc
+ * @param {string} title - the title of the card
+ * @param {*} children
  * @returns
  */
 function BuildInfoCard({ title, children }) {

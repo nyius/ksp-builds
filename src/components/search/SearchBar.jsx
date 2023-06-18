@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import algoliasearch from 'algoliasearch/lite';
 import useBuilds from '../../context/builds/BuildsActions';
 import { RiSearchEyeFill } from 'react-icons/ri';
 
+/**
+ * Displays the search bar
+ * @returns
+ */
 function SearchBar() {
-	const searchClient = algoliasearch('ASOR7A703R', process.env.REACT_APP_ALGOLIA_KEY);
-	const index = searchClient.initIndex('builds');
 	const [searchTerm, setSearchTerm] = useState('');
 	const navigate = useNavigate();
 

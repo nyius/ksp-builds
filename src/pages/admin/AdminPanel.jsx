@@ -23,7 +23,7 @@ import Spinner1 from '../../components/spinners/Spinner1';
 import TextEditor from '../../components/textEditor/TextEditor';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
-import UsernameLink from '../../components/buttons/UsernameLink';
+import UsernameLink from '../../components/username/UsernameLink';
 
 function AdminPanel() {
 	const { user } = useContext(AuthContext);
@@ -236,8 +236,8 @@ function AdminPanel() {
 
 			usersSnap.forEach(user => {
 				const data = user.data();
-				updateDoc(doc(db, 'users', user.id), { folders: [] });
-				updateDoc(doc(db, 'userProfiles', user.id), { folders: [] });
+				// updateDoc(doc(db, 'users', user.id), { folders: [] });
+				updateDoc(doc(db, 'userProfiles', user.id), { type: 'userProfile' });
 			});
 
 			toast.success('All users updated!');
@@ -256,15 +256,13 @@ function AdminPanel() {
 
 			buildsSnap.forEach(buildDoc => {
 				const buildRef = doc(db, 'builds', buildDoc.id);
+				const build = buildDoc.data();
 
-				const getBuild = async () => {
+				const updateBuild = async () => {
 					try {
-						let parsedBuild = await fetchBuildFromAWS(buildDoc.id);
-						let partCount = getBuildPartCount(parsedBuild);
-
 						const updateBuild = async () => {
 							try {
-								await updateDoc(buildRef, { partCount });
+								await updateDoc(buildRef, { type: 'build' });
 							} catch (error) {
 								console.log(error);
 							}
@@ -276,7 +274,7 @@ function AdminPanel() {
 					}
 				};
 
-				getBuild();
+				updateBuild();
 			});
 
 			toast.success('All Builds updated!');

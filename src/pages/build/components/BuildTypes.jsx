@@ -11,7 +11,7 @@ function BuildTypes() {
 
 	return (
 		<div className="flex flex-row flex-wrap gap-2">
-			{loadedBuild.type.map(type => {
+			{loadedBuild.types.map(type => {
 				return <TypeBadge key={type} type={type} />;
 			})}
 		</div>

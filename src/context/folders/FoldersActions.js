@@ -1,16 +1,17 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import FoldersContext from './FoldersContext';
 import AuthContext from '../auth/AuthContext';
 import { doc, updateDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
-import useAuth, { updateUserState } from '../auth/AuthActions';
+import { updateUserState } from '../auth/AuthActions';
 import { cloneDeep } from 'lodash';
 import { db } from '../../firebase.config';
 import { profanity } from '@2toad/profanity';
 import { buildNameToUrl } from '../../utilities/buildNameToUrl';
-import { checkIfBuildInFolder } from './FoldersUtilils';
+import { checkForSameNameFolder, checkIfBuildInFolder } from './FoldersUtilils';
+import { setLocalStoredUser } from '../../utilities/userLocalStorage';
 
 /**
  * Hook with functions for adding a new folder
@@ -54,7 +55,14 @@ function useAddNewFolder() {
 	const addNewFolder = async folderName => {
 		try {
 			const id = uuidv4().slice(0, 20);
-			let urlName = buildNameToUrl(folderName);
+			let sameNameCount = checkForSameNameFolder(user.folders, folderName);
+			let urlName;
+			if (sameNameCount > 0) {
+				urlName = buildNameToUrl(folderName + '-' + sameNameCount);
+			} else {
+				urlName = buildNameToUrl(folderName);
+			}
+			console.log(urlName);
 
 			const newFolder = { folderName, id, builds: [], urlName };
 
@@ -91,6 +99,7 @@ export const useDeleteFolder = () => {
 			const newFolders = user.folders.filter(folder => folder.id !== deleteFolderId);
 			setDeleteFolder(dispatchFolders, null, null);
 			updateUserState(dispatchAuth, { folders: newFolders });
+			setOpenedFolder(dispatchFolders, null);
 
 			await updateDoc(doc(db, 'users', user.uid), { folders: newFolders });
 			await updateDoc(doc(db, 'userProfiles', user.uid), { folders: newFolders });
@@ -109,7 +118,7 @@ export const useDeleteFolder = () => {
  */
 export const useAddBuildToFolder = () => {
 	const { user } = useContext(AuthContext);
-	const { dispatchFolders, selectedFolders, openedFolder } = useContext(FoldersContext);
+	const { dispatchFolders, selectedFolders } = useContext(FoldersContext);
 	const { updateAllFolders } = useUpdateFolder();
 
 	/**
@@ -121,42 +130,33 @@ export const useAddBuildToFolder = () => {
 			let newFolders = cloneDeep(selectedFolders);
 			let usersFolders = cloneDeep(user.folders);
 
-			if (openedFolder) {
-				usersFolders.map(folder => {
-					if (folder.id === openedFolder?.id) {
-						// Check if this folder contains the build already
-						if (!folder.builds.includes(id)) {
-							folder.builds.push(id);
-						}
-					}
-				});
-			} else {
-				// Loop over the users folders
-				usersFolders.map(folder => {
-					// check if this folder contains the build id
-					if (folder.builds.includes(id)) {
-						// Check if we dont have this folder selected.
-						// if its not selected but we found the id, it means the user wants to remove the build from this folder
-						const folderIndex = newFolders.findIndex(newFolder => newFolder.id === folder.id);
+			// Loop over the users folders
+			usersFolders.map(folder => {
+				// check if this folder contains the build id
+				if (folder.builds.includes(id)) {
+					// Check if we dont have this folder selected.
+					// if its not selected but we found the id, it means the user wants to remove the build from this folder
+					const folderIndex = newFolders.findIndex(newFolder => newFolder.id !== 'your-builds' && newFolder.id === folder.id);
 
-						if (folderIndex < 0) {
-							const buildIndex = folder.builds.indexOf(id);
-							folder.builds.splice(buildIndex, 1);
-						}
-					} else {
-						// if the folder doesnt include the id, check if we have this folder selected. If we do, add it
-						const folderIndex = newFolders.findIndex(newFolder => newFolder.id === folder.id);
-						if (folderIndex >= 0) {
-							folder.builds.push(id);
-						}
+					if (folderIndex < 0) {
+						const buildIndex = folder.builds.indexOf(id);
+						folder.builds.splice(buildIndex, 1);
 					}
-				});
-			}
+				} else {
+					// if the folder doesnt include the id, check if we have this folder selected. If we do, add it
+					const folderIndex = newFolders.findIndex(newFolder => newFolder.id !== 'your-builds' && newFolder.id === folder.id);
+					if (folderIndex >= 0) {
+						folder.builds.push(id);
+					}
+				}
+			});
 
 			await updateAllFolders(usersFolders);
 			setSelectedFolder(dispatchFolders, null);
 			setOpenedFolder(dispatchFolders, null);
 			setAddBuildToFolderModal(dispatchFolders, false);
+			setMakingNewFolder(dispatchFolders, false);
+			setNewFolderName(dispatchFolders, null);
 		} catch (error) {
 			console.log(error);
 			toast.error('Something went wrong, please try again');
@@ -290,7 +290,7 @@ export const useHandleFolderInteraction = () => {
 	 * @param {evene} e
 	 */
 	const handleNewFolderBlur = e => {
-		if (!e.relatedTarget) {
+		if (!e.relatedTarget || e.relatedTarget?.parentElement.id.includes('tooltip')) {
 			handleAddNewFolder();
 		}
 	};
@@ -341,7 +341,12 @@ export const useUpdateFolder = () => {
 			const updatedFolderIndex = user.folders.findIndex(folder => folder.id === updatedFolder.id);
 			const newFolders = cloneDeep(user.folders);
 			if (newFolders[updatedFolderIndex].folderName !== updatedFolder.folderName) {
-				updatedFolder.urlName = buildNameToUrl(updatedFolder.folderName);
+				let sameNameCount = checkForSameNameFolder(newFolders, updatedFolder.folderName);
+				if (sameNameCount > 1) {
+					updatedFolder.urlName = buildNameToUrl(updatedFolder.folderName + '-' + sameNameCount);
+				} else {
+					updatedFolder.urlName = buildNameToUrl(updatedFolder.folderName);
+				}
 			}
 
 			newFolders[updatedFolderIndex] = updatedFolder;
@@ -350,6 +355,7 @@ export const useUpdateFolder = () => {
 
 			await updateDoc(doc(db, 'users', user.uid), { folders: newFolders });
 			await updateDoc(doc(db, 'userProfiles', user.uid), { folders: newFolders });
+			setLocalStoredUser(user.uid, user);
 
 			toast.success('Folder Updated!');
 		} catch (error) {
@@ -368,6 +374,7 @@ export const useUpdateFolder = () => {
 
 			await updateDoc(doc(db, 'users', user.uid), { folders: newFolders });
 			await updateDoc(doc(db, 'userProfiles', user.uid), { folders: newFolders });
+			setLocalStoredUser(user.uid, user);
 
 			toast.success('Saved!');
 		} catch (error) {
@@ -576,5 +583,41 @@ export const setLastSelectedFolder = (dispatchFolders, folderId) => {
 	dispatchFolders({
 		type: 'SET_FOLDERS',
 		payload: { lastSelectedFolderId: folderId },
+	});
+};
+
+/**
+ * handles setting where the folder is currently open
+ * @param {function} dispatchFolders - dispatch function
+ * @param {string} location - where the folder is currently open (user, popup, profile, upload)
+ */
+export const setFolderLocation = (dispatchFolders, location) => {
+	dispatchFolders({
+		type: 'SET_FOLDERS',
+		payload: { folderLocation: location },
+	});
+};
+
+/**
+ * handles setting where the folder is currently open
+ * @param {function} dispatchFolders - dispatch function
+ * @param {arr} folders - a array of users folders to display
+ */
+export const setUsersFolders = (dispatchFolders, folders) => {
+	dispatchFolders({
+		type: 'SET_FOLDERS',
+		payload: { usersFolders: folders },
+	});
+};
+
+/**
+ * handles setting if the folder view is collapsed or not
+ * @param {function} dispatchFolders - dispatch function
+ * @param {arr} bool
+ */
+export const setCollapsedFolders = (dispatchFolders, bool) => {
+	dispatchFolders({
+		type: 'SET_FOLDERS',
+		payload: { collapsedFolders: bool },
 	});
 };

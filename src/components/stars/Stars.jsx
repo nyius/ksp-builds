@@ -1,5 +1,9 @@
 import React from 'react';
 
+/**
+ * Stars background
+ * @returns
+ */
 function Stars() {
 	return (
 		<>

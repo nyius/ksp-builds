@@ -25,12 +25,13 @@ function UploadBuildFolders() {
 		setSortedBuilds(filterBuilds(newFetchedBuilds));
 	}, [fetchedBuilds, sortBy]);
 
+	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="flex flex-col w-full gap-2 2k:gap-4">
 			<div className="flex flex-row gap-4 items-center mb-2 2k:mb-4 mt-8 2k:mt-18">
 				<h3 className="text-slate-200 text-xl 2k:text-3xl">Save to Folder</h3>
 			</div>
-			<Folders hideOwnFolder={true} editable={true} />
+			<Folders />
 
 			{openedFolder ? <Builds buildsToDisplay={sortedBuilds} /> : null}
 		</div>

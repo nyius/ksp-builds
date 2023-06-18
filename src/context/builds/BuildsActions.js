@@ -34,21 +34,6 @@ const useBuilds = () => {
 				builds.push(doc.data());
 				setLocalStoredBuild(doc.data());
 			});
-
-			/*
-			if (!buildsSnap.empty) {
-				buildsSnap.forEach(doc => {
-					builds.push(doc.data());
-				});
-			} else {
-				const buildsSnap = await getDocs(q);
-
-				buildsSnap.forEach(doc => {
-					builds.push(doc.data());
-				});
-			}
-			*/
-
 			setFetchedBuilds(dispatchBuilds, builds);
 			setLastfetchedBuild(dispatchBuilds, buildsSnap.docs.length < fetchAmount ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1]);
 			setStoredBuilds(dispatchBuilds, [builds]);
@@ -126,44 +111,6 @@ const useBuilds = () => {
 	};
 
 	/**
-	 * Fetches the lasted added/updated builds
-	 */
-	const fetchLastUpdatedBuilds = async () => {
-		try {
-			const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
-			// Get the most recently updated doc
-			let newestDocQ = query(buildsRef, where('visibility', '==', 'public'), orderBy('lastModified', 'desc'), limit(1));
-			const newestDocSnap = await getDocs(newestDocQ);
-			let newestDoc;
-
-			newestDocSnap.forEach(doc => {
-				newestDoc = doc.data();
-			});
-
-			// Fetch the locally saved newest
-			const localNewest = JSON.parse(localStorage.getItem('newestBuild'));
-
-			if (localNewest) {
-				// check if the local newest update is now older than the last thing updated on the server
-				if (localNewest.seconds < newestDoc.lastModified.seconds) {
-					let newDocsQ = query(buildsRef, where('visibility', '==', 'public'), where('lastModified', '>', new Date(localNewest.seconds * 1000)));
-					await getDocs(newDocsQ);
-
-					localStorage.setItem('newestBuild', JSON.stringify(newestDoc.lastModified));
-				}
-			} else {
-				// Users first time/ no localNewest saved, fetch all builds so they're cached
-				console.log(`No local stored timestamp`);
-				const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
-				await getDocs(buildsRef);
-				localStorage.setItem('newestBuild', JSON.stringify(newestDoc.lastModified));
-			}
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	/**
 	 * Handles fetching more builds (like if the user goes to the next page)
 	 */
 	const fetchMoreBuilds = async () => {
@@ -186,20 +133,6 @@ const useBuilds = () => {
 				builds.push(doc.data());
 				setLocalStoredBuild(doc.data());
 			});
-
-			/*
-			if (!buildsSnap.empty) {
-				buildsSnap.forEach(doc => {
-					builds.push(doc.data());
-				});
-			} else {
-				const buildsSnap = await getDocs(q);
-
-				buildsSnap.forEach(doc => {
-					builds.push(doc.data());
-				});
-			}
-			*/
 
 			setFetchedBuilds(dispatchBuilds, builds);
 			setLastfetchedBuild(dispatchBuilds, buildsSnap.docs.length < fetchAmount ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1]);

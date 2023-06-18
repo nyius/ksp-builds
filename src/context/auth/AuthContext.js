@@ -43,7 +43,6 @@ export const AuthProvider = ({ children }) => {
 				}
 
 				let notifications = await fetchNotifications(user, dispatchAuth);
-
 				dispatchAuth({
 					type: 'UPDATE_USER',
 					payload: { notifications },
@@ -129,6 +128,8 @@ export const AuthProvider = ({ children }) => {
 		notificationsLoading: true,
 		fetchingProfile: false,
 		fetchedUserProfile: null,
+		openProfile: null,
+		fetchedUserProfiles: [],
 		resetPasswordState: false,
 		accountToDelete: null,
 		reportingContent: null,

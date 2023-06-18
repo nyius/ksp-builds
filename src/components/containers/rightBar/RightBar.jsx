@@ -2,6 +2,10 @@ import React, { useContext } from 'react';
 import NewsCard from '../../news/NewsCard';
 import NewsContext from '../../../context/news/NewsContext';
 
+/**
+ * Right bar container
+ * @returns
+ */
 function RightBar() {
 	const { articles, articlesLoading } = useContext(NewsContext);
 

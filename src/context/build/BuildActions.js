@@ -49,25 +49,12 @@ const useBuild = () => {
 					await fetchBuildFromServer(localBuildById.id);
 				} else {
 					setLoadedBuild(dispatchBuild, localBuildById);
-					await fetchComments(newId);
+					await fetchComments(localBuildById.id);
 					await updateViewCount(localBuildById);
 					return;
 				}
 			} else {
-				let localBuildByName = getBuildFromLocalStorageByName(newId);
-
-				if (localBuildByName) {
-					if (checkLocalBuildAge(localBuildByName.lastFetchedTimestamp, 10)) {
-						await fetchBuildFromServer(localBuildByName.id);
-					} else {
-						setLoadedBuild(dispatchBuild, localBuildByName);
-						await fetchComments(localBuildByName.id);
-						await updateViewCount(localBuildByName);
-						return;
-					}
-				} else {
-					await fetchBuildFromServer(id);
-				}
+				await fetchBuildFromServer(id);
 			}
 		} catch (error) {
 			setLoadedBuild(dispatchBuild, '');
@@ -98,7 +85,6 @@ const useBuild = () => {
 			} else {
 				// maybe the URL isn't the id, but instead the builds name. Search for that next
 				const buildsRef = collection(db, process.env.REACT_APP_BUILDSDB);
-
 				let q = query(buildsRef, where('urlName', '==', id));
 				const fetchedBuilds = await getDocs(q);
 

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { cloneDeep } from 'lodash';
@@ -7,14 +7,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { standardBuild } from '../../utilities/standardBuild';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from '../../context/auth/AuthContext';
-import { useUpdateBuild, useUploadBuild, setBuildToUpload } from '../../context/build/BuildActions';
+import { useUploadBuild, setBuildToUpload } from '../../context/build/BuildActions';
 import FoldersContext from '../../context/folders/FoldersContext';
-import { setBuildToAddToFolder } from '../../context/folders/FoldersActions';
+import { setBuildToAddToFolder, setFolderLocation } from '../../context/folders/FoldersActions';
 import BuildContext from '../../context/build/BuildContext';
 //---------------------------------------------------------------------------------------------------//
 import Spinner1 from '../../components/spinners/Spinner1';
 import LogoBackground from '../../assets/logo_bg_dark.png';
-import Button from '../../components/buttons/Button';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import CancelBuildEditModal from '../../components/modals/CancelBuildEditModal';
 import PlanetHeader from '../../components/header/PlanetHeader';
@@ -46,7 +45,6 @@ function Upload() {
 	const { dispatchBuild, editingBuild, uploadingBuild, buildToUpload } = useContext(BuildContext);
 	const { dispatchFolders } = useContext(FoldersContext);
 	const { uploadBuild } = useUploadBuild();
-	const logo = 'https://images.ctfassets.net/wn7ipiv9ue5v/7EtYz1F2APPTGOwrfGHRzw/6b6787d46e856aeaac1a305c112500f7/Update_0.1.2.0_Landscape.jpg';
 	//---------------------------------------------------------------------------------------------------//
 	const navigate = useNavigate();
 
@@ -56,6 +54,7 @@ function Upload() {
 
 	useEffect(() => {
 		if (!authLoading && user?.username) {
+			setFolderLocation(dispatchFolders, 'upload');
 			setBuildToAddToFolder(dispatchFolders, buildId, user);
 		}
 	}, [authLoading]);

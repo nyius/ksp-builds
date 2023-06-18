@@ -11,7 +11,8 @@ function ImageSlide({ image, i }) {
 		display: 'flex',
 		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundSize: 'cover',
+		backgroundSize: 'contain',
+		backgroundPosition: 'center',
 		backgroundRepeat: 'no-repeat',
 		aspectRatio: '16/9',
 	};

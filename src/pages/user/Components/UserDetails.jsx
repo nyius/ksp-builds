@@ -9,15 +9,15 @@ import BotwBadge from '../../../assets/BotW_badge2.png';
  * @returns
  */
 function UserDetails() {
-	const { fetchedUserProfile } = useContext(AuthContext);
+	const { openProfile } = useContext(AuthContext);
 	const { fetchedBuilds } = useContext(BuildsContext);
 	const [dateCreated, setDateCreated] = useState(null);
 
 	useEffect(() => {
-		if (fetchedUserProfile) {
-			setDateCreated(new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(fetchedUserProfile.dateCreated.seconds * 1000));
+		if (openProfile) {
+			setDateCreated(new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(openProfile.dateCreated.seconds * 1000));
 		}
-	}, [fetchedUserProfile]);
+	}, [openProfile]);
 
 	return (
 		<>
@@ -30,9 +30,9 @@ function UserDetails() {
 					<p className="text-xl 2k:text-3xl text-accent">{fetchedBuilds.length}</p>
 				</BuildInfoCard>
 				<BuildInfoCard title="Rocket Reputation">
-					<p className="text-xl 2k:text-3xl text-accent">{fetchedUserProfile.rocketReputation}</p>
+					<p className="text-xl 2k:text-3xl text-accent">{openProfile.rocketReputation}</p>
 				</BuildInfoCard>
-				{fetchedUserProfile?.buildOfTheWeekWinner && (
+				{openProfile?.buildOfTheWeekWinner && (
 					<BuildInfoCard>
 						<img src={BotwBadge} alt="" className="w-22 2k:w-44" />
 						<p className="text-lg xl:text-2xl 2k:text-3xl font-bold">Build of the Week Winner</p>

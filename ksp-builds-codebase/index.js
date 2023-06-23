@@ -3,10 +3,12 @@ const admin = require('firebase-admin');
 const cheerio = require('cheerio');
 const firestore = require('firebase/firestore');
 const axios = require('axios');
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 admin.initializeApp();
 const { TwitterApi } = require('twitter-api-v2');
 const { firebase } = require('googleapis/build/src/apis/firebase');
+const Parser = require('rss-parser');
+let parser = new Parser();
 const stripe = require('stripe')(process.env.REACT_APP_STRIPE_SECRET);
 const endpointSecret = process.env.REACT_APP_STRIPE_SUCCESS_ENDPOINT_PROD;
 // const endpointSecret = 'whsec_ba90833eb62f59831b3b58cd308b311dbeee87a326899886ccdeb196e450e96d';
@@ -41,6 +43,108 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 		for (const article in devData) {
 			data.push(devData[article]);
 		}
+
+		// sort the array by date
+		data.sort((a, b) => {
+			const aDate = new Date(a.date);
+			const bDate = new Date(b.date);
+			return bDate - aDate;
+		});
+
+		//Fetch the existing challenges/articles
+		//---------------------------------------------------------------------------------------------------//
+		const getNewsCommand = new GetObjectCommand({
+			Bucket: process.env.REACT_APP_BUCKET,
+			Key: `kspNews.json`,
+		});
+
+		let response = await s3Client.send(getNewsCommand);
+		let rawNews = await response.Body.transformToString();
+		let fetchedExistingNews = JSON.parse(rawNews);
+
+		// filter any ones that match
+		const filteredNews = data.filter(article => fetchedExistingNews.some(({ title }) => title === article.title));
+
+		// merge them together and save
+		let scrapedNews = [...filteredNews, ...data];
+
+		// Upload to News to AWS---------------------------------------------------------------------------------------------------//
+		const command = new PutObjectCommand({
+			Bucket: process.env.REACT_APP_BUCKET,
+			Key: `kspNews.json`,
+			Body: JSON.stringify(scrapedNews),
+			ContentEncoding: 'base64',
+			ContentType: 'application/json',
+			ACL: 'public-read',
+		});
+
+		await s3Client.send(command);
+
+		// Fetch existing challenges ---------------------------------------------------------------------------------------------------//
+		const getChallengesCommand = new GetObjectCommand({
+			Bucket: process.env.REACT_APP_BUCKET,
+			Key: `kspChallenges.json`,
+		});
+
+		let challengesResponse = await s3Client.send(getChallengesCommand);
+		let rawChallenges = await challengesResponse.Body.transformToString();
+		let fetchedExistingChallenges = JSON.parse(rawChallenges);
+
+		const filteredChallenges = challengesData.filter(article => fetchedExistingChallenges.some(({ title }) => title === article.title));
+
+		let scrapedChallenges = [...filteredChallenges, ...challengesData];
+
+		// Upload to Challenges to AWS---------------------------------------------------------------------------------------------------//
+		const challengesCommand = new PutObjectCommand({
+			Bucket: process.env.REACT_APP_BUCKET,
+			Key: `kspChallenges.json`,
+			Body: JSON.stringify(scrapedChallenges),
+			ContentEncoding: 'base64',
+			ContentType: 'application/json',
+			ACL: 'public-read',
+		});
+
+		await s3Client.send(challengesCommand);
+
+		return {
+			status: 'success',
+			message: 'Did the thing',
+		};
+	} catch (error) {
+		console.log(error);
+	}
+});
+
+// Gets the news articles manually
+exports.scrapeNewsManual = functions.https.onRequest(async context => {
+	try {
+		const s3Client = new S3Client({
+			apiVersion: 'latest',
+			region: 'us-east-1',
+			credentials: {
+				accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+				secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+			},
+		});
+
+		const data = [];
+		const challenges = [];
+
+		const newsData = await scrapeNews();
+		const patchData = await scrapePatchNotes();
+		const devData = await scrapeDevDiaries();
+		const challengesData = await scrapeChallenges();
+
+		// add all the article to one array
+		for (const article in newsData) {
+			data.push(newsData[article]);
+		}
+		for (const article in patchData) {
+			data.push(patchData[article]);
+		}
+		for (const article in devData) {
+			data.push(devData[article]);
+		}
 		for (const article in challengesData) {
 			challenges.push(challengesData[article]);
 		}
@@ -57,30 +161,34 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 			return bDate - aDate;
 		});
 
-		const dataJSON = JSON.stringify(data);
-		const challengesJson = JSON.stringify(challengesData);
+		let scrapedNews;
+
+		//Fetch the existing challenges/articles
+		const getNewsCommand = new GetObjectCommand({
+			Bucket: process.env.REACT_APP_BUCKET,
+			Key: `kspNews.json`,
+		});
+
+		let response = await s3Client.send(getNewsCommand);
+		let rawNews = await response.Body.transformToString();
+		let fetchedExistingNews = JSON.parse(rawNews);
+
+		// filter any ones that match
+		const filteredNews = data.filter(article => fetchedExistingNews.some(({ title }) => title === article.title));
+
+		// merge them together and save
+		scrapedNews = [...filteredNews, ...data];
 
 		const command = new PutObjectCommand({
 			Bucket: process.env.REACT_APP_BUCKET,
 			Key: `kspNews.json`,
-			Body: dataJSON,
+			Body: JSON.stringify(scrapedNews),
 			ContentEncoding: 'base64',
 			ContentType: 'application/json',
 			ACL: 'public-read',
 		});
 
-		const response = await s3Client.send(command);
-
-		const challengesCommand = new PutObjectCommand({
-			Bucket: process.env.REACT_APP_BUCKET,
-			Key: `kspChallenges.json`,
-			Body: challengesJson,
-			ContentEncoding: 'base64',
-			ContentType: 'application/json',
-			ACL: 'public-read',
-		});
-
-		const challengesResponse = await s3Client.send(challengesCommand);
+		await s3Client.send(command);
 
 		// return 20 articles
 		return {
@@ -89,6 +197,47 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 		};
 	} catch (error) {
 		console.log(error);
+	}
+});
+
+exports.scrapeChallengesManual = functions.https.onRequest(async context => {
+	try {
+		const s3Client = new S3Client({
+			apiVersion: 'latest',
+			region: 'us-east-1',
+			credentials: {
+				accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+				secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+			},
+		});
+
+		const newChallenges = await scrapeChallenges();
+
+		const getChallengesCommand = new GetObjectCommand({
+			Bucket: process.env.REACT_APP_BUCKET,
+			Key: `kspChallenges.json`,
+		});
+
+		let challengesResponse = await s3Client.send(getChallengesCommand);
+		let rawChallenges = await challengesResponse.Body.transformToString();
+		let fetchedExistingChallenges = JSON.parse(rawChallenges);
+
+		const filteredChallenges = newChallenges.filter(newChallenge => fetchedExistingChallenges.some(({ title }) => title === newChallenge.title));
+
+		let scrapedChallenges = [...filteredChallenges, ...newChallenges];
+
+		const challengesCommand = new PutObjectCommand({
+			Bucket: process.env.REACT_APP_BUCKET,
+			Key: `kspChallenges.json`,
+			Body: JSON.stringify(scrapedChallenges),
+			ContentEncoding: 'base64',
+			ContentType: 'application/json',
+			ACL: 'public-read',
+		});
+
+		await s3Client.send(challengesCommand);
+	} catch (error) {
+		functions.logger.log(error);
 	}
 });
 
@@ -452,7 +601,7 @@ const scrapeNews = async () => {
 	const htmlElement = $('.css-180q35u');
 
 	$('.css-180q35u')
-		.find('.css-41n5y6')
+		.find('.css-1ti1acs')
 		.each((i, element) => {
 			// Extract data
 			const image = $(element).find('.css-1hbpsw3').find('.css-llahnu').find('img').attr('srcset');
@@ -488,9 +637,9 @@ const scrapePatchNotes = async () => {
 
 	const $ = cheerio.load(axiosResponse.data);
 
-	const htmlElement = $('.css-180q35u');
+	const htmlElement = $('.css-1ti1acs');
 
-	$('.css-180q35u')
+	$('.css-1ti1acs')
 		.find('.css-41n5y6')
 		.each((i, element) => {
 			// Extract data
@@ -527,9 +676,9 @@ const scrapeDevDiaries = async () => {
 
 	const $ = cheerio.load(axiosResponse.data);
 
-	const htmlElement = $('.css-180q35u');
+	const htmlElement = $('.css-1ti1acs');
 
-	$('.css-180q35u')
+	$('.css-1ti1acs')
 		.find('.css-41n5y6')
 		.each((i, element) => {
 			// Extract data
@@ -549,10 +698,42 @@ const scrapeDevDiaries = async () => {
 	const dataJSON = articles;
 	return dataJSON;
 };
+
 /**
- * Handles scraping the KSP website for weekly challenges
+ * Handles fetching the challenges from the forums RSS Feed
  * @returns
  */
+const scrapeChallenges = async () => {
+	const challenges = [];
+
+	let feed = await parser.parseURL('https://forum.kerbalspaceprogram.com/forum/121-challenges-mission-ideas.xml/?member=169308&key=a55960987e65bf9880247b7deb6f43b3');
+	const urlRegex = /(https?:\/\/[^\s"]+\.(?:png|jpg|jpeg|webm))/i;
+
+	feed.items.forEach(challenge => {
+		challenge.url = challenge.link;
+		delete challenge.link;
+		challenge.date = challenge.pubDate;
+		delete challenge.pubDate;
+		delete challenge.isoDate;
+		challenge.articleId = challenge.guid;
+		delete challenge.guid;
+		delete challenge.message;
+
+		const foundImages = challenge.content.match(urlRegex);
+		const firstImageLink = foundImages ? foundImages[1] : null;
+		if (firstImageLink) challenge.image = firstImageLink;
+		challenges.push(challenge);
+	});
+
+	const dataJSON = challenges;
+	return dataJSON;
+};
+
+/**
+ * OLD - scrapes the website for challenges
+ * @returns
+ */
+/*
 const scrapeChallenges = async () => {
 	const articles = [];
 	// Scrape the new articles
@@ -617,3 +798,4 @@ const scrapeChallenges = async () => {
 	const dataJSON = articles;
 	return dataJSON;
 };
+*/

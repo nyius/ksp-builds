@@ -23,6 +23,7 @@
 		"googleapis": "^118.0.0",
 		"nodemon": "^2.0.21",
 		"openai": "^3.2.1",
+		"rss-parser": "^3.13.0",
 		"stripe": "^12.3.0",
 		"twitter-api-v2": "^1.14.2"
 	},

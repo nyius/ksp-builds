@@ -62,14 +62,12 @@ export const NewsProvider = ({ children }) => {
 					console.log(error);
 				}
 
-				const sortedChallenges = parsedChalleges
-					.sort((a, b) => {
-						let aDate = new Date(a.date);
-						let bDate = new Date(b.date);
+				const sortedChallenges = parsedChalleges.sort((a, b) => {
+					let aDate = new Date(a.date);
+					let bDate = new Date(b.date);
 
-						return aDate < bDate ? 1 : -1;
-					})
-					.splice(0, 5);
+					return aDate < bDate ? 1 : -1;
+				});
 
 				dispatchNews({
 					type: 'SET_CHALLENGES',

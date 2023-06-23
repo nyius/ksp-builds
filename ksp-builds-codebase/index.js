@@ -26,7 +26,6 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 		});
 		// every hour '0 * * * *'
 		const data = [];
-		const challenges = [];
 
 		const newsData = await scrapeNews();
 		const patchData = await scrapePatchNotes();
@@ -51,8 +50,7 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 			return bDate - aDate;
 		});
 
-		//Fetch the existing challenges/articles
-		//---------------------------------------------------------------------------------------------------//
+		// Fetch the existing challenges/articles ---------------------------------------------------------------------------------------------------//
 		const getNewsCommand = new GetObjectCommand({
 			Bucket: process.env.REACT_APP_BUCKET,
 			Key: `kspNews.json`,
@@ -63,7 +61,7 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 		let fetchedExistingNews = JSON.parse(rawNews);
 
 		// filter any ones that match
-		const filteredNews = data.filter(article => fetchedExistingNews.some(({ title }) => title === article.title));
+		const filteredNews = data.filter(article => fetchedExistingNews.some(({ title }) => title !== article.title));
 
 		// merge them together and save
 		let scrapedNews = [...filteredNews, ...data];
@@ -90,7 +88,7 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 		let rawChallenges = await challengesResponse.Body.transformToString();
 		let fetchedExistingChallenges = JSON.parse(rawChallenges);
 
-		const filteredChallenges = challengesData.filter(article => fetchedExistingChallenges.some(({ title }) => title === article.title));
+		const filteredChallenges = challengesData.filter(challenge => fetchedExistingChallenges.some(({ title }) => title !== challenge.title));
 
 		let scrapedChallenges = [...filteredChallenges, ...challengesData];
 
@@ -174,7 +172,7 @@ exports.scrapeNewsManual = functions.https.onRequest(async context => {
 		let fetchedExistingNews = JSON.parse(rawNews);
 
 		// filter any ones that match
-		const filteredNews = data.filter(article => fetchedExistingNews.some(({ title }) => title === article.title));
+		const filteredNews = data.filter(article => fetchedExistingNews.some(({ title }) => title !== article.title));
 
 		// merge them together and save
 		scrapedNews = [...filteredNews, ...data];
@@ -200,6 +198,7 @@ exports.scrapeNewsManual = functions.https.onRequest(async context => {
 	}
 });
 
+// Gets the challenges manually
 exports.scrapeChallengesManual = functions.https.onRequest(async context => {
 	try {
 		const s3Client = new S3Client({
@@ -212,6 +211,7 @@ exports.scrapeChallengesManual = functions.https.onRequest(async context => {
 		});
 
 		const newChallenges = await scrapeChallenges();
+		functions.logger.log(newChallenges);
 
 		const getChallengesCommand = new GetObjectCommand({
 			Bucket: process.env.REACT_APP_BUCKET,
@@ -222,7 +222,11 @@ exports.scrapeChallengesManual = functions.https.onRequest(async context => {
 		let rawChallenges = await challengesResponse.Body.transformToString();
 		let fetchedExistingChallenges = JSON.parse(rawChallenges);
 
-		const filteredChallenges = newChallenges.filter(newChallenge => fetchedExistingChallenges.some(({ title }) => title === newChallenge.title));
+		const filteredChallenges = newChallenges.filter(newChallenge =>
+			fetchedExistingChallenges.some(({ title }) => {
+				return title !== newChallenge.title;
+			})
+		);
 
 		let scrapedChallenges = [...filteredChallenges, ...newChallenges];
 
@@ -230,6 +234,88 @@ exports.scrapeChallengesManual = functions.https.onRequest(async context => {
 			Bucket: process.env.REACT_APP_BUCKET,
 			Key: `kspChallenges.json`,
 			Body: JSON.stringify(scrapedChallenges),
+			ContentEncoding: 'base64',
+			ContentType: 'application/json',
+			ACL: 'public-read',
+		});
+
+		await s3Client.send(challengesCommand);
+	} catch (error) {
+		functions.logger.log(error);
+	}
+});
+
+exports.fixChallenges = functions.https.onRequest(async context => {
+	try {
+		const s3Client = new S3Client({
+			apiVersion: 'latest',
+			region: 'us-east-1',
+			credentials: {
+				accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+				secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+			},
+		});
+
+		const getChallengesCommand = new GetObjectCommand({
+			Bucket: process.env.REACT_APP_BUCKET,
+			Key: `kspChallenges.json`,
+		});
+
+		let challengesResponse = await s3Client.send(getChallengesCommand);
+		let rawChallenges = await challengesResponse.Body.transformToString();
+		let fetchedExistingChallenges = JSON.parse(rawChallenges);
+
+		// const filteredChallenges = challengesData.filter(challenge => fetchedExistingChallenges.some(({ title }) => title === challenge.title));
+
+		// let scrapedChallenges = [...filteredChallenges, ...challengesData];
+
+		let newArr = fetchedExistingChallenges.filter((obj, index, self) => {
+			return index === self.findIndex(o => o.title === obj.title);
+		});
+
+		const challengesCommand = new PutObjectCommand({
+			Bucket: process.env.REACT_APP_BUCKET,
+			Key: `kspChallenges.json`,
+			Body: JSON.stringify(newArr),
+			ContentEncoding: 'base64',
+			ContentType: 'application/json',
+			ACL: 'public-read',
+		});
+
+		await s3Client.send(challengesCommand);
+	} catch (error) {
+		functions.logger.log(error);
+	}
+});
+
+exports.fixNews = functions.https.onRequest(async context => {
+	try {
+		const s3Client = new S3Client({
+			apiVersion: 'latest',
+			region: 'us-east-1',
+			credentials: {
+				accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+				secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+			},
+		});
+
+		const getChallengesCommand = new GetObjectCommand({
+			Bucket: process.env.REACT_APP_BUCKET,
+			Key: `kspNews.json`,
+		});
+
+		let newsRes = await s3Client.send(getChallengesCommand);
+		let rawNews = await newsRes.Body.transformToString();
+		let fetchedExistingNews = JSON.parse(rawNews);
+
+		let newArr = fetchedExistingNews.filter((obj, index, self) => {
+			return index === self.findIndex(o => o.title === obj.title);
+		});
+
+		const challengesCommand = new PutObjectCommand({
+			Bucket: process.env.REACT_APP_BUCKET,
+			Key: `kspNews.json`,
+			Body: JSON.stringify(newArr),
 			ContentEncoding: 'base64',
 			ContentType: 'application/json',
 			ACL: 'public-read',

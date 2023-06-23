@@ -10,13 +10,11 @@ import CantFind from '../../components/cantFind/CantFind';
 import Spinner1 from '../../components/spinners/Spinner1';
 import DeleteChallengeModal from '../../components/modals/DeleteChallengeModal';
 import Helmet from '../../components/Helmet/Helmet';
-import findAllByKey from '../../utilities/findAllByKey';
 import SubmitBuildChallengeBtn from './Components/Buttons/SubmitBuildChallengeBtn';
 import ReadOriginalChallengeBtn from './Components/Buttons/ReadOriginalChallengeBtn';
 import DeleteChallengeBtn from './Components/Buttons/DeleteChallengeBtn';
 import ChallengeEditor from './Components/ChallengeEditor';
 import ChallengeDescription from './Components/ChallengeDescription';
-import ChallengeHero from './Components/ChallengeHero';
 
 /**
  * Challenge Page
@@ -28,24 +26,20 @@ function Challenge() {
 	const [parsedArticle, setParsedArticle] = useState(null);
 	const [challenge, setChallenge] = useState(null);
 	//---------------------------------------------------------------------------------------------------//
-	const params = useParams().id;
+	const articleId = useParams().id;
 
 	useEffect(() => {
 		setChallenge(() => {
 			const challengeArr = challenges.filter(challenge => {
-				if (challenge.articleId === params) return challenge;
+				if (challenge.articleId === articleId) return challenge;
 			});
 			return challengeArr[0];
 		});
 	}, [challenges]);
 
 	useEffect(() => {
-		if (challenge) {
-			if (challenge.article.model) {
-				setParsedArticle(findAllByKey(challenge.article.model.article.richText.json, 'value'));
-			} else {
-				setParsedArticle(EditorState.createWithContent(convertFromRaw(JSON.parse(challenge.article))));
-			}
+		if (challenge && challenge.article) {
+			setParsedArticle(EditorState.createWithContent(convertFromRaw(JSON.parse(challenge.article))));
 		}
 	}, [challenge]);
 
@@ -60,31 +54,28 @@ function Challenge() {
 	}
 
 	//---------------------------------------------------------------------------------------------------//
-	if (parsedArticle) {
-		return (
-			<>
-				<Helmet title={challenge.title} pageLink={`https://kspbuilds.com/challenges/${params}`} />
+	return (
+		<>
+			<Helmet title={challenge.title} pageLink={`https://kspbuilds.com/challenges/${articleId}`} />
 
-				<MiddleContainer>
-					<DeleteChallengeBtn />
-					<ChallengeHero challenge={challenge} />
-
-					<ReadOriginalChallengeBtn url={challenge.url} />
-
-					<div className="border-2 border-dashed border-slate-600 rounded-xl p-4 2k:p-8">
-						<p className="text-2xl 2k:text-4xl font-black text-slate-300 mb-5 2k:mb-10">CHALLENGE</p>
-						<div className="flex flex-col gap-2">
-							<ChallengeDescription rawChallenge={challenge} parsedChallenge={parsedArticle} />
-							<ChallengeEditor parsedArticle={parsedArticle} />
-						</div>
+			<MiddleContainer>
+				<div className="border-2 border-dashed border-slate-600 rounded-xl p-4 2k:p-8">
+					<p className="text-2xl 2k:text-4xl font-black text-slate-100 mb-5 2k:mb-10 pixel-font text-center">{challenge.title}</p>
+					<div className="flex flex-col gap-2">
+						<ChallengeDescription challenge={challenge} />
+						<ChallengeEditor parsedArticle={parsedArticle} />
 					</div>
+				</div>
+				<div className="flex flex-row gap-2 2k:gap-4">
 					<SubmitBuildChallengeBtn challengeId={challenge.articleId} />
-				</MiddleContainer>
+					<DeleteChallengeBtn />
+					<ReadOriginalChallengeBtn url={challenge.url} />
+				</div>
+			</MiddleContainer>
 
-				<DeleteChallengeModal id={params} />
-			</>
-		);
-	}
+			<DeleteChallengeModal id={articleId} />
+		</>
+	);
 }
 
 export default Challenge;

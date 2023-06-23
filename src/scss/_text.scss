@@ -198,3 +198,27 @@
 	-webkit-mask: var(--mask);
 	mask: var(--mask);
 }
+
+.challengeDesc {
+	color: white;
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	align-items: center;
+	justify-content: center;
+
+	& ul {
+		font-size: 2rem;
+
+		& li {
+			padding: 2rem;
+			background-color: #2a303c;
+			margin-bottom: 0.5rem;
+			border-radius: 0.5rem;
+		}
+	}
+
+	& p {
+		font-size: 2rem;
+	}
+}

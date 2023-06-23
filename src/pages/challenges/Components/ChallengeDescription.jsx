@@ -1,25 +1,21 @@
 import React from 'react';
+import Parser from 'html-react-parser';
 
 /**
  * Displays a challenges description
- * @param {*} rawChallenge - the raw challenge
- * @param {*} parsedChallenge - the parsed challenge
+ * @param {*} challenge - the raw challenge
  * @returns
  */
-function ChallengeDescription({ rawChallenge, parsedChallenge }) {
-	if (rawChallenge.article.model) {
-		return (
-			<>
-				{parsedChallenge.map((section, i) => {
-					return (
-						<p key={i} className="text-xl 2k:text-3xl">
-							{section}
-						</p>
-					);
-				})}
-			</>
-		);
-	}
+function ChallengeDescription({ challenge }) {
+	let doc = new DOMParser().parseFromString(challenge.content, 'text/html');
+
+	const htmlDecode = input => {
+		let e = document.createElement('div');
+		e.innerHTML = input;
+		return e.childNodes.length === 0 ? '' : e.childNodes[3].nodeValue;
+	};
+
+	return <div className="challengeDesc">{Parser(challenge.content)}</div>;
 }
 
 export default ChallengeDescription;

@@ -7,7 +7,7 @@ import Button from '../../../../components/buttons/Button';
  * @returns
  */
 function ReadMoreChallengebtn({ challengeId }) {
-	return <Button type="ahref" href={`/challenges/${challengeId}`} text="Read more" color="bg-base-900 hover:!bg-primary" css="font-thin absolute bottom-2 right-2" position="z-50" size="w-fit" />;
+	return <Button type="ahref" href={`/challenges/${challengeId}`} text="Read more" color="bg-base-900 hover:!bg-primary text-white" css="font-thin absolute bottom-2 right-2" position="z-50" size="w-fit" />;
 }
 
 export default ReadMoreChallengebtn;

@@ -13,7 +13,7 @@ function CommentReportBtn({ comment }) {
 	//---------------------------------------------------------------------------------------------------//
 	if (comment.comment !== 'deleted') {
 		return (
-			<label htmlFor="report-modal" className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl" onClick={() => setReport(dispatchAuth, 'comment', comment)}>
+			<label htmlFor="report-modal" className="text-slate-400 hover:text-blue-300 cursor-pointer 2k:text-2xl" onClick={() => setReport(dispatchAuth, 'comment', comment)}>
 				Report
 			</label>
 		);

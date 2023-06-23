@@ -30,7 +30,9 @@ function Comment({ comment }) {
 					<UsernameLink username={comment.username} uid={comment.uid} hoverPosition="right" css="font-bold" />
 					<CommentDate timestamp={comment.timestamp} />
 				</div>
-				<CommentBody comment={comment} setEditedComment={setEditedComment} />
+				<div className="text-slate-200">
+					<CommentBody comment={comment} setEditedComment={setEditedComment} />
+				</div>
 
 				<div className="flex flex-row gap-4 2k:gap-8">
 					<CommentReplyBtn comment={comment} />

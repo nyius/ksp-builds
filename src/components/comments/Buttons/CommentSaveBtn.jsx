@@ -29,7 +29,7 @@ function CommentSaveBtn({ commentId, editedComment, setEditedComment }) {
 	//---------------------------------------------------------------------------------------------------//
 	if (editingComment && editingComment.id === commentId) {
 		return (
-			<p className="text-slate-500 hover:text-green-300 cursor-pointer 2k:text-2xl" onClick={e => handleSaveCommentEdit(e)}>
+			<p className="text-slate-300 hover:text-green-400 cursor-pointer 2k:text-2xl" onClick={e => handleSaveCommentEdit(e)}>
 				Save
 			</p>
 		);

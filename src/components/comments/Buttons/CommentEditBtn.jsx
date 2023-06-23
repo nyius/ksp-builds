@@ -13,7 +13,7 @@ function CommentEditBtn({ comment }) {
 	//---------------------------------------------------------------------------------------------------//
 	if (!editingComment && comment.comment !== 'deleted') {
 		return (
-			<p onClick={() => setEditingComment(dispatchBuild, comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
+			<p onClick={() => setEditingComment(dispatchBuild, comment)} className="text-slate-400 hover:text-blue-300 cursor-pointer 2k:text-2xl">
 				Edit
 			</p>
 		);

@@ -22,8 +22,8 @@ function BuildDescription() {
 	return (
 		<>
 			{/* Description */}
-			<p className="text-2xl 2k:text-4xl text-slate-500 mb-5">ABOUT THIS BUILD</p>
-			<div className="mb-20 2k:mb-32 text-xl 2k:text-3xl">
+			<p className="text-2xl 2k:text-4xl text-slate-400 mb-5">ABOUT THIS BUILD</p>
+			<div className="mb-20 2k:mb-32 text-xl 2k:text-3xl text-slate-200">
 				<Editor editorState={buildDesc} readOnly={true} toolbarHidden={true} />
 			</div>
 		</>

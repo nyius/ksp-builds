@@ -23,7 +23,6 @@ import './App.css';
 /*TODO
 ***Update all profiles to have a type and all builds to have a type before pusing next update - builds need to make their 'type' into 'types' first
 drag and drop your own builds into a folder?
-fix news
 when launching the app, it should loop over the localstorage and check all of the stored builds to see their age
 	if theyre older than like a week, they should be removed from storage
 builds fetched by ID need to be paginated. break them up into folders and then iterate over them

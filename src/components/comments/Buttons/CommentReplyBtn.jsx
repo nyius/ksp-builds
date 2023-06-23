@@ -17,7 +17,7 @@ function CommentReplyBtn({ comment }) {
 	if (!editingComment && !fetchedUserProfile?.blockList?.includes(user.uid) && comment.comment !== 'deleted') {
 		return (
 			<CheckCredentials type="user">
-				<a href={`#add-comment`} onClick={() => setReplyingComment(dispatchBuild, comment)} className="text-slate-500 hover:text-blue-300 cursor-pointer 2k:text-2xl">
+				<a href={`#add-comment`} onClick={() => setReplyingComment(dispatchBuild, comment)} className="text-slate-400 hover:text-blue-300 cursor-pointer 2k:text-2xl">
 					Reply
 				</a>
 			</CheckCredentials>

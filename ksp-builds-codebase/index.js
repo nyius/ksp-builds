@@ -61,7 +61,7 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 		let fetchedExistingNews = JSON.parse(rawNews);
 
 		// filter any ones that match
-		const filteredNews = data.filter(article => fetchedExistingNews.some(({ title }) => title !== article.title));
+		const filteredNews = data.filter(article => !fetchedExistingNews.some(({ title }) => title === article.title));
 
 		// merge them together and save
 		let scrapedNews = [...filteredNews, ...data];
@@ -88,7 +88,7 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 		let rawChallenges = await challengesResponse.Body.transformToString();
 		let fetchedExistingChallenges = JSON.parse(rawChallenges);
 
-		const filteredChallenges = challengesData.filter(challenge => fetchedExistingChallenges.some(({ title }) => title !== challenge.title));
+		const filteredChallenges = challengesData.filter(challenge => !fetchedExistingChallenges.some(({ title }) => title === challenge.title));
 
 		let scrapedChallenges = [...filteredChallenges, ...challengesData];
 
@@ -265,9 +265,11 @@ exports.fixChallenges = functions.https.onRequest(async context => {
 		let rawChallenges = await challengesResponse.Body.transformToString();
 		let fetchedExistingChallenges = JSON.parse(rawChallenges);
 
-		// const filteredChallenges = challengesData.filter(challenge => fetchedExistingChallenges.some(({ title }) => title === challenge.title));
+		// const filteredChallenges = challengesData.filter(challenge => !fetchedExistingChallenges.some(({ title }) => title === challenge.title));
 
 		// let scrapedChallenges = [...filteredChallenges, ...challengesData];
+
+		// scrapedChallenges.map(challenge => functions.logger.log(challenge.title));
 
 		let newArr = fetchedExistingChallenges.filter((obj, index, self) => {
 			return index === self.findIndex(o => o.title === obj.title);
@@ -282,7 +284,7 @@ exports.fixChallenges = functions.https.onRequest(async context => {
 			ACL: 'public-read',
 		});
 
-		await s3Client.send(challengesCommand);
+		// await s3Client.send(challengesCommand);
 	} catch (error) {
 		functions.logger.log(error);
 	}

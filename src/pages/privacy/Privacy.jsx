@@ -23,6 +23,7 @@ function Privacy() {
 
 			<MiddleContainer>
 				<PlanetHeader text="Privacy Policy" />
+
 				<p className="text-lg 2k:text-3xl text-slate-200">
 					We at Kerbal Builds respect the privacy of our users and are committed to protecting it. <br></br>
 					<br></br> This privacy policy explains how we collect, use, and disclose information about our users. <br></br>

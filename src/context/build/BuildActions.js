@@ -424,6 +424,11 @@ export const useUpdateBuild = () => {
 			build.partCount = getBuildPartCount(buildJSON);
 			delete build.build;
 			delete build.rawImageFiles;
+			delete build.timestamp;
+			delete build.lastFetchedTimestamp;
+			delete build.views;
+			delete build.upVotes;
+			delete build.downVotes;
 
 			if (build.thumbnail !== build.images[0]) {
 				build.thumbnail = build.images[0];
@@ -438,6 +443,7 @@ export const useUpdateBuild = () => {
 				} else {
 					build.urlName = `${buildNameToUrl(build.name)}-${availableNameNum}`;
 				}
+				build.searchName = build.name.toLowerCase();
 			}
 
 			build.lastModified = serverTimestamp();

@@ -34,6 +34,7 @@ const useBuilds = () => {
 				builds.push(doc.data());
 				setLocalStoredBuild(doc.data());
 			});
+			console.log(builds);
 			setFetchedBuilds(dispatchBuilds, builds);
 			setLastfetchedBuild(dispatchBuilds, buildsSnap.docs.length < fetchAmount ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1]);
 			setStoredBuilds(dispatchBuilds, [builds]);

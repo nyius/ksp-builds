@@ -56,7 +56,7 @@ function Challenge() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Helmet title={challenge.title} pageLink={`https://kspbuilds.com/challenges/${articleId}`} />
+			<Helmet title={challenge.title} pageLink={`https://kspbuilds.com/challenges/${articleId}`} description={challenge.contentSnippet.slice(0, 150) + '...'} />
 
 			<MiddleContainer>
 				<div className="border-2 border-dashed border-slate-600 rounded-xl p-4 2k:p-8">

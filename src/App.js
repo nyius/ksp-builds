@@ -30,6 +30,7 @@ move all variables declared inside of a component  (that isnt involved with anyt
 useEffects should only do 1 thing, split them up
 useEffect cleanup functions
 useEffects could be broken out into their own hooks for easier to read code and functionality (lesson 171/172)
+more space themed loading spinner
 drag and drop your own builds into a folder?
 when launching the app, it should loop over the localstorage and check all of the stored builds to see their age
 	if theyre older than like a week, they should be removed from storage

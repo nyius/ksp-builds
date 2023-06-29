@@ -57,7 +57,7 @@ function SignUp() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Helmet title="Sign Up" pageLink="https://kspbuilds.com/sign-up" />
+			<Helmet title="Sign Up" pageLink="https://kspbuilds.com/sign-up" description="Sign up for free to KSP Builds! Create an account to upload your creations, save your favorites, and comment/chat with others" />
 
 			<MiddleContainer>
 				<PlanetHeader text="Sign Up" />

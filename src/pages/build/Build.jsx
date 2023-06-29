@@ -96,7 +96,9 @@ function Build() {
 
 	return (
 		<>
-			{!loadingBuild && loadedBuild && <Helmet title={loadedBuild?.name ? loadedBuild?.name : 'Build'} pageLink={`https://kspbuilds.com/build/${location.pathname}`} />}
+			{!loadingBuild && loadedBuild && (
+				<Helmet title={loadedBuild?.name ? loadedBuild?.name : 'Build'} pageLink={`https://kspbuilds.com/build/${location.pathname}`} description={`View the build '${loadedBuild.name}' by ${loadedBuild.author}.`} />
+			)}
 
 			<MiddleContainer>
 				<div className="flex flex-col gap-4 w-full">

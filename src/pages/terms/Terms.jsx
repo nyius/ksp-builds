@@ -19,7 +19,7 @@ function Terms() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Helmet title="Terms and Conditions" pageLink="https://kspbuilds.com/terms" />
+			<Helmet title="Terms and Conditions" pageLink="https://kspbuilds.com/terms" description="Terms and conditions for KSP Builds." />
 
 			<MiddleContainer>
 				<PlanetHeader text="Terms and Conditions" />

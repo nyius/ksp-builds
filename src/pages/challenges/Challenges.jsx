@@ -23,7 +23,7 @@ function Challenges() {
 
 	return (
 		<>
-			<Helmet title="Challenges" pageLink="https://kspbuilds.com/challenges" />
+			<Helmet title="Challenges" pageLink="https://kspbuilds.com/challenges" description="View the latest Kerbal Space Program 2 challenges! Try exploring every planet in the kerbin system, place a space station around Duna, and more" />
 
 			<MiddleContainer>
 				<PlanetHeader text="Challenges" />

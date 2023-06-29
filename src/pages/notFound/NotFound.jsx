@@ -20,10 +20,7 @@ function NotFound() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Helmet>
-				<meta charSet="utf-8" />
-				<title>KSP Builds - Not Found</title>
-			</Helmet>
+			<Helmet title="Not Found" desctiption="Whoops... how did you end up here? Did you let Jebidiah pilot again?" />
 
 			<MiddleContainer>
 				<CantFind text="Oops.. Page not found">

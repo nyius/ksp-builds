@@ -71,7 +71,7 @@ function Favorites() {
 			<Helmet>
 				<meta charSet="utf-8" />
 				<title>KSP Builds - Favorites</title>
-				<link rel="canonical" href={`https://kspbuilds.com/favorites`} />
+				<link rel="canonical" href="https://kspbuilds.com/favorites" description="View your favorited builds & creations on KSP Builds." />
 			</Helmet>
 
 			<MiddleContainer color="none">

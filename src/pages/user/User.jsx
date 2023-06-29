@@ -127,7 +127,7 @@ function User() {
 	if (!fetchingProfile && openProfile) {
 		return (
 			<>
-				<Helmet title={openProfile.username} pageLink={`https://kspbuilds.com/profile/${openProfile.uid}`} />
+				<Helmet title={openProfile.username} pageLink={`https://kspbuilds.com/profile/${openProfile.uid}`} description={`Public KSP Builds profile for ${openProfile.username}. View their builds, send a message, and more.`} />
 
 				<MiddleContainer color="none">
 					<DeleteAccountBtn />

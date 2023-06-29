@@ -9,7 +9,7 @@ const subscribeToUsersMessages = async dispatchAuth => {
 	try {
 		// Listen to current users messages to know if we get a new one -------------------------------------------------------------------------------------------------------------------------------------------------
 		const userMessagesQuery = query(collection(db, 'users', auth.currentUser.uid, 'messages'), where('id', '!=', 'first'));
-		const unsubscribeUserMessage = onSnapshot(userMessagesQuery, querySnapshot => {
+		onSnapshot(userMessagesQuery, querySnapshot => {
 			querySnapshot.docChanges().forEach(change => {
 				if (change.type === 'added') {
 					let newIncomingConvo = change.doc.data();

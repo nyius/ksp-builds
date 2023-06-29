@@ -82,7 +82,7 @@ function Profile() {
 
 	return (
 		<>
-			<Helmet title="Profile" pagelink="https://kspbuilds.com/profile" />
+			<Helmet title="Profile" pagelink="https://kspbuilds.com/profile" description="View your KSP Builds profile. See your uploads, change your bio & profile picture, and more." />
 
 			<MiddleContainer color="none">
 				<PlanetHeader text="Profile" />

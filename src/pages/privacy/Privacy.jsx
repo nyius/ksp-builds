@@ -19,7 +19,7 @@ function Privacy() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Helmet title="Privacy Policy" pageLink="https://kspbuilds.com/privacy" />
+			<Helmet title="Privacy Policy" pageLink="https://kspbuilds.com/privacy" description="Privacy policy for the KSP Builds website." />
 
 			<MiddleContainer>
 				<PlanetHeader text="Privacy Policy" />

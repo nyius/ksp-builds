@@ -428,11 +428,7 @@ function AdminPanel() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Helmet>
-				<meta charSet="utf-8" />
-				<title>KSP Builds - Admin Panel</title>
-				<link rel="canonical" href={`https://kspbuilds.com/admin-panel`} />
-			</Helmet>
+			<Helmet title="Admin Panel" pageLink="https://kspbuilds.com/admin-panel" description="Admin Panel for KSP Builds" />
 
 			<MiddleContainer>
 				<PlanetHeader text="Admin" />

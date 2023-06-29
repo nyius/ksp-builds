@@ -106,7 +106,7 @@ function Upload() {
 
 	return (
 		<>
-			<Helmet title="Upload a Build" pageLink="https://kspbuilds.com/upload" />
+			<Helmet title="Upload a Build" pageLink="https://kspbuilds.com/upload" description="Upload your creations to KSP Builds! Simply copy your craft from the game with ctrl+c and paste it right here." />
 
 			<MiddleContainer>
 				{buildToUpload && (

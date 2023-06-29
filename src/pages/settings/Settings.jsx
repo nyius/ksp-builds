@@ -41,7 +41,7 @@ function Settings() {
 
 	return (
 		<>
-			<Helmet title="Settings" pageLink="https://kspbuilds.com/settings" />
+			<Helmet title="Settings" pageLink="https://kspbuilds.com/settings" description="View and change settings for your KSP Builds account. Change notifications, manage subscription, username color, and more." />
 
 			<MiddleContainer>
 				<PlanetHeader text="Settings" />

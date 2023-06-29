@@ -50,7 +50,7 @@ function PatchNotes() {
 
 	return (
 		<>
-			<Helmet title="Patch Notes" pageLink="https://kspbuilds.com/patch-notes" />
+			<Helmet title="Patch Notes" pageLink="https://kspbuilds.com/patch-notes" description="See the latest updates and fixes to the KSP Builds website." />
 
 			<MiddleContainer>
 				<PlanetHeader text="KSP Builds Patch Notes" />

@@ -33,8 +33,6 @@ function BuildCard({ build }) {
 		}, 100);
 	};
 
-	// console.log(new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(build.lastModified.seconds * 1000));
-
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="flex flex-row p-2 2k:p-4 max-w-xl aspect-square md:aspect-5/6 shadow-lg hover:shadow-xl xl:aspect-square 2k:aspect-5/6 w-full relative" onMouseEnter={() => handleHover(build.urlName)} onMouseLeave={() => handleHover(false)}>

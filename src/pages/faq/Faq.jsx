@@ -24,7 +24,7 @@ import WhoRunsKSPB from './Components/faqAnswers/WhoRunsKSPB';
 function Faq() {
 	return (
 		<MiddleContainer>
-			<Helmet title="F.A.Q" pageLink="https://kspbuilds.com/faq" />
+			<Helmet title="F.A.Q" pageLink="https://kspbuilds.com/faq" description="Frequently asked questions for KSP Builds, such as how to upload a build, submit a build for a challenge, and more!" />
 
 			<PlanetHeader text="F.A.Q" />
 

@@ -15,7 +15,7 @@ function Sponsor() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Helmet title="Sponsor" pageLink="https://kspbuilds.com/news" />
+			<Helmet title="Sponsor" pageLink="https://kspbuilds.com/news" description="Interested in sponsoring, advertising, or working with KSP Builds? Find out more here!" />
 
 			<MiddleContainer>
 				<PlanetHeader text="Sponsor" />

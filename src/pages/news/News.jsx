@@ -25,7 +25,7 @@ function News() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Helmet title="Latest KSP 2 News" pageLink="https://kspbuilds.com/news" />
+			<Helmet title="Latest KSP 2 News" pageLink="https://kspbuilds.com/news" description="View the latest Kerbal Space Program 2 news! Find out whats happening from patch notes, dev blogs, and more" />
 
 			<MiddleContainer>
 				<PlanetHeader text="Latest KSP News" />

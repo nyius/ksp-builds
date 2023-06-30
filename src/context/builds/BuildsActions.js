@@ -200,9 +200,10 @@ export const useCreateFirestoreQuery = () => {
 	const createFirestoreQuery = (type, startAfterLastFetched, fetchUid, buildIds) => {
 		const constraints = [limit(fetchAmount)];
 
+		console.log(versionFilter, typeFilter, modsFilter, challengeFilter);
 		// Sorting Filters
 		if (versionFilter !== 'any') constraints.unshift(where('kspVersion', '==', versionFilter));
-		if (typeFilter !== '') constraints.unshift(where('type', 'array-contains', typeFilter));
+		if (typeFilter !== '') constraints.unshift(where('types', 'array-contains', typeFilter));
 		if (modsFilter == 'yes') constraints.unshift(where('modsUsed', '==', true));
 		if (modsFilter == 'no') constraints.unshift(where('modsUsed', '==', false));
 		if (challengeFilter !== 'any') constraints.unshift(where('forChallenge', '==', challengeFilter));

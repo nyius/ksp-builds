@@ -41,7 +41,7 @@ twitch sidebar
 	-firebase function to listen to all 'going live' events for verified twitch accounts (no faster than once per min)
 	-push all live streams into an array on the DB (check what game theyre playing for KSP - may need to do multiple checks? or just let them go live with anything. Maybe listen to the KSP twitch category? scrape the page?)
 	-remove from the array when they aren't live anymore
-	
+Messages button should always appear (right now the messages loading state hides it)
 email notifs for botw
 bundle craft together, multiple download buttons per folder
 make type searching work for your own builds/visiting a users builds

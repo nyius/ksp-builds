@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import AuthContext from '../../../../context/auth/AuthContext';
 import Button from '../../../../components/buttons/Button';
-import { setEditingProfile } from '../../../../context/auth/AuthActions';
+import { setEditingBio } from '../../../../context/auth/AuthActions';
 import { convertFromRaw, EditorState } from 'draft-js';
 import { useUpdateProfile } from '../../../../context/auth/AuthActions';
 
@@ -21,10 +21,10 @@ function SaveBioBtn({ editedBio, setBioState }) {
 	const handleSubmitBioUpdate = async () => {
 		if (editedBio) {
 			await updateUserBio(editedBio);
-			setEditingProfile(dispatchAuth, false);
+			setEditingBio(dispatchAuth, false);
 			setBioState(EditorState.createWithContent(convertFromRaw(JSON.parse(editedBio))));
 		} else {
-			setEditingProfile(dispatchAuth, false);
+			setEditingBio(dispatchAuth, false);
 		}
 	};
 

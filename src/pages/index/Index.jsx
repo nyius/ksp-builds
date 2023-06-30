@@ -5,7 +5,6 @@ import algoliasearch from 'algoliasearch/lite';
 import useBuilds from '../../context/builds/BuildsActions';
 import FiltersContext from '../../context/filters/FiltersContext';
 import BuildsContext from '../../context/builds/BuildsContext';
-import useFilters from '../../context/filters/FiltersActions';
 //---------------------------------------------------------------------------------------------------//
 import Builds from '../../components/builds/Builds';
 import Hero from '../../components/hero/Hero';
@@ -30,7 +29,6 @@ function Index() {
 
 	const { resetStates } = useResetStates();
 	const { typeFilter, versionFilter, sortBy, modsFilter, challengeFilter } = useContext(FiltersContext);
-	const { setTypeFilter } = useFilters();
 	const { fetchAmount } = useContext(BuildsContext);
 
 	useEffect(() => {

@@ -1,13 +1,13 @@
 import { useContext } from 'react';
 import { db } from '../../firebase.config';
 import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter, where, increment } from 'firebase/firestore';
-import { signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithPopup, createUserWithEmailAndPassword, updateEmail } from 'firebase/auth';
 import { googleProvider } from '../../firebase.config';
 import { auth } from '../../firebase.config';
 import { cloneDeep } from 'lodash';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
-import { fetchUserProfileFromServer, sendNotification } from './AuthUtils';
+import { checkMatchingEmails, fetchUserProfileFromServer, sendNotification } from './AuthUtils';
 //---------------------------------------------------------------------------------------------------//
 import AuthContext from './AuthContext';
 import BuildContext from '../build/BuildContext';
@@ -123,6 +123,11 @@ const useAuth = () => {
 				}
 				return;
 			});
+
+			if (!userCredential) {
+				toast.error('Something went wrong. Please check your email/password and try again!');
+				return;
+			}
 
 			const email = userCredential.user.email;
 			const uid = userCredential.user.uid;
@@ -320,7 +325,7 @@ export const useHandleVoting = () => {
  * @returns
  */
 export const useUpdateProfile = () => {
-	const { user, dispatchAuth } = useContext(AuthContext);
+	const { user, dispatchAuth, editingEmail, verifyEditedEmail } = useContext(AuthContext);
 	/**
 	 * Handles updating the users profile picture on the server and context
 	 * @param {*} profilePicture
@@ -345,6 +350,26 @@ export const useUpdateProfile = () => {
 			updateUserProfilesAndDb({ bio, lastModified: serverTimestamp() });
 			updateUserState(dispatchAuth, { bio });
 			toast.success('Bio updated!');
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong. Please try again');
+		}
+	};
+
+	/**
+	 * Handles updating the users bio on the server and context
+	 * @param
+	 */
+	const updateUserEmail = async () => {
+		try {
+			if (!checkMatchingEmails(editingEmail, verifyEditedEmail)) {
+				toast.error("New emails don't match!");
+				return;
+			}
+			updateEmail(auth.currentUser, editingEmail);
+			updateUserDb({ email: editingEmail, lastModified: serverTimestamp() });
+			updateUserState(dispatchAuth, { email: editingEmail });
+			toast.success('Email updated!');
 		} catch (error) {
 			console.log(error);
 			toast.error('Something went wrong. Please try again');
@@ -395,7 +420,7 @@ export const useUpdateProfile = () => {
 		}
 	};
 
-	return { updateUserProfilePic, updateUserBio, updateUserDb, updateUserProfilesAndDb };
+	return { updateUserProfilePic, updateUserBio, updateUserDb, updateUserProfilesAndDb, updateUserEmail };
 };
 
 /**
@@ -1096,13 +1121,37 @@ export const setFetchingProfile = (dispatchAuth, bool) => {
 };
 
 /**
- * Handles setting if the user is editing their profile in context
+ * Handles setting if the user is editing their bio in context
  * @param {function} dispatchAuth - the dispatch function
- * @param {*} value - the value for editing the profile. False to stop editing, or an object if editing.
+ * @param {*} value - the value for editing the bio. False to stop editing, or an object if editing.
  */
-export const setEditingProfile = (dispatchAuth, value) => {
+export const setEditingBio = (dispatchAuth, value) => {
 	dispatchAuth({
-		type: 'SET_EDITING_PROFILE',
+		type: 'SET_EDITING_BIO',
+		payload: value,
+	});
+};
+
+/**
+ * Handles setting if the user is editing their email in context
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {*} value - the value for editing the profile. False to stop editing, or an string if editing.
+ */
+export const setEditingEmail = (dispatchAuth, value) => {
+	dispatchAuth({
+		type: 'SET_EDITING_EMAIL',
+		payload: value,
+	});
+};
+
+/**
+ * Handles setting if the verified email when a user is changing their email
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {*} value - the value for editing the profile. False to stop editing, or an string if editing.
+ */
+export const setVerifyEditedEmail = (dispatchAuth, value) => {
+	dispatchAuth({
+		type: 'SET_VERIFY_EDITED_EMAIL',
 		payload: value,
 	});
 };

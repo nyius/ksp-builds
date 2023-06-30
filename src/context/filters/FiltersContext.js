@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { getDoc, doc, getDocFromCache } from 'firebase/firestore';
+import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import FiltersReducer from './FiltersReducer';
 import useCheckUrlForType from '../../utilities/useCheckUrlForType';

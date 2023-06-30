@@ -6,7 +6,7 @@ import Button from '../../buttons/Button';
  * @returns
  */
 function CreateAccountBtn() {
-	return <Button type="ahref" href="/sign-up" icon="plus" text="Create Account" css="hidden md:flex" />;
+	return <Button type="ahref" href="/sign-up" icon="plus" text="Create Account" css="hidden md:flex" color="text-white" />;
 }
 
 export default CreateAccountBtn;

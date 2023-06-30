@@ -203,3 +203,19 @@ export const fetchUserProfileFromServer = async id => {
 		throw new Error(error);
 	}
 };
+
+/**
+ * Check if emals match
+ * @param {string} email1
+ * @param {string} email2
+ * @returns true or false
+ */
+export const checkMatchingEmails = (email1, email2) => {
+	if (email1 && email2) {
+		if (email1 !== email2) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+};

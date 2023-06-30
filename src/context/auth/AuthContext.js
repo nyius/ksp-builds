@@ -119,7 +119,9 @@ export const AuthProvider = ({ children }) => {
 	const initialState = {
 		user: null,
 		newUsername: '',
-		editingProfile: false,
+		editingEmail: false,
+		verifyEditedEmail: null,
+		editingBio: false,
 		cancelEditProfile: false,
 		usernameChanged: false,
 		verifyChangeUsername: false,

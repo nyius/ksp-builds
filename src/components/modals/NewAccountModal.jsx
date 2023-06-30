@@ -58,6 +58,7 @@ function NewAccountModal() {
 		 */
 		const checkIfUserExists = async () => {
 			try {
+				console.log(username);
 				// Check if the username already exists
 				const docRefUser = doc(db, 'usernames', username);
 				const docSnapUser = await getDoc(docRefUser);
@@ -148,13 +149,13 @@ function NewAccountModal() {
 			<input type="checkbox" id="new-account-modal" className="modal-toggle" />
 			<div className="modal">
 				<div className="modal-box">
-					<div className="font-bold alert dot-bg text-xl 2k:text-3xl mb-4">
+					<div className="font-bold alert dot-bg text-xl 2k:text-3xl mb-4 text-slate-200">
 						Almost done...
 						<img className="w-12 2k:w-24" src={Astrobiff} alt="" />
 					</div>
-					<p className="py-4 mb-4 2k:mb-8 text-center text-xl 2k:text-3xl">Please take a second to finalize your account.</p>
+					<p className="py-4 mb-4 2k:mb-8 text-center text-xl 2k:text-3xl text-slate-200">Please take a second to finalize your account.</p>
 					<div className="mb-10">
-						<label htmlFor="usernam" className="text-xl 2k:text-2xl text-slate-400 italic">
+						<label htmlFor="usernam" className="text-xl 2k:text-2xl text-slate-200 italic">
 							Username
 						</label>
 						<TextInput
@@ -169,8 +170,8 @@ function NewAccountModal() {
 							required={true}
 						/>
 
-						<label htmlFor="profile-picture" className="w-full flex mb-2 text-xl 2k:text-2xl text-slate-400 italic">
-							Profile Picture (2mb max size)
+						<label htmlFor="profile-picture" className="w-full flex mb-2 text-xl 2k:text-2xl text-slate-200 italic">
+							Optional - Profile Picture (2mb max size)
 						</label>
 
 						<div className="flex flex-row flex-wrap items-center">

@@ -10,6 +10,7 @@ import SignUpBtn from './Components/Buttons/SignUpBtn';
 import LoginBtn from './Components/Buttons/LoginBtn';
 import ResetPasswordBtn from './Components/Buttons/ResetPasswordBtn';
 import GoogleLoginBtn from './Components/Buttons/GoogleLoginBtn';
+import { checkMatchingEmails } from '../../context/auth/AuthUtils';
 
 /**
  * Sign up page
@@ -40,20 +41,6 @@ function SignUp() {
 		});
 	};
 
-	/**
-	 * Check if emals match
-	 * @returns
-	 */
-	const checkMatchingEmail = () => {
-		if (newUser.email && newUser.emailVerify) {
-			if (newUser.email !== newUser.emailVerify) {
-				return false;
-			} else {
-				return true;
-			}
-		}
-	};
-
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
@@ -65,17 +52,23 @@ function SignUp() {
 					<div className="w-full sm:w-1/2 self-center flex flex-col">
 						<form className="w-full flex flex-col self-center" action="">
 							{/* Emails */}
-							<p className="text-xl 2k:text-3xl text-slate-400">Email</p>
-							<TextInput onChange={handleFieldChange} type="email" id="email" placeholder="Enter email" required={true} margin=" mb-2" />
+							<p className="text-xl 2k:text-3xl text-slate-200">Email</p>
+							<TextInput onChange={handleFieldChange} type="email" id="email" placeholder="Enter email" required={true} color="text-white" margin="mb-2" />
 
-							<TextInput onChange={handleFieldChange} type="email" id="emailVerify" placeholder="Re-enter email" required={true} margin="mb-2" />
+							<TextInput onChange={handleFieldChange} type="email" id="emailVerify" placeholder="Re-enter email" required={true} color="text-white" margin="mb-2" />
 							{newUser.email && newUser.emailVerify ? (
-								<>{checkMatchingEmail() ? <p className="text-xl 2k:text-2xl italic text-emerald-500">Emails match!</p> : <p className="text-xl 2k:text-2xl italic text-red-500">Emails must match</p>}</>
+								<>
+									{checkMatchingEmails(newUser.email, newUser.emailVerify) ? (
+										<p className="text-xl 2k:text-2xl italic text-emerald-500">Emails match!</p>
+									) : (
+										<p className="text-xl 2k:text-2xl italic text-red-500">Emails must match</p>
+									)}
+								</>
 							) : null}
 
 							{/* Password */}
-							<p className="text-xl 2k:text-3xl text-slate-400 mt-6 2k:mt-10">Password</p>
-							<TextInput onChange={handleFieldChange} type="password" id="password" placeholder="Enter password" required={true} margin="mb-2" />
+							<p className="text-xl 2k:text-3xl text-slate-200 mt-6 2k:mt-10">Password</p>
+							<TextInput onChange={handleFieldChange} type="password" id="password" placeholder="Enter password" required={true} color="text-white" margin="mb-2" />
 							{newUser.password && newUser.password.length < 6 ? <p className="text-xl 2k:text-2xl italic text-red-500">Password must be more than 6 characters</p> : null}
 
 							{accountExists ? (
@@ -91,7 +84,7 @@ function SignUp() {
 							<SignUpBtn newUser={newUser} setAccountExists={setAccountExists} />
 						</form>
 
-						<p className="text-xl 2k:text-3xl mb-4">Or create an account with Google</p>
+						<p className="text-xl 2k:text-3xl mb-4 text-slate-200">Or create an account with Google</p>
 						<GoogleLoginBtn />
 					</div>
 					<img src={AstrobiffRide} alt="AStrobiff Riding Rocket" className="w-100 h-full" />

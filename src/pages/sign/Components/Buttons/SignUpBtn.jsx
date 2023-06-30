@@ -2,6 +2,7 @@ import React from 'react';
 import Button from '../../../../components/buttons/Button';
 import { toast } from 'react-toastify';
 import useAuth from '../../../../context/auth/AuthActions';
+import { checkMatchingEmails } from '../../../../context/auth/AuthUtils';
 
 /**
  * Button for signing up a user
@@ -11,20 +12,6 @@ import useAuth from '../../../../context/auth/AuthActions';
  */
 function SignUpBtn({ newUser, setAccountExists }) {
 	const { newEmailAccount } = useAuth();
-
-	/**
-	 * Check if emals match
-	 * @returns
-	 */
-	const checkMatchingEmail = () => {
-		if (newUser.email && newUser.emailVerify) {
-			if (newUser.email !== newUser.emailVerify) {
-				return false;
-			} else {
-				return true;
-			}
-		}
-	};
 
 	const signUp = async () => {
 		if (!newUser.email) {
@@ -42,7 +29,7 @@ function SignUpBtn({ newUser, setAccountExists }) {
 			toast.error('Password must be more than 6 characters');
 			return;
 		}
-		if (!checkMatchingEmail()) {
+		if (!checkMatchingEmails(newUser.email, newUser.emailVerify)) {
 			console.log(`Emails don't match`);
 			toast.error("Your emails don't match");
 			return;
@@ -50,7 +37,7 @@ function SignUpBtn({ newUser, setAccountExists }) {
 
 		const signinStatus = await newEmailAccount(newUser);
 
-		if (signinStatus.message === 'exists') {
+		if (signinStatus?.message === 'exists') {
 			setAccountExists(true);
 		}
 	};

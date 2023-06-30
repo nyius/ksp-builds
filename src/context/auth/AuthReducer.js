@@ -18,11 +18,30 @@ const AuthReducer = (state, action) => {
 				user: null,
 				newUsername: '',
 				newBio: '',
-				editingProfile: false,
+				editingBio: false,
+				editingEmail: false,
+				verifyEditedEmail: null,
 				cancelEditProfile: false,
 				usernameChanged: false,
 				newGoogleSignup: false,
 				verifyChangeUsername: false,
+				newSignup: false,
+				lastFetchedNotification: 'end',
+				notificationsLoading: false,
+				fetchingProfile: false,
+				resetPasswordState: false,
+				accountToDelete: null,
+				reportingContent: null,
+				reportType: '',
+				messageTab: null,
+				conversations: [],
+				newConvo: null,
+				hoverUser: null,
+				deleteConvoId: null,
+				userToBlock: null,
+				newSub: false,
+				convosOpen: false,
+				convosLoading: false,
 			};
 		case 'UPDATE_USER':
 			const getUserStateUpdate = cloneDeep(state.user);
@@ -100,10 +119,20 @@ const AuthReducer = (state, action) => {
 				...state,
 				newBio: action.payload,
 			};
-		case 'SET_EDITING_PROFILE':
+		case 'SET_EDITING_BIO':
 			return {
 				...state,
-				editingProfile: action.payload,
+				editingBio: action.payload,
+			};
+		case 'SET_EDITING_EMAIL':
+			return {
+				...state,
+				editingEmail: action.payload,
+			};
+		case 'SET_VERIFY_EDITED_EMAIL':
+			return {
+				...state,
+				verifyEditedEmail: action.payload,
 			};
 		case 'SET_LAST_FETCHED_NOTIF':
 			return {

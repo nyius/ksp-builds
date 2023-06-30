@@ -17,7 +17,7 @@ const TextEditor = state => {
 	// Handles sending the markup back to the parent
 	const { setState, i, text } = state;
 	const { dispatchBuild, editingBuild, editingComment, resetTextEditor, buildOfTheWeek } = useContext(BuildContext);
-	const { editingProfile } = useContext(AuthContext);
+	const { editingBio } = useContext(AuthContext);
 	const emptyState = `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`;
 
 	const [editorState, setEditorState] = useState(() => {
@@ -33,11 +33,11 @@ const TextEditor = state => {
 			`)
 			);
 		}
-		if (editingProfile) {
-			if (checkIfJson(editingProfile.bio)) {
-				return EditorState.createWithContent(convertFromRaw(JSON.parse(editingProfile.bio)));
+		if (editingBio) {
+			if (checkIfJson(editingBio.bio)) {
+				return EditorState.createWithContent(convertFromRaw(JSON.parse(editingBio.bio)));
 			} else {
-				return EditorState.createWithContent(ContentState.createFromText(editingProfile.bio));
+				return EditorState.createWithContent(ContentState.createFromText(editingBio.bio));
 			}
 		}
 		if (text) {

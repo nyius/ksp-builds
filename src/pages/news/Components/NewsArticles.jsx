@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import NewsContext from '../../../context/news/NewsContext';
-import NewsCard from '../../../components/news/NewsCard';
+import NewsCard from '../../../components/cards/NewsCard';
 
 /**
  * Displays News Articles

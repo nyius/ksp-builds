@@ -4,13 +4,14 @@ import Conversation from '../Conversation';
 import Conversations from '../Conversations';
 import CloseMessageBoxBtn from '../Buttons/CloseMessageBoxBtn';
 import BackToConvosBtn from '../Buttons/BackToConvosBtn';
+import Spinner1 from '../../spinners/Spinner1';
 
 /**
  * Displays the popup message box with a users conversations/convo
  * @returns
  */
 function MessageBox() {
-	const { convosOpen, messageTab } = useContext(AuthContext);
+	const { convosOpen, messageTab, convosLoading } = useContext(AuthContext);
 
 	if (convosOpen) {
 		return (
@@ -20,7 +21,7 @@ function MessageBox() {
 						{messageTab ? <BackToConvosBtn /> : <div className="text-xl 2k:text-2xl pixel-font">Messages</div>}
 						<CloseMessageBoxBtn />
 					</div>
-					<div className="w-full conversation-size overflow-auto scrollbar flex-nowrap absolute bottom-0 border-t-2 border-dashed border-slate-500">{messageTab ? <Conversation /> : <Conversations />}</div>
+					{convosLoading ? <Spinner1 /> : <div className="w-full conversation-size overflow-auto scrollbar flex-nowrap absolute bottom-0 border-t-2 border-dashed border-slate-500">{messageTab ? <Conversation /> : <Conversations />}</div>}
 				</div>
 			</div>
 		);

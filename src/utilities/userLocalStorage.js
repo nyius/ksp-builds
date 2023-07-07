@@ -46,6 +46,7 @@ export const checkLocalUserAge = (lastFetchedUserTime, time) => {
  * @param {obj} user - the user to save to local storage
  */
 export const setLocalStoredUser = (id, user) => {
+	delete user.auth;
 	user.lastFetchedTimestamp = new Date();
 	localStorage.setItem(id, JSON.stringify(user));
 };

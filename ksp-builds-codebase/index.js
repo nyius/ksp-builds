@@ -13,24 +13,25 @@ const stripe = require('stripe')(process.env.REACT_APP_STRIPE_SECRET);
 const endpointSecret = process.env.REACT_APP_STRIPE_SUCCESS_ENDPOINT_PROD;
 // const endpointSecret = 'whsec_ba90833eb62f59831b3b58cd308b311dbeee87a326899886ccdeb196e450e96d';
 
+const s3Client = new S3Client({
+	apiVersion: 'latest',
+	region: 'us-east-1',
+	credentials: {
+		accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+		secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+	},
+});
+
 // Gets the news articles
 exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context => {
 	try {
-		const s3Client = new S3Client({
-			apiVersion: 'latest',
-			region: 'us-east-1',
-			credentials: {
-				accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-				secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-			},
-		});
 		// every hour '0 * * * *'
 		const data = [];
 
-		const newsData = await scrapeNews();
-		const patchData = await scrapePatchNotes();
-		const devData = await scrapeDevDiaries();
-		const challengesData = await scrapeChallenges();
+		const newsData = await scrapeKspNews();
+		const patchData = await scrapeKspPatchNotes();
+		const devData = await scrapeKspDevDiaries();
+		const challengesData = await scrapeKspChallenges();
 
 		// add all the article to one array
 		for (const article in newsData) {
@@ -116,22 +117,13 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 // Gets the news articles manually
 exports.scrapeNewsManual = functions.https.onRequest(async context => {
 	try {
-		const s3Client = new S3Client({
-			apiVersion: 'latest',
-			region: 'us-east-1',
-			credentials: {
-				accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-				secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-			},
-		});
-
 		const data = [];
 		const challenges = [];
 
-		const newsData = await scrapeNews();
-		const patchData = await scrapePatchNotes();
-		const devData = await scrapeDevDiaries();
-		const challengesData = await scrapeChallenges();
+		const newsData = await scrapeKspNews();
+		const patchData = await scrapeKspPatchNotes();
+		const devData = await scrapeKspDevDiaries();
+		const challengesData = await scrapeKspChallenges();
 
 		// add all the article to one array
 		for (const article in newsData) {
@@ -201,16 +193,7 @@ exports.scrapeNewsManual = functions.https.onRequest(async context => {
 // Gets the challenges manually
 exports.scrapeChallengesManual = functions.https.onRequest(async context => {
 	try {
-		const s3Client = new S3Client({
-			apiVersion: 'latest',
-			region: 'us-east-1',
-			credentials: {
-				accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-				secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-			},
-		});
-
-		const newChallenges = await scrapeChallenges();
+		const newChallenges = await scrapeKspChallenges();
 		functions.logger.log(newChallenges);
 
 		const getChallengesCommand = new GetObjectCommand({
@@ -247,15 +230,6 @@ exports.scrapeChallengesManual = functions.https.onRequest(async context => {
 
 exports.fixChallenges = functions.https.onRequest(async context => {
 	try {
-		const s3Client = new S3Client({
-			apiVersion: 'latest',
-			region: 'us-east-1',
-			credentials: {
-				accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-				secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-			},
-		});
-
 		const getChallengesCommand = new GetObjectCommand({
 			Bucket: process.env.REACT_APP_BUCKET,
 			Key: `kspChallenges.json`,
@@ -292,15 +266,6 @@ exports.fixChallenges = functions.https.onRequest(async context => {
 
 exports.fixNews = functions.https.onRequest(async context => {
 	try {
-		const s3Client = new S3Client({
-			apiVersion: 'latest',
-			region: 'us-east-1',
-			credentials: {
-				accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-				secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-			},
-		});
-
 		const getChallengesCommand = new GetObjectCommand({
 			Bucket: process.env.REACT_APP_BUCKET,
 			Key: `kspNews.json`,
@@ -670,10 +635,68 @@ exports.handleStripePayments = functions.https.onRequest(async (req, res) => {
 });
 
 /**
+ * Gets live ksp streams for KSP 1 and KSP 2
+ */
+exports.fetchLiveKspStreams = functions.pubsub.schedule('every 1 minutes').onRun(async (req, res) => {
+	try {
+		const newToken = await axios
+			.post(
+				'https://id.twitch.tv/oauth2/token',
+				{
+					client_id: process.env.REACT_APP_TWITCH_ID,
+					client_secret: process.env.REACT_APP_TWITCH_SECRET,
+					grant_type: 'client_credentials',
+				},
+				{
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+				}
+			)
+			.then(async newToken => {
+				return newToken.data.access_token;
+			})
+			.catch(err => {
+				throw new Error(`Error from exios in getting new token: ${err}`);
+			});
+
+		await axios
+			.get(`https://api.twitch.tv/helix/streams?game_id=${process.env.REACT_APP_TWITCH_KSP2_ID}`, {
+				headers: {
+					Authorization: `Bearer ${newToken}`,
+					'Client-Id': process.env.REACT_APP_TWITCH_ID,
+				},
+			})
+			.then(liveStreams => {
+				const saveLiveStreams = new PutObjectCommand({
+					Bucket: process.env.REACT_APP_BUCKET,
+					Key: `liveKspStreams.json`,
+					Body: JSON.stringify(liveStreams.data),
+					ContentEncoding: 'base64',
+					ContentType: 'application/json',
+					ACL: 'public-read',
+				});
+
+				s3Client.send(saveLiveStreams);
+			})
+			.catch(async err => {
+				if (err?.response?.data?.status == 401) {
+					throw new Error(`Something went wrong with authenticating: ${err}`);
+				} else {
+					throw new Error(`Something went wrong fetching streams ${err}`);
+				}
+			});
+	} catch (error) {
+		functions.logger.log(error);
+		res.status(404).send(`Something went wrong fetching streams ${error}`);
+	}
+});
+
+/**
  * Handles scraping the KSP website for news articles
  * @returns
  */
-const scrapeNews = async () => {
+const scrapeKspNews = async () => {
 	const articles = [];
 	// Scrape the new articles
 	const axiosResponse = await axios.request({
@@ -712,7 +735,7 @@ const scrapeNews = async () => {
  * Handles scraping the KSP website for patch notes
  * @returns
  */
-const scrapePatchNotes = async () => {
+const scrapeKspPatchNotes = async () => {
 	const articles = [];
 	// Scrape the new articles
 	const axiosResponse = await axios.request({
@@ -751,7 +774,7 @@ const scrapePatchNotes = async () => {
  * Handles scraping the KSP website for patch notes
  * @returns
  */
-const scrapeDevDiaries = async () => {
+const scrapeKspDevDiaries = async () => {
 	const articles = [];
 	// Scrape the new articles
 	const axiosResponse = await axios.request({
@@ -791,7 +814,7 @@ const scrapeDevDiaries = async () => {
  * Handles fetching the challenges from the forums RSS Feed
  * @returns
  */
-const scrapeChallenges = async () => {
+const scrapeKspChallenges = async () => {
 	const challenges = [];
 
 	let feed = await parser.parseURL('https://forum.kerbalspaceprogram.com/forum/121-challenges-mission-ideas.xml/?member=169308&key=a55960987e65bf9880247b7deb6f43b3');
@@ -816,74 +839,3 @@ const scrapeChallenges = async () => {
 	const dataJSON = challenges;
 	return dataJSON;
 };
-
-/**
- * OLD - scrapes the website for challenges
- * @returns
- */
-/*
-const scrapeChallenges = async () => {
-	const articles = [];
-	// Scrape the new articles
-	const axiosResponse = await axios.request({
-		method: 'GET',
-		url: 'https://www.kerbalspaceprogram.com/challenges',
-		headers: {
-			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-		},
-	});
-
-	const $ = cheerio.load(axiosResponse.data);
-
-	const htmlElement = $('.css-180q35u');
-	let articlePromises = [];
-
-	$('.css-1cc0i4l').each((i, element) => {
-		// Extract data
-		const articleId = $(element).find('.css-180q35u').attr('data-article');
-		const image = $(element).find('.css-180q35u').find('.css-41n5y6').find('.css-1hbpsw3').find('.css-llahnu').find('img').attr('srcset');
-		const date = $(element).find('.css-180q35u').find('.css-41n5y6').find('.css-jwjfk5').find('.css-og1fvt').find('time').text();
-		const title = $(element).find('.css-180q35u').find('.css-41n5y6').find('.css-jwjfk5').find('.css-kv05w6').text();
-		const article = {
-			image,
-			date,
-			title,
-			articleId,
-			type: 'Challenge',
-			url: 'https://www.kerbalspaceprogram.com/challenges',
-		};
-
-		// Fetch the actual article
-		const fetchArticle = () => {
-			try {
-				articlePromises.push(
-					axios
-						.get(`https://www.kerbalspaceprogram.com/api/getnewsarticle?id=${articleId}`, {
-							headers: {
-								'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-							},
-						})
-						.then(res => {
-							return res.data;
-						})
-				);
-			} catch (error) {
-				functions.logger.log(error);
-			}
-		};
-
-		fetchArticle();
-
-		articles.push(article);
-	});
-
-	await Promise.all(articlePromises).then(res => {
-		res.map((articleRes, i) => {
-			articles[i].article = articleRes;
-		});
-	});
-
-	const dataJSON = articles;
-	return dataJSON;
-};
-*/

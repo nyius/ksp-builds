@@ -1,26 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Button from '../../buttons/Button';
+import NewsContext from '../../../context/news/NewsContext';
+import { nextHeroSlide } from '../../../context/news/NewsActions';
 
 /**
- * takes in the current slide and the set state function
- * @param {int} currentSlide - current slide num
- * @param {function} setCurrentSlide - setter function
+ * Goes to next hero slide
  * @returns
  */
-function NextSlideBtn({ currentSlide, setCurrentSlide, slides }) {
-	/**
-	 * Handles going to the next slide
-	 */
-	const handleNextSlide = () => {
-		setCurrentSlide(() => {
-			if (currentSlide === slides.length - 1) {
-				return 0;
-			} else {
-				return currentSlide + 1;
-			}
-		});
-	};
-	return <Button icon="right2" size="!h-fit sm:!h-full" onClick={handleNextSlide} position="z-50 absolute sm:relative top-1/4 sm:top-0 right-10 sm:right-0" />;
+function NextSlideBtn() {
+	const { dispatchNews } = useContext(NewsContext);
+
+	return <Button icon="right2" size="!btn-circle" color="text-slate-100" onClick={() => nextHeroSlide(dispatchNews)} position="z-110 absolute sm:relative" />;
 }
 
 export default NextSlideBtn;

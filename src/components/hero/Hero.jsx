@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useState, Fragment } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import NewsContext from '../../context/news/NewsContext';
 import BuildsContext from '../../context/builds/BuildsContext';
-import ChallengeCard from '../cards/ChallengeCard';
-import BuildOfTheWeekCard from '../cards/BuildOfTheWeekCard';
 import PrevSlideBtn from './Buttons/PrevSlideBtn';
 import NextSlideBtn from './Buttons/NextSlideBtn';
+import HeroList from './Components/HeroList';
+import { setHeroSlidesLength } from '../../context/news/NewsActions';
 
 /**
  * Hero at the top of the page
@@ -12,18 +12,17 @@ import NextSlideBtn from './Buttons/NextSlideBtn';
  */
 function Hero() {
 	const [slides, setSlides] = useState([]);
-	const [currentSlide, setCurrentSlide] = useState(0);
-	const { challenges, articlesLoading } = useContext(NewsContext);
+	const { challenges, articles, articlesLoading, dispatchNews } = useContext(NewsContext);
 	const { loadingBuildOfTheWeek, buildOfTheWeek } = useContext(BuildsContext);
 
 	// Add build of the week and challenges together
 	useEffect(() => {
 		if (!loadingBuildOfTheWeek && !articlesLoading) {
-			const arr = [...challenges];
-			if (buildOfTheWeek) arr.push(buildOfTheWeek);
+			const fullNewsArr = [...challenges, ...articles];
+			if (buildOfTheWeek) fullNewsArr.push(buildOfTheWeek);
 
-			// Sort challenges and build of the week together by timestamp
-			arr.sort((a, b) => {
+			// Sort everything
+			fullNewsArr.sort((a, b) => {
 				let aDate, bDate;
 
 				aDate = a.buildOfTheWeek ? new Date(a.buildOfTheWeek.seconds * 1000) : new Date(a.date);
@@ -31,27 +30,23 @@ function Hero() {
 
 				return aDate < bDate ? 1 : -1;
 			});
-			setSlides(arr);
+
+			const newsArr = fullNewsArr.slice(0, 10);
+
+			setHeroSlidesLength(dispatchNews, newsArr.length);
+			setSlides(newsArr);
 		}
 	}, [articlesLoading, loadingBuildOfTheWeek]);
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<div className="banner flex flex-row w-full p-4 2k:p-8 bg-base-900 rounded-lg mb-10 items-center relative place-content-between">
+			<div className="hero flex flex-row w-full p-4 2k:p-8 rounded-lg mb-10 justify-center items-center relative">
 				{!articlesLoading && !loadingBuildOfTheWeek && challenges ? (
 					<>
-						<PrevSlideBtn currentSlide={currentSlide} setCurrentSlide={setCurrentSlide} slides={slides} />
-						<div className="w-full h-full flex flex-col lg:flex-row items-center gap-10 2k:gap-20 ">
-							{slides.map((item, i) => {
-								return (
-									<Fragment key={i}>
-										{item.buildOfTheWeek ? <BuildOfTheWeekCard currentSlide={currentSlide} i={i} key={i} buildOfTheWeek={item} /> : <ChallengeCard currentSlide={currentSlide} i={i} key={i} challenge={item} />}
-									</Fragment>
-								);
-							})}
-						</div>
-						<NextSlideBtn currentSlide={currentSlide} setCurrentSlide={setCurrentSlide} slides={slides} />
+						<PrevSlideBtn />
+						<HeroList slides={slides} />
+						<NextSlideBtn />
 					</>
 				) : null}
 			</div>

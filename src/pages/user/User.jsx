@@ -75,7 +75,7 @@ function User() {
 	// Fetches the users builds once we get their profile
 	useEffect(() => {
 		// Check if we found the users profile
-		if (openProfile) {
+		if (openProfile && openProfile.username) {
 			setUsersFolders(dispatchFolders, openProfile.folders ? openProfile.folders : []);
 			if (folderId) {
 				const folderToFetchId = openProfile.folders?.filter(folder => folder.id === folderId);
@@ -114,7 +114,7 @@ function User() {
 		);
 	}
 
-	if (!fetchingProfile && !openProfile) {
+	if ((!fetchingProfile && !openProfile) || (!fetchingProfile && !openProfile?.username)) {
 		return (
 			<MiddleContainer>
 				<CantFind text="Oops.. user not found">

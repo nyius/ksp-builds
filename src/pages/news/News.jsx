@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
-import NewsCard from '../../components/news/NewsCard';
+import NewsCard from '../../components/cards/NewsCard';
 import NewsContext from '../../context/news/NewsContext';
 import Helmet from '../../components/Helmet/Helmet';
 import Spinner1 from '../../components/spinners/Spinner1';

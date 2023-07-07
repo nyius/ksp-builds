@@ -10,10 +10,10 @@ import MessageInput from './Components/MessageInput';
  * @returns
  */
 function Messaging() {
-	const { authLoading, user, convosLoading } = useContext(AuthContext);
+	const { authLoading, user } = useContext(AuthContext);
 
 	//---------------------------------------------------------------------------------------------------//
-	if (!authLoading && user?.username && !convosLoading) {
+	if (!authLoading && user?.username) {
 		return (
 			<>
 				<div>

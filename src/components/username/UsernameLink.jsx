@@ -115,7 +115,7 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color, css }) {
 						</div>
 
 						{/* Popup Hover */}
-						{!noHoverUi && hover ? (
+						{!noHoverUi && hover && usersProfile?.username ? (
 							<div
 								className={`absolute z-50 -top-0 -translate-x-1/3 -translate-y-full ${hoverPosition === 'right' ? '!-translate-x-0' : ''} ${hoverPosition === 'bottom-right' ? '!top-6 !translate-y-0 !-translate-x-0' : ''} ${
 									hoverPosition === 'top-left' ? '!-translate-x-3/4' : ''

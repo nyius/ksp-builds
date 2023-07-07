@@ -145,34 +145,62 @@
 	aspect-ratio: 16/9;
 }
 
-.banner {
+.hero {
 	height: fit-content;
 }
 
 @media (min-width: 768px) {
-	.banner {
+	.hero {
 		height: 50rem;
 	}
 }
 
 @media (min-width: 1025px) {
-	.banner {
+	.hero {
 		height: 30rem;
 	}
 }
 
 @media (min-width: 1921px) {
-	.banner {
+	.hero {
 		height: 40rem;
 	}
 }
 
 @media (min-width: 2561px) {
-	.banner {
+	.hero {
 		height: 45rem;
 	}
 }
 
 .conversation-size {
 	height: 47rem;
+}
+
+.hero-card {
+	width: 100%;
+}
+
+@media (min-width: 768px) {
+	.hero-card {
+		width: 100%;
+	}
+}
+
+@media (min-width: 1025px) {
+	.hero-card {
+		width: 80rem;
+	}
+}
+
+@media (min-width: 1921px) {
+	.hero-card {
+		width: 100rem;
+	}
+}
+
+@media (min-width: 2561px) {
+	.hero-card {
+		width: 120rem;
+	}
 }

@@ -206,7 +206,7 @@ export const useFetchUser = () => {
 				return fetchedProfile;
 			} else {
 				setLoading ? setLoading(false) : setFetchingProfile(dispatchAuth, false);
-				throw new Error(`Couldn't find profile for ${id}!`);
+				throw new Error(`Couldn't find profile`);
 			}
 		} catch (error) {
 			console.log(error);
@@ -308,7 +308,6 @@ export const useHandleVoting = () => {
 						await updateUserDb({ upVotes: newUpVotes });
 						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1), lastModified: serverTimestamp() });
 						await updateUserProfilesAndDb({ rocketReputation: increment(-1) }, build.uid);
-						await updateUserProfilesAndDb({ rocketReputation: increment(-1) }, build.uid);
 					}
 				}
 			}
@@ -383,9 +382,11 @@ export const useUpdateProfile = () => {
 	 */
 	const updateUserDb = async (update, userUid) => {
 		try {
+			if ((userUid && userUid === user.uid) || !userUid) {
+				updateUserState(dispatchAuth, { ...update });
+				setLocalStoredUser(userUid ? userUid : user.uid, user);
+			}
 			await updateDoc(doc(db, 'users', userUid ? userUid : user.uid), update);
-			updateUserState(dispatchAuth, { ...update });
-			setLocalStoredUser(userUid, user);
 		} catch (error) {
 			console.log(error);
 			toast.error('Something went wrong. Please try again');

@@ -19,10 +19,14 @@ import Messaging from './components/Messaging/Messaging';
 //---------------------------------------------------------------------------------------------------//
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
+import 'react-popper-tooltip/dist/styles.css';
 
 /*TODO
-Add a 'group' when uploading a build that displays on the side
-top hero should be news included, remove news from sidebar (make that just streams)
+bundle craft together, multiple download buttons per folder
+	Add a 'group' when uploading a build that displays on the side
+low res quick load thumbnails
+creating an account needs to have matching passwords. Also be much stricter on emails (needs @, etc)
+usernames should be more prohibitive? less symbols allowed
 use useMemo to improve performance
 go through all component props and set defaults if possible (like color = "#fff", size="24", etc)
 check for things like {example ? "true" : "false"} and slim down
@@ -30,31 +34,37 @@ move all variables declared inside of a component  (that isnt involved with anyt
 useEffects should only do 1 thing, split them up
 useEffect cleanup functions
 useEffects could be broken out into their own hooks for easier to read code and functionality (lesson 171/172)
+create useContext hooks to replace all instances of useContext(contextName) - so isntead it is useBuilds or useAuth, etc (lesson 225)
+reducer functions switch/case should all be renamed
+	-instead of 'SET_THIS_THING' it should be easily readable like 'setLoading' or 'addNewBuild', etc
+should probably remove all checks for user.username and instead add a 'isAuthenticated' var in the context thats just true or false
 more space themed loading spinner
-drag and drop your own builds into a folder?
+error reporting to server and logged
+	-username (if one)
+	-uid (if one)
+	-url
+	-Error
+	-Action that caused error
+drag and drop your own builds into a folder? 
+	When on home page allow drag and drop of a build. Sidebar appears with folders in it
+Should be able to login with username/password
+	-automatically generate an email auth with the new username (eg steve@kspbuilds.com)
+		-when the user signs in with username, stick @kspbuilds.com to the end and then attempt the email login
 when launching the app, it should loop over the localstorage and check all of the stored builds to see their age
 	if theyre older than like a week, they should be removed from storage
 builds fetched by ID need to be paginated. break them up into folders and then iterate over them
-twitch sidebar
-	on 4k split banner with twitch streams?
-	or show other slides hidden off to the side on left and right
-	-firebase function to listen to all 'going live' events for verified twitch accounts (no faster than once per min)
-	-push all live streams into an array on the DB (check what game theyre playing for KSP - may need to do multiple checks? or just let them go live with anything. Maybe listen to the KSP twitch category? scrape the page?)
-	-remove from the array when they aren't live anymore
-Messages button should always appear (right now the messages loading state hides it)
+create backup database on an entirely new firebase instance - updates once a week
 email notifs for botw
-bundle craft together, multiple download buttons per folder
 make type searching work for your own builds/visiting a users builds
 implement react-popper to replace tooltips and username hover
 pagination allowing user to jump right to a page? might result in a large amount of firebase calls
-thumbnails scale down
+thumbnails scale down so theyre max 1600px wide
 competitions/ways to give users accolades/awards
-t-shirts, merch
 Volunteer positions (moderate, write posts, create challenges, etc) - this will include all the features they may need to see/have access to
 Quick share builds (without needing to create a whole build)
 switch to vite?
 Mission generation page - would get destroyed by chatGPT charges so maybe in the future
-create backup database on an entirely new firebase instance - updates once a week
+t-shirts, merch
  */
 
 //---------------------------------------------------------------------------------------------------//

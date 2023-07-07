@@ -69,3 +69,35 @@ export const setEditingPatchNotes = (dispatchNews, id) => {
 		payload: id,
 	});
 };
+
+/**
+ * Handles going to the next slide in the hero
+ * @param {function} dispatchNews - dispatch function
+ */
+export const nextHeroSlide = dispatchNews => {
+	dispatchNews({
+		type: 'nextHeroSlide',
+	});
+};
+
+/**
+ * Handles going to the next slide in the hero
+ * @param {function} dispatchNews - dispatch function
+ */
+export const prevHeroSlide = dispatchNews => {
+	dispatchNews({
+		type: 'prevHeroSlide',
+	});
+};
+
+/**
+ * Handles setting the id of the patch note to edit in context
+ * @param {function} dispatchNews - dispatch function
+ * @param {int} length - length of the hero slides
+ */
+export const setHeroSlidesLength = (dispatchNews, length) => {
+	dispatchNews({
+		type: 'SET_HERO_SLIDES_LENGTH',
+		payload: length,
+	});
+};

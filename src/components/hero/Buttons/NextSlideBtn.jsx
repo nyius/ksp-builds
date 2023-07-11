@@ -10,7 +10,7 @@ import { nextHeroSlide } from '../../../context/news/NewsActions';
 function NextSlideBtn() {
 	const { dispatchNews } = useContext(NewsContext);
 
-	return <Button icon="right2" size="!btn-circle" color="text-slate-100" onClick={() => nextHeroSlide(dispatchNews)} position="z-110 absolute sm:relative" />;
+	return <Button icon="right2" size="!btn-circle" color="text-slate-100" onClick={() => nextHeroSlide(dispatchNews)} position="z-51 absolute right-2 sm:right-auto sm:relative" />;
 }
 
 export default NextSlideBtn;

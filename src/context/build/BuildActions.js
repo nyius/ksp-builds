@@ -2,7 +2,6 @@ import { useContext, useState } from 'react';
 import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, where, getDocs, serverTimestamp, getDocsFromCache, getDocFromCache } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { s3Client } from '../../S3.config';
 import { toast } from 'react-toastify';
@@ -17,7 +16,6 @@ import standardNotifications from '../../utilities/standardNotifications';
 import { buildNameToUrl } from '../../utilities/buildNameToUrl';
 import getBuildPartCount from '../../utilities/getBuildPartCount';
 import fetchBuildFromAWS from '../../utilities/fetchBuildFromAws';
-import { setLocalStoredBuild, getBuildFromLocalStorage, checkLocalBuildAge, getBuildFromLocalStorageByName } from '../../utilities/buildLocalStorage';
 //---------------------------------------------------------------------------------------------------//
 import BuildContext from './BuildContext';
 import BuildsContext from '../builds/BuildsContext';
@@ -25,7 +23,7 @@ import AuthContext from '../auth/AuthContext';
 import { useUpdateProfile, useHandleVoting } from '../auth/AuthActions';
 import { sendNotification } from '../auth/AuthUtils';
 import FiltersContext from '../filters/FiltersContext';
-import { updateDownloadCount, updateViewCount, makeBuildReadyToUpload, searchBuilds } from './BuildUtils';
+import { updateDownloadCount, updateViewCount, makeBuildReadyToUpload, searchBuilds, setLocalStoredBuild, getBuildFromLocalStorage, checkLocalBuildAge, deleteBuildFromLocalStorage } from './BuildUtils';
 import { useAddBuildToFolder } from '../folders/FoldersActions';
 //---------------------------------------------------------------------------------------------------//
 
@@ -45,7 +43,7 @@ const useBuild = () => {
 			let localBuildById = getBuildFromLocalStorage(newId);
 
 			if (localBuildById) {
-				if (checkLocalBuildAge(localBuildById.lastFetchedTimestamp, 10)) {
+				if (checkLocalBuildAge(localBuildById.lastFetchedTimestamp, process.env.REACT_APP_CACHE_TIMEOUT)) {
 					await fetchBuildFromServer(localBuildById.id);
 				} else {
 					setLoadedBuild(dispatchBuild, localBuildById);
@@ -448,8 +446,10 @@ export const useUpdateBuild = () => {
 
 			build.lastModified = serverTimestamp();
 
+			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, build.id);
+
 			// update the document
-			await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), {
+			await updateDoc(buildRef, {
 				...build,
 			}).catch(err => {
 				setSavingBuild(dispatchBuild, false);
@@ -457,7 +457,7 @@ export const useUpdateBuild = () => {
 			});
 
 			// if the build changed, update AWS
-			if (process.env.REACT_APP_ENV !== 'DEV') {
+			if (process.env.REACT_APP_ENV !== 'DEV' && buildJSON) {
 				const compressedBuild = compressToEncodedURIComponent(buildJSON);
 
 				// update the raw build on aws
@@ -474,8 +474,6 @@ export const useUpdateBuild = () => {
 
 				build.build = JSON.parse(buildJSON);
 			}
-
-			const buildRef = doc(db, process.env.REACT_APP_BUILDSDB, build.id);
 
 			// get the build from the db so we get new timestamps
 			const fetchedBuild = await getDoc(buildRef);
@@ -564,13 +562,9 @@ export const useDeleteBuild = () => {
 				await updateDoc(doc(db, 'userProfiles', userId), { builds: newBuildsArr });
 			}
 
-			navigate('/');
+			deleteBuildFromLocalStorage(id);
 
-			// Filter the deleted build out of the loaded builds
-			// dispatchBuilds({
-			// 	type: 'DELETE_BUILD',
-			// 	payload: id,
-			// });
+			navigate('/');
 
 			toast.success(`Build Deleted!`);
 		} catch (error) {
@@ -629,7 +623,7 @@ export const useUploadBuild = () => {
 
 			// Create the thumbnail
 			if (typeof build.thumbnail !== 'string') {
-				const convertThumb = await compressAccurately(build.thumbnail, 150);
+				const convertThumb = await compressAccurately(build.thumbnail, { size: 150, width: 600 });
 				const thumbURL = await uploadImage(convertThumb, setLoading, auth.currentUser.uid);
 				build.thumbnail = thumbURL;
 			}
@@ -712,7 +706,7 @@ export const useUploadBuild = () => {
 				}
 
 				// Add the build to the users folders (if they selected to)
-				addBuildToFolder(newId);
+				await addBuildToFolder(newId);
 
 				toast.success('Build created!');
 

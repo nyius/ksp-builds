@@ -14,6 +14,7 @@ import Sort from '../../components/sort/Sort';
 import Helmet from '../../components/Helmet/Helmet';
 //---------------------------------------------------------------------------------------------------//
 import useResetStates from '../../utilities/useResetStates';
+import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
 //---------------------------------------------------------------------------------------------------//
 
 /**
@@ -68,6 +69,7 @@ function Index() {
 				<SearchBar />
 				<Sort />
 				<FetchAmount />
+				<BuildsViewBtn />
 			</div>
 			<Builds />
 		</>

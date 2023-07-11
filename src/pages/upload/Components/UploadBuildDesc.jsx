@@ -9,7 +9,7 @@ import TextEditor from '../../../components/textEditor/TextEditor';
  */
 function UploadBuildDesc() {
 	const { dispatchBuild, buildToUpload, editingBuild } = useContext(BuildContext);
-	const [description, setDescription] = useState(editingBuild ? buildToUpload.description : `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`);
+	const [description, setDescription] = useState(editingBuild ? editingBuild.description : `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`);
 
 	useEffect(() => {
 		if (description) {

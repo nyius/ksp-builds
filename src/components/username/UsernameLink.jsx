@@ -117,7 +117,7 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color, css }) {
 						{/* Popup Hover */}
 						{!noHoverUi && hover && usersProfile?.username ? (
 							<div
-								className={`absolute z-50 -top-0 -translate-x-1/3 -translate-y-full ${hoverPosition === 'right' ? '!-translate-x-0' : ''} ${hoverPosition === 'bottom-right' ? '!top-6 !translate-y-0 !-translate-x-0' : ''} ${
+								className={`absolute z-100 -top-0 -translate-x-1/3 -translate-y-full ${hoverPosition === 'right' ? '!-translate-x-0' : ''} ${hoverPosition === 'bottom-right' ? '!top-6 !translate-y-0 !-translate-x-0' : ''} ${
 									hoverPosition === 'top-left' ? '!-translate-x-3/4' : ''
 								} ${hoverPosition === 'bottom' ? '!top-6 !translate-y-0' : ''} cursor-auto bg-base-900 p-2 shadow ${color ? color : 'bg-base-100'}  rounded-box w-130 2k:w-160`}
 							>
@@ -126,7 +126,7 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color, css }) {
 										<UserProfilePicture loading={loadingProfile} usersProfile={usersProfile} />
 
 										<div className="flex flex-col gap-2">
-											<div className="flex flex-row gap-2">
+											<div className="flex flex-row flex-wrap gap-2">
 												<UserUsername username={username} customUsernameColor={usersProfile?.customUsernameColor} />
 												<UserJoined timestamp={usersProfile?.dateCreated} />
 											</div>

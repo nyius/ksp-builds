@@ -2,11 +2,15 @@ import React, { createContext, useEffect, useReducer } from 'react';
 import BuildsReducer from './BuildsReducer';
 import { getDoc, doc, getDocFromCache } from 'firebase/firestore';
 import { db } from '../../firebase.config';
+import { useLocation, useParams } from 'react-router-dom';
+import { setBuildsForcedView, setBuildsView } from './BuildsActions';
+import { checkLocalBuildAge } from '../build/BuildUtils';
 
 const BuildsContext = createContext();
 
 export const BuildsProvider = ({ children }) => {
 	const windowWidth = window.innerWidth;
+	const location = useLocation();
 
 	// Initial state
 	const initialState = {
@@ -23,8 +27,11 @@ export const BuildsProvider = ({ children }) => {
 		buildOfTheWeek: null,
 		loadingBuildOfTheWeek: true,
 		gridSize: 1,
+		buildsView: 'grid',
+		forcedView: null,
 	};
 
+	// Fetch Amount
 	useEffect(() => {
 		// Get window width and set gridSize for fetch amount
 		if (windowWidth > 3500) {
@@ -55,7 +62,7 @@ export const BuildsProvider = ({ children }) => {
 		} else {
 			dispatchBuilds({
 				type: 'SET_FETCHED_BUILDS',
-				payload: { gridSize: 1, fetchAmount: 4 },
+				payload: { gridSize: 1, fetchAmount: 8 },
 			});
 		}
 
@@ -107,6 +114,40 @@ export const BuildsProvider = ({ children }) => {
 		};
 
 		fetchServerWeeklyFeatured();
+	}, []);
+
+	// Set builds forced view type
+	useEffect(() => {
+		if (location.pathname.split('/')[1] !== 'build') {
+			setBuildsForcedView(dispatchBuilds, null);
+		}
+	}, [location]);
+
+	// set builds view
+	useEffect(() => {
+		const buildsViewLocal = JSON.parse(localStorage.getItem('buildsView'));
+
+		if (buildsViewLocal) {
+			setBuildsView(dispatchBuilds, buildsViewLocal);
+		}
+	}, []);
+
+	// Loop over builds and remove any that are older than 30 days
+	useEffect(() => {
+		for (let i = 0; i < localStorage.length; i++) {
+			const key = localStorage.key(i);
+			const value = localStorage.getItem(key);
+
+			if (!value) return;
+
+			if (value.includes(`"type":"build"`)) {
+				let build = JSON.parse(value);
+
+				if (checkLocalBuildAge(build.lastFetchedTimestamp, 43200)) {
+					localStorage.removeItem(key);
+				}
+			}
+		}
 	}, []);
 
 	const [state, dispatchBuilds] = useReducer(BuildsReducer, initialState);

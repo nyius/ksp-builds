@@ -39,6 +39,7 @@
 		"react-sitemap-stevedevops": "^0.4.0",
 		"react-slideshow-image": "^4.2.1",
 		"react-toastify": "^9.1.1",
+		"regex-username": "^2.0.0",
 		"twitter-api-v2": "^1.14.2",
 		"uuid": "^9.0.0",
 		"uuidv4": "^6.2.13",

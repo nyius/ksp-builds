@@ -11,7 +11,7 @@ function FetchAmount() {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<select onChange={e => setFetchAmount(dispatchBuilds, Number(e.target.value))} className="select select-bordered 2k:select-lg 2k:text-2xl 2k:font-thin max-w-xs bg-base-900 mr-6 md:mr-0">
+		<select onChange={e => setFetchAmount(dispatchBuilds, Number(e.target.value))} className="select select-bordered 2k:select-lg 2k:text-2xl 2k:font-thin max-w-xs bg-base-900">
 			<optgroup>
 				<option value="" hidden defaultValue={true}>
 					Builds to Load

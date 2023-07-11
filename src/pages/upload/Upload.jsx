@@ -9,7 +9,7 @@ import { standardBuild } from '../../utilities/standardBuild';
 import AuthContext from '../../context/auth/AuthContext';
 import { useUploadBuild, setBuildToUpload } from '../../context/build/BuildActions';
 import FoldersContext from '../../context/folders/FoldersContext';
-import { setBuildToAddToFolder, setFolderLocation } from '../../context/folders/FoldersActions';
+import { setBuildToAddToFolder, setFolderLocation, setPinnedFolder } from '../../context/folders/FoldersActions';
 import BuildContext from '../../context/build/BuildContext';
 //---------------------------------------------------------------------------------------------------//
 import Spinner1 from '../../components/spinners/Spinner1';
@@ -36,26 +36,27 @@ import UpdateBuildBtn from './Components/Buttons/UpdateBuildBtn';
 
 /**
  * Handles displaying the container for creating & editing a build.
- * @param {*} param0
+ *
  * @returns
  */
 function Upload() {
 	const buildId = uuidv4().slice(0, 30);
 	const { user, authLoading } = useContext(AuthContext);
 	const { dispatchBuild, editingBuild, uploadingBuild, buildToUpload } = useContext(BuildContext);
-	const { dispatchFolders } = useContext(FoldersContext);
+	const { dispatchFolders, pinnedFolder } = useContext(FoldersContext);
 	const { uploadBuild } = useUploadBuild();
 	//---------------------------------------------------------------------------------------------------//
 	const navigate = useNavigate();
 
 	useEffect(() => {
+		setPinnedFolder(dispatchFolders, editingBuild ? editingBuild.pinnedFolder : null);
 		setBuildToUpload(dispatchBuild, editingBuild ? cloneDeep(editingBuild) : cloneDeep(standardBuild));
 	}, []);
 
 	useEffect(() => {
 		if (!authLoading && user?.username) {
 			setFolderLocation(dispatchFolders, 'upload');
-			setBuildToAddToFolder(dispatchFolders, buildId, user);
+			setBuildToAddToFolder(dispatchFolders, editingBuild ? editingBuild.id : buildId, user);
 		}
 	}, [authLoading]);
 
@@ -78,6 +79,7 @@ function Upload() {
 			makeReadyBuild.images.length === 0 && (makeReadyBuild.images = [LogoBackground]);
 			makeReadyBuild.author = user.username;
 			makeReadyBuild.uid = user.uid;
+			if (pinnedFolder) makeReadyBuild.pinnedFolder = pinnedFolder;
 			if (makeReadyBuild.rawImageFiles.length > 0) {
 				makeReadyBuild.thumbnail = makeReadyBuild.rawImageFiles[0];
 			}

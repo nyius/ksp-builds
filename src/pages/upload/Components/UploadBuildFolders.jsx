@@ -6,6 +6,7 @@ import { cloneDeep } from 'lodash';
 import BuildsContext from '../../../context/builds/BuildsContext';
 import useFilters from '../../../context/filters/FiltersActions';
 import FiltersContext from '../../../context/filters/FiltersContext';
+import WhatIsFolderBtn from './Buttons/WhatIsFolderBtn';
 
 /**
  * Displays the users folders
@@ -29,7 +30,12 @@ function UploadBuildFolders() {
 	return (
 		<div className="flex flex-col w-full gap-2 2k:gap-4">
 			<div className="flex flex-row gap-4 items-center mb-2 2k:mb-4 mt-8 2k:mt-18">
-				<h3 className="text-slate-200 text-xl 2k:text-3xl">Save to Folder</h3>
+				<h3 className="flex flex-row gap-2 items-center 2k:gap-4 text-slate-200 text-xl 2k:text-3xl">
+					Save to Folder{' '}
+					<span>
+						<WhatIsFolderBtn />
+					</span>
+				</h3>
 			</div>
 			<Folders />
 

@@ -23,7 +23,6 @@ import Favorite from '../../components/buttons/Favorite';
 import DeleteCommentModal from '../../components/modals/DeleteCommentModal';
 import Helmet from '../../components/Helmet/Helmet';
 import BuildInfo from './components/BuildInfo';
-import IsAdmin from '../../components/credentials/IsAdmin';
 import BuildDescription from './components/BuildDescription';
 import BuildName from './components/BuildName';
 import BuildTypes from './components/BuildTypes';
@@ -39,12 +38,15 @@ import DeleteBuildBtn from './components/Buttons/DeleteBuildBtn';
 import BuildVideo from './components/BuildVideo';
 import BuildComments from './components/BuildComments';
 import ReturnHomeBtn from './components/Buttons/ReturnHomeBtn';
+import BuildPinnedFolder from './components/BuildPinnedFolder';
+import FoldersContext from '../../context/folders/FoldersContext';
 //---------------------------------------------------------------------------------------------------//
 
 function Build() {
 	//---------------------------------------------------------------------------------------------------//
 	const { fetchBuild } = useBuild();
 	const { dispatchBuild, loadingBuild, loadedBuild, editingBuild } = useContext(BuildContext);
+	const { fetchedPinnedFolder } = useContext(FoldersContext);
 	const { user } = useContext(AuthContext);
 	const [buildDesc, setBuildDesc] = useState(null);
 	const { fetchUsersProfile } = useFetchUser();
@@ -106,7 +108,12 @@ function Build() {
 						<Button text="Make build of the week" color="btn-primary" icon="fill-star" htmlFor="build-of-the-week-modal" onClick={() => setBuildOfTheWeek(dispatchBuild, loadedBuild)} />
 					</CheckCredentials>
 
-					<Carousel images={loadedBuild.images} />
+					<div className="flex flex-col lg:flex-row w-full lg:h-61rem 2k:h-75rem gap-3 2k:gap-6">
+						<div className={`flex h-full flex-col ${loadedBuild.pinnedFolder && fetchedPinnedFolder ? 'w-full lg:w-3/4' : 'w-full'}`}>
+							<Carousel images={loadedBuild.images} />
+						</div>
+						<BuildPinnedFolder />
+					</div>
 
 					<BuildInfo />
 

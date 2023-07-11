@@ -47,7 +47,8 @@ export const checkIfBuildInAllFolders = (buildId, user) => {
  * @param {arr} selectedFolders - array of currently selected folders
  */
 export const checkIfFolderSelected = (folderId, selectedFolders) => {
-	const folderIndex = selectedFolders.findIndex(folder => folder.id === folderId);
+	let folderIndex = selectedFolders.findIndex(folder => folder.id === folderId);
+	if (folderId === 'your-builds') folderIndex = 1;
 
 	return folderIndex >= 0 ? true : false;
 };

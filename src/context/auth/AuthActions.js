@@ -170,7 +170,7 @@ export const useFetchUser = () => {
 			let localUser = getUserFromLocalStorage(id);
 
 			if (localUser) {
-				if (checkLocalUserAge(localUser.lastFetchedTimestamp, 10)) {
+				if (checkLocalUserAge(localUser.lastFetchedTimestamp, process.env.REACT_APP_CACHE_TIMEOUT)) {
 					const fetchedUser = await handleFetchUserProfileFromServer(id, setLoading);
 					setFetchedUserProfiles(dispatchAuth, localUser, fetchedUserProfiles);
 					return fetchedUser;
@@ -252,8 +252,8 @@ export const useHandleVoting = () => {
 			let newDownVotes = cloneDeep(user.downVotes);
 
 			if (type === 'upVote') {
-				// Check if we already upvoted this (and if so, unupvote it)
 				if (newUpVotes.includes(build.id)) {
+					// If you clicked upvote and already have the build upvoted, remove it
 					const index = newUpVotes.indexOf(build.id);
 					newUpVotes.splice(index, 1);
 
@@ -262,30 +262,33 @@ export const useHandleVoting = () => {
 					await updateUserProfilesAndDb({ rocketReputation: increment(-1) }, build.uid);
 					await updateWeeklyUpvoted(build.id, 'remove', user.uid);
 				} else {
+					// If you clicked upvote and you dont have it upvoted
 					newUpVotes.push(build.id);
-
-					await updateUserDb({ upVotes: newUpVotes });
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes += 1), lastModified: serverTimestamp() });
-					await updateUserProfilesAndDb({ rocketReputation: increment(1) }, build.uid);
+					let usersUpdates = { upVotes: newUpVotes };
+					let buildAuthorUpdates = { rocketReputation: increment(1) };
+					let buildUpdates = { upVotes: (build.upVotes += 1), lastModified: serverTimestamp() };
 
 					if (build.uid !== user.uid) {
 						await updateWeeklyUpvoted(build.id, 'add', user.uid);
 					}
 
-					// If the user has this downvoted but wants to upvote it, remove the downvote
 					if (newDownVotes.includes(build.id)) {
+						// If the user has this downvoted but wants to upvote it, remove the downvote
 						const index = newDownVotes.indexOf(build.id);
 						newDownVotes.splice(index, 1);
-
-						await updateUserDb({ downVotes: newDownVotes });
-						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1), lastModified: serverTimestamp() });
-						await updateUserProfilesAndDb({ rocketReputation: increment(1) }, build.uid);
+						usersUpdates.downVotes = newDownVotes;
+						buildUpdates.downVotes = build.downVotes -= 1;
 					}
+
+					await updateUserDb(usersUpdates);
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), buildUpdates);
+					await updateUserProfilesAndDb(buildAuthorUpdates, build.uid);
 				}
 			}
+
 			if (type === 'downVote') {
-				// Check if we already downvoted this (and if so, undownvote it)
 				if (newDownVotes.includes(build.id)) {
+					// If we already have it downvoted and we clicked downvote, remove the downvote
 					const index = newDownVotes.indexOf(build.id);
 					newDownVotes.splice(index, 1);
 
@@ -293,22 +296,27 @@ export const useHandleVoting = () => {
 					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1), lastModified: serverTimestamp() });
 					await updateUserProfilesAndDb({ rocketReputation: increment(1) }, build.uid);
 				} else {
+					// If you clicked downvote and you dont have it down voted
 					newDownVotes.push(build.id);
+					let usersUpdates = { downVotes: newDownVotes };
+					let buildAuthorUpdates = { rocketReputation: increment(-1) };
+					let buildUpdates = { downVotes: (build.downVotes += 1), lastModified: serverTimestamp() };
 
-					await updateUserDb({ downVotes: newDownVotes });
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes += 1), lastModified: serverTimestamp() });
-					await updateUserProfilesAndDb({ rocketReputation: increment(-1) }, build.uid);
-					await updateWeeklyUpvoted(build.id, 'remove', user.uid);
+					if (build.uid !== user.uid) {
+						await updateWeeklyUpvoted(build.id, 'remove', user.uid);
+					}
 
 					// If the user has this upvoted but wants to downvote it, remove the upvote
 					if (newUpVotes.includes(build.id)) {
 						const index = newUpVotes.indexOf(build.id);
 						newUpVotes.splice(index, 1);
-
-						await updateUserDb({ upVotes: newUpVotes });
-						await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1), lastModified: serverTimestamp() });
-						await updateUserProfilesAndDb({ rocketReputation: increment(-1) }, build.uid);
+						usersUpdates.upVotes = newUpVotes;
+						buildUpdates.upVotes = build.upVotes -= 1;
 					}
+
+					await updateUserDb(usersUpdates);
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), buildUpdates);
+					await updateUserProfilesAndDb(buildAuthorUpdates, build.uid);
 				}
 			}
 		} catch (error) {
@@ -382,9 +390,13 @@ export const useUpdateProfile = () => {
 	 */
 	const updateUserDb = async (update, userUid) => {
 		try {
-			if ((userUid && userUid === user.uid) || !userUid) {
+			if (!userUid) {
 				updateUserState(dispatchAuth, { ...update });
-				setLocalStoredUser(userUid ? userUid : user.uid, user);
+				setLocalStoredUser(user.uid, user);
+			}
+			if (userUid && userUid === user.uid) {
+				updateUserState(dispatchAuth, { ...update });
+				setLocalStoredUser(user.uid, user);
 			}
 			await updateDoc(doc(db, 'users', userUid ? userUid : user.uid), update);
 		} catch (error) {

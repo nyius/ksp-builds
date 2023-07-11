@@ -6,10 +6,11 @@ import CheckCredentials from '../credentials/CheckCredentials';
 
 /**
  * Shows the arrows to upvote/downvote. Takes in the build
- * @param {*} build
+ * @param {obj} build - the builds obkect
+ * @param {string} view - (optional) 'stacked' if you want the up arrow on top, then vote count, then bottom arrow on bottom (like reddit)
  * @returns
  */
-function VoteArrows({ build }) {
+function VoteArrows({ build, view }) {
 	const { handleVoting } = useHandleVoting();
 	const { user, authLoading } = useContext(AuthContext);
 
@@ -40,12 +41,17 @@ function VoteArrows({ build }) {
 		if (build.upVotes - build.downVotes < 0) {
 			return 0;
 		} else {
-			return build.upVotes - build.downVotes;
+			let votes = `${build.upVotes - build.downVotes}`;
+			if (votes > 9999) {
+				votes = votes.slice(0, 2) + '.' + votes.slice(2, 3) + 'k';
+			}
+
+			return votes;
 		}
 	};
 
 	return (
-		<div className="flex flex-row gap-1 items-center">
+		<div className={`flex ${view === 'stacked' ? 'flex-col' : 'flex-row'} gap-1 items-center`}>
 			<span className="text-lg 2k:text-2xl">{calculateVoteCount()}</span>
 			<span id="upVote" onClick={() => handleVoting('upVote', build)} className={`vote-arrow cursor-pointer hover:text-orange-600 ${checkIfVoted('upVote', build.id)}`}>
 				<GoArrowUp id="upVote" />

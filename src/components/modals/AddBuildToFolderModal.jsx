@@ -12,17 +12,22 @@ import useFilters from '../../context/filters/FiltersActions';
 import FiltersContext from '../../context/filters/FiltersContext';
 import AuthContext from '../../context/auth/AuthContext';
 import Sort from '../sort/Sort';
+import BuildContext from '../../context/build/BuildContext';
+import { useUpdateBuild } from '../../context/build/BuildActions';
+import { toast } from 'react-toastify';
 
 /**
  * Modal for adding a build to a folder
  * @returns
  */
 function AddBuildToFolderModal() {
-	const { dispatchFolders, selectedFolders, buildToAddToFolder, openedFolder } = useContext(FoldersContext);
+	const { dispatchFolders, selectedFolders, buildToAddToFolder, openedFolder, pinnedFolder } = useContext(FoldersContext);
 	const { user } = useContext(AuthContext);
+	const { updateBuild } = useUpdateBuild();
 	const { addBuildToFolder } = useAddBuildToFolder();
 	const { filterBuilds } = useFilters();
 	const { fetchedBuilds } = useContext(BuildsContext);
+	const { loadedBuild } = useContext(BuildContext);
 	const { sortBy } = useContext(FiltersContext);
 	const [sortedBuilds, setSortedBuilds] = useState([]);
 
@@ -32,6 +37,23 @@ function AddBuildToFolderModal() {
 
 		setSortedBuilds(filterBuilds(newFetchedBuilds));
 	}, [fetchedBuilds, sortBy]);
+
+	const handleSaveFolderChange = async () => {
+		await addBuildToFolder(buildToAddToFolder);
+
+		if (pinnedFolder !== loadedBuild?.pinnedFolder) {
+			if (loadedBuild?.uid !== user.uid) {
+				toast.error('Cant pin a folder to a build thats not yours!');
+				console.log('Cant pin a folder to a build thats not yours!');
+				return;
+			}
+
+			const buildToUpdate = cloneDeep(loadedBuild);
+			buildToUpdate.pinnedFolder = pinnedFolder;
+
+			await updateBuild(buildToUpdate);
+		}
+	};
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
@@ -60,15 +82,17 @@ function AddBuildToFolderModal() {
 						<Folders />
 
 						<div className="flex flex-row gap-2 w-full place-content-between mb-5 2k:mb-8">
-							<Button
-								tabIndex={0}
-								id="add-build-to-folder-btn"
-								htmlFor="add-build-to-folder-modal"
-								text={`${`${selectedFolders.length > 1 ? `Save to ${selectedFolders.length} Folders` : `${selectedFolders.length > 0 ? 'Save to Folder' : 'Save'}`}`}`}
-								icon="save"
-								color="btn-success"
-								onClick={() => addBuildToFolder(buildToAddToFolder)}
-							/>
+							<div className="flex flex-row gap-3 2k:gap-5">
+								<Button
+									tabIndex={0}
+									id="add-build-to-folder-btn"
+									htmlFor="add-build-to-folder-modal"
+									text={`${pinnedFolder !== loadedBuild?.pinnedFolder ? 'Save Changes' : selectedFolders.length > 1 ? `Save to ${selectedFolders.length} Folders` : selectedFolders.length > 0 ? 'Save to Folder' : 'Save'}`}
+									icon="save"
+									color="btn-success"
+									onClick={handleSaveFolderChange}
+								/>
+							</div>
 							<Button
 								htmlFor="add-build-to-folder-modal"
 								text="Cancel"

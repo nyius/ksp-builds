@@ -10,7 +10,7 @@ import { prevHeroSlide } from '../../../context/news/NewsActions';
 function PrevSlideBtn() {
 	const { dispatchNews } = useContext(NewsContext);
 
-	return <Button icon="left2" size="!btn-circle" color="text-slate-100" onClick={() => prevHeroSlide(dispatchNews)} position="z-110 absolute sm:relative" />;
+	return <Button icon="left2" size="!btn-circle" color="text-slate-100" onClick={() => prevHeroSlide(dispatchNews)} position="z-51 absolute left-2 sm:left-auto sm:relative" />;
 }
 
 export default PrevSlideBtn;

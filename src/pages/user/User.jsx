@@ -30,6 +30,7 @@ import ReportUserBtn from '../../components/buttons/ReportUserBtn';
 import Username from './Components/Username';
 import UserBio from './Components/UserBio';
 import UserDetails from './Components/UserDetails';
+import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
 
 /**
  * The page to display a user
@@ -163,7 +164,11 @@ function User() {
 					{/* Builds */}
 					<div className="flex flex-row flex-wrap gap-4 w-full place-content-between sm:mb-4">
 						<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">{openedFolder ? openedFolder?.folderName : `${openProfile.username}'s Builds`}</h2>
-						<Sort />
+
+						<div className="flex flex-row gap-3 2k:gap-6">
+							<Sort />
+							<BuildsViewBtn />
+						</div>
 					</div>
 					<Builds buildsToDisplay={sortedBuilds} />
 				</MiddleContainer>

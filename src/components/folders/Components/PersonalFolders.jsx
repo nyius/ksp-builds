@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import Folder from '../Folder';
+import Folder from './Folder';
 import FoldersContext from '../../../context/folders/FoldersContext';
 import AuthContext from '../../../context/auth/AuthContext';
 import CheckCredentials from '../../credentials/CheckCredentials';

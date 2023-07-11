@@ -70,10 +70,13 @@ export const uploadImage = async (image, setLoadingState, uid) => {
 
 /**
  * handles uploading multiple images to the DB.
- * @param {*} image
+ * @param {file} images - images to upload
+ * @param {function} setLoadingState - a setter state for loading
+ * @param {int} imageKb - (optional) - the target KB size for each image
+ * @param {int} imageWidth - (optional) - the target width for each image
  * @returns
  */
-export const uploadImages = async (images, setLoadingState) => {
+export const uploadImages = async (images, setLoadingState, imageKb, imageWidth) => {
 	setLoadingState(true);
 
 	for (const image in images) {
@@ -92,7 +95,7 @@ export const uploadImages = async (images, setLoadingState) => {
 	const storeImage = async image => {
 		// Store images in firebase
 		return new Promise((resolve, reject) => {
-			const fileName = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`;
+			const fileName = `${auth.currentUser.uid}-${uuidv4()}`;
 
 			const storageRef = ref(storage, 'images/' + fileName);
 			const uploadTask = uploadBytesResumable(storageRef, image, { cacheControl: 'public,max-age=31536000' });
@@ -142,15 +145,17 @@ export const uploadImages = async (images, setLoadingState) => {
 	};
 
 	/**
-	 * Compress all images to 400kb
-	 * @param {*} image
+	 * Compress images to 400kb, 1300px width (if not set in upload images func).
 	 * @returns
 	 */
 	const compressImg = async image => {
 		try {
 			return new Promise((resolve, reject) => {
 				const compressImg = async image => {
-					const compressed = await compressAccurately(image, 400);
+					const compressed = await compressAccurately(image, {
+						size: imageKb ? imageKb : 400,
+						width: imageWidth ? imageWidth : 1300,
+					});
 					return compressed;
 				};
 

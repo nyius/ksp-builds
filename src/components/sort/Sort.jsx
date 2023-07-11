@@ -21,7 +21,7 @@ function Sort() {
 	};
 
 	return (
-		<select onChange={handleChangeSort} className="select select-bordered 2k:select-lg 2k:text-2xl 2k:font-thin max-w-xs bg-base-900 mr-6 md:mr-0">
+		<select onChange={handleChangeSort} className="select select-bordered 2k:select-lg 2k:text-2xl 2k:font-thin max-w-xs bg-base-900">
 			<optgroup>
 				<SortOption text="Views" value="views_most" />
 				<SortOption text="Date (newest)" value="date_newest" />

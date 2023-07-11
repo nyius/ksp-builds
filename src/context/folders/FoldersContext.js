@@ -12,6 +12,8 @@ export const FoldersProvider = ({ children }) => {
 		editingFolder: null,
 		editingFolderName: null,
 		selectedFolders: [],
+		pinnedFolder: null,
+		fetchedPinnedFolder: null,
 		buildToAddToFolder: null,
 		makingNewFolder: false,
 		newFolderName: '',

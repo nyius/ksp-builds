@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import FoldersContext from '../../../context/folders/FoldersContext';
 import AuthContext from '../../../context/auth/AuthContext';
-import Folder from '../Folder';
+import Folder from './Folder';
 import { buildNameToUrl } from '../../../utilities/buildNameToUrl';
 
 /**

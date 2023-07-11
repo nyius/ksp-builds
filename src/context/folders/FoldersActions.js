@@ -12,6 +12,8 @@ import { profanity } from '@2toad/profanity';
 import { buildNameToUrl } from '../../utilities/buildNameToUrl';
 import { checkForSameNameFolder, checkIfBuildInFolder } from './FoldersUtilils';
 import { setLocalStoredUser } from '../../utilities/userLocalStorage';
+import BuildContext from '../build/BuildContext';
+import { useUpdateBuild } from '../build/BuildActions';
 
 /**
  * Hook with functions for adding a new folder
@@ -28,6 +30,8 @@ function useAddNewFolder() {
 		if (!newFolderName || newFolderName.trim() === '') {
 			setNewFolderName(dispatchFolders, '');
 			setMakingNewFolder(dispatchFolders, false);
+			toast.error('Folder needs a name!');
+			console.log(`Folder needs a name!`);
 			return;
 		}
 
@@ -62,7 +66,6 @@ function useAddNewFolder() {
 			} else {
 				urlName = buildNameToUrl(folderName);
 			}
-			console.log(urlName);
 
 			const newFolder = { folderName, id, builds: [], urlName };
 
@@ -120,33 +123,46 @@ export const useAddBuildToFolder = () => {
 	const { user } = useContext(AuthContext);
 	const { dispatchFolders, selectedFolders } = useContext(FoldersContext);
 	const { updateAllFolders } = useUpdateFolder();
+	const { loadedBuild } = useContext(BuildContext);
+	const { updateBuild } = useUpdateBuild();
 
 	/**
 	 * handles adding a build to a folder/folders
-	 * @param {string} id - id of build to add
+	 * @param {string} buildId - buildId of build to add
 	 */
-	const addBuildToFolder = async id => {
+	const addBuildToFolder = async buildId => {
 		try {
 			let newFolders = cloneDeep(selectedFolders);
 			let usersFolders = cloneDeep(user.folders);
 
-			// Loop over the users folders
+			// Loop over the users existing folders
 			usersFolders.map(folder => {
-				// check if this folder contains the build id
-				if (folder.builds.includes(id)) {
-					// Check if we dont have this folder selected.
-					// if its not selected but we found the id, it means the user wants to remove the build from this folder
+				// check if a folder contains the build we want to save
+				if (folder.builds.includes(buildId)) {
+					// If this existing folder contains our build, see if we have this folder selected
+					// If this folder was not selected but contains the build, it means the user wants to remove the build from this folder
 					const folderIndex = newFolders.findIndex(newFolder => newFolder.id !== 'your-builds' && newFolder.id === folder.id);
 
 					if (folderIndex < 0) {
-						const buildIndex = folder.builds.indexOf(id);
+						const buildIndex = folder.builds.indexOf(buildId);
 						folder.builds.splice(buildIndex, 1);
+
+						// Check if the build has the folder pinned. If it does, remove the pin from the folder
+						if (loadedBuild) {
+							if (loadedBuild.pinnedFolder === folder.id) {
+								const buildToUpdate = cloneDeep(loadedBuild);
+								buildToUpdate.pinnedFolder = null;
+
+								updateBuild(buildToUpdate);
+							}
+						}
 					}
 				} else {
-					// if the folder doesnt include the id, check if we have this folder selected. If we do, add it
+					// if the folder doesnt include the builds id, check if we have this folder selected.
+					// If we do have this folder selected, add the build to it
 					const folderIndex = newFolders.findIndex(newFolder => newFolder.id !== 'your-builds' && newFolder.id === folder.id);
 					if (folderIndex >= 0) {
-						folder.builds.push(id);
+						folder.builds.push(buildId);
 					}
 				}
 			});
@@ -341,6 +357,24 @@ export const useUpdateFolder = () => {
 			const updatedFolderIndex = user.folders.findIndex(folder => folder.id === updatedFolder.id);
 			const newFolders = cloneDeep(user.folders);
 			if (newFolders[updatedFolderIndex].folderName !== updatedFolder.folderName) {
+				if (!updatedFolder.folderName || updatedFolder.folderName.trim() === '') {
+					toast.error('Folder needs a name!');
+					console.log(`Folder needs a name!`);
+					return;
+				}
+
+				if (updatedFolder.folderName.length > 50) {
+					toast.error('Folder name too long!');
+					console.log(`Folder name too long!`);
+					return;
+				}
+
+				if (profanity.exists(updatedFolder.folderName)) {
+					toast.error('Folder name not acceptable!');
+					console.log(`Folder name  not acceptable`);
+					return;
+				}
+
 				let sameNameCount = checkForSameNameFolder(newFolders, updatedFolder.folderName);
 				if (sameNameCount > 1) {
 					updatedFolder.urlName = buildNameToUrl(updatedFolder.folderName + '-' + sameNameCount);
@@ -370,13 +404,15 @@ export const useUpdateFolder = () => {
 	 */
 	const updateAllFolders = async newFolders => {
 		try {
+			const updatedUser = cloneDeep(user);
 			updateUserState(dispatchAuth, { folders: newFolders });
+			updatedUser.folders = newFolders;
 
 			await updateDoc(doc(db, 'users', user.uid), { folders: newFolders });
 			await updateDoc(doc(db, 'userProfiles', user.uid), { folders: newFolders });
-			setLocalStoredUser(user.uid, user);
+			setLocalStoredUser(user.uid, updatedUser);
 
-			toast.success('Saved!');
+			toast.success('Folders Saved!');
 		} catch (error) {
 			console.log(error);
 			toast.error('Something went wrong, please try again');
@@ -619,5 +655,29 @@ export const setCollapsedFolders = (dispatchFolders, bool) => {
 	dispatchFolders({
 		type: 'SET_FOLDERS',
 		payload: { collapsedFolders: bool },
+	});
+};
+
+/**
+ * Handles setting the id of the folder to pin on a build
+ * @param {function} dispatchFolders - dispatch function
+ * @param {string} folderId
+ */
+export const setPinnedFolder = (dispatchFolders, folderId) => {
+	dispatchFolders({
+		type: 'setPinnedFolder',
+		payload: folderId,
+	});
+};
+
+/**
+ * Handles setting the id of the folder to pin on a build
+ * @param {function} dispatchFolders - dispatch function
+ * @param {string} folder - the fetched folder
+ */
+export const setFetchedPinnedFolder = (dispatchFolders, folder) => {
+	dispatchFolders({
+		type: 'SET_FOLDERS',
+		payload: { fetchedPinnedFolder: folder },
 	});
 };

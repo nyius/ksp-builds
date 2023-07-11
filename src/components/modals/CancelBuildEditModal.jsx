@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import Button from '../buttons/Button';
 import { setCancelBuilEdit } from '../../context/build/BuildActions';
 import BuildContext from '../../context/build/BuildContext';
+import PlanetHeader from '../header/PlanetHeader';
 
 /**
  * Modal for when the user wants to cancel editing their build before saving
@@ -15,7 +16,7 @@ function CancelBuildEditModal() {
 			<input type="checkbox" id="cancel-build-edit" className="modal-toggle" />
 			<div className="modal">
 				<div className="modal-box relative scrollbar">
-					<h3 className="text-2xl 2k:text-4xl font-bold text-slate-100 text-center mb-6">Cancel Changes</h3>
+					<PlanetHeader text="Cancel Changes"></PlanetHeader>
 					<h3 className="text-xl 2k:text-xl text-slate-100 text-center mb-6">Are you sure you want to cancel? Any changes will be lost</h3>
 
 					<div className="flex flex-row gap-2 w-full items-center justify-center">

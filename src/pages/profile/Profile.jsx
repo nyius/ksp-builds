@@ -22,6 +22,8 @@ import Helmet from '../../components/Helmet/Helmet';
 import ProfilePicture from './Components/ProfilePicture';
 import ProfileInfo from './Components/ProfileInfo';
 import ProfileDetails from './Components/ProfileDetails';
+import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
+import Regex from 'regex-username';
 
 /**
  * Displays the users own profile
@@ -92,7 +94,6 @@ function Profile() {
 						<ProfilePicture />
 						<ProfileInfo />
 					</div>
-
 					<ProfileDetails />
 				</div>
 
@@ -101,7 +102,10 @@ function Profile() {
 
 				<div className="flex flex-row flex-wrap gap-4 w-full place-content-between sm:mb-4">
 					<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">{openedFolder ? openedFolder?.folderName : 'Your Builds'}</h2>
-					<Sort />
+					<div className="flex flex-row gap-3 2k:gap-5">
+						<Sort />
+						<BuildsViewBtn />
+					</div>
 				</div>
 				<Builds buildsToDisplay={sortedBuilds} />
 			</MiddleContainer>

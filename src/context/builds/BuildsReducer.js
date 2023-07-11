@@ -81,6 +81,16 @@ const BuildsReducer = (state, action) => {
 				...state,
 				fetchAmount: action.payload,
 			};
+		case 'setBuildsView':
+			return {
+				...state,
+				buildsView: action.payload,
+			};
+		case 'setBuildsForcedView':
+			return {
+				...state,
+				forcedView: action.payload,
+			};
 		default:
 			return state;
 	}

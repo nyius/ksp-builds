@@ -7,6 +7,11 @@ const FoldersReducer = (state, action) => {
 				...state,
 				...action.payload,
 			};
+		case 'setPinnedFolder':
+			return {
+				...state,
+				pinnedFolder: action.payload,
+			};
 		default:
 			return state;
 	}

@@ -10,6 +10,7 @@ import fetchAllUsersConvos from '../../utilities/fetchAllUsersConvos';
 import fetchConvosMessages from '../../utilities/fetchConvosMessages';
 import subscribeToUsersMessages from '../../utilities/subscribeToUsersMessages';
 import subscribeToConvo from '../../utilities/subscribeToConvo';
+import { checkLocalBuildAge } from '../build/BuildUtils';
 
 const AuthContext = createContext();
 
@@ -186,6 +187,24 @@ export const AuthProvider = ({ children }) => {
 			});
 		}
 	}, [state.newConvo]);
+
+	// Loop over users and remove any that are older than 30 days
+	useEffect(() => {
+		for (let i = 0; i < localStorage.length; i++) {
+			const key = localStorage.key(i);
+			const value = localStorage.getItem(key);
+
+			if (!value) return;
+
+			if (value.includes(`"type":"userProfile"`)) {
+				let user = JSON.parse(value);
+
+				if (checkLocalBuildAge(user.lastFetchedTimestamp, 43200)) {
+					localStorage.removeItem(key);
+				}
+			}
+		}
+	}, []);
 
 	return <AuthContext.Provider value={{ ...state, dispatchAuth, authLoading }}>{children}</AuthContext.Provider>;
 };

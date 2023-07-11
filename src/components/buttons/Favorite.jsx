@@ -7,6 +7,8 @@ import CheckCredentials from '../credentials/CheckCredentials';
 
 /**
  * Handles favoriting a build
+ * @param {string} id - id of the build to favorite
+ * @param {string} text - (optional) text to display on the btn
  * @returns
  */
 function Favorite({ id }) {
@@ -17,7 +19,9 @@ function Favorite({ id }) {
 	return (
 		<CheckCredentials type="favorite">
 			<Button
-				css={user?.favorites?.includes(id ? id : loadedBuild.id) ? 'text-secondary' : null}
+				css={`
+					${user?.favorites?.includes(id ? id : loadedBuild.id) ? 'text-secondary' : null} normal-case
+				`}
 				onClick={() => handleFavoriting(id ? id : loadedBuild.id)}
 				color="btn-ghost"
 				tooltip="Favorite"

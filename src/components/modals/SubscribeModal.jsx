@@ -7,6 +7,7 @@ import Tier3Badge from '../../assets/badges/tier3/tier3_badge36.png';
 import AuthContext from '../../context/auth/AuthContext';
 import { setNewSub } from '../../context/auth/AuthActions';
 import { FaHeart } from 'react-icons/fa';
+import PlanetHeader from '../header/PlanetHeader';
 
 function SubscribeModal() {
 	const { dispatchAuth, user, authLoading, newSub } = useContext(AuthContext);
@@ -18,8 +19,8 @@ function SubscribeModal() {
 					<input type="checkbox" id="subscribe-modal" className="modal-toggle" />
 					<div className="modal">
 						<div className="modal-box relative !min-w-1/4">
-							<Button htmlFor="subscribe-modal" style="btn-circle" position="absolute right-2 top-2" text="X" onClick={() => setNewSub(dispatchAuth, false)} />
-							<h3 className="text-xl 2k:text-3xl font-bold text-center mb-4 2k:mb-6 text-white">Subscribe</h3>
+							<Button htmlFor="subscribe-modal" style="btn-circle" position="z-50 absolute right-2 top-2" text="X" onClick={() => setNewSub(dispatchAuth, false)} />
+							<PlanetHeader text="Subscribe"></PlanetHeader>
 							<img src={AstrobiffHeart} alt="Astrobiff" className="rounded-xl mb-3 2k:mb-6" />
 
 							{newSub ? (

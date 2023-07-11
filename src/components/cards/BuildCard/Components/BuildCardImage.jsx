@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * Displays the builds image. uses Either the thumbnail or the first image it can find
- * @param {*} param0
+ * @param {*} build
  * @returns
  */
 function BuildCardImage({ build }) {

@@ -3,6 +3,7 @@ import Step1 from '../../assets/How-to-copy-build-1.png';
 import Step2 from '../../assets/how-to-copy-build-2.png';
 import Step3 from '../../assets/How-to-copy-build-3.png';
 import Button from '../buttons/Button';
+import PlanetHeader from '../header/PlanetHeader';
 
 function HowToCopyBuildModal() {
 	return (
@@ -11,8 +12,8 @@ function HowToCopyBuildModal() {
 			<div className="modal">
 				<div className="modal-box justify-center relative scrollbar">
 					<div className="flex flex-col w-full justify-center">
-						<Button htmlFor="how-to-copy-build-modal" text="X" position="absolute right-2 top-2" style="btn-circle" />
-						<h3 className="text-2xl 2k:text-4xl font-bold text-slate-100 text-center mb-6">How to Copy Build</h3>
+						<Button htmlFor="how-to-copy-build-modal" text="X" position="z-50 absolute right-2 top-2" style="btn-circle" />
+						<PlanetHeader text="How to Copy Build"></PlanetHeader>
 						<h3 className="text-xl 2k:text-3xl text-slate-100 text-center mb-6">**This only works for KSP 2**</h3>
 						{/* Step 1 */}
 						<h4 className="mb-4 text-xl 2k:text-3xl text-slate-300">

@@ -11,6 +11,8 @@ import Button from '../buttons/Button';
 import { profanity } from '@2toad/profanity';
 import TextInput from '../input/TextInput';
 import { uploadProfilePicture } from '../../context/auth/AuthUtils';
+import Regex from 'regex-username';
+import regexUsername from 'regex-username';
 
 function NewAccountModal() {
 	const navigate = useNavigate();
@@ -47,6 +49,12 @@ function NewAccountModal() {
 		if (profanity.exists(newUsername)) {
 			toast.error('Username not acceptable!');
 			console.log(`Username not acceptable`);
+			return;
+		}
+
+		if (!Regex().test(newUsername)) {
+			toast.error('Username not valid!');
+			console.log(`Username not valid`);
 			return;
 		}
 

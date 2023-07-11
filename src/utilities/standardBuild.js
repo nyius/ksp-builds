@@ -7,6 +7,7 @@ export const standardBuild = {
 	timestamp: serverTimestamp(),
 	description: '{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}',
 	images: [],
+	imagesSmall: [],
 	thumbnail: `https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/images%2Fkspbuilds_bg_sm.png?alt=media&token=22a22144-9cbb-4e31-8dfa-6e6b7b6e3bed`,
 	build: '',
 	author: '',
@@ -26,4 +27,5 @@ export const standardBuild = {
 	forChallenge: false,
 	lastModified: serverTimestamp(),
 	rawImageFiles: [],
+	pinnedFolder: null,
 };

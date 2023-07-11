@@ -18,7 +18,7 @@ function Carousel({ images }) {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="slide-container">
+		<div className="h-full">
 			<Slide {...properties}>
 				{images.map((image, i) => (
 					<ImageSlide key={i} image={image} i={i} />

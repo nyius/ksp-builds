@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 //---------------------------------------------------------------------------------------------------//
 import BuildsContext from '../../context/builds/BuildsContext';
 import useBuilds, { setCurrentPage } from '../../context/builds/BuildsActions';
@@ -9,14 +9,19 @@ import BuildCard from '../cards/BuildCard/BuildCard';
 import CantFind from '../cantFind/CantFind';
 import PrevPageBtn from './Buttons/PrevPageBtn';
 import NextPageBtn from './Buttons/NextPageBtn';
+import BuildsContainer from './Components/BuildsContainer';
+import ListBuildCard from '../cards/ListBuildCard/ListBuildCard';
+import PinnedListBuildCard from '../cards/PinnedListBuildCard/PinnedListBuildCard';
 
 /**
  * Displays a list of fetched builds
- * @param {arr} buildsToDisplay - takes in an optional array of builds to display
+ * @param {arr} buildsToDisplay - (optional) takes in an array of builds to display
  * @returns
  */
 function Builds({ buildsToDisplay }) {
-	const { dispatchBuilds, loadingBuilds, fetchedBuilds, currentPage } = useContext(BuildsContext);
+	const [builds, setBuilds] = useState([]);
+
+	const { dispatchBuilds, loadingBuilds, fetchedBuilds, currentPage, buildsView, forcedView } = useContext(BuildsContext);
 	const { openedFolder } = useContext(FoldersContext);
 	const { fetchBuildsById } = useBuilds();
 
@@ -25,13 +30,31 @@ function Builds({ buildsToDisplay }) {
 	}, []);
 
 	useEffect(() => {
+		if (!loadingBuilds) {
+			setBuilds(buildsToDisplay ? buildsToDisplay : fetchedBuilds);
+		}
+	}, [loadingBuilds, fetchedBuilds, buildsToDisplay]);
+
+	useEffect(() => {
 		if (openedFolder) {
 			fetchBuildsById(openedFolder.builds, null, 'public');
 		}
 	}, [openedFolder]);
 
 	//---------------------------------------------------------------------------------------------------//
-	if (!loadingBuilds && fetchedBuilds.length === 0) {
+	if (loadingBuilds) {
+		return (
+			<BuildsContainer>
+				<div className="flex flex-row w-full justify-center items-center">
+					<div className="w-20">
+						<Spinner1 />
+					</div>
+				</div>
+			</BuildsContainer>
+		);
+	}
+
+	if (!loadingBuilds && builds.length === 0) {
 		return (
 			<div className="flex flex-row flex-wrap gap-4 w-full place-content-end sm:mb-4">
 				<CantFind text="No builds found :("></CantFind>
@@ -41,31 +64,13 @@ function Builds({ buildsToDisplay }) {
 
 	return (
 		<>
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2k:grid-cols-5 4k:grid-cols-6 5k:grid-cols-7 gap-4 xl:gap-6 2k:gap-8 realtive w-full items-stretch justify-center md:justify-items-center mb-6 p-6 md:p-0">
-				{loadingBuilds ? (
-					<div className="flex flex-row w-full justify-center items-center">
-						<div className="w-20">
-							<Spinner1 />
-						</div>
-					</div>
-				) : (
-					<>
-						{buildsToDisplay ? (
-							<>
-								{buildsToDisplay.map((build, i) => {
-									return <BuildCard key={build.id} i={i} build={build} />;
-								})}
-							</>
-						) : (
-							<>
-								{fetchedBuilds.map((build, i) => {
-									return <BuildCard key={build.id} i={i} build={build} />;
-								})}
-							</>
-						)}
-					</>
-				)}
-			</div>
+			<BuildsContainer>
+				{builds.map(build => {
+					return (
+						<Fragment key={build.id}>{buildsView === 'grid' && forcedView !== 'pinnedList' ? <BuildCard build={build} /> : forcedView === 'pinnedList' ? <PinnedListBuildCard build={build} /> : <ListBuildCard build={build} />}</Fragment>
+					);
+				})}
+			</BuildsContainer>
 
 			<div className="btn-group w-full justify-center items-center">
 				<PrevPageBtn />

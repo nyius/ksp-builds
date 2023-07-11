@@ -6,7 +6,7 @@ import AuthContext from '../auth/AuthContext';
 import FiltersContext from '../filters/FiltersContext';
 import useFilters from '../filters/FiltersActions';
 import { cloneDeep } from 'lodash';
-import { checkLocalBuildAge, getBuildFromLocalStorage, setLocalStoredBuild } from '../../utilities/buildLocalStorage';
+import { checkLocalBuildAge, getBuildFromLocalStorage, setLocalStoredBuild } from '../build/BuildUtils';
 
 /**
  * Hook with functions for fetching builds
@@ -48,7 +48,8 @@ const useBuilds = () => {
 	/**
 	 * Handles fetching an array of builds
 	 * @param {arr} buildsToFetch - an array of build ids to fetch
-	 * @param {string} fetchUid - a users UID
+	 * @param {string} fetchUid - a users UID (optional)
+	 * @param {string} type - public/private/unlisted
 	 */
 	const fetchBuildsById = async (buildsToFetch, fetchUid, type) => {
 		const buildsToFetchCopy = cloneDeep(buildsToFetch);
@@ -316,5 +317,29 @@ export const setLastfetchedBuild = (dispatchBuilds, lastFetchedBuild) => {
 		payload: {
 			lastFetchedBuild: lastFetchedBuild,
 		},
+	});
+};
+
+/**
+ * handles setting the view type for builds (list/grid)
+ * @param {function} dispatchBuilds - Dispatch function
+ * @param {string} view - takes in thew view to display (grid/list)
+ */
+export const setBuildsView = (dispatchBuilds, view) => {
+	dispatchBuilds({
+		type: 'setBuildsView',
+		payload: view,
+	});
+};
+
+/**
+ * handles setting a forced view for builds list (pinnedList)
+ * @param {function} dispatchBuilds - Dispatch function
+ * @param {string} view - takes in thew view to display (pinnedList)
+ */
+export const setBuildsForcedView = (dispatchBuilds, view) => {
+	dispatchBuilds({
+		type: 'setBuildsForcedView',
+		payload: view,
 	});
 };

@@ -10,7 +10,7 @@ import { BiCommentAdd, BiReset, BiMessageAltDetail } from 'react-icons/bi';
 import { MdOutlineDoneOutline, MdEmail, MdSettingsInputComponent, MdReport } from 'react-icons/md';
 import { FcGoogle } from 'react-icons/fc';
 import { HiNewspaper, HiChevronDoubleDown } from 'react-icons/hi';
-import { AiOutlineHeart, AiFillHeart, AiOutlineBulb, AiFillStar, AiOutlineStar } from 'react-icons/ai';
+import { AiOutlineHeart, AiFillHeart, AiOutlineBulb, AiFillStar, AiOutlineStar, AiOutlineQuestionCircle, AiFillPushpin, AiOutlinePushpin } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import Tier1Badge from '../../assets/badges/tier1/tier1_badge36.png';
 import Tier2Badge from '../../assets/badges/tier2/tier2_badge36.png';
@@ -63,6 +63,8 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 		if (icon === 'up2') return <BsCaretUpFill />;
 		if (icon === 'email') return <MdEmail />;
 		if (icon === 'head') return <FaUserAstronaut />;
+		if (icon === 'fill-pin') return <AiFillPushpin />;
+		if (icon === 'outline-pin') return <AiOutlinePushpin />;
 		if (icon === 'settings') return <MdSettingsInputComponent />;
 		if (icon === 'home') return <FaHome />;
 		if (icon === 'news') return <HiNewspaper />;
@@ -75,6 +77,7 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 		if (icon === 'twitter') return <BsTwitter />;
 		if (icon === 'discord') return <FaDiscord />;
 		if (icon === 'github') return <FaGithub />;
+		if (icon === 'question') return <AiOutlineQuestionCircle />;
 		if (icon === 'message') return <BiCommentAdd />;
 		if (icon === 'fill-star') return <AiFillStar />;
 		if (icon === 'outline-star') return <AiOutlineStar />;

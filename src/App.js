@@ -22,11 +22,7 @@ import './App.css';
 import 'react-popper-tooltip/dist/styles.css';
 
 /*TODO
-bundle craft together, multiple download buttons per folder
-	Add a 'group' when uploading a build that displays on the side
-low res quick load thumbnails
 creating an account needs to have matching passwords. Also be much stricter on emails (needs @, etc)
-usernames should be more prohibitive? less symbols allowed
 use useMemo to improve performance
 go through all component props and set defaults if possible (like color = "#fff", size="24", etc)
 check for things like {example ? "true" : "false"} and slim down
@@ -35,8 +31,6 @@ useEffects should only do 1 thing, split them up
 useEffect cleanup functions
 useEffects could be broken out into their own hooks for easier to read code and functionality (lesson 171/172)
 create useContext hooks to replace all instances of useContext(contextName) - so isntead it is useBuilds or useAuth, etc (lesson 225)
-reducer functions switch/case should all be renamed
-	-instead of 'SET_THIS_THING' it should be easily readable like 'setLoading' or 'addNewBuild', etc
 should probably remove all checks for user.username and instead add a 'isAuthenticated' var in the context thats just true or false
 more space themed loading spinner
 error reporting to server and logged
@@ -50,15 +44,12 @@ drag and drop your own builds into a folder?
 Should be able to login with username/password
 	-automatically generate an email auth with the new username (eg steve@kspbuilds.com)
 		-when the user signs in with username, stick @kspbuilds.com to the end and then attempt the email login
-when launching the app, it should loop over the localstorage and check all of the stored builds to see their age
-	if theyre older than like a week, they should be removed from storage
 builds fetched by ID need to be paginated. break them up into folders and then iterate over them
 create backup database on an entirely new firebase instance - updates once a week
 email notifs for botw
 make type searching work for your own builds/visiting a users builds
 implement react-popper to replace tooltips and username hover
 pagination allowing user to jump right to a page? might result in a large amount of firebase calls
-thumbnails scale down so theyre max 1600px wide
 competitions/ways to give users accolades/awards
 Volunteer positions (moderate, write posts, create challenges, etc) - this will include all the features they may need to see/have access to
 Quick share builds (without needing to create a whole build)

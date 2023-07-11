@@ -11,6 +11,7 @@ import BlockModal from './BlockModal';
 import SubscribeModal from './SubscribeModal';
 import AddBuildToFolderModal from './AddBuildToFolderModal';
 import DeleteFolderModal from './DeleteFolderModal';
+import WhatIsFolderModal from './WhatIsFolderModal';
 
 /**
  * Stores (mostly) all modals
@@ -31,6 +32,7 @@ function Modals() {
 			<BlockModal />
 			<SubscribeModal />
 			<AddBuildToFolderModal />
+			<WhatIsFolderModal />
 		</>
 	);
 }

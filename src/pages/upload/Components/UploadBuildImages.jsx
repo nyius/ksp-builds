@@ -107,9 +107,15 @@ function UploadBuildImages() {
 		// make sure we have a file uploaded
 		if (e.target.files) {
 			const newBuildImages = await uploadImages(e.target.files, setUploadingImage);
+			const newBuildImagesSmall = await uploadImages(e.target.files, setUploadingImage, 50, 100);
 
 			if (newBuildImages) {
-				setBuildToUpload(dispatchBuild, { ...buildToUpload, images: [...buildToUpload.images, ...newBuildImages], rawImageFiles: [...buildToUpload.rawImageFiles, ...e.target.files] });
+				setBuildToUpload(dispatchBuild, {
+					...buildToUpload,
+					images: [...buildToUpload.images, ...newBuildImages],
+					imagesSmall: [...buildToUpload.imagesSmall, ...newBuildImagesSmall],
+					rawImageFiles: [...buildToUpload.rawImageFiles, ...e.target.files],
+				});
 			}
 		}
 	};

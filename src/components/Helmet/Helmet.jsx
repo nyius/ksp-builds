@@ -18,12 +18,7 @@ function HelmetHeader({ title, pageLink, type, description, image }) {
 
 			<meta property="og:title" content={title} />
 			<meta property="og:type" content={type ? type : 'website'} />
-			<meta
-				property="og:image"
-				content={
-					image ? image : 'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/images%2FKhOfrRnd8zY6TCfF6S8d5VqX1ht2-kspbuilds_bg.png-a5051359-60b3-486d-a77e-a4783930f0bd?alt=media&token=027007b2-44ed-4d35-b6ab-0382ad3095d3'
-				}
-			/>
+			<meta property="og:image" content={image ? image : 'https://i.imgur.com/Tl08i9E.png'} />
 			<meta property="og:url" content={pageLink} />
 			<meta property="og:description" content={description ? description : 'A Hub to share and explore Kerbal Space Program 2 Builds'} />
 			<meta property="og:site_name" content="KSP Builds" />

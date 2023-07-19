@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../../../components/buttons/Button';
-import BuildContext from '../../../../context/build/BuildContext';
+import { useBuildContext } from '../../../../context/build/BuildContext';
 import { setBuildToUpload } from '../../../../context/build/BuildActions';
 
 function RemoveImageBtn({ i }) {
-	const { buildToUpload, dispatchBuild } = useContext(BuildContext);
+	const { buildToUpload, dispatchBuild } = useBuildContext();
 	/**
 	 * Handles removing an image that the user uploaded
 	 * @param {*} i

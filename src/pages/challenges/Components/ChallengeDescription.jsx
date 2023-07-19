@@ -7,14 +7,6 @@ import Parser from 'html-react-parser';
  * @returns
  */
 function ChallengeDescription({ challenge }) {
-	let doc = new DOMParser().parseFromString(challenge.content, 'text/html');
-
-	const htmlDecode = input => {
-		let e = document.createElement('div');
-		e.innerHTML = input;
-		return e.childNodes.length === 0 ? '' : e.childNodes[3].nodeValue;
-	};
-
 	return <div className="challengeDesc">{Parser(challenge.content)}</div>;
 }
 

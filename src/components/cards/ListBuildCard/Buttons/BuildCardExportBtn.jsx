@@ -14,7 +14,7 @@ function BuildCardExportBtn({ buildId, hover }) {
 
 	return (
 		<>
-			<div className={`absolute hidden lg:block ${hover ? 'right-60 border-solid border-r-8' : 'right-0'} z-51 top-0 w-60 bg-base-400 rounded-r-lg h-full p-4 transition-all border-zinc-900`}></div>
+			<div className={`absolute hidden lg:block ${hover ? 'right-60 border-solid border-r-8' : 'right-0'} z-51 top-0 w-60 bg-base-300 rounded-r-lg h-full p-4 transition-all border-zinc-900`}></div>
 
 			<div
 				className={`absolute ${

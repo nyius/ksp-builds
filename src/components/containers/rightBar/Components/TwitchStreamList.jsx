@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import NewsContext from '../../../../context/news/NewsContext';
+import React from 'react';
+import { useNewsContext } from '../../../../context/news/NewsContext';
 import TwitchStreamCard from './TwitchStreamCard';
 import { FaRocket } from 'react-icons/fa';
 
@@ -10,7 +10,7 @@ import Spinner1 from '../../../spinners/Spinner1';
  * @returns
  */
 function TwitchStreamList() {
-	const { streams, streamsLoading } = useContext(NewsContext);
+	const { streams, streamsLoading } = useNewsContext();
 
 	if (streamsLoading) return <Spinner1 />;
 

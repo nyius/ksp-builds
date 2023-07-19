@@ -38,7 +38,7 @@ export const checkIfBuildInFolder = (buildId, folderId, user) => {
 export const checkIfBuildInAllFolders = (buildId, user) => {
 	const folderIndex = user?.folders?.findIndex(folder => folder.builds.includes(buildId));
 
-	return folderIndex >= 0 ? true : false;
+	return folderIndex >= 0;
 };
 
 /**
@@ -50,7 +50,7 @@ export const checkIfFolderSelected = (folderId, selectedFolders) => {
 	let folderIndex = selectedFolders.findIndex(folder => folder.id === folderId);
 	if (folderId === 'your-builds') folderIndex = 1;
 
-	return folderIndex >= 0 ? true : false;
+	return folderIndex >= 0;
 };
 
 /**

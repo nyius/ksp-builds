@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../../context/auth/AuthContext';
 import Button from '../../../../components/buttons/Button';
 import { setEditingEmail } from '../../../../context/auth/AuthActions';
 import { useUpdateProfile } from '../../../../context/auth/AuthActions';
@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
  * @returns
  */
 function SaveEmailBtn() {
-	const { dispatchAuth, editingEmail, verifyEditedEmail } = useContext(AuthContext);
+	const { dispatchAuth, editingEmail, verifyEditedEmail } = useAuthContext();
 	const { updateUserEmail } = useUpdateProfile();
 
 	/**

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { cloneDeep } from 'lodash';
@@ -6,11 +6,11 @@ import { v4 as uuidv4 } from 'uuid';
 //---------------------------------------------------------------------------------------------------//
 import { standardBuild } from '../../utilities/standardBuild';
 //---------------------------------------------------------------------------------------------------//
-import AuthContext from '../../context/auth/AuthContext';
-import { useUploadBuild, setBuildToUpload } from '../../context/build/BuildActions';
-import FoldersContext from '../../context/folders/FoldersContext';
-import { setBuildToAddToFolder, setFolderLocation, setPinnedFolder } from '../../context/folders/FoldersActions';
-import BuildContext from '../../context/build/BuildContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
+import { useUploadBuild, useSetBuildToUpload } from '../../context/build/BuildActions';
+import { useFoldersContext } from '../../context/folders/FoldersContext';
+import { useSetBuildToAddToFolder, useSetFolderLocation, useSetPinnedFolder } from '../../context/folders/FoldersActions';
+import { useBuildContext } from '../../context/build/BuildContext';
 //---------------------------------------------------------------------------------------------------//
 import Spinner1 from '../../components/spinners/Spinner1';
 import LogoBackground from '../../assets/logo_bg_dark.png';
@@ -34,31 +34,24 @@ import SubmitBtn from './Components/Buttons/SubmitBtn';
 import CancelEditBtn from './Components/Buttons/CancelEditBtn';
 import UpdateBuildBtn from './Components/Buttons/UpdateBuildBtn';
 
+const buildId = uuidv4().slice(0, 30);
+
 /**
  * Handles displaying the container for creating & editing a build.
  *
  * @returns
  */
 function Upload() {
-	const buildId = uuidv4().slice(0, 30);
-	const { user, authLoading } = useContext(AuthContext);
-	const { dispatchBuild, editingBuild, uploadingBuild, buildToUpload } = useContext(BuildContext);
-	const { dispatchFolders, pinnedFolder } = useContext(FoldersContext);
+	const { editingBuild, uploadingBuild, buildToUpload } = useBuildContext();
+	const { pinnedFolder } = useFoldersContext();
+	const { user } = useAuthContext();
 	const { uploadBuild } = useUploadBuild();
-	//---------------------------------------------------------------------------------------------------//
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		setPinnedFolder(dispatchFolders, editingBuild ? editingBuild.pinnedFolder : null);
-		setBuildToUpload(dispatchBuild, editingBuild ? cloneDeep(editingBuild) : cloneDeep(standardBuild));
-	}, []);
-
-	useEffect(() => {
-		if (!authLoading && user?.username) {
-			setFolderLocation(dispatchFolders, 'upload');
-			setBuildToAddToFolder(dispatchFolders, editingBuild ? editingBuild.id : buildId, user);
-		}
-	}, [authLoading]);
+	useSetBuildToUpload(editingBuild ? cloneDeep(editingBuild) : cloneDeep(standardBuild));
+	useSetBuildToAddToFolder(editingBuild ? editingBuild.id : buildId);
+	useSetPinnedFolder(editingBuild ? editingBuild.pinnedFolder : null);
+	useSetFolderLocation('upload');
 
 	/**
 	 * Handles submitting the build

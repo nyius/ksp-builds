@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import NewsContext from '../../../context/news/NewsContext';
+import React from 'react';
+import { useNewsContext } from '../../../context/news/NewsContext';
 import TextEditor from '../../../components/textEditor/TextEditor';
 
 /**
@@ -9,7 +9,7 @@ import TextEditor from '../../../components/textEditor/TextEditor';
  * @returns
  */
 function PatchNoteEditor({ patchNote, setEditedPatchNote }) {
-	const { editingPatchNotes } = useContext(NewsContext);
+	const { editingPatchNotes } = useNewsContext();
 
 	if (patchNote.id === editingPatchNotes) {
 		return <TextEditor text={patchNote.patchNote} setState={setEditedPatchNote} />;

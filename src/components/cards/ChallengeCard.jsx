@@ -30,7 +30,7 @@ function ChallengeCard({ challenge, i }) {
 				</div>
 				<p className="text-lg 2k:text-2xl italic text-slate-500 mb-10 2k:mb-20 z-50 shrink-0">{date.toDateString()}</p>
 				<div className="flex flex-row flex-wrap gap-4 2k:gap-6">
-					<Button type="ahref" href={`/upload/c=${challenge?.articleId}`} text="Submit Build" icon="plus" color="btn-dark text-white" position="z-50" size="w-fit" />
+					<Button type="ahref" href={`/upload/challenge=${challenge?.articleId}`} text="Submit Build" icon="plus" color="btn-dark text-white" position="z-50" size="w-fit" />
 					<Button type="ahref" href={`/challenges/${challenge?.articleId}`} text="Read more" icon="right" color="btn-dark text-white" position="z-50" size="w-fit" />
 					<Button onClick={() => setChallengeFilter(challenge?.articleId)} text="View Builds" icon="export" color="btn-dark text-white" position="z-50" size="w-fit" />
 				</div>

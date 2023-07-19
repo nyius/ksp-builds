@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { toast } from 'react-toastify';
-import AuthContext from '../../../context/auth/AuthContext';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import { useUpdateProfile } from '../../../context/auth/AuthActions';
 
 function Messaging() {
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthContext();
 	const { updateUserProfilesAndDb } = useUpdateProfile();
 
 	/**

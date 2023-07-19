@@ -1,12 +1,12 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../../context/auth/AuthContext';
 
 /**
  * Displays a users profile picture
  * @returns
  */
 function ProfilePicture() {
-	const { openProfile } = useContext(AuthContext);
+	const { openProfile } = useAuthContext();
 
 	return (
 		<div className="avatar mb-4 self-center">

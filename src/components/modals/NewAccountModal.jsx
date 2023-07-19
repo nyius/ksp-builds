@@ -1,18 +1,17 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { toast } from 'react-toastify';
 import Astrobiff from '../../assets/astrobiff.png';
 import Spinner1 from '../spinners/Spinner1';
-import AuthContext from '../../context/auth/AuthContext';
-import { setNewSignup, useUpdateProfile, updateUserState } from '../../context/auth/AuthActions';
+import { useAuthContext } from '../../context/auth/AuthContext';
+import { setNewSignup, useUpdateProfile, updateUserState, setAuthenticated } from '../../context/auth/AuthActions';
 import Button from '../buttons/Button';
 import { profanity } from '@2toad/profanity';
 import TextInput from '../input/TextInput';
 import { uploadProfilePicture } from '../../context/auth/AuthUtils';
 import Regex from 'regex-username';
-import regexUsername from 'regex-username';
 
 function NewAccountModal() {
 	const navigate = useNavigate();
@@ -20,7 +19,7 @@ function NewAccountModal() {
 	const [uploadingImage, setUploadingImage] = useState(false);
 	const [newProfilePicture, setNewProfilePicture] = useState(Astrobiff);
 
-	const { user, newSignup, dispatchAuth } = useContext(AuthContext);
+	const { user, newSignup, dispatchAuth } = useAuthContext();
 	const { updateUserProfilePic } = useUpdateProfile();
 	const newAccountModal = document.querySelector('#new-account-modal');
 
@@ -66,7 +65,6 @@ function NewAccountModal() {
 		 */
 		const checkIfUserExists = async () => {
 			try {
-				console.log(username);
 				// Check if the username already exists
 				const docRefUser = doc(db, 'usernames', username);
 				const docSnapUser = await getDoc(docRefUser);
@@ -87,11 +85,13 @@ function NewAccountModal() {
 						.then(() => {
 							setNewSignup(dispatchAuth, false);
 							updateUserState(dispatchAuth, updateUser);
+							setAuthenticated(dispatchAuth, true);
 							toast.success('Account Created!');
 						})
 						.catch(err => {
 							console.log(err);
 							toast.error('Something went wrong :(');
+							setAuthenticated(dispatchAuth, false);
 							return;
 						});
 
@@ -148,7 +148,7 @@ function NewAccountModal() {
 				newAccountModal.checked = false;
 			}
 		}
-	}, [newSignup]);
+	}, [newSignup, newAccountModal]);
 
 	//---------------------------------------------------------------------------------------------------//
 	return (

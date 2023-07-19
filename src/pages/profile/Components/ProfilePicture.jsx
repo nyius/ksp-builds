@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React, { useState } from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import { AiFillCamera } from 'react-icons/ai';
 import { uploadProfilePicture } from '../../../context/auth/AuthUtils';
 import { useUpdateProfile } from '../../../context/auth/AuthActions';
@@ -11,7 +11,7 @@ import Spinner1 from '../../../components/spinners/Spinner1';
  * @returns
  */
 function ProfilePicture() {
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthContext();
 	const { updateUserProfilePic } = useUpdateProfile();
 	const [uploadingProfilePhoto, setUploadingProfilePhoto] = useState(false);
 

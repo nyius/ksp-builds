@@ -1,12 +1,12 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useDeleteConversation } from '../../context/auth/AuthActions';
 import Button from '../buttons/Button';
-import AuthContext from '../../context/auth/AuthContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import PlanetHeader from '../header/PlanetHeader';
 
 function DeleteConversationModal() {
 	const { deleteConversation } = useDeleteConversation();
-	const { deleteConvoId } = useContext(AuthContext);
+	const { deleteConvoId } = useAuthContext();
 
 	//---------------------------------------------------------------------------------------------------//
 	return (

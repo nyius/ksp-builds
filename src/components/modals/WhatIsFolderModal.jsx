@@ -24,7 +24,7 @@ function WhatIsFolderModal() {
 								<p className="text-2xl 2k:text-3xl font-bold text-slate-100 text-center mb-3 2k:mb-6">Pinned Folder</p>
 								<p className="text-xl 2k:text-2xl text-slate-200 text-center mb-6 2k:mb-10">You can 'Pin' your own folder to a build.</p>
 								<p className="text-xl 2k:text-2xl text-slate-200 mb-6 2k:mb-10">
-									• When Pin a folder to a build, that folder will appear on the side of that builds page. This is great if you have multiple different craft for one common project/mission.
+									• When you pin a folder to a build, that folder will appear on the side of that builds page. This is great if you have multiple different craft for one common project/mission.
 								</p>
 								<p className="text-xl 2k:text-2xl text-slate-200 mb-6 2k:mb-10">• For example, you can have separate builds for a duna lander, one for a probe, and another for the launcher.</p>
 								<p className="text-xl 2k:text-2xl text-slate-200 mb-6 2k:mb-10">• By having those builds in the same folder, users can quickly and easily see other builds they may want to download.</p>

@@ -1,6 +1,5 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { cloneDeep } from 'lodash';
 import { Helmet } from 'react-helmet';
 //---------------------------------------------------------------------------------------------------//
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
@@ -9,61 +8,30 @@ import Sort from '../../components/sort/Sort';
 import Spinner1 from '../../components/spinners/Spinner1';
 import CantFind from '../../components/cantFind/CantFind';
 import Button from '../../components/buttons/Button';
-import BuildCard from '../../components/cards/BuildCard/BuildCard';
 //---------------------------------------------------------------------------------------------------//
-import useResetStates from '../../utilities/useResetStates';
+import useResetStates from '../../hooks/useResetStates';
 //---------------------------------------------------------------------------------------------------//
-import useFilters from '../../context/filters/FiltersActions';
-import useBuilds, { setBuildsLoading, setClearFetchedBuilds } from '../../context/builds/BuildsActions';
-import BuildsContext from '../../context/builds/BuildsContext';
-import FiltersContext from '../../context/filters/FiltersContext';
-import AuthContext from '../../context/auth/AuthContext';
+import { useResetFilters } from '../../context/filters/FiltersActions';
+import { useGetFilteredBuilds, useFetchBuildsById } from '../../context/builds/BuildsActions';
+import { useBuildsContext } from '../../context/builds/BuildsContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
+import Builds from '../../components/builds/Builds';
+import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
 
 /**
  * Handles displaying users favorites
  * @returns
  */
 function Favorites() {
-	const [sortedBuilds, setSortedBuilds] = useState([]);
-	//---------------------------------------------------------------------------------------------------//
-	const { dispatchBuilds, fetchedBuilds, loadingBuilds } = useContext(BuildsContext);
-	const { authLoading, user } = useContext(AuthContext);
-	const { sortBy } = useContext(FiltersContext);
-	//---------------------------------------------------------------------------------------------------//
-	const { fetchBuilds } = useBuilds();
-	const { filterBuilds, resetFilters } = useFilters();
-	const { resetStates } = useResetStates();
-	//---------------------------------------------------------------------------------------------------//
+	const { fetchedBuilds, loadingBuilds } = useBuildsContext();
+	const { authLoading, user, isAuthenticated } = useAuthContext();
 	const navigate = useNavigate();
+	const [sortedBuilds] = useGetFilteredBuilds([]);
 
-	// Reset edidtingBuild/editingComment stats on page load
-	useEffect(() => {
-		resetStates();
-		resetFilters();
-	}, []);
+	useResetFilters();
+	useResetStates();
 
-	useEffect(() => {
-		setClearFetchedBuilds(dispatchBuilds);
-
-		if (!authLoading) {
-			if (user?.username) {
-				if (user?.favorites.length > 0) {
-					fetchBuilds(user.favorites);
-				} else {
-					setBuildsLoading(dispatchBuilds, false);
-				}
-			} else {
-				setBuildsLoading(dispatchBuilds, false);
-			}
-		}
-	}, [authLoading]);
-
-	// Listen for changes to the sorting and filter the builds accordingly
-	useEffect(() => {
-		let newFetchedBuilds = cloneDeep(fetchedBuilds);
-
-		setSortedBuilds(filterBuilds(newFetchedBuilds));
-	}, [fetchedBuilds, sortBy]);
+	useFetchBuildsById(user?.favorites);
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
@@ -76,8 +44,11 @@ function Favorites() {
 
 			<MiddleContainer color="none">
 				<PlanetHeader text="Your Favorites" />
-				<Sort />
-				{!authLoading && user?.username && (
+				<div className="flex flex-row gap-3 2k:gap-5">
+					<Sort />
+					<BuildsViewBtn />
+				</div>
+				{!authLoading && isAuthenticated && (
 					<div className="flex flex-row flex-wrap w-full items-stretch justify-center md:justify-items-center mb-6 p-6 md:p-0">
 						{loadingBuilds ? (
 							<div className="flex flex-row w-full justify-center items-center">
@@ -92,11 +63,7 @@ function Favorites() {
 										<Button text="Go find some!" icon="left" onClick={() => navigate('/')} color="btn-primary" />
 									</CantFind>
 								) : (
-									<>
-										{sortedBuilds.map((build, i) => {
-											return <BuildCard key={i} i={i} build={build} />;
-										})}
-									</>
+									<Builds buildsToDisplay={sortedBuilds} />
 								)}
 							</>
 						)}

@@ -1,8 +1,7 @@
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import React, { Fragment } from 'react';
 //---------------------------------------------------------------------------------------------------//
-import BuildsContext from '../../context/builds/BuildsContext';
-import useBuilds, { setCurrentPage } from '../../context/builds/BuildsActions';
-import FoldersContext from '../../context/folders/FoldersContext';
+import { useBuildsContext } from '../../context/builds/BuildsContext';
+import { useFetchOpenFolderBuilds, useLoadedBuilds, useSetCurrentPage } from '../../context/builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
 import Spinner1 from '../spinners/Spinner1';
 import BuildCard from '../cards/BuildCard/BuildCard';
@@ -19,27 +18,12 @@ import PinnedListBuildCard from '../cards/PinnedListBuildCard/PinnedListBuildCar
  * @returns
  */
 function Builds({ buildsToDisplay }) {
-	const [builds, setBuilds] = useState([]);
+	const { loadingBuilds, currentPage, buildsView, forcedView } = useBuildsContext();
 
-	const { dispatchBuilds, loadingBuilds, fetchedBuilds, currentPage, buildsView, forcedView } = useContext(BuildsContext);
-	const { openedFolder } = useContext(FoldersContext);
-	const { fetchBuildsById } = useBuilds();
+	const [builds] = useLoadedBuilds([], buildsToDisplay);
 
-	useEffect(() => {
-		setCurrentPage(dispatchBuilds, 0);
-	}, []);
-
-	useEffect(() => {
-		if (!loadingBuilds) {
-			setBuilds(buildsToDisplay ? buildsToDisplay : fetchedBuilds);
-		}
-	}, [loadingBuilds, fetchedBuilds, buildsToDisplay]);
-
-	useEffect(() => {
-		if (openedFolder) {
-			fetchBuildsById(openedFolder.builds, null, 'public');
-		}
-	}, [openedFolder]);
+	useSetCurrentPage(0);
+	useFetchOpenFolderBuilds();
 
 	//---------------------------------------------------------------------------------------------------//
 	if (loadingBuilds) {

@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import BuildsContext from '../../../context/builds/BuildsContext';
+import React from 'react';
+import { useBuildsContext } from '../../../context/builds/BuildsContext';
 
 /**
  * Displays the builds container
@@ -7,7 +7,7 @@ import BuildsContext from '../../../context/builds/BuildsContext';
  * @returns
  */
 function BuildsContainer({ children }) {
-	const { buildsView, forcedView } = useContext(BuildsContext);
+	const { buildsView, forcedView } = useBuildsContext();
 
 	return (
 		<div

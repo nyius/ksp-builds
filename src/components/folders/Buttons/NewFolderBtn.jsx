@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
-import FoldersContext from '../../../context/folders/FoldersContext';
+import React from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
+import { useFoldersContext } from '../../../context/folders/FoldersContext';
 import { setMakingNewFolder } from '../../../context/folders/FoldersActions';
 import { FaPlus } from 'react-icons/fa';
 
@@ -9,8 +9,8 @@ import { FaPlus } from 'react-icons/fa';
  * @returns
  */
 function NewFolderBtn() {
-	const { user } = useContext(AuthContext);
-	const { openedFolder, dispatchFolders, folderView } = useContext(FoldersContext);
+	const { user } = useAuthContext();
+	const { openedFolder, dispatchFolders, folderView } = useFoldersContext();
 
 	if (user?.folders?.length <= 20 && !openedFolder) {
 		return (

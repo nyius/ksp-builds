@@ -1,15 +1,15 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../../../components/buttons/Button';
 import { setReplyingComment } from '../../../../context/build/BuildActions';
 import { useComment } from '../../../../context/build/BuildActions';
-import BuildContext from '../../../../context/build/BuildContext';
+import { useBuildContext } from '../../../../context/build/BuildContext';
 
 /**
  * Button to handle clearing a comment
  * @returns
  */
 function ClearCommentButton() {
-	const { dispatchBuild } = useContext(BuildContext);
+	const { dispatchBuild } = useBuildContext();
 	const { setComment } = useComment();
 
 	/**

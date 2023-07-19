@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import BuildContext from '../../context/build/BuildContext';
+import React, { useState } from 'react';
+import { useBuildContext } from '../../context/build/BuildContext';
 import { setBuildOfTheWeek, useMakeBuildOfTheWeek } from '../../context/build/BuildActions';
 import Button from '../buttons/Button';
 import TextEditor from '../textEditor/TextEditor';
@@ -12,7 +12,7 @@ import CheckCredentials from '../credentials/CheckCredentials';
 function MakeBuildOfTheWeekModal() {
 	const { makeBuildOfTheWeek } = useMakeBuildOfTheWeek();
 	const [notification, setNotification] = useState('');
-	const { dispatchBuild, buildOfTheWeek, loadedBuild } = useContext(BuildContext);
+	const { dispatchBuild, buildOfTheWeek, loadedBuild } = useBuildContext();
 
 	//---------------------------------------------------------------------------------------------------//
 	return (

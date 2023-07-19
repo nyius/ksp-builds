@@ -1,11 +1,17 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useDeleteBuild } from '../../context/build/BuildActions';
 import Button from '../buttons/Button';
-import BuildContext from '../../context/build/BuildContext';
+import { useBuildContext } from '../../context/build/BuildContext';
 import PlanetHeader from '../header/PlanetHeader';
 
+/**
+ * Modal for deleting a build
+ * @param {*} id
+ * @param {*} userID
+ * @returns
+ */
 function DeleteBuildModal({ id, userID }) {
-	const { loadedBuild } = useContext(BuildContext);
+	const { loadedBuild } = useBuildContext();
 	const { deleteBuild } = useDeleteBuild();
 
 	return (

@@ -3,7 +3,7 @@ import Button from '../../../../components/buttons/Button';
 
 /**
  * Button to go to the KSP website to read the original challenge
- * @param {*} param0
+ * @param {*} url
  * @returns
  */
 function ReadOriginalChallengeBtn({ url }) {

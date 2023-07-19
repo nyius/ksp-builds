@@ -35,7 +35,7 @@ function Footer() {
 					<ul>
 						<span className="footer-title 2k:text-2xl">Social</span>
 						<Button type="ahref" href="https://twitter.com/KSP_Builds" text="Twitter" target="_blank" css="text-white" icon="twitter" />
-						<Button type="ahref" href="https://discord.gg/g6YkuGJs" text="Discord" target="_blank" css="text-white" icon="discord" />
+						<Button type="ahref" href={process.env.REACT_APP_DISCORD_INVITE} text="Discord" target="_blank" css="text-white" icon="discord" />
 						<Button type="ahref" href="https://github.com/nyius/ksp-builds" css="text-white" target="_blank" text="Github" icon="github" />
 					</ul>
 					<ul>
@@ -45,7 +45,7 @@ function Footer() {
 					</ul>
 				</div>
 			</div>
-			<div className="flex flex-col gap-3 2k:gap-6 gap-4 md:place-self-center md:justify-self-end items-end">
+			<div className="flex flex-col gap-3 2k:gap-6 md:place-self-center md:justify-self-end items-end">
 				<div className=" text-xl 2k:text-2xl">KSP Builds is not affiliated with Private Division, Intercept Games, Take Two, or Kerbal Space Program 2.</div>
 				<div className="flex flex-row gap-3 2k:gap-6">
 					<p className="text-xl 2k:text-2xl">Thanks to these amazing artists for their artwork!</p>

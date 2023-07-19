@@ -1,31 +1,23 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React from 'react';
 import Button from './Button';
-import AuthContext from '../../context/auth/AuthContext';
-import { useFetchConversation } from '../../context/auth/AuthActions';
+import { useAuthContext } from '../../context/auth/AuthContext';
+import { useFetchConversation, useSetUserToMessage } from '../../context/auth/AuthActions';
 
 /**
  * Button to message a user
  * @returns
  */
 function MessageUserBtn({ usersProfile, text }) {
-	const { openProfile, user } = useContext(AuthContext);
+	const { user } = useAuthContext();
 	const { fetchConversation } = useFetchConversation();
-	const [userProfile, setUserProfile] = useState(null);
+	const [userToMessage] = useSetUserToMessage(null, usersProfile);
 
-	useEffect(() => {
-		if (usersProfile) {
-			setUserProfile(usersProfile);
-		} else {
-			setUserProfile(openProfile);
-		}
-	}, []);
-
-	if (user && userProfile && user.uid !== userProfile.uid) {
+	if (user && userToMessage && user.uid !== userToMessage.uid) {
 		return (
 			<>
-				{!userProfile.blockList?.includes(user?.uid) && (userProfile.allowPrivateMessaging === true || userProfile.allowPrivateMessaging === undefined) && (
+				{!userToMessage.blockList?.includes(user?.uid) && (userToMessage.allowPrivateMessaging === true || userToMessage.allowPrivateMessaging === undefined) && (
 					<div className="tooltip" data-tip="Message">
-						<Button text={text} size="w-full" icon="comment" color="btn-primary" onClick={() => fetchConversation(userProfile)} />
+						<Button text={text} size="w-full" icon="comment" color="btn-primary" onClick={() => fetchConversation(userToMessage)} />
 					</div>
 				)}
 			</>

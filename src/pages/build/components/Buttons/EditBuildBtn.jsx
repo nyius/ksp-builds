@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../../../components/buttons/Button';
-import BuildContext from '../../../../context/build/BuildContext';
+import { useBuildContext } from '../../../../context/build/BuildContext';
 import { setEditingBuild } from '../../../../context/build/BuildActions';
 
 /**
@@ -8,7 +8,7 @@ import { setEditingBuild } from '../../../../context/build/BuildActions';
  * @returns
  */
 function EditBuildBtn() {
-	const { dispatchBuild, loadedBuild } = useContext(BuildContext);
+	const { dispatchBuild, loadedBuild } = useBuildContext();
 
 	return <Button tooltip="Edit Build" icon="edit" color="btn-info" onClick={() => setEditingBuild(dispatchBuild, loadedBuild)} />;
 }

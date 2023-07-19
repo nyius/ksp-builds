@@ -1,15 +1,14 @@
-import React, { useContext } from 'react';
-import FiltersContext from '../../context/filters/FiltersContext';
+import React from 'react';
 import useFilters from '../../context/filters/FiltersActions';
-import SortOption from './Components/SortOption';
+import { useFiltersContext } from '../../context/filters/FiltersContext';
 
 /**
  * Displays the build sorting dropdown
  * @returns
  */
 function Sort() {
-	const { sortBy } = useContext(FiltersContext);
 	const { setSortFilter } = useFilters();
+	const { sortBy } = useFiltersContext();
 
 	/**
 	 * Handles user changing sorting
@@ -21,14 +20,12 @@ function Sort() {
 	};
 
 	return (
-		<select onChange={handleChangeSort} className="select select-bordered 2k:select-lg 2k:text-2xl 2k:font-thin max-w-xs bg-base-900">
-			<optgroup>
-				<SortOption text="Views" value="views_most" />
-				<SortOption text="Date (newest)" value="date_newest" />
-				<SortOption text="Date (oldest)" value="date_oldest" />
-				<SortOption text="Votes" value="upVotes" />
-				<SortOption text="Comments" value="comments" />
-			</optgroup>
+		<select value={sortBy ? sortBy : 'views_most'} onChange={handleChangeSort} className="select select-bordered 2k:select-lg 2k:text-2xl 2k:font-thin max-w-xs bg-base-900">
+			<option value="views_most">Views</option>
+			<option value="date_newest">Date (newest)</option>
+			<option value="date_oldest">Date (oldest)</option>
+			<option value="upVotes">Votes</option>
+			<option value="comments">Comments</option>
 		</select>
 	);
 }

@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import Conversation from '../Conversation';
 import Conversations from '../Conversations';
 import CloseMessageBoxBtn from '../Buttons/CloseMessageBoxBtn';
@@ -11,7 +11,7 @@ import Spinner1 from '../../spinners/Spinner1';
  * @returns
  */
 function MessageBox() {
-	const { convosOpen, messageTab, convosLoading } = useContext(AuthContext);
+	const { convosOpen, messageTab, convosLoading } = useAuthContext();
 
 	if (convosOpen) {
 		return (

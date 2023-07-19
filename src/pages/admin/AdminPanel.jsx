@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, getDoc, setDoc, getCountFromServer, serverTimestamp, addDoc, getDocFromCache, getDocsFromCache } from 'firebase/firestore';
 import { updateMetadata, ref, listAll } from 'firebase/storage';
 import { db } from '../../firebase.config';
@@ -9,13 +9,11 @@ import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import { storage } from '../../firebase.config';
 //---------------------------------------------------------------------------------------------------//
-import AuthContext from '../../context/auth/AuthContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import { sendNotification } from '../../context/auth/AuthUtils';
 //---------------------------------------------------------------------------------------------------//
 import standardNotifications from '../../utilities/standardNotifications';
 import { uploadImages } from '../../utilities/uploadImage';
-import getBuildPartCount from '../../utilities/getBuildPartCount';
-import fetchBuildFromAWS from '../../utilities/fetchBuildFromAws';
 //---------------------------------------------------------------------------------------------------//
 import TextInput from '../../components/input/TextInput';
 import Button from '../../components/buttons/Button';
@@ -24,9 +22,10 @@ import TextEditor from '../../components/textEditor/TextEditor';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import UsernameLink from '../../components/username/UsernameLink';
+import { createDateFromFirebaseTimestamp } from '../../utilities/createDateFromFirebaseTimestamp';
 
 function AdminPanel() {
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthContext();
 	//---------------------------------------------------------------------------------------------------//
 	const [uploadingChallengeImage, setUploadingChallengeImage] = useState(false);
 	const [reportRepliedFilter, setReportRepliedFilter] = useState(false);
@@ -593,7 +592,7 @@ function AdminPanel() {
 
 										{/* date/type */}
 										<div className="flex flex-row gap-5 2k:gap-10">
-											<p className="text-xl 2k:text-2xl">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(report.date.seconds * 1000)}</p>
+											<p className="text-xl 2k:text-2xl">{createDateFromFirebaseTimestamp(report.date.seconds, 'long')}</p>
 											<div
 												className={`badge ${report.type === 'contact' && 'badge-primary'} ${report.type === 'comment' && 'badge-secondary'} ${report.type === 'build' && 'badge-accent'} ${
 													report.type === 'user' && 'badge-info'

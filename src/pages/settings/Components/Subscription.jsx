@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import ManageSubscriptionBtn from './Buttons/ManageSubscriptionBtn';
 import SubscribeT1Btn from './Buttons/SubscribeT1Btn';
 import SubscribeT2Btn from './Buttons/SubscribeT2Btn';
@@ -11,7 +11,7 @@ import SubscriptionPrice from './SubscriptionPrice';
  * @returns
  */
 function Subscription() {
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthContext();
 
 	return (
 		<>

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import AuthContext from '../../context/auth/AuthContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import Button from './Button';
 import { setUserToBlock } from '../../context/auth/AuthActions';
 
@@ -8,7 +8,7 @@ import { setUserToBlock } from '../../context/auth/AuthActions';
  * @returns
  */
 function BlockUserBtn({ userToBlock }) {
-	const { user, dispatchAuth } = useContext(AuthContext);
+	const { user, dispatchAuth } = useAuthContext();
 
 	if (userToBlock && user && user?.username !== userToBlock?.username) {
 		return (

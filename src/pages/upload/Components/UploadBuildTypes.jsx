@@ -1,6 +1,6 @@
-import React, { useContext, useState, useEffect } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
-import { setBuildToUpload } from '../../../context/build/BuildActions';
+import React, { useState } from 'react';
+import { useBuildContext } from '../../../context/build/BuildContext';
+import { useSetUploadBuildTypes } from '../../../context/build/BuildActions';
 import BuildTypes from '../../../components/create/BuildTypes';
 
 /**
@@ -8,12 +8,10 @@ import BuildTypes from '../../../components/create/BuildTypes';
  * @returns
  */
 function UploadBuildTypes() {
-	const { dispatchBuild, buildToUpload } = useContext(BuildContext);
+	const { buildToUpload } = useBuildContext();
 	const [types, setTypes] = useState(buildToUpload.types.length > 0 ? buildToUpload.types : []);
 
-	useEffect(() => {
-		setBuildToUpload(dispatchBuild, { ...buildToUpload, types });
-	}, [types]);
+	useSetUploadBuildTypes(types);
 
 	//---------------------------------------------------------------------------------------------------//
 	if (buildToUpload) {

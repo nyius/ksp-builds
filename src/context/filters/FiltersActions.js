@@ -1,13 +1,17 @@
-import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FiltersContext from './FiltersContext';
+import { useFiltersContext } from './FiltersContext';
 import { setCurrentPage } from '../builds/BuildsActions';
-import BuildsContext from '../builds/BuildsContext';
+import { useBuildsContext } from '../builds/BuildsContext';
+import { useEffect } from 'react';
 
+/**
+ * Filters actions
+ * @returns
+ */
 const useFilters = () => {
-	const { sortBy, typeFilter, versionFilter, challengeFilter, dispatchBuildFilters, modsFilter } = useContext(FiltersContext);
+	const { sortBy, typeFilter, versionFilter, challengeFilter, dispatchBuildFilters, modsFilter } = useFiltersContext();
+	const { dispatchBuilds } = useBuildsContext();
 	const navigate = useNavigate();
-	const { dispatchBuilds } = useContext(BuildsContext);
 
 	/**
 	 * Handles setting the sorting for builds
@@ -146,6 +150,19 @@ const useFilters = () => {
 	};
 
 	return { filterBuilds, setSortFilter, setTypeFilter, setVersionFilter, resetFilters, setModsFilter, setChallengeFilter };
+};
+
+/**
+ * Handle resetting the all of the filters
+ */
+export const useResetFilters = () => {
+	const { dispatchBuildFilters } = useFiltersContext();
+
+	useEffect(() => {
+		dispatchBuildFilters({
+			type: 'RESET_FILTERS',
+		});
+	}, []);
 };
 
 export default useFilters;

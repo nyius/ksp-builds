@@ -1,18 +1,13 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import { cloneDeep } from 'lodash';
 import { useNavigate } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
-import AuthContext from '../../context/auth/AuthContext';
-import { useFetchUser, setOpenProfile, setFetchingProfile } from '../../context/auth/AuthActions';
-import BuildsContext from '../../context/builds/BuildsContext';
-import FiltersContext from '../../context/filters/FiltersContext';
-import useFilters from '../../context/filters/FiltersActions';
-import FoldersContext from '../../context/folders/FoldersContext';
-import useBuilds from '../../context/builds/BuildsActions';
+import { useAuthContext } from '../../context/auth/AuthContext';
+import { useGetAndSetOpenUserProfile } from '../../context/auth/AuthActions';
+import { useGetFilteredBuilds } from '../../context/builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
 import Spinner1 from '../../components/spinners/Spinner1';
-import { setBuildToAddToFolder, setFolderLocation, setOpenedFolder, setUsersFolders } from '../../context/folders/FoldersActions';
+import { useCheckOpenProfileFolderAndFetchBuilds, useResetOpenFolder, useSetBuildToAddToFolder, useSetFolderLocation, useSetOpenUsersFolders } from '../../context/folders/FoldersActions';
 import Sort from '../../components/sort/Sort';
 import CantFind from '../../components/cantFind/CantFind';
 import Button from '../../components/buttons/Button';
@@ -31,6 +26,7 @@ import Username from './Components/Username';
 import UserBio from './Components/UserBio';
 import UserDetails from './Components/UserDetails';
 import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
+import { useFoldersContext } from '../../context/folders/FoldersContext';
 
 /**
  * The page to display a user
@@ -38,73 +34,18 @@ import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
  */
 function User() {
 	const usersId = useParams().id;
-	const folderId = useParams().folderId;
 	const navigate = useNavigate();
 	//---------------------------------------------------------------------------------------------------//
-	const [sortedBuilds, setSortedBuilds] = useState([]);
-	//---------------------------------------------------------------------------------------------------//
-	const { sortBy } = useContext(FiltersContext);
-	const { fetchedBuilds } = useContext(BuildsContext);
-	const { dispatchAuth, openProfile, fetchingProfile, user, authLoading } = useContext(AuthContext);
-	const { dispatchFolders, openedFolder } = useContext(FoldersContext);
-	//---------------------------------------------------------------------------------------------------//
-	const { fetchUsersProfile, checkIfUserInContext } = useFetchUser();
-	const { filterBuilds } = useFilters();
-	const { fetchBuildsById } = useBuilds();
+	const [sortedBuilds] = useGetFilteredBuilds([]);
+	const { openProfile, fetchingProfile, user, authLoading, isAuthenticated } = useAuthContext();
+	const { openedFolder } = useFoldersContext();
 
-	// Fetches the users profile first so we know what builds they have
-	useEffect(() => {
-		setOpenProfile(dispatchAuth, null);
-		setFetchingProfile(dispatchAuth, true);
-
-		let foundProfile = checkIfUserInContext(usersId);
-		if (foundProfile) {
-			setOpenProfile(dispatchAuth, foundProfile);
-			setFetchingProfile(dispatchAuth, false);
-		} else {
-			fetchUsersProfile(usersId).then(fetchedUser => {
-				setOpenProfile(dispatchAuth, fetchedUser);
-			});
-		}
-
-		// Reset folder states
-		setFolderLocation(dispatchFolders, 'user');
-		setOpenedFolder(dispatchFolders, null);
-		setBuildToAddToFolder(dispatchFolders, null, user);
-	}, []);
-
-	// Fetches the users builds once we get their profile
-	useEffect(() => {
-		// Check if we found the users profile
-		if (openProfile && openProfile.username) {
-			setUsersFolders(dispatchFolders, openProfile.folders ? openProfile.folders : []);
-			if (folderId) {
-				const folderToFetchId = openProfile.folders?.filter(folder => folder.id === folderId);
-
-				if (folderToFetchId.length > 0) {
-					setOpenedFolder(dispatchFolders, folderToFetchId[0]);
-				} else {
-					const folderToFetchName = openProfile.folders?.filter(folder => folder.urlName === folderId);
-
-					if (folderToFetchName.length > 0) {
-						setOpenedFolder(dispatchFolders, folderToFetchName[0]);
-					} else {
-						navigate(`/user/${usersId}`);
-						fetchBuildsById(openProfile.builds, openProfile.uid, 'user');
-					}
-				}
-			} else {
-				fetchBuildsById(openProfile.builds, openProfile.uid, 'user');
-			}
-		}
-	}, [openProfile]);
-
-	// Listen for changes to the sorting and filter the builds accordingly
-	useEffect(() => {
-		let newFetchedBuilds = cloneDeep(fetchedBuilds);
-
-		setSortedBuilds(filterBuilds(newFetchedBuilds));
-	}, [fetchedBuilds, sortBy]);
+	useGetAndSetOpenUserProfile(usersId);
+	useCheckOpenProfileFolderAndFetchBuilds(usersId);
+	useSetOpenUsersFolders();
+	useSetFolderLocation('user');
+	useResetOpenFolder();
+	useSetBuildToAddToFolder(null);
 
 	//---------------------------------------------------------------------------------------------------//
 	if (fetchingProfile) {
@@ -138,7 +79,7 @@ function User() {
 								<div className="flex flex-col gap-3 2k:gap-4 w-full md:w-1/4">
 									<ProfilePicture />
 
-									{!authLoading && user?.username && user?.uid !== openProfile.uid ? (
+									{!authLoading && isAuthenticated && user?.uid !== openProfile.uid ? (
 										<>
 											<MessageUserBtn text="Message" />
 											<FollowUserBtn text="Follow" />

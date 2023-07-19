@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import useResetStates from '../../utilities/useResetStates';
+import React, { useState } from 'react';
+import useResetStates from '../../hooks/useResetStates';
 //---------------------------------------------------------------------------------------------------//
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import TextInput from '../../components/input/TextInput';
@@ -23,11 +23,9 @@ function SignUp() {
 		password: '',
 	});
 	const [accountExists, setAccountExists] = useState(false);
-	const { resetStates } = useResetStates();
 
-	useEffect(() => {
-		resetStates();
-	}, []);
+	useResetStates();
+
 	/**
 	 * Handles setting the newUser state to a changing field
 	 * @param {*} e

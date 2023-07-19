@@ -7,7 +7,7 @@ import Button from '../../../../components/buttons/Button';
  * @returns
  */
 function SubmitBuildChallengeBtn({ challengeId }) {
-	return <Button type="ahref" href={`/upload/c=${challengeId}`} text="Submit Build" icon="plus" color="btn-accent" position="z-50" size="w-fit" />;
+	return <Button type="ahref" href={`/upload/challenge=${challengeId}`} text="Submit Build" icon="plus" color="btn-accent" position="z-50" size="w-fit" />;
 }
 
 export default SubmitBuildChallengeBtn;

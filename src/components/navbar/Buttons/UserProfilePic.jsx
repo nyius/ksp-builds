@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import LogoIcon from '../../../assets/logo_light_icon.png';
 
 /**
@@ -7,7 +7,7 @@ import LogoIcon from '../../../assets/logo_light_icon.png';
  * @returns
  */
 function UserProfilePic() {
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthContext();
 
 	return (
 		<label tabIndex={0} className="btn btn-circle w-14 h-14 2k:w-20 2k:h-20 2k:btn-lg avatar">

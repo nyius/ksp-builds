@@ -1,36 +1,15 @@
-import React, { useContext, useState, useEffect } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React from 'react';
+import { useGetNewNotifs } from '../../../context/auth/AuthActions';
 
 /**
  * Displays an icon if the user has a new notification
  * @returns
  */
 function NewNotificationIcon() {
-	const { authLoading, user } = useContext(AuthContext);
-	const [totalUnread, setTotalUnread] = useState(0);
+	const [totalUnreadNotifs] = useGetNewNotifs(0);
 
-	/**
-	 * Calculates total unread notifications
-	 */
-	const calcUnreadNotifs = () => {
-		setTotalUnread(0);
-		user.notifications.map(notif => {
-			if (!notif.read) {
-				setTotalUnread(prevstate => (prevstate += 1));
-			}
-		});
-	};
-
-	useEffect(() => {
-		if (!authLoading && user?.username) {
-			if (user.notifications) {
-				calcUnreadNotifs();
-			}
-		}
-	}, [authLoading, user]);
-
-	if (totalUnread > 0) {
-		return <span className="indicator-item indicator-bottom indicator-start badge badge-secondary 2k:text-2xl 2k:p-4">{totalUnread > 99 ? '99+' : totalUnread}</span>;
+	if (totalUnreadNotifs > 0) {
+		return <span className="indicator-item indicator-bottom indicator-start badge badge-secondary 2k:text-2xl 2k:p-4">{totalUnreadNotifs > 99 ? '99+' : totalUnreadNotifs}</span>;
 	}
 }
 

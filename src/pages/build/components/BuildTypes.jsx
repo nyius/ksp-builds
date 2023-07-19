@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
+import React from 'react';
+import { useBuildContext } from '../../../context/build/BuildContext';
 import TypeBadge from '../../../components/typeBadge/TypeBadge';
 
 /**
@@ -7,7 +7,7 @@ import TypeBadge from '../../../components/typeBadge/TypeBadge';
  * @returns
  */
 function BuildTypes() {
-	const { loadedBuild } = useContext(BuildContext);
+	const { loadedBuild } = useBuildContext();
 
 	return (
 		<div className="flex flex-row flex-wrap gap-2">

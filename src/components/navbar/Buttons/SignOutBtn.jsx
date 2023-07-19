@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../buttons/Button';
 import { toast } from 'react-toastify';
 import { auth } from '../../../firebase.config';
-import AuthContext from '../../../context/auth/AuthContext';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 
 function SignOutBtn() {
-	const { dispatchAuth } = useContext(AuthContext);
+	const { dispatchAuth } = useAuthContext();
 
 	/**
 	 * Function to handle signing out

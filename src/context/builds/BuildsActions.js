@@ -1,19 +1,25 @@
-import { useContext } from 'react';
+import { useEffect, useState } from 'react';
 import { getDocs, collection, startAfter, orderBy, limit, query, where, getDocsFromCache } from 'firebase/firestore';
 import { db } from '../../firebase.config';
-import BuildsContext from './BuildsContext';
-import AuthContext from '../auth/AuthContext';
-import FiltersContext from '../filters/FiltersContext';
+import { useBuildsContext } from './BuildsContext';
+import { useAuthContext } from '../auth/AuthContext';
+import { useFiltersContext } from '../filters/FiltersContext';
 import useFilters from '../filters/FiltersActions';
 import { cloneDeep } from 'lodash';
 import { checkLocalBuildAge, getBuildFromLocalStorage, setLocalStoredBuild } from '../build/BuildUtils';
+import { useFoldersContext } from '../folders/FoldersContext';
+import { useParams, useSearchParams } from 'react-router-dom';
+import algoliasearch from 'algoliasearch/lite';
+
+const searchClient = algoliasearch('ASOR7A703R', process.env.REACT_APP_ALGOLIA_KEY);
+const searchIndex = searchClient.initIndex('builds');
 
 /**
  * Hook with functions for fetching builds
  * @returns
  */
 const useBuilds = () => {
-	const { dispatchBuilds, currentPage, storedBuilds, fetchAmount } = useContext(BuildsContext);
+	const { dispatchBuilds, currentPage, storedBuilds, fetchAmount } = useBuildsContext();
 	const { createFirestoreQuery } = useCreateFirestoreQuery();
 	const { filterBuilds } = useFilters();
 
@@ -76,7 +82,7 @@ const useBuilds = () => {
 				}
 			});
 
-			// filter the builds we are keeping from local storate from those to fetch
+			// filter the builds we are keeping from local storage from those to fetch
 			const filteredBuildsToFetch = buildsToFetchCopy.filter(id => !localBuildsToKeepIds.includes(id));
 
 			const batches = [];
@@ -153,10 +159,65 @@ const useBuilds = () => {
 export default useBuilds;
 
 /**
+ * Handles fetching a batch of builds by their ids
+ * @param {arr} buildIds - an array of builds ids to fetch
+ * @param {string} fetchUid - a users UID (optional)
+ * @param {string} type - public/private/unlisted
+ */
+export const useFetchBuildsById = (buildIds, fetchUid, type) => {
+	const { dispatchBuilds } = useBuildsContext();
+	const { fetchBuildsById } = useBuilds();
+
+	useEffect(() => {
+		clearFetchedBuilds(dispatchBuilds);
+		if (!buildIds) return;
+
+		if (buildIds.length > 0) {
+			fetchBuildsById(buildIds, fetchUid, type);
+		} else {
+			setBuildsLoading(dispatchBuilds, false);
+		}
+	}, [dispatchBuilds, buildIds]);
+};
+
+/**
+ * Fetches builds from the server.
+ * Listens to changes in filters and search params.
+ */
+export const useFetchBuilds = () => {
+	const { typeFilter, versionFilter, sortBy, modsFilter, challengeFilter } = useFiltersContext();
+	const { fetchBuildsById, fetchBuilds } = useBuilds();
+	const [searchParams] = useSearchParams();
+	const urlParams = useParams();
+	const { fetchAmount } = useBuildsContext();
+
+	// listens for changes to filters/searches and fetches builds based on filter
+	useEffect(() => {
+		const searchQuery = searchParams.get('search_query');
+
+		if (searchQuery) {
+			searchIndex.search(searchQuery).then(({ hits }) => {
+				let ids = [];
+
+				hits.map(hit => {
+					ids.push(hit.objectID);
+				});
+
+				fetchBuildsById(ids, null, 'public');
+			});
+		} else if (urlParams.id) {
+			fetchBuilds();
+		} else {
+			fetchBuilds();
+		}
+	}, [urlParams, searchParams, modsFilter, versionFilter, challengeFilter, sortBy, fetchAmount, typeFilter]);
+};
+
+/**
  * Hook with functions for handling the current builds page
  */
 export const useChangePage = () => {
-	const { dispatchBuilds, storedBuilds, currentPage } = useContext(BuildsContext);
+	const { dispatchBuilds, storedBuilds, currentPage } = useBuildsContext();
 	/**
 	 * Handles going back a page. Gets the page from the localstorage
 	 * @param {num} page
@@ -186,9 +247,9 @@ export const useChangePage = () => {
  * Hook for functions that return a firestore query
  */
 export const useCreateFirestoreQuery = () => {
-	const { typeFilter, versionFilter, modsFilter, challengeFilter, sortBy } = useContext(FiltersContext);
-	const { lastFetchedBuild, fetchAmount } = useContext(BuildsContext);
-	const { user } = useContext(AuthContext);
+	const { typeFilter, versionFilter, modsFilter, challengeFilter, sortBy } = useFiltersContext();
+	const { lastFetchedBuild, fetchAmount } = useBuildsContext();
+	const { user } = useAuthContext();
 
 	/**
 	 * handles creating a firestore query.
@@ -229,7 +290,86 @@ export const useCreateFirestoreQuery = () => {
 	return { createFirestoreQuery };
 };
 
-// State Updaters ---------------------------------------------------------------------------------------------------//
+/**
+ * Fetches builds for the current open folder
+ */
+export const useFetchOpenFolderBuilds = () => {
+	const { openedFolder } = useFoldersContext();
+	const { fetchBuildsById } = useBuilds();
+
+	useEffect(() => {
+		if (openedFolder) {
+			fetchBuildsById(openedFolder.builds, null, 'public');
+		}
+	}, [openedFolder]);
+};
+
+/**
+ * Handles setting the current builds page on page load
+ * @param {int} pageNum - page to go to
+ */
+export const useSetCurrentPage = pageNum => {
+	const { dispatchBuilds } = useBuildsContext();
+
+	useEffect(() => {
+		setCurrentPage(dispatchBuilds, pageNum);
+	}, []);
+};
+
+/**
+ * Handles storing the fetched builds in a state that we can use (as to not use directly from context).
+ * Listens to LoadingBuilds, fetchedBuilds, and buildsToDisplay for changes.
+ * @param {*} initialState - an initial state
+ * @param {arr} buildsToDisplay - (optional) An array of builds to set
+ * @returns [builds, setBuilds]
+ */
+export const useLoadedBuilds = (initialState, buildsToDisplay) => {
+	const [builds, setBuilds] = useState(initialState);
+	const { loadingBuilds, fetchedBuilds } = useBuildsContext();
+
+	useEffect(() => {
+		if (!loadingBuilds) {
+			setBuilds(buildsToDisplay ? buildsToDisplay : fetchedBuilds);
+		}
+	}, [loadingBuilds, fetchedBuilds, buildsToDisplay]);
+
+	return [builds, setBuilds];
+};
+
+/**
+ * Returns the current fetched builds, sorted
+ * @param {*} initialState
+ * @returns [filteredBuilds, setFilteredBuilds]
+ */
+export const useGetFilteredBuilds = initialState => {
+	const { filterBuilds } = useFilters();
+	const { sortBy } = useFiltersContext();
+	const { fetchedBuilds } = useBuildsContext();
+	const [filteredBuilds, setFilteredBuilds] = useState(initialState);
+
+	// Listen for changes to the sorting and filter the builds accordingly
+	useEffect(() => {
+		let newFetchedBuilds = cloneDeep(fetchedBuilds);
+
+		setFilteredBuilds(filterBuilds(newFetchedBuilds));
+	}, [fetchedBuilds, sortBy]);
+
+	return [filteredBuilds, setFilteredBuilds];
+};
+
+/**
+ * Handles setting a forced view mode for the builds list
+ * @param {*} view
+ */
+export const useSetBuildsForcedView = view => {
+	const { dispatchBuilds } = useBuildsContext();
+
+	useEffect(() => {
+		setBuildsForcedView(dispatchBuilds, view);
+	}, [dispatchBuilds, view]);
+};
+
+// State Updaters -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 /**
  * handles setting fetched builds in the context
  * @param {function} dispatchBuilds - Dispatch function
@@ -299,7 +439,7 @@ export const setFetchAmount = (dispatchBuilds, amount) => {
  * Clears the fetched builds
  * @param {function} dispatchBuilds - Dispatch function
  */
-export const setClearFetchedBuilds = dispatchBuilds => {
+export const clearFetchedBuilds = dispatchBuilds => {
 	dispatchBuilds({
 		type: 'CLEAR_BUILDS',
 		payload: null,

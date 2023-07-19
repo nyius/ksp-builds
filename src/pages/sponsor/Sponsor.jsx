@@ -20,7 +20,7 @@ function Sponsor() {
 			<MiddleContainer>
 				<PlanetHeader text="Sponsor" />
 				<div className="flex flex-col text-slate-200 p-20 2k:p-32">
-					<img src={InGameLogo} alt="In Game KSP Builds Logo" className="mb-20 2k:mb-24 rounded-xl border border-2 border-dashed border-slate-600" />
+					<img src={InGameLogo} alt="In Game KSP Builds Logo" className="mb-20 2k:mb-24 rounded-xl border-2 border-dashed border-slate-600" />
 					<div className="text-3xl 2k:text-5xl text-white font-bold mb-5 2k:mb-10 text-center pixel-font">Work with KSP Builds</div>
 					<div className="flex flex-col md:flex-row gap-4 2k:gap-8 items-center bg-base-800 p-8 2k:p-16 rounded-xl">
 						<div className="text-xl 2k:text-3xl w-full md:w-1/2 2k:w-3/4">

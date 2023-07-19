@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../buttons/Button';
 import { useHandleNotifications } from '../../../context/auth/AuthActions';
-import AuthContext from '../../../context/auth/AuthContext';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 
 /**
  * Button for loading more notifs
@@ -9,7 +9,7 @@ import AuthContext from '../../../context/auth/AuthContext';
  */
 function LoadMoreBtn() {
 	const { fetchMoreNotifications } = useHandleNotifications();
-	const { lastFetchedNotification } = useContext(AuthContext);
+	const { lastFetchedNotification } = useAuthContext();
 
 	if (lastFetchedNotification !== 'end') {
 		return <Button type="button" text="Load More" icon="reset" color="btn-primary" onClick={fetchMoreNotifications} />;

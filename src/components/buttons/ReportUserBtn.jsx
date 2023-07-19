@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import Button from './Button';
 import { setReport } from '../../context/auth/AuthActions';
 
@@ -8,7 +8,7 @@ import { setReport } from '../../context/auth/AuthActions';
  * @returns
  */
 function ReportUserBtn({ userToReport }) {
-	const { dispatchAuth } = useContext(AuthContext);
+	const { dispatchAuth } = useAuthContext();
 
 	return (
 		<div className="tooltip" data-tip="Report">

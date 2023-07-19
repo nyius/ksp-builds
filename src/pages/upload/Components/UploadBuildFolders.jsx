@@ -1,30 +1,17 @@
-import React, { useContext, useState, useEffect } from 'react';
-import FoldersContext from '../../../context/folders/FoldersContext';
+import React from 'react';
+import { useFoldersContext } from '../../../context/folders/FoldersContext';
 import Builds from '../../../components/builds/Builds';
 import Folders from '../../../components/folders/Folders';
-import { cloneDeep } from 'lodash';
-import BuildsContext from '../../../context/builds/BuildsContext';
-import useFilters from '../../../context/filters/FiltersActions';
-import FiltersContext from '../../../context/filters/FiltersContext';
 import WhatIsFolderBtn from './Buttons/WhatIsFolderBtn';
+import { useGetFilteredBuilds } from '../../../context/builds/BuildsActions';
 
 /**
  * Displays the users folders
  * @returns
  */
 function UploadBuildFolders() {
-	const { openedFolder } = useContext(FoldersContext);
-	const { fetchedBuilds } = useContext(BuildsContext);
-	const { sortBy } = useContext(FiltersContext);
-	const [sortedBuilds, setSortedBuilds] = useState(null);
-	const { filterBuilds } = useFilters();
-
-	// Listen for changes to the sorting and filter the builds accordingly
-	useEffect(() => {
-		let newFetchedBuilds = cloneDeep(fetchedBuilds);
-
-		setSortedBuilds(filterBuilds(newFetchedBuilds));
-	}, [fetchedBuilds, sortBy]);
+	const { openedFolder } = useFoldersContext();
+	const [sortedBuilds] = useGetFilteredBuilds(null);
 
 	//---------------------------------------------------------------------------------------------------//
 	return (

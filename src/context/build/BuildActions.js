@@ -1,7 +1,7 @@
-import { useContext, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, where, getDocs, serverTimestamp, getDocsFromCache, getDocFromCache } from 'firebase/firestore';
 import { db } from '../../firebase.config';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { s3Client } from '../../S3.config';
 import { toast } from 'react-toastify';
@@ -9,6 +9,7 @@ import { compressAccurately } from 'image-conversion';
 import { auth } from '../../firebase.config';
 import { cloneDeep } from 'lodash';
 import { compressToEncodedURIComponent } from 'lz-string';
+import { convertFromRaw, EditorState } from 'draft-js';
 //---------------------------------------------------------------------------------------------------//
 import { uploadImage } from '../../utilities/uploadImage';
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
@@ -17,49 +18,54 @@ import { buildNameToUrl } from '../../utilities/buildNameToUrl';
 import getBuildPartCount from '../../utilities/getBuildPartCount';
 import fetchBuildFromAWS from '../../utilities/fetchBuildFromAws';
 //---------------------------------------------------------------------------------------------------//
-import BuildContext from './BuildContext';
-import BuildsContext from '../builds/BuildsContext';
-import AuthContext from '../auth/AuthContext';
-import { useUpdateProfile, useHandleVoting } from '../auth/AuthActions';
+import { useBuildContext } from './BuildContext';
+import { useBuildsContext } from '../builds/BuildsContext';
+import { useAuthContext } from '../auth/AuthContext';
+import { useUpdateProfile, useHandleVoting, useFetchUser } from '../auth/AuthActions';
 import { sendNotification } from '../auth/AuthUtils';
-import FiltersContext from '../filters/FiltersContext';
+import { useFiltersContext } from '../filters/FiltersContext';
 import { updateDownloadCount, updateViewCount, makeBuildReadyToUpload, searchBuilds, setLocalStoredBuild, getBuildFromLocalStorage, checkLocalBuildAge, deleteBuildFromLocalStorage } from './BuildUtils';
 import { useAddBuildToFolder } from '../folders/FoldersActions';
+import { useNewsContext } from '../news/NewsContext';
 //---------------------------------------------------------------------------------------------------//
 
-const useBuild = () => {
-	const { dispatchBuild } = useContext(BuildContext);
+/**
+ * Fetches the build and dispatches the result. First checks local storage. If no build is found or is out of date, fetches from server.
+ * @param {string} id - id of the build to fetch
+ */
+const useFetchBuild = async id => {
+	const { dispatchBuild } = useBuildContext();
+	const { fetchComments } = useFetchComments();
 
-	/**
-	 * Fetches the build and dispatches the result. First checks local storage. If no build is found or is out of date, fetches from server.
-	 * @param {string} id - id of the build to fetch
-	 */
-	const fetchBuild = async id => {
-		dispatchBuild({ type: 'LOADING_BUILD', payload: true });
+	useEffect(() => {
+		const fetchBuild = async () => {
+			dispatchBuild({ type: 'LOADING_BUILD', payload: true });
 
-		try {
-			const newId = buildNameToUrl(id);
+			try {
+				const newId = buildNameToUrl(id);
 
-			let localBuildById = getBuildFromLocalStorage(newId);
+				let localBuildById = getBuildFromLocalStorage(newId);
 
-			if (localBuildById) {
-				if (checkLocalBuildAge(localBuildById.lastFetchedTimestamp, process.env.REACT_APP_CACHE_TIMEOUT)) {
-					await fetchBuildFromServer(localBuildById.id);
+				if (localBuildById) {
+					if (checkLocalBuildAge(localBuildById.lastFetchedTimestamp, process.env.REACT_APP_CACHE_TIMEOUT)) {
+						await fetchBuildFromServer(localBuildById.id);
+					} else {
+						setLoadedBuild(dispatchBuild, localBuildById);
+						await fetchComments(localBuildById.id);
+						await updateViewCount(localBuildById);
+						return;
+					}
 				} else {
-					setLoadedBuild(dispatchBuild, localBuildById);
-					await fetchComments(localBuildById.id);
-					await updateViewCount(localBuildById);
-					return;
+					await fetchBuildFromServer(id);
 				}
-			} else {
-				await fetchBuildFromServer(id);
+			} catch (error) {
+				setLoadedBuild(dispatchBuild, '');
+				console.log(error);
+				throw new Error(`Error fetching build: ${error}`);
 			}
-		} catch (error) {
-			setLoadedBuild(dispatchBuild, '');
-			console.log(error);
-			throw new Error(`Error fetching build: ${error}`);
-		}
-	};
+		};
+		fetchBuild();
+	}, [id]);
 
 	/**
 	 * handles fetching a build from the server
@@ -108,6 +114,16 @@ const useBuild = () => {
 			throw new Error(`Error fetching build: ${error}`);
 		}
 	};
+};
+
+export default useFetchBuild;
+
+/**
+ * Hook with funcionality for fetching a builds comments
+ * @returns { fetchComments }
+ */
+export const useFetchComments = () => {
+	const { dispatchBuild } = useBuildContext();
 
 	/**
 	 * Fetches a builds comments
@@ -140,21 +156,16 @@ const useBuild = () => {
 		}
 	};
 
-	return {
-		fetchComments,
-		fetchBuild,
-	};
+	return { fetchComments };
 };
-
-export default useBuild;
 
 /**
  * Hook for making a build of the week
  * @returns
  */
 export const useMakeBuildOfTheWeek = () => {
-	const { buildOfTheWeek } = useContext(BuildContext);
-	const { user } = useContext(AuthContext);
+	const { buildOfTheWeek } = useBuildContext();
+	const { user } = useAuthContext();
 
 	/**
 	 * handles making a build the build of the week
@@ -208,8 +219,8 @@ export const useMakeBuildOfTheWeek = () => {
  * @returns
  */
 export const useComment = () => {
-	const { dispatchBuild, comments, comment, loadedBuild, replyingComment } = useContext(BuildContext);
-	const { user } = useContext(AuthContext);
+	const { dispatchBuild, comments, comment, loadedBuild, replyingComment } = useBuildContext();
+	const { user } = useAuthContext();
 
 	/**
 	 * Handles adding a new comment
@@ -362,7 +373,7 @@ export const useComment = () => {
  * @returns
  */
 export const useCopyBuildToClipboard = () => {
-	const { dispatchBuild, fetchedRawBuilds } = useContext(BuildContext);
+	const { dispatchBuild, fetchedRawBuilds } = useBuildContext();
 
 	/**
 	 * handles copying a build to the clipboard. Fetches it from AWS and stores it in context
@@ -405,7 +416,7 @@ export const useCopyBuildToClipboard = () => {
  * @returns
  */
 export const useUpdateBuild = () => {
-	const { dispatchBuild, loadedBuild } = useContext(BuildContext);
+	const { dispatchBuild, loadedBuild } = useBuildContext();
 
 	/**
 	 * Handles updating the build in the database
@@ -507,7 +518,7 @@ export const useUpdateBuild = () => {
  * @returns
  */
 export const useDeleteBuild = () => {
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthContext();
 	const navigate = useNavigate();
 
 	/**
@@ -582,11 +593,11 @@ export const useDeleteBuild = () => {
  */
 export const useUploadBuild = () => {
 	const { addBuildToFolder } = useAddBuildToFolder();
-	const { dispatchBuild } = useContext(BuildContext);
-	const { user } = useContext(AuthContext);
+	const { dispatchBuild } = useBuildContext();
+	const { user } = useAuthContext();
 	const { updateUserProfilesAndDb } = useUpdateProfile();
-	const { dispatchBuilds } = useContext(BuildsContext);
-	const { kspVersions } = useContext(FiltersContext);
+	const { dispatchBuilds } = useBuildsContext();
+	const { kspVersions } = useFiltersContext();
 	const { handleVoting } = useHandleVoting();
 
 	const [loading, setLoading] = useState(null);
@@ -721,6 +732,155 @@ export const useUploadBuild = () => {
 	};
 
 	return { uploadBuild };
+};
+
+/**
+ * Handles navigatng home if the user visits a private build thats not their own
+ */
+export const useNavigateIfPrivateBuild = () => {
+	const { loadingBuild, loadedBuild } = useBuildContext();
+	const { user } = useAuthContext();
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (!loadingBuild && loadedBuild) {
+			if (loadedBuild.visibility === 'private' && user.uid !== loadedBuild.uid) {
+				navigate('/');
+			}
+		}
+	}, [loadingBuild, loadedBuild, user]);
+};
+
+/**
+ * Waits for a build to load and then returns  draftJS compatible build description
+ * @param {*} initialState
+ * @returns
+ */
+export const useGetBuildDesc = initialState => {
+	const [buildDesc, setBuildDesc] = useState(initialState);
+	const { loadingBuild, loadedBuild } = useBuildContext();
+
+	useEffect(() => {
+		if (!loadingBuild && loadedBuild) {
+			setBuildDesc(EditorState.createWithContent(convertFromRaw(JSON.parse(loadedBuild.description))));
+		}
+	}, [loadingBuild, loadedBuild]);
+
+	return [buildDesc, setBuildDesc];
+};
+
+/**
+ * Fetches the current loaded builds authors profile.
+ */
+export const useFetchBuildAuthorProfile = () => {
+	const { loadingBuild, loadedBuild } = useBuildContext();
+	const { fetchUsersProfile } = useFetchUser();
+
+	useEffect(() => {
+		if (!loadingBuild && loadedBuild) {
+			fetchUsersProfile(loadedBuild.uid);
+		}
+	}, [loadingBuild, loadedBuild]);
+};
+
+/**
+ * Handles setting the build to upload to the server.
+ * @param {obj} buildToUpload - the build to upload
+ */
+export const useSetBuildToUpload = buildToUpload => {
+	const { dispatchBuild } = useBuildContext();
+
+	useEffect(() => {
+		setBuildToUpload(dispatchBuild, buildToUpload);
+	}, []);
+};
+
+/**
+ * Handles checking if the current URL contains a challenge. Used for Upload/Edit build page
+ * @returns [challengeParam, setChallengeParam]
+ */
+export const useGetBuildChallenge = initialState => {
+	const { dispatchBuild, buildToUpload } = useBuildContext();
+	const { challenges, articlesLoading } = useNewsContext();
+	const challengeParams = useParams().id;
+	const [challengeParam, setChallengeParam] = useState(initialState);
+
+	useEffect(() => {
+		// Check if the user came here from clicking a 'submit build for ___ challenge' button.
+		if (challengeParams && buildToUpload) {
+			if (!articlesLoading && challengeParams.includes('challenge=')) {
+				const challengeId = challengeParams.replace('challenge=', '');
+				const challenge = challenges.filter(challenge => {
+					if (challenge.articleId === challengeId) return challenge;
+				});
+				if (challenge.length > 0) {
+					setBuildToUpload(dispatchBuild, { ...buildToUpload, forChallenge: challengeId, challengeTitle: challenge[0].title });
+					setChallengeParam(challengeId);
+				} else {
+					console.log(`Couldnt find that challenge`);
+				}
+			}
+		}
+	}, [articlesLoading, challengeParams]);
+
+	return [challengeParam, setChallengeParam];
+};
+
+/**
+ * handles setting the raw image files if the user is editing a build
+ */
+export const useGetEditingBuildRawImages = () => {
+	const { dispatchBuild, buildToUpload, editingBuild } = useBuildContext();
+
+	useEffect(() => {
+		if (buildToUpload && !buildToUpload.rawImageFiles) {
+			setBuildToUpload(dispatchBuild, { ...buildToUpload, rawImageFiles: editingBuild.images });
+		}
+	}, [buildToUpload]);
+};
+
+/**
+ * Handles fetching the raw build of the currently editing build. Sets the fetched raw build into the 'buildToUpload' object in context
+ * @returns [loadingRawBuild, setLoadingRawBuild]
+ */
+export const useGetEditingBuildRawBuild = () => {
+	const { dispatchBuild, buildToUpload, editingBuild } = useBuildContext();
+	const [loadingRawBuild, setLoadingRawBuild] = useState(true);
+
+	useEffect(() => {
+		if (editingBuild) {
+			setLoadingRawBuild(true);
+
+			const fetchRawBuild = async () => {
+				try {
+					const fetchedRawBuild = await fetchBuildFromAWS(editingBuild.id);
+					return fetchedRawBuild;
+				} catch (error) {
+					console.log(error);
+					toast.error('Something went wrong fetching the Raw build');
+				}
+			};
+
+			fetchRawBuild().then(fetchedRawBuild => {
+				setBuildToUpload(dispatchBuild, { ...buildToUpload, build: fetchedRawBuild });
+				setLoadingRawBuild(false);
+			});
+		}
+	}, [editingBuild]);
+
+	return [loadingRawBuild, setLoadingRawBuild];
+};
+
+/**
+ * Handles setting the build types in the current build to upload.
+ * @param {arr} types - array of selected types
+ */
+export const useSetUploadBuildTypes = types => {
+	const { dispatchBuild, buildToUpload } = useBuildContext();
+
+	useEffect(() => {
+		setBuildToUpload(dispatchBuild, { ...buildToUpload, types });
+	}, [types]);
 };
 
 // State Updaters ---------------------------------------------------------------------------------------------------//

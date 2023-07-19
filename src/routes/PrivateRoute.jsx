@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
-import AuthContext from '../context/auth/AuthContext';
+import { useAuthContext } from '../context/auth/AuthContext';
 
 /**
  * Handles navigation for private routes
@@ -8,7 +8,7 @@ import AuthContext from '../context/auth/AuthContext';
  * @returns
  */
 function PrivateRoute({ children, admin }) {
-	const { user, authLoading } = useContext(AuthContext);
+	const { user, authLoading } = useAuthContext();
 
 	// Check if the page is for admins only, and if the user is admin
 	if (admin) return authLoading ? '' : user ? user.siteAdmin ? <>{children}</> : <Navigate to="/" /> : <Navigate to="/login" />;

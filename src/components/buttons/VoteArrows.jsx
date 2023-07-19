@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import { useHandleVoting } from '../../context/auth/AuthActions';
 import { GoArrowUp, GoArrowDown } from 'react-icons/go';
 import CheckCredentials from '../credentials/CheckCredentials';
@@ -12,7 +12,7 @@ import CheckCredentials from '../credentials/CheckCredentials';
  */
 function VoteArrows({ build, view }) {
 	const { handleVoting } = useHandleVoting();
-	const { user, authLoading } = useContext(AuthContext);
+	const { user, authLoading } = useAuthContext();
 
 	/**
 	 * Checks if the current user has voted on the build. Takes in a vote type to check and the id of the build. Returns the tailwind syntax to color the vote arrow

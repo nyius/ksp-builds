@@ -1,24 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import { Editor } from 'react-draft-wysiwyg';
-import checkIfJson from '../../../utilities/checkIfJson';
-import { convertFromRaw, EditorState, ContentState } from 'draft-js';
+import useCreateDraftJs from '../../../hooks/useCreateDraftJs';
 
 /**
  * Displays the user bio
  * @returns
  */
 function UserBio() {
-	const { openProfile } = useContext(AuthContext);
-	const [bioState, setBioState] = useState(null);
-
-	useEffect(() => {
-		if (checkIfJson(openProfile?.bio)) {
-			setBioState(EditorState.createWithContent(convertFromRaw(JSON.parse(openProfile?.bio))));
-		} else {
-			setBioState(EditorState.createWithContent(ContentState.createFromText(openProfile?.bio)));
-		}
-	}, [openProfile]);
+	const { openProfile } = useAuthContext();
+	const [bioState] = useCreateDraftJs(null, openProfile?.bio);
 
 	return (
 		<div className="flex flex-row gap-2 text-white">

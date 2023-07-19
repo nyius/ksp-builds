@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../buttons/Button';
-import NewsContext from '../../../context/news/NewsContext';
+import { useNewsContext } from '../../../context/news/NewsContext';
 import { nextHeroSlide } from '../../../context/news/NewsActions';
 
 /**
@@ -8,7 +8,7 @@ import { nextHeroSlide } from '../../../context/news/NewsActions';
  * @returns
  */
 function NextSlideBtn() {
-	const { dispatchNews } = useContext(NewsContext);
+	const { dispatchNews } = useNewsContext();
 
 	return <Button icon="right2" size="!btn-circle" color="text-slate-100" onClick={() => nextHeroSlide(dispatchNews)} position="z-51 absolute right-2 sm:right-auto sm:relative" />;
 }

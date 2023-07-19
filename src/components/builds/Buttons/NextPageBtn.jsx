@@ -1,6 +1,5 @@
-import React, { useContext } from 'react';
-import { useChangePage } from '../../../context/builds/BuildsActions';
-import BuildsContext from '../../../context/builds/BuildsContext';
+import React from 'react';
+import { useBuildsContext } from '../../../context/builds/BuildsContext';
 import useBuilds from '../../../context/builds/BuildsActions';
 
 /**
@@ -8,7 +7,7 @@ import useBuilds from '../../../context/builds/BuildsActions';
  * @returns
  */
 function NextPageBtn() {
-	const { loadingBuilds, fetchedBuilds, fetchAmount } = useContext(BuildsContext);
+	const { loadingBuilds, fetchedBuilds, fetchAmount } = useBuildsContext();
 	const { fetchMoreBuilds } = useBuilds();
 
 	return (

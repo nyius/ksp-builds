@@ -1,4 +1,4 @@
-import React, { createContext, useReducer } from 'react';
+import React, { createContext, useContext, useReducer } from 'react';
 import BuildReducer from './BuildReducer';
 
 const BuildContext = createContext();
@@ -27,6 +27,16 @@ export const BuildProvider = ({ children }) => {
 	const [state, dispatchBuild] = useReducer(BuildReducer, initialState);
 
 	return <BuildContext.Provider value={{ ...state, dispatchBuild }}>{children}</BuildContext.Provider>;
+};
+
+/**
+ * Build Context
+ * @returns
+ */
+export const useBuildContext = () => {
+	const context = useContext(BuildContext);
+
+	return context;
 };
 
 export default BuildContext;

@@ -1,6 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../context/auth/AuthContext';
-import BuildContext from '../../context/build/BuildContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
+import { useBuildContext } from '../../context/build/BuildContext';
 
 /**
  * Checks credentials (type) and retuns children if credentials are met
@@ -10,11 +9,11 @@ import BuildContext from '../../context/build/BuildContext';
  * @returns
  */
 function CheckCredentials({ type, uid, children }) {
-	const { authLoading, user } = useContext(AuthContext);
-	const { loadedBuild, loadingBuild } = useContext(BuildContext);
+	const { authLoading, user, isAuthenticated } = useAuthContext();
+	const { loadedBuild, loadingBuild } = useBuildContext();
 
 	if (!authLoading) {
-		if (type === 'user' && user && (user.username || user.siteAdmin)) {
+		if (type === 'user' && user && (isAuthenticated || user.siteAdmin)) {
 			return children;
 		} else if (type === 'admin' && user && user?.siteAdmin) {
 			return children;
@@ -28,7 +27,7 @@ function CheckCredentials({ type, uid, children }) {
 			return children;
 		} else if (type === 'notSubscribed' && user && !user?.subscribed) {
 			return children;
-		} else if (type === 'loggedOut' && !user?.username) {
+		} else if (type === 'loggedOut' && !isAuthenticated) {
 			return children;
 		}
 	} else {

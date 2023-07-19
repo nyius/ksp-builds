@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import CheckCredentials from '../../credentials/CheckCredentials';
-import BuildContext from '../../../context/build/BuildContext';
+import { useBuildContext } from '../../../context/build/BuildContext';
 import { setReplyingComment } from '../../../context/build/BuildActions';
 
 /**
@@ -10,8 +10,8 @@ import { setReplyingComment } from '../../../context/build/BuildActions';
  * @returns
  */
 function CommentReplyBtn({ comment }) {
-	const { editingComment, dispatchBuild } = useContext(BuildContext);
-	const { fetchedUserProfile, user } = useContext(AuthContext);
+	const { editingComment, dispatchBuild } = useBuildContext();
+	const { fetchedUserProfile, user } = useAuthContext();
 
 	//---------------------------------------------------------------------------------------------------//
 	if (!editingComment && !fetchedUserProfile?.blockList?.includes(user.uid) && comment.comment !== 'deleted') {

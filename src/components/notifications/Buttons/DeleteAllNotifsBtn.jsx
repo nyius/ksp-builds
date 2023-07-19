@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../buttons/Button';
-import AuthContext from '../../../context/auth/AuthContext';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import { useHandleNotifications } from '../../../context/auth/AuthActions';
 
 /**
@@ -8,7 +8,7 @@ import { useHandleNotifications } from '../../../context/auth/AuthActions';
  * @returns
  */
 function DeleteAllNotifsBtn() {
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthContext();
 	const { handleDeleteAllNotifications } = useHandleNotifications();
 
 	if (user?.notifications.length > 0) {

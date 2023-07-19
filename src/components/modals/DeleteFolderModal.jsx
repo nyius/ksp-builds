@@ -1,16 +1,20 @@
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import Button from '../buttons/Button';
-import FoldersContext from '../../context/folders/FoldersContext';
+import { useFoldersContext } from '../../context/folders/FoldersContext';
 import { setDeleteFolder, useDeleteFolder } from '../../context/folders/FoldersActions';
 import PlanetHeader from '../header/PlanetHeader';
 
 function DeleteFolderModal() {
-	const { dispatchFolders, deleteFolderId, deleteFolderName } = useContext(FoldersContext);
+	const { dispatchFolders, deleteFolderId, deleteFolderName } = useFoldersContext();
 	const { deleteFolder } = useDeleteFolder();
+
+	const handleChange = () => {
+		return;
+	};
 
 	return (
 		<>
-			<input type="checkbox" checked={deleteFolderId ? true : false} id="delete-folder-modal" className="modal-toggle" />
+			<input type="checkbox" checked={deleteFolderId ? true : false} onChange={handleChange} id="delete-folder-modal" className="modal-toggle" />
 			<div className="modal z-1000">
 				<div className="modal-box relative">
 					<Button htmlFor="delete-folder-modal" style="btn-circle" position="z-50 absolute right-2 top-2" text="X" onClick={() => setDeleteFolder(dispatchFolders, null, null)} />

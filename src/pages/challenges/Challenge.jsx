@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import { convertFromRaw, EditorState } from 'draft-js';
-//---------------------------------------------------------------------------------------------------//
-import NewsContext from '../../context/news/NewsContext';
+import { useNewsContext } from '../../context/news/NewsContext';
 //---------------------------------------------------------------------------------------------------//
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import Button from '../../components/buttons/Button';
@@ -15,34 +13,19 @@ import ReadOriginalChallengeBtn from './Components/Buttons/ReadOriginalChallenge
 import DeleteChallengeBtn from './Components/Buttons/DeleteChallengeBtn';
 import ChallengeEditor from './Components/ChallengeEditor';
 import ChallengeDescription from './Components/ChallengeDescription';
+import { useGetChallenge, useSetChallengeArticle } from '../../context/news/NewsActions';
 
 /**
  * Challenge Page
  * @returns
  */
 function Challenge() {
-	const { challenges, articlesLoading } = useContext(NewsContext);
-	//---------------------------------------------------------------------------------------------------//
-	const [parsedArticle, setParsedArticle] = useState(null);
-	const [challenge, setChallenge] = useState(null);
-	//---------------------------------------------------------------------------------------------------//
+	const { articlesLoading } = useNewsContext();
+	const [challenge] = useGetChallenge(null);
+	const [parsedArticle] = useSetChallengeArticle(null, challenge);
 	const articleId = useParams().id;
 
-	useEffect(() => {
-		setChallenge(() => {
-			const challengeArr = challenges.filter(challenge => {
-				if (challenge.articleId === articleId) return challenge;
-			});
-			return challengeArr[0];
-		});
-	}, [challenges]);
-
-	useEffect(() => {
-		if (challenge && challenge.article) {
-			setParsedArticle(EditorState.createWithContent(convertFromRaw(JSON.parse(challenge.article))));
-		}
-	}, [challenge]);
-
+	//---------------------------------------------------------------------------------------------------//
 	if (articlesLoading) return <Spinner1 />;
 
 	if (!articlesLoading && !challenge) {
@@ -53,10 +36,9 @@ function Challenge() {
 		);
 	}
 
-	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<Helmet title={challenge.title} pageLink={`https://kspbuilds.com/challenges/${articleId}`} description={challenge.contentSnippet.slice(0, 150) + '...'} />
+			<Helmet title={challenge.title} pageLink={`https://kspbuilds.com/challenges/${articleId}`} image={challenge.image ? challenge.image : null} type="article" description={challenge.contentSnippet.slice(0, 150) + '...'} />
 
 			<MiddleContainer>
 				<div className="border-2 border-dashed border-slate-600 rounded-xl p-4 2k:p-8">

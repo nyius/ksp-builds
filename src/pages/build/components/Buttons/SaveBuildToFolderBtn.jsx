@@ -1,20 +1,20 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../../../components/buttons/Button';
 import CheckCredentials from '../../../../components/credentials/CheckCredentials';
-import FoldersContext from '../../../../context/folders/FoldersContext';
+import { useFoldersContext } from '../../../../context/folders/FoldersContext';
 import { setAddBuildToFolderModal, setBuildToAddToFolder, setFolderLocation } from '../../../../context/folders/FoldersActions';
 import { checkIfBuildInAllFolders } from '../../../../context/folders/FoldersUtilils';
-import BuildContext from '../../../../context/build/BuildContext';
-import AuthContext from '../../../../context/auth/AuthContext';
+import { useBuildContext } from '../../../../context/build/BuildContext';
+import { useAuthContext } from '../../../../context/auth/AuthContext';
 
 /**
  * Button for saving the current build to a folder
  * @returns
  */
 function SaveBuildToFolderBtn() {
-	const { dispatchFolders } = useContext(FoldersContext);
-	const { user } = useContext(AuthContext);
-	const { loadedBuild } = useContext(BuildContext);
+	const { dispatchFolders } = useFoldersContext();
+	const { user } = useAuthContext();
+	const { loadedBuild } = useBuildContext();
 
 	//---------------------------------------------------------------------------------------------------//
 	return (

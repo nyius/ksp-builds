@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React, { useState } from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import { useSendMessage } from '../../../context/auth/AuthActions';
 import { toast } from 'react-toastify';
 
@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
  * @returns
  */
 function MessageInput() {
-	const { messageTab, convosOpen, user } = useContext(AuthContext);
+	const { messageTab, convosOpen, user } = useAuthContext();
 	const [message, setMessage] = useState('');
 	const { sendMessage } = useSendMessage();
 

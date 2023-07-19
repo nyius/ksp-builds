@@ -1,9 +1,10 @@
-import React, { createContext, useReducer, useEffect } from 'react';
+import React, { createContext, useReducer, useEffect, useContext } from 'react';
 import NewsReducer from './NewsReducer';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { s3Client } from '../../S3.config';
 import { doc, getDocs, where, limit, query, collection } from 'firebase/firestore';
 import { db } from '../../firebase.config';
+import { createDateFromFirebaseTimestamp } from '../../utilities/createDateFromFirebaseTimestamp';
 
 const NewsContext = createContext();
 
@@ -51,7 +52,7 @@ export const NewsProvider = ({ children }) => {
 
 				challenges.forEach(doc => {
 					const challenge = doc.data();
-					challenge.date = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(challenge.date.seconds * 1000);
+					challenge.date = createDateFromFirebaseTimestamp(challenge.date.seconds);
 					parsedChalleges.push(challenge);
 				});
 
@@ -120,6 +121,16 @@ export const NewsProvider = ({ children }) => {
 	const [state, dispatchNews] = useReducer(NewsReducer, initialState);
 
 	return <NewsContext.Provider value={{ ...state, dispatchNews }}>{children}</NewsContext.Provider>;
+};
+
+/**
+ * News Context
+ * @returns
+ */
+export const useNewsContext = () => {
+	const context = useContext(NewsContext);
+
+	return context;
 };
 
 export default NewsContext;

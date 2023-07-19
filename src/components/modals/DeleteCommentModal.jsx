@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useComment, setDeletingComment } from '../../context/build/BuildActions';
-import BuildContext from '../../context/build/BuildContext';
+import { useBuildContext } from '../../context/build/BuildContext';
 import Button from '../buttons/Button';
 import PlanetHeader from '../header/PlanetHeader';
 
@@ -9,7 +9,7 @@ import PlanetHeader from '../header/PlanetHeader';
  * @returns
  */
 function DeleteCommentModal() {
-	const { deletingCommentId, dispatchBuild, loadedBuild } = useContext(BuildContext);
+	const { deletingCommentId, dispatchBuild, loadedBuild } = useBuildContext();
 	const { deleteComment } = useComment();
 
 	//---------------------------------------------------------------------------------------------------//
@@ -17,7 +17,7 @@ function DeleteCommentModal() {
 		<>
 			{loadedBuild && deletingCommentId ? (
 				<>
-					<input type="checkbox" id="delete-comment-modal" checked={deletingCommentId ? true : false} className="modal-toggle" />
+					<input type="checkbox" id="delete-comment-modal" checked={deletingCommentId} className="modal-toggle" />
 					<div className="modal">
 						<div className="modal-box relative">
 							<Button htmlFor="delete-comment-modal" style="btn-circle" position="z-50 absolute right-2 top-2" text="X" onClick={() => setDeletingComment(dispatchBuild, null)} />

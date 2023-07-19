@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import NewsContext from '../../context/news/NewsContext';
+import React from 'react';
+import { useNewsContext } from '../../context/news/NewsContext';
 import Button from '../buttons/Button';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
@@ -11,7 +11,7 @@ import { setDeletePatchNoteId } from '../../context/news/NewsActions';
  * @returns
  */
 function DeletePatchNotesModal() {
-	const { dispatchNews, deletePatchNoteId } = useContext(NewsContext);
+	const { dispatchNews, deletePatchNoteId } = useNewsContext();
 
 	/**
 	 * handles deleting a post

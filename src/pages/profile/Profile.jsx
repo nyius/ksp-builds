@@ -1,17 +1,13 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { cloneDeep } from 'lodash';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
-import AuthContext from '../../context/auth/AuthContext';
-import BuildsContext from '../../context/builds/BuildsContext';
-import useBuilds, { setBuildsLoading, setClearFetchedBuilds } from '../../context/builds/BuildsActions';
-import useFilters from '../../context/filters/FiltersActions';
-import FiltersContext from '../../context/filters/FiltersContext';
-import { setSelectedFolder, setBuildToAddToFolder, setFolderLocation } from '../../context/folders/FoldersActions';
-import FoldersContext from '../../context/folders/FoldersContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
+import { useGetFilteredBuilds, useFetchBuildsById } from '../../context/builds/BuildsActions';
+import { useResetFilters } from '../../context/filters/FiltersActions';
+import { useSetBuildToAddToFolder, useSetFolderLocation, useSetSelectedFolders } from '../../context/folders/FoldersActions';
+import { useFoldersContext } from '../../context/folders/FoldersContext';
 //---------------------------------------------------------------------------------------------------//
-import useResetStates from '../../utilities/useResetStates';
-//---------------------------------------------------------------------------------------------------//
+import useResetStates from '../../hooks/useResetStates';
 import Spinner1 from '../../components/spinners/Spinner1';
 import Sort from '../../components/sort/Sort';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
@@ -23,51 +19,24 @@ import ProfilePicture from './Components/ProfilePicture';
 import ProfileInfo from './Components/ProfileInfo';
 import ProfileDetails from './Components/ProfileDetails';
 import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
-import Regex from 'regex-username';
 
 /**
  * Displays the users own profile
  * @returns
  */
 function Profile() {
+	const { openedFolder } = useFoldersContext();
+	const { user, authLoading, isAuthenticated } = useAuthContext();
+	const [sortedBuilds] = useGetFilteredBuilds([]);
 	const navigate = useNavigate();
-	const { sortBy } = useContext(FiltersContext);
-	const { dispatchBuilds, fetchedBuilds } = useContext(BuildsContext);
-	const { user, authLoading } = useContext(AuthContext);
-	const { dispatchFolders, openedFolder } = useContext(FoldersContext);
-	//---------------------------------------------------------------------------------------------------//
-	const { fetchBuildsById } = useBuilds();
-	const { filterBuilds, resetFilters } = useFilters();
-	const { resetStates } = useResetStates();
-	//---------------------------------------------------------------------------------------------------//
-	const [sortedBuilds, setSortedBuilds] = useState([]);
 
-	useEffect(() => {
-		setFolderLocation(dispatchFolders, 'profile');
-		setSelectedFolder(dispatchFolders, null);
-		setBuildToAddToFolder(dispatchFolders, null, user);
-		resetStates();
-		resetFilters();
-	}, []);
+	useResetFilters();
+	useResetStates();
 
-	useEffect(() => {
-		setClearFetchedBuilds(dispatchBuilds);
-
-		if (!authLoading) {
-			if (user?.username && user?.builds.length > 0) {
-				fetchBuildsById(user.builds, user.uid, 'user');
-			} else {
-				setBuildsLoading(dispatchBuilds, false);
-			}
-		}
-	}, [authLoading]);
-
-	// Listen for changes to the sorting and filter the builds accordingly
-	useEffect(() => {
-		let newFetchedBuilds = cloneDeep(fetchedBuilds);
-
-		setSortedBuilds(filterBuilds(newFetchedBuilds));
-	}, [fetchedBuilds, sortBy]);
+	useFetchBuildsById(user?.builds);
+	useSetBuildToAddToFolder(null);
+	useSetSelectedFolders(null);
+	useSetFolderLocation('profile');
 
 	//---------------------------------------------------------------------------------------------------//
 	if (authLoading) {
@@ -78,7 +47,7 @@ function Profile() {
 		);
 	}
 
-	if (!authLoading && (!user || !user?.username)) {
+	if (!authLoading && (!user || !isAuthenticated)) {
 		navigate('/');
 	}
 

@@ -1,12 +1,12 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { FaFolder } from 'react-icons/fa';
 import { MdOutlineCheckBoxOutlineBlank, MdCheckBox } from 'react-icons/md';
-import FoldersContext from '../../../context/folders/FoldersContext';
+import { useFoldersContext } from '../../../context/folders/FoldersContext';
 import { setNewFolderName, setSelectedFolder, setLongClickStart, setEditingFolderName, setLastSelectedFolder, useHandleFolderInteraction, setPinnedFolder } from '../../../context/folders/FoldersActions';
 import { checkIfFolderSelected } from '../../../context/folders/FoldersUtilils';
 import { AiFillPushpin, AiOutlinePushpin } from 'react-icons/ai';
-import BuildContext from '../../../context/build/BuildContext';
-import AuthContext from '../../../context/auth/AuthContext';
+import { useBuildContext } from '../../../context/build/BuildContext';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 
 /**
  * Handles displaying a single folder icon
@@ -16,7 +16,7 @@ import AuthContext from '../../../context/auth/AuthContext';
  * @returns
  */
 function Folder({ folder, editable, type }) {
-	const { dispatchFolders, editingFolder, newFolderName, editingFolderName, buildToAddToFolder, folderView, selectedFolders, folderLocation, pinnedFolder } = useContext(FoldersContext);
+	const { dispatchFolders, editingFolder, newFolderName, editingFolderName, buildToAddToFolder, folderView, selectedFolders, folderLocation, pinnedFolder } = useFoldersContext();
 	const { handleFolderClick, handleFolderLongClick, handleFolderBlur, handleFolderKeyPress, handleNewFolderKeyPress, handleNewFolderBlur, checkIfFolderOpen } = useHandleFolderInteraction();
 
 	if (type === 'new' && !folder) {
@@ -114,8 +114,13 @@ function Folder({ folder, editable, type }) {
 
 export default Folder;
 
+/**
+ * Displays checkbox for adding a build to a folder
+ * @param {string} folderId - the id of the folder
+ * @returns
+ */
 const AddToFolderCheckbox = ({ folderId }) => {
-	const { selectedFolders } = useContext(FoldersContext);
+	const { selectedFolders } = useFoldersContext();
 
 	return (
 		<div className="absolute top-2 left-2 tooltip" data-tip="Add build to folder">
@@ -131,9 +136,9 @@ const AddToFolderCheckbox = ({ folderId }) => {
  * @returns
  */
 const PinFolderCheckbox = ({ folder }) => {
-	const { dispatchFolders, pinnedFolder, buildToAddToFolder, selectedFolders } = useContext(FoldersContext);
-	const { loadedBuild } = useContext(BuildContext);
-	const { user } = useContext(AuthContext);
+	const { dispatchFolders, pinnedFolder, buildToAddToFolder, selectedFolders } = useFoldersContext();
+	const { loadedBuild } = useBuildContext();
+	const { user } = useAuthContext();
 
 	const handlePinFolderClick = e => {
 		e.stopPropagation();

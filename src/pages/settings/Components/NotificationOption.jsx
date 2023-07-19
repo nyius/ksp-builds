@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 
 /**
  * Displays an option for a notification
@@ -9,7 +9,7 @@ import AuthContext from '../../../context/auth/AuthContext';
  * @returns
  */
 function NotificationOption({ handleChange, text, id }) {
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthContext();
 
 	return (
 		<label className="cursor-pointer label w-fit gap-2">

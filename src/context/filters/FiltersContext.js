@@ -1,20 +1,17 @@
-import React, { createContext, useReducer, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { createContext, useReducer, useEffect, useState, useContext } from 'react';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import FiltersReducer from './FiltersReducer';
-import useCheckUrlForType from '../../utilities/useCheckUrlForType';
+import useCheckUrlForType from '../../hooks/useCheckUrlForType';
 
 const FiltersContext = createContext();
 
 export const FiltersProvider = ({ children }) => {
 	const [filtersLoading, setFiltersLoading] = useState(true);
-	const location = useLocation();
 	const { checkUrlForType } = useCheckUrlForType();
 
+	// Fetch the KSP versions from the DB
 	useEffect(() => {
-		// Fetch the KSP versions from the DB
-
 		const fetchKspInfo = async () => {
 			try {
 				const data = await getDoc(doc(db, 'kspInfo', 'info'));
@@ -36,8 +33,10 @@ export const FiltersProvider = ({ children }) => {
 		};
 
 		fetchKspInfo();
+	}, []);
 
-		// Sorting---------------------------------------------------------------------------------------------------//
+	// Sorting---------------------------------------------------------------------------------------------------//
+	useEffect(() => {
 		const sorting = localStorage.getItem('sort');
 
 		if (sorting) {
@@ -49,8 +48,10 @@ export const FiltersProvider = ({ children }) => {
 				},
 			});
 		}
+	}, []);
 
-		//Type---------------------------------------------------------------------------------------------------//
+	//Type---------------------------------------------------------------------------------------------------//
+	useEffect(() => {
 		let type = checkUrlForType();
 
 		if (type) {
@@ -76,6 +77,16 @@ export const FiltersProvider = ({ children }) => {
 
 	const [state, dispatchBuildFilters] = useReducer(FiltersReducer, initialState);
 	return <FiltersContext.Provider value={{ ...state, dispatchBuildFilters, filtersLoading }}>{children}</FiltersContext.Provider>;
+};
+
+/**
+ * Filters Context
+ * @returns
+ */
+export const useFiltersContext = () => {
+	const context = useContext(FiltersContext);
+
+	return context;
 };
 
 export default FiltersContext;

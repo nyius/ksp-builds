@@ -1,10 +1,10 @@
-import React, { useEffect, useContext } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Helmet from '../../components/Helmet/Helmet';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
-import useResetStates from '../../utilities/useResetStates';
-import AuthContext from '../../context/auth/AuthContext';
+import useResetStates from '../../hooks/useResetStates';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import Spinner1 from '../../components/spinners/Spinner1';
 import Notifications from './Components/Notifications';
 import UsernameColor from './Components/UsernameColor';
@@ -19,12 +19,9 @@ import DeleteAccount from './Components/DeleteAccount';
  */
 function Settings() {
 	const navigate = useNavigate();
-	const { resetStates } = useResetStates();
-	const { user, authLoading } = useContext(AuthContext);
+	const { user, authLoading } = useAuthContext();
 
-	useEffect(() => {
-		resetStates();
-	}, []);
+	useResetStates();
 
 	//---------------------------------------------------------------------------------------------------//
 	if (authLoading) {

@@ -1,5 +1,4 @@
 import React from 'react';
-import Button from '../../components/buttons/Button';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import Helmet from '../../components/Helmet/Helmet';

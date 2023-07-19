@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import NewsContext from '../../../context/news/NewsContext';
+import React from 'react';
+import { useNewsContext } from '../../../context/news/NewsContext';
 import { Editor } from 'react-draft-wysiwyg';
 
 /**
@@ -7,7 +7,7 @@ import { Editor } from 'react-draft-wysiwyg';
  * @returns
  */
 function ChallengeEditor({ parsedArticle }) {
-	const { editingChallenge } = useContext(NewsContext);
+	const { editingChallenge } = useNewsContext();
 
 	if (editingChallenge) {
 		return <Editor editorState={parsedArticle} readOnly={true} toolbarHidden={true} />;

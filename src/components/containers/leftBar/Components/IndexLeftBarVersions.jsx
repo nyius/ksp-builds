@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import LeftBarTitle from '../LeftBarTitle';
 import useFilters from '../../../../context/filters/FiltersActions';
-import FiltersContext from '../../../../context/filters/FiltersContext';
+import { useFiltersContext } from '../../../../context/filters/FiltersContext';
 
 /**
  * Displays the version select dropdown on the left index bar
@@ -9,7 +9,7 @@ import FiltersContext from '../../../../context/filters/FiltersContext';
  */
 function IndexLeftBarVersions() {
 	const { setVersionFilter } = useFilters();
-	const { filtersLoading, kspVersions } = useContext(FiltersContext);
+	const { filtersLoading, kspVersions } = useFiltersContext();
 
 	return (
 		<>

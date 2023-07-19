@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import NewsContext from '../../../../context/news/NewsContext';
+import React from 'react';
+import { useNewsContext } from '../../../../context/news/NewsContext';
 import Button from '../../../../components/buttons/Button';
 import { updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../../../firebase.config';
@@ -13,7 +13,7 @@ import { setEditingPatchNotes } from '../../../../context/news/NewsActions';
  * @returns
  */
 function SavePatchEditBtn({ id, editedPatchNotes }) {
-	const { dispatchNews, editingPatchNotes } = useContext(NewsContext);
+	const { dispatchNews, editingPatchNotes } = useNewsContext();
 
 	/**
 	 * Handles updates

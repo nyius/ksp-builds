@@ -1,16 +1,16 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import Button from '../buttons/Button';
 import PlanetHeader from '../header/PlanetHeader';
 import TextInput from '../input/TextInput';
 import { toast } from 'react-toastify';
 import resetPassword from '../../utilities/resetPassword';
-import AuthContext from '../../context/auth/AuthContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import { setResetPassword } from '../../context/auth/AuthActions';
 
 function ResetPassword() {
 	const [email, setEmail] = useState('');
 	const [emailSent, setEmailSent] = useState('');
-	const { resetPasswordState, dispatchAuth } = useContext(AuthContext);
+	const { resetPasswordState, dispatchAuth } = useAuthContext();
 	/**
 	 * Handles a user starting the login process
 	 * @returns

@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import Favorite from '../../buttons/Favorite';
-import BuildCardTypes from './Components/BuildCardTypes';
 import BuildCardViews from './Components/BuildCardViews';
 import BuildCardComments from './Components/BuildCardComments';
 import BuildCardDownloads from './Components/BuildCardDownloads';
 import BuildCardUploadDate from './Components/BuildCardUploadDate';
 import BuildCardName from './Components/BuildCardName';
 import BuildCardImage from './Components/BuildCardImage';
-import BuildCardExportBtn from './Buttons/BuildCardExportBtn';
 
 /**
  * Displays a build card in list form

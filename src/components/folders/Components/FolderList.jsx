@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import FoldersContext from '../../../context/folders/FoldersContext';
+import React from 'react';
+import { useFoldersContext } from '../../../context/folders/FoldersContext';
 import UsersFolders from './UsersFolders';
 import PersonalFolders from './PersonalFolders';
 
@@ -8,7 +8,7 @@ import PersonalFolders from './PersonalFolders';
  * @returns
  */
 function FolderList() {
-	const { collapsedFolders, folderView } = useContext(FoldersContext);
+	const { collapsedFolders, folderView } = useFoldersContext();
 
 	//---------------------------------------------------------------------------------------------------//
 	if (!collapsedFolders) {

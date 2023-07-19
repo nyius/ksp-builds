@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import UsernameLink from '../username/UsernameLink';
 //---------------------------------------------------------------------------------------------------//
 import Button from '../buttons/Button';
 import BotwBadge from '../../assets/BotW_badge.png';
-import NewsContext from '../../context/news/NewsContext';
+import { createDateFromFirebaseTimestamp } from '../../utilities/createDateFromFirebaseTimestamp';
 
 /**
  * Displays the card for the build of the week
@@ -13,7 +13,6 @@ import NewsContext from '../../context/news/NewsContext';
  */
 function BuildOfTheWeekCard({ buildOfTheWeek }) {
 	const navigate = useNavigate();
-	const { currentHeroSlide } = useContext(NewsContext);
 
 	// This is for the banner card
 	return (
@@ -35,7 +34,7 @@ function BuildOfTheWeekCard({ buildOfTheWeek }) {
 							Created by
 							<UsernameLink username={buildOfTheWeek.author} uid={buildOfTheWeek.uid} hoverPosition="bottom" />
 						</div>
-						<p className="text-lg mb-6 2k:mb-8 2k:text-xl italic text-slate-500 z-10">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(buildOfTheWeek.buildOfTheWeek.seconds * 1000)}</p>
+						<p className="text-lg mb-6 2k:mb-8 2k:text-xl italic text-slate-500 z-10">{createDateFromFirebaseTimestamp(buildOfTheWeek.buildOfTheWeek.seconds)}</p>
 						<div className="flex flex-row flex-wrap gap-4 2k:gap-6">
 							<Button type="ahref" href={`/build/${buildOfTheWeek.id}`} text="View build" icon="right" color="text-white" position="z-50" />
 						</div>

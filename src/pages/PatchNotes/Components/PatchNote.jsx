@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
-import NewsContext from '../../../context/news/NewsContext';
+import React, { useEffect } from 'react';
+import { useNewsContext } from '../../../context/news/NewsContext';
 import { Editor } from 'react-draft-wysiwyg';
-import { convertFromRaw, EditorState } from 'draft-js';
+import useCreateDraftJs from '../../../hooks/useCreateDraftJs';
 
 /**
  * Displays the patch note
@@ -9,10 +9,11 @@ import { convertFromRaw, EditorState } from 'draft-js';
  * @returns
  */
 function PatchNote({ patchNote }) {
-	const { editingPatchNotes } = useContext(NewsContext);
+	const { editingPatchNotes } = useNewsContext();
+	const [patchNoteDraftJs] = useCreateDraftJs(null, patchNote.patchNote);
 
 	if (editingPatchNotes !== patchNote.id) {
-		return <Editor editorState={EditorState.createWithContent(convertFromRaw(JSON.parse(patchNote.patchNote)))} readOnly={true} toolbarHidden={true} />;
+		return <Editor editorState={patchNoteDraftJs} readOnly={true} toolbarHidden={true} />;
 	}
 }
 

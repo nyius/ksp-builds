@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
+import React from 'react';
+import { useBuildContext } from '../../../context/build/BuildContext';
 import TextEditor from '../../textEditor/TextEditor';
 import { Editor } from 'react-draft-wysiwyg';
 import { convertFromRaw, EditorState } from 'draft-js';
@@ -11,7 +11,7 @@ import { convertFromRaw, EditorState } from 'draft-js';
  * @returns
  */
 function CommentBody({ comment, setEditedComment }) {
-	const { editingComment } = useContext(BuildContext);
+	const { editingComment } = useBuildContext();
 	const editorState = comment.comment !== 'deleted' && EditorState.createWithContent(convertFromRaw(JSON.parse(comment.comment)));
 
 	//---------------------------------------------------------------------------------------------------//

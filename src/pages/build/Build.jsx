@@ -1,14 +1,12 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { convertFromRaw, EditorState } from 'draft-js';
+import { useLocation } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
-import useResetStates from '../../utilities/useResetStates';
+import useResetStates from '../../hooks/useResetStates';
 //---------------------------------------------------------------------------------------------------//
-import BuildContext from '../../context/build/BuildContext';
-import AuthContext from '../../context/auth/AuthContext';
-import useBuild, { setBuildOfTheWeek } from '../../context/build/BuildActions';
-import { useFetchUser } from '../../context/auth/AuthActions';
+import { useBuildContext } from '../../context/build/BuildContext';
+import useFetchBuild, { setBuildOfTheWeek, useFetchBuildAuthorProfile, useNavigateIfPrivateBuild } from '../../context/build/BuildActions';
+import { useFoldersContext } from '../../context/folders/FoldersContext';
 //---------------------------------------------------------------------------------------------------//
 import VoteArrows from '../../components/buttons/VoteArrows';
 import Spinner1 from '../../components/spinners/Spinner1';
@@ -39,41 +37,19 @@ import BuildVideo from './components/BuildVideo';
 import BuildComments from './components/BuildComments';
 import ReturnHomeBtn from './components/Buttons/ReturnHomeBtn';
 import BuildPinnedFolder from './components/BuildPinnedFolder';
-import FoldersContext from '../../context/folders/FoldersContext';
-//---------------------------------------------------------------------------------------------------//
 
 function Build() {
-	//---------------------------------------------------------------------------------------------------//
-	const { fetchBuild } = useBuild();
-	const { dispatchBuild, loadingBuild, loadedBuild, editingBuild } = useContext(BuildContext);
-	const { fetchedPinnedFolder } = useContext(FoldersContext);
-	const { user } = useContext(AuthContext);
-	const [buildDesc, setBuildDesc] = useState(null);
-	const { fetchUsersProfile } = useFetchUser();
-	const { resetStates } = useResetStates();
+	const { dispatchBuild, loadingBuild, loadedBuild, editingBuild } = useBuildContext();
+	const { fetchedPinnedFolder } = useFoldersContext();
 	const location = useLocation();
-	const navigate = useNavigate();
 	const { id } = useParams();
 
-	useEffect(() => {
-		resetStates();
-	}, []);
+	useResetStates();
 
-	// Fetch the build
-	useEffect(() => {
-		fetchBuild(id);
-	}, [id]);
+	useFetchBuild(id);
 
-	useEffect(() => {
-		if (!loadingBuild && loadedBuild) {
-			if (loadedBuild.visibility === 'private' && user.uid !== loadedBuild.uid) {
-				navigate('/');
-			} else {
-				setBuildDesc(EditorState.createWithContent(convertFromRaw(JSON.parse(loadedBuild.description))));
-				fetchUsersProfile(loadedBuild.uid);
-			}
-		}
-	}, [loadingBuild, loadedBuild]);
+	useNavigateIfPrivateBuild();
+	useFetchBuildAuthorProfile();
 
 	//---------------------------------------------------------------------------------------------------//
 	if (editingBuild) return <Create />;
@@ -99,7 +75,13 @@ function Build() {
 	return (
 		<>
 			{!loadingBuild && loadedBuild && (
-				<Helmet title={loadedBuild?.name ? loadedBuild?.name : 'Build'} pageLink={`https://kspbuilds.com/build/${location.pathname}`} description={`View the build '${loadedBuild.name}' by ${loadedBuild.author}.`} />
+				<Helmet
+					title={loadedBuild?.name ? loadedBuild?.name : 'Build'}
+					image={loadedBuild?.images[0]}
+					type="article"
+					pageLink={`https://kspbuilds.com/build/${location.pathname}`}
+					description={`View the build '${loadedBuild.name}' by ${loadedBuild.author}.`}
+				/>
 			)}
 
 			<MiddleContainer>

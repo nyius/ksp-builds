@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import LeftBarTitle from '../LeftBarTitle';
 import useFilters from '../../../../context/filters/FiltersActions';
-import NewsContext from '../../../../context/news/NewsContext';
+import { useNewsContext } from '../../../../context/news/NewsContext';
 
 /**
  * Displays the challenges filter for the index left bar
@@ -9,7 +9,7 @@ import NewsContext from '../../../../context/news/NewsContext';
  */
 function IndexLeftBarChallenges() {
 	const { setChallengeFilter } = useFilters();
-	const { articlesLoading, challenges } = useContext(NewsContext);
+	const { articlesLoading, challenges } = useNewsContext();
 
 	return (
 		<>

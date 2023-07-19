@@ -1,4 +1,5 @@
 import React from 'react';
+import { createDateFromFirebaseTimestamp } from '../../../utilities/createDateFromFirebaseTimestamp';
 
 /**
  * Displays a notifications timestamp
@@ -7,7 +8,7 @@ import React from 'react';
  */
 function NotifTimestamp({ timestamp }) {
 	if (timestamp?.seconds) {
-		return <div>{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(timestamp.seconds * 1000)}</div>;
+		return <div>{createDateFromFirebaseTimestamp(timestamp.seconds, 'long')}</div>;
 	}
 }
 

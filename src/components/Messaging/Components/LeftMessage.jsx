@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import UsernameLink from '../../username/UsernameLink';
 import MessageTimestamp from './MessageTimestamp';
 import MessageAvatar from './MessageAvatar';
@@ -12,7 +12,7 @@ import MessageBubble from './MessageBubble';
  * @returns
  */
 function LeftMessage({ message, i }) {
-	const { user, messageTab } = useContext(AuthContext);
+	const { user, messageTab } = useAuthContext();
 
 	if (message.uid !== user.uid) {
 		return (

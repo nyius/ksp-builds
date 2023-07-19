@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
+import React from 'react';
+import { useBuildContext } from '../../../context/build/BuildContext';
 import { setBuildToUpload } from '../../../context/build/BuildActions';
 
 /**
@@ -7,7 +7,7 @@ import { setBuildToUpload } from '../../../context/build/BuildActions';
  * @returns
  */
 function UploadBuildTags() {
-	const { dispatchBuild, buildToUpload } = useContext(BuildContext);
+	const { dispatchBuild, buildToUpload } = useBuildContext();
 
 	/**
 	 * Handles setting the tags

@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
-import AuthContext from '../../../context/auth/AuthContext';
+import React from 'react';
+import { useBuildContext } from '../../../context/build/BuildContext';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import { useComment } from '../../../context/build/BuildActions';
 import Spinner1 from '../../../components/spinners/Spinner1';
 import Comment from '../../../components/comments/Comment';
@@ -16,8 +16,8 @@ import ClearCommentButton from './Buttons/ClearCommentButton';
  * @returns
  */
 function BuildComments() {
-	const { commentsLoading, comments, replyingComment } = useContext(BuildContext);
-	const { fetchedUserProfile, user } = useContext(AuthContext);
+	const { commentsLoading, comments, replyingComment } = useBuildContext();
+	const { fetchedUserProfile, user } = useAuthContext();
 	const { setComment } = useComment();
 
 	if (commentsLoading) {

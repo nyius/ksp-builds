@@ -15,7 +15,7 @@ function MobileTypes() {
 				</span>
 				Types
 			</label>
-			<ul tabIndex={2} className="mt-2 p-2 shadow menu menu-compact dropdown-content bg-base-200 rounded-box w-96 gap-2 z-101 p-4 drop-shadow-lg">
+			<ul tabIndex={2} className="mt-2 p-2 shadow menu menu-compact dropdown-content bg-base-200 rounded-box w-96 gap-2 z-101 drop-shadow-lg">
 				<VerticalTypeLink text="Rocket" />
 				<VerticalTypeLink text="Interplanetary" />
 				<VerticalTypeLink text="Interstellar" />

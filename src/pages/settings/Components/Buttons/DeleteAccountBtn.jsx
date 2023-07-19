@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../../context/auth/AuthContext';
 import Button from '../../../../components/buttons/Button';
 import { setAccountToDelete } from '../../../../context/auth/AuthActions';
 
 function DeleteAccountBtn() {
-	const { dispatchAuth, user } = useContext(AuthContext);
+	const { dispatchAuth, user } = useAuthContext();
 
 	return <Button text="Delete Account" htmlFor="delete-account-modal" onClick={() => setAccountToDelete(dispatchAuth, user.uid)} size="w-fit" icon="delete" color="btn-error" />;
 }

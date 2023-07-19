@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
+import React from 'react';
+import { useBuildContext } from '../../../context/build/BuildContext';
 import { setEditingComment } from '../../../context/build/BuildActions';
 
 /**
@@ -8,7 +8,7 @@ import { setEditingComment } from '../../../context/build/BuildActions';
  * @returns
  */
 function CommentEditBtn({ comment }) {
-	const { dispatchBuild, editingComment } = useContext(BuildContext);
+	const { dispatchBuild, editingComment } = useBuildContext();
 
 	//---------------------------------------------------------------------------------------------------//
 	if (!editingComment && comment.comment !== 'deleted') {

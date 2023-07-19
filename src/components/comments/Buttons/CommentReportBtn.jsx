@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { setReport } from '../../../context/auth/AuthActions';
-import AuthContext from '../../../context/auth/AuthContext';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 
 /**
  * Displays the report button for a comment
@@ -8,7 +8,7 @@ import AuthContext from '../../../context/auth/AuthContext';
  * @returns
  */
 function CommentReportBtn({ comment }) {
-	const { dispatchAuth } = useContext(AuthContext);
+	const { dispatchAuth } = useAuthContext();
 
 	//---------------------------------------------------------------------------------------------------//
 	if (comment.comment !== 'deleted') {

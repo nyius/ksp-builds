@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../../../components/buttons/Button';
-import AuthContext from '../../../../context/auth/AuthContext';
+import { useAuthContext } from '../../../../context/auth/AuthContext';
 import { updateUsernameColor } from '../../../../context/auth/AuthUtils';
 
 /**
@@ -9,7 +9,7 @@ import { updateUsernameColor } from '../../../../context/auth/AuthUtils';
  * @returns
  */
 function SaveUsernameColorBtn({ usernameColor }) {
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthContext();
 
 	if (usernameColor) {
 		return <Button text="Save" icon="save" color="btn-accent" size="w-fit" onClick={() => updateUsernameColor(user.uid, usernameColor)} />;

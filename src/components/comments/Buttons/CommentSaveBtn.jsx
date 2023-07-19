@@ -1,8 +1,7 @@
-import React, { useContext } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
-import { setEditingComment } from '../../../context/build/BuildActions';
+import React from 'react';
+import { useBuildContext } from '../../../context/build/BuildContext';
+import { setEditingComment, useFetchComments } from '../../../context/build/BuildActions';
 import { updateComment } from '../../../context/build/BuildUtils';
-import useBuild from '../../../context/build/BuildActions';
 
 /**
  * Allows the user to save an edited comment.
@@ -12,8 +11,8 @@ import useBuild from '../../../context/build/BuildActions';
  * @returns
  */
 function CommentSaveBtn({ commentId, editedComment, setEditedComment }) {
-	const { dispatchBuild, editingComment, loadedBuild } = useContext(BuildContext);
-	const { fetchComments } = useBuild();
+	const { dispatchBuild, editingComment, loadedBuild } = useBuildContext();
+	const { fetchComments } = useFetchComments();
 
 	/**
 	 * Handles when a user saves changes to their comment

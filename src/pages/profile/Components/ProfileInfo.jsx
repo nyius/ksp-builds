@@ -1,37 +1,26 @@
-import React, { useContext, useState, useEffect } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React, { useState } from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import { Editor } from 'react-draft-wysiwyg';
 import TextEditor from '../../../components/textEditor/TextEditor';
 import EditBioBtn from './Buttons/EditBioBtn';
 import CancelEditBioBtn from './Buttons/CancelEditBioBtn';
 import CancelEditEmailBtn from './Buttons/CancelEditEmailBtn';
 import SaveBioBtn from './Buttons/SaveBioBtn';
-import checkIfJson from '../../../utilities/checkIfJson';
-import { convertFromRaw, EditorState, ContentState } from 'draft-js';
 import EditEmailBtn from './Buttons/EditEmailBtn';
 import SaveEmailBtn from './Buttons/SaveEmailBtn';
 import { setEditingEmail, setVerifyEditedEmail } from '../../../context/auth/AuthActions';
 import { checkMatchingEmails } from '../../../context/auth/AuthUtils';
 import TextInput from '../../../components/input/TextInput';
+import useCreateDraftJs from '../../../hooks/useCreateDraftJs';
 
 /**
  * Displays the users profile info like email and bio
  * @returns
  */
 function ProfileInfo() {
-	const { user, editingBio, editingEmail, verifyEditedEmail, authLoading, dispatchAuth } = useContext(AuthContext);
+	const { user, editingBio, editingEmail, verifyEditedEmail, dispatchAuth } = useAuthContext();
 	const [editedBio, setEditedBio] = useState(null);
-	const [bioState, setBioState] = useState(null);
-
-	useEffect(() => {
-		if (!authLoading) {
-			if (checkIfJson(user?.bio)) {
-				setBioState(EditorState.createWithContent(convertFromRaw(JSON.parse(user?.bio))));
-			} else {
-				setBioState(EditorState.createWithContent(ContentState.createFromText(user?.bio)));
-			}
-		}
-	}, [authLoading]);
+	const [bioState, setBioState] = useCreateDraftJs(null, user?.bio);
 
 	//---------------------------------------------------------------------------------------------------//
 	return (

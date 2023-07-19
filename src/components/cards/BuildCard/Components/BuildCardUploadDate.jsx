@@ -1,4 +1,5 @@
 import React from 'react';
+import { createDateFromFirebaseTimestamp } from '../../../../utilities/createDateFromFirebaseTimestamp';
 
 /**
  * Displays the date the build was uploaded
@@ -6,7 +7,7 @@ import React from 'react';
  * @returns
  */
 function BuildCardUploadDate({ timestamp }) {
-	return <div className="flex items-center h-full text-slate-400 text-lg 2k:text-xl sm:text-lg italic">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(timestamp.seconds * 1000)}</div>;
+	return <div className="flex items-center h-full text-slate-400 text-lg 2k:text-xl sm:text-lg italic">{createDateFromFirebaseTimestamp(timestamp.seconds)}</div>;
 }
 
 export default BuildCardUploadDate;

@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useChangePage } from '../../../context/builds/BuildsActions';
-import BuildsContext from '../../../context/builds/BuildsContext';
+import { useBuildsContext } from '../../../context/builds/BuildsContext';
 
 /**
  * Handles going back a page
@@ -8,7 +8,7 @@ import BuildsContext from '../../../context/builds/BuildsContext';
  */
 function PrevPageBtn() {
 	const { goBackPage } = useChangePage();
-	const { loadingBuilds, currentPage } = useContext(BuildsContext);
+	const { loadingBuilds, currentPage } = useBuildsContext();
 
 	return (
 		<>

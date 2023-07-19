@@ -1,7 +1,6 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFetchUser } from '../../context/auth/AuthActions';
-import AuthContext from '../../context/auth/AuthContext';
+import { useReturnUserProfile } from '../../context/auth/AuthActions';
 import UsernameBadges from './Components/UsernameBadges';
 import UserProfilePicture from './Components/UserProfilePicture';
 import HoverBadges from './Components/HoverBadges';
@@ -13,6 +12,34 @@ import BlockUserBtn from '../buttons/BlockUserBtn';
 import UserReputation from './Components/UserReputation';
 import UserJoined from './Components/UserJoined';
 import UserUsername from './Components/UserUsername';
+
+let hoverTimer, hoverOutTimer;
+
+const handleHover = setHover => {
+	cancelHoverOutTimer();
+
+	hoverTimer = setTimeout(() => {
+		setHover(true);
+	}, 400);
+};
+
+const handleBlur = (e, setHover) => {
+	if (!e.currentTarget.contains(e.relatedTarget)) {
+		cancelHoverTimer();
+
+		hoverOutTimer = setTimeout(() => {
+			setHover(false);
+		}, 400);
+	}
+};
+
+const cancelHoverTimer = () => {
+	clearTimeout(hoverTimer);
+};
+
+const cancelHoverOutTimer = () => {
+	clearTimeout(hoverOutTimer);
+};
 
 /**
  * Displays the users username as a link. Also displays a hover popup menu.
@@ -26,76 +53,16 @@ import UserUsername from './Components/UserUsername';
  */
 function UsernameLink({ username, uid, hoverPosition, noHoverUi, color, css }) {
 	const navigate = useNavigate();
-	const { fetchedUserProfiles } = useContext(AuthContext);
-	const { fetchUsersProfile, checkIfUserInContext } = useFetchUser();
 	const [hover, setHover] = useState(false);
-	const [usersProfile, setUsersProfile] = useState(null);
-	const [loadingProfile, setLoadingProfile] = useState(true);
-	let hoverTimer, hoverOutTimer;
-
-	const handleBlur = e => {
-		if (!e.currentTarget.contains(e.relatedTarget)) {
-			cancelHoverTimer();
-
-			hoverOutTimer = setTimeout(() => {
-				setHover(false);
-			}, 400);
-		}
-	};
-
-	const handleHover = () => {
-		cancelHoverOutTimer();
-
-		hoverTimer = setTimeout(() => {
-			setHover(true);
-		}, 400);
-	};
-
-	const cancelHoverTimer = () => {
-		clearTimeout(hoverTimer);
-	};
-
-	const cancelHoverOutTimer = () => {
-		clearTimeout(hoverOutTimer);
-	};
-
-	useEffect(() => {
-		if (uid) {
-			let foundProfile = checkIfUserInContext(uid);
-			if (foundProfile) {
-				setUsersProfile(foundProfile);
-				setLoadingProfile(false);
-			} else {
-				fetchUsersProfile(uid, setLoadingProfile).then(fetchedUser => {
-					setUsersProfile(fetchedUser);
-					setLoadingProfile(false);
-				});
-			}
-		}
-	}, []);
-
-	useEffect(() => {
-		if (usersProfile) {
-			let foundProfile = checkIfUserInContext(uid);
-			if (foundProfile) {
-				setUsersProfile(foundProfile);
-				setLoadingProfile(false);
-			} else {
-				fetchUsersProfile(uid, setLoadingProfile).then(fetchedUser => {
-					setUsersProfile(fetchedUser);
-					setLoadingProfile(false);
-				});
-			}
-		}
-	}, [fetchedUserProfiles]);
+	const [usersProfile, loadingProfile] = useReturnUserProfile(null, uid);
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
 			<div
 				className="dropdown username-link"
-				onMouseEnter={handleHover}
-				onMouseLeave={e => handleBlur(e)}
+				onMouseEnter={() => handleHover(setHover)}
+				onMouseLeave={e => handleBlur(e, setHover)}
 				onClick={e => {
 					e.stopPropagation();
 					e.preventDefault();

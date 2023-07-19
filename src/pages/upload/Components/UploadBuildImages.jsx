@@ -1,10 +1,18 @@
-import React, { useContext, useEffect, useState } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
+import React, { useState } from 'react';
+import { useBuildContext } from '../../../context/build/BuildContext';
 import { FiCameraOff } from 'react-icons/fi';
-import { setBuildToUpload } from '../../../context/build/BuildActions';
+import { setBuildToUpload, useGetEditingBuildRawImages } from '../../../context/build/BuildActions';
 import { uploadImages } from '../../../utilities/uploadImage';
 import Spinner1 from '../../../components/spinners/Spinner1';
 import RemoveImageBtn from './Buttons/RemoveImageBtn';
+
+/**
+ * Handles dragging a piece
+ * @param {*} e
+ */
+const drag = e => {
+	e.dataTransfer.setData('text', e.target.id);
+};
 
 /**
  * Component for handling the builds images
@@ -13,21 +21,9 @@ import RemoveImageBtn from './Buttons/RemoveImageBtn';
 function UploadBuildImages() {
 	const [uploadingImage, setUploadingImage] = useState(false);
 	const [hoverImage, setHoverImage] = useState(false);
-	const { dispatchBuild, buildToUpload, editingBuild } = useContext(BuildContext);
+	const { dispatchBuild, buildToUpload } = useBuildContext();
 
-	useEffect(() => {
-		if (buildToUpload && !buildToUpload.rawImageFiles) {
-			setBuildToUpload(dispatchBuild, { ...buildToUpload, rawImageFiles: editingBuild.images });
-		}
-	}, [buildToUpload]);
-
-	/**
-	 * Handles dragging a piece
-	 * @param {*} e
-	 */
-	const drag = e => {
-		e.dataTransfer.setData('text', e.target.id);
-	};
+	useGetEditingBuildRawImages();
 
 	// Allows an image to be dropped on (for rearranging images)
 	const allowDrop = e => {

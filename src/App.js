@@ -22,17 +22,13 @@ import './App.css';
 import 'react-popper-tooltip/dist/styles.css';
 
 /*TODO
+useEffect cleanup functions
+create a 'message popup' func that displays an error/success toast popup, as well as console logs the error
+go through all component props and set defaults if possible (like color = "#fff", size="24", etc)
 creating an account needs to have matching passwords. Also be much stricter on emails (needs @, etc)
 use useMemo to improve performance
-go through all component props and set defaults if possible (like color = "#fff", size="24", etc)
-check for things like {example ? "true" : "false"} and slim down
-move all variables declared inside of a component  (that isnt involved with anything in that component) outside of the component
-useEffects should only do 1 thing, split them up
-useEffect cleanup functions
-useEffects could be broken out into their own hooks for easier to read code and functionality (lesson 171/172)
-create useContext hooks to replace all instances of useContext(contextName) - so isntead it is useBuilds or useAuth, etc (lesson 225)
-should probably remove all checks for user.username and instead add a 'isAuthenticated' var in the context thats just true or false
 more space themed loading spinner
+Change allowed folders to max like 5, then have users that support get access to unlimited folders (even level 1 support)
 error reporting to server and logged
 	-username (if one)
 	-uid (if one)

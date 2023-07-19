@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
+import React from 'react';
+import { useBuildContext } from '../../../context/build/BuildContext';
 import { setBuildToUpload } from '../../../context/build/BuildActions';
 
 /**
@@ -7,23 +7,21 @@ import { setBuildToUpload } from '../../../context/build/BuildActions';
  * @returns
  */
 function UploadBuildVisibility() {
-	const { dispatchBuild, buildToUpload } = useContext(BuildContext);
+	const { dispatchBuild, buildToUpload } = useBuildContext();
 	const options = ['Public', 'Private', 'Unlisted'];
 
 	if (buildToUpload) {
 		return (
 			<div className="flex flex-row items-center gap-6 text-slate-200">
 				<p className="2k:text-2xl">Visibility</p>
-				<select id="visibility" onChange={e => setBuildToUpload(dispatchBuild, { ...buildToUpload, visibility: e.target.value })} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
-					<optgroup>
-						{options.map((visibility, i) => {
-							return (
-								<option key={i} value={visibility} selected={buildToUpload.visibility === visibility}>
-									{visibility}
-								</option>
-							);
-						})}
-					</optgroup>
+				<select id="visibility" defaultValue={buildToUpload.visibility} onChange={e => setBuildToUpload(dispatchBuild, { ...buildToUpload, visibility: e.target.value })} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
+					{options.map((visibility, i) => {
+						return (
+							<option key={i} value={visibility}>
+								{visibility}
+							</option>
+						);
+					})}
 				</select>
 			</div>
 		);

@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../context/auth/AuthContext';
 import { Navigate } from 'react-router-dom';
 
 /**
@@ -8,7 +8,7 @@ import { Navigate } from 'react-router-dom';
  * @returns
  */
 function PublicRoute({ children }) {
-	const { user, authLoading } = useContext(AuthContext);
+	const { user, authLoading } = useAuthContext();
 
 	// If the user is logged in, take them away
 	// Else, show them the children

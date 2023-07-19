@@ -1,6 +1,6 @@
-import React, { useState, useContext, useEffect, useRef, Fragment } from 'react';
-import AuthContext from '../../context/auth/AuthContext';
-import { setConvoTab, setDeleteConversationId } from '../../context/auth/AuthActions';
+import React, { useRef, Fragment } from 'react';
+import { useAuthContext } from '../../context/auth/AuthContext';
+import { setConvoTab, setDeleteConversationId, useSetConversations } from '../../context/auth/AuthActions';
 import { readMessage } from '../../context/auth/AuthUtils';
 import ConvosAvatar from './Components/ConvosAvatar';
 import ConvosTimestamp from './Components/ConvosTimestamp';
@@ -8,33 +8,18 @@ import DeleteConvoBtn from './Buttons/DeleteConvoBtn';
 import NewMessageNotif from './Components/NewMessageNotif';
 import ConvosUsername from './Components/ConvosUsername';
 import ConvosLastMessage from './Components/ConvosLastMessage';
+import { useScrollToElement } from '../../hooks/ScrollToElement';
 
 /**
  * Displays the users list of conversations with other users
  * @returns
  */
 function Conversations() {
-	const { dispatchAuth, conversations, user } = useContext(AuthContext);
+	const { dispatchAuth, user } = useAuthContext();
 	const messagesTopTef = useRef(null);
-	const [convos, setConvos] = useState([]);
+	const [convos] = useSetConversations([]);
 
-	const scrollToTop = () => {
-		messagesTopTef.current?.scrollIntoView({ behavior: 'smooth' });
-	};
-
-	useEffect(() => {
-		scrollToTop();
-	}, []);
-
-	useEffect(() => {
-		let sorted = conversations.sort((a, b) => {
-			let aDate = a.lastMessage;
-			let bDate = b.lastMessage;
-
-			return aDate < bDate ? 1 : -1;
-		});
-		setConvos(sorted);
-	}, [conversations]);
+	useScrollToElement(messagesTopTef);
 
 	/**
 	 * Handles opening a convo up

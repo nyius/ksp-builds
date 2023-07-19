@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../../../components/buttons/Button';
 import { cloneDeep } from 'lodash';
-import BuildContext from '../../../../context/build/BuildContext';
+import { useBuildContext } from '../../../../context/build/BuildContext';
 import { useUpdateBuild } from '../../../../context/build/BuildActions';
-import FoldersContext from '../../../../context/folders/FoldersContext';
+import { useFoldersContext } from '../../../../context/folders/FoldersContext';
 import { useAddBuildToFolder } from '../../../../context/folders/FoldersActions';
 
 /**
@@ -11,8 +11,8 @@ import { useAddBuildToFolder } from '../../../../context/folders/FoldersActions'
  * @returns
  */
 function UpdateBuildBtn() {
-	const { buildToUpload } = useContext(BuildContext);
-	const { pinnedFolder } = useContext(FoldersContext);
+	const { buildToUpload } = useBuildContext();
+	const { pinnedFolder } = useFoldersContext();
 	const { updateBuild } = useUpdateBuild();
 	const { addBuildToFolder } = useAddBuildToFolder();
 

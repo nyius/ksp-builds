@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useCopyBuildToClipboard } from '../../../../context/build/BuildActions';
 import { TiExport } from 'react-icons/ti';
-import BuildsContext from '../../../../context/builds/BuildsContext';
+import { useBuildsContext } from '../../../../context/builds/BuildsContext';
 
 /**
  * handles displaying the export build button
@@ -12,7 +12,7 @@ import BuildsContext from '../../../../context/builds/BuildsContext';
 function BuildCardExportBtn({ buildId, hover }) {
 	const [fetchingRawBuild, setFetchingRawBuild] = useState(false);
 	const { copyBuildToClipboard } = useCopyBuildToClipboard();
-	const { forcedView } = useContext(BuildsContext);
+	const { forcedView } = useBuildsContext();
 
 	if (!forcedView) {
 		return (

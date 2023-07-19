@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
+import React from 'react';
+import { useBuildContext } from '../../../context/build/BuildContext';
 import youtubeLinkConverter from '../../../utilities/youtubeLinkConverter';
 
 /**
@@ -7,7 +7,7 @@ import youtubeLinkConverter from '../../../utilities/youtubeLinkConverter';
  * @returns
  */
 function BuildVideo() {
-	const { loadedBuild } = useContext(BuildContext);
+	const { loadedBuild } = useBuildContext();
 	return (
 		<>
 			{loadedBuild.video ? (

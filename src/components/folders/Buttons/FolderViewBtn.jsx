@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../buttons/Button';
-import FoldersContext from '../../../context/folders/FoldersContext';
+import { useFoldersContext } from '../../../context/folders/FoldersContext';
 import { setFolderView } from '../../../context/folders/FoldersActions';
 
 /**
@@ -8,7 +8,7 @@ import { setFolderView } from '../../../context/folders/FoldersActions';
  * @returns
  */
 function FolderViewBtn() {
-	const { dispatchFolders, folderView } = useContext(FoldersContext);
+	const { dispatchFolders, folderView } = useFoldersContext();
 
 	if (folderView === 'list') {
 		return <Button tooltip="Change to Grid View" color={`btn-ghost ${folderView === 'grid' ? 'text-white' : ''}`} icon="grid" onClick={() => setFolderView(dispatchFolders, 'grid')} />;

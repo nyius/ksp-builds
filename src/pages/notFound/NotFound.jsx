@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CantFind from '../../components/cantFind/CantFind';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import Button from '../../components/buttons/Button';
-import useResetStates from '../../utilities/useResetStates';
+import useResetStates from '../../hooks/useResetStates';
 import { Helmet } from 'react-helmet';
 
 /**
@@ -12,11 +12,9 @@ import { Helmet } from 'react-helmet';
  */
 function NotFound() {
 	const navigate = useNavigate();
-	const { resetStates } = useResetStates();
 
-	useEffect(() => {
-		resetStates();
-	}, []);
+	useResetStates();
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>

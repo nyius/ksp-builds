@@ -10,7 +10,6 @@ import { RiSearchEyeFill } from 'react-icons/ri';
 function SearchBar() {
 	const [searchTerm, setSearchTerm] = useState('');
 	const navigate = useNavigate();
-
 	const { fetchBuilds } = useBuilds();
 
 	/**

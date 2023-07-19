@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../../buttons/Button';
 import { setReport } from '../../../../context/auth/AuthActions';
-import AuthContext from '../../../../context/auth/AuthContext';
+import { useAuthContext } from '../../../../context/auth/AuthContext';
 
 /**
  * Displays the button to report a build
@@ -9,7 +9,7 @@ import AuthContext from '../../../../context/auth/AuthContext';
  * @returns
  */
 function BuildCardReportBtn({ build }) {
-	const { dispatchAuth } = useContext(AuthContext);
+	const { dispatchAuth } = useAuthContext();
 	return <Button tooltip="Report" htmlFor="report-modal" css="normal-case" color="btn-ghost" text="report" icon="report" onClick={() => setReport(dispatchAuth, 'build', build)} />;
 }
 

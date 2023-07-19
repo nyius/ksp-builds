@@ -1,4 +1,5 @@
 import React from 'react';
+import { createDateFromFirebaseTimestamp } from '../../../utilities/createDateFromFirebaseTimestamp';
 
 /**
  * Displays timestamp if a comment was edited
@@ -7,7 +8,7 @@ import React from 'react';
  */
 function CommentEdited({ comment }) {
 	if (comment.edited) {
-		return <div className="2k:text-2xl italic">edited {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(comment.edited.seconds * 1000)}</div>;
+		return <div className="2k:text-2xl italic">edited {createDateFromFirebaseTimestamp(comment.edited.seconds, 'long')}</div>;
 	}
 }
 

@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import NewsContext from '../../../../context/news/NewsContext';
+import React from 'react';
+import { useNewsContext } from '../../../../context/news/NewsContext';
 import Button from '../../../../components/buttons/Button';
 import { setEditingPatchNotes } from '../../../../context/news/NewsActions';
 
@@ -9,7 +9,7 @@ import { setEditingPatchNotes } from '../../../../context/news/NewsActions';
  * @returns
  */
 function CancelEditPatchBtn({ id }) {
-	const { dispatchNews, editingPatchNotes } = useContext(NewsContext);
+	const { dispatchNews, editingPatchNotes } = useNewsContext();
 	if (id === editingPatchNotes) {
 		return <Button text="Cancel" color="btn-error" icon="cancel" onClick={() => setEditingPatchNotes(dispatchNews, null)} />;
 	}

@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { setOpenedFolder } from '../../../context/folders/FoldersActions';
-import FoldersContext from '../../../context/folders/FoldersContext';
+import { setOpenedFolder, useResetOpenFolder } from '../../../context/folders/FoldersActions';
+import { useFoldersContext } from '../../../context/folders/FoldersContext';
 import useBuilds from '../../../context/builds/BuildsActions';
-import AuthContext from '../../../context/auth/AuthContext';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import { FaFolder } from 'react-icons/fa';
 
 /**
@@ -11,13 +11,16 @@ import { FaFolder } from 'react-icons/fa';
  * @param {string} currentUser - takes in the users username (to use for sharing link generation)
  * @returns
  */
-function FolderNavbar({ currentUser }) {
-	const { dispatchFolders, openedFolder } = useContext(FoldersContext);
-	const { openProfile, user } = useContext(AuthContext);
-	const navigate = useNavigate();
+function FolderNavbar() {
+	const { dispatchFolders, openedFolder, currentFolderOwner } = useFoldersContext();
+	const { openProfile, user } = useAuthContext();
 	const { fetchBuildsById } = useBuilds();
+
+	const navigate = useNavigate();
 	const location = useLocation();
 	let currentLocation = location.pathname.split('/')[1];
+
+	useResetOpenFolder();
 
 	return (
 		<div className="text-xl 2k:text-2xl breadcrumbs">
@@ -26,7 +29,7 @@ function FolderNavbar({ currentUser }) {
 					onClick={() => {
 						setOpenedFolder(dispatchFolders, null);
 						if (currentLocation === 'user') {
-							navigate(`/user/${currentUser}`);
+							navigate(`/user/${currentFolderOwner}`);
 							fetchBuildsById(openProfile.builds, openProfile.uid, 'user');
 						} else if (currentLocation === 'profile') {
 							fetchBuildsById(user.builds, user.uid, 'user');
@@ -34,7 +37,7 @@ function FolderNavbar({ currentUser }) {
 					}}
 				>
 					<a className="flex flex-row gap-2">
-						<FaFolder /> Your Folders
+						<FaFolder /> {currentFolderOwner === user?.username ? 'Your Folders' : `${currentFolderOwner}'s Folders`}
 					</a>
 				</li>
 				{openedFolder ? (

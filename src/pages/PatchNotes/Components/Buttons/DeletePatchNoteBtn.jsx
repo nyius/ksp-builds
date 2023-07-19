@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import NewsContext from '../../../../context/news/NewsContext';
+import React from 'react';
+import { useNewsContext } from '../../../../context/news/NewsContext';
 import Button from '../../../../components/buttons/Button';
 import { setDeletePatchNoteId } from '../../../../context/news/NewsActions';
 
@@ -9,7 +9,7 @@ import { setDeletePatchNoteId } from '../../../../context/news/NewsActions';
  * @returns
  */
 function DeletePatchNoteBtn({ id }) {
-	const { dispatchNews } = useContext(NewsContext);
+	const { dispatchNews } = useNewsContext();
 
 	return <Button htmlFor="delete-patch-note-modal" onClick={() => setDeletePatchNoteId(dispatchNews, id)} text="Delete" icon="delete" />;
 }

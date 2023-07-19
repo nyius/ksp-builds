@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import DeleteConversationModal from '../modals/DeleteConversationModal';
 import ChatBtn from './Buttons/ChatBtn';
 import MessageBox from './Components/MessageBox';
@@ -10,10 +10,10 @@ import MessageInput from './Components/MessageInput';
  * @returns
  */
 function Messaging() {
-	const { authLoading, user } = useContext(AuthContext);
+	const { authLoading, isAuthenticated } = useAuthContext();
 
 	//---------------------------------------------------------------------------------------------------//
-	if (!authLoading && user?.username) {
+	if (!authLoading && isAuthenticated) {
 		return (
 			<>
 				<div>

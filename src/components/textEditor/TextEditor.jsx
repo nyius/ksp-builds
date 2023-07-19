@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react';
-import BuildContext from '../../context/build/BuildContext';
+import React, { useEffect, useState } from 'react';
+import { useBuildContext } from '../../context/build/BuildContext';
 import { convertFromRaw, convertToRaw, EditorState, ContentState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import { setResetTextEditorState } from '../../context/build/BuildActions';
-import AuthContext from '../../context/auth/AuthContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import checkIfJson from '../../utilities/checkIfJson';
 
 /**
@@ -16,8 +16,8 @@ import checkIfJson from '../../utilities/checkIfJson';
 const TextEditor = state => {
 	// Handles sending the markup back to the parent
 	const { setState, i, text } = state;
-	const { dispatchBuild, editingBuild, editingComment, resetTextEditor, buildOfTheWeek } = useContext(BuildContext);
-	const { editingBio } = useContext(AuthContext);
+	const { dispatchBuild, editingBuild, editingComment, resetTextEditor, buildOfTheWeek } = useBuildContext();
+	const { editingBio } = useAuthContext();
 	const emptyState = `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`;
 
 	const [editorState, setEditorState] = useState(() => {

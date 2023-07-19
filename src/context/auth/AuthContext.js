@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useReducer } from 'react';
+import React, { createContext, useState, useEffect, useReducer, useContext } from 'react';
 import { cloneDeep } from 'lodash';
 import AuthReducer from './AuthReducer';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -122,6 +122,7 @@ export const AuthProvider = ({ children }) => {
 		newUsername: '',
 		editingEmail: false,
 		verifyEditedEmail: null,
+		isAuthenticated: false,
 		editingBio: false,
 		cancelEditProfile: false,
 		usernameChanged: false,
@@ -207,6 +208,16 @@ export const AuthProvider = ({ children }) => {
 	}, []);
 
 	return <AuthContext.Provider value={{ ...state, dispatchAuth, authLoading }}>{children}</AuthContext.Provider>;
+};
+
+/**
+ * Auth Context
+ * @returns
+ */
+export const useAuthContext = () => {
+	const context = useContext(AuthContext);
+
+	return context;
 };
 
 export default AuthContext;

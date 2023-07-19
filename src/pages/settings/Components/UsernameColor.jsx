@@ -1,23 +1,16 @@
-import React, { useContext, useState, useEffect } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import { TwitterPicker } from 'react-color';
 import SaveUsernameColorBtn from './Buttons/SaveUsernameColorBtn';
+import { useReturnUsernameCustomColor } from '../../../context/auth/AuthActions';
 
 /**
  * Username color picker component
  * @returns
  */
 function UsernameColor() {
-	const { user, authLoading } = useContext(AuthContext);
-	const [usernameColor, setUsernameColor] = useState(null);
-
-	useEffect(() => {
-		if (!authLoading && user?.username) {
-			if (user.customUsernameColor) {
-				setUsernameColor(user.customUsernameColor);
-			}
-		}
-	}, [authLoading]);
+	const { user } = useAuthContext();
+	const [usernameColor, setUsernameColor] = useReturnUsernameCustomColor(null);
 
 	/**
 	 * Handles a user changing their username color

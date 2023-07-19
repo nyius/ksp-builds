@@ -1,42 +1,30 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React from 'react';
 import Button from '../buttons/Button';
 import PlanetHeader from '../header/PlanetHeader';
 import Folders from '../folders/Folders';
 import { setBuildToAddToFolder, setSelectedFolder, setOpenedFolder, setAddBuildToFolderModal, setFolderLocation, setMakingNewFolder, setNewFolderName } from '../../context/folders/FoldersActions';
 import { useAddBuildToFolder } from '../../context/folders/FoldersActions';
-import FoldersContext from '../../context/folders/FoldersContext';
+import { useFoldersContext } from '../../context/folders/FoldersContext';
 import Builds from '../builds/Builds';
 import { cloneDeep } from 'lodash';
-import BuildsContext from '../../context/builds/BuildsContext';
-import useFilters from '../../context/filters/FiltersActions';
-import FiltersContext from '../../context/filters/FiltersContext';
-import AuthContext from '../../context/auth/AuthContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import Sort from '../sort/Sort';
-import BuildContext from '../../context/build/BuildContext';
+import { useBuildContext } from '../../context/build/BuildContext';
 import { useUpdateBuild } from '../../context/build/BuildActions';
 import { toast } from 'react-toastify';
+import { useGetFilteredBuilds } from '../../context/builds/BuildsActions';
 
 /**
  * Modal for adding a build to a folder
  * @returns
  */
 function AddBuildToFolderModal() {
-	const { dispatchFolders, selectedFolders, buildToAddToFolder, openedFolder, pinnedFolder } = useContext(FoldersContext);
-	const { user } = useContext(AuthContext);
+	const { dispatchFolders, selectedFolders, buildToAddToFolder, openedFolder, pinnedFolder } = useFoldersContext();
+	const { loadedBuild } = useBuildContext();
+	const { user } = useAuthContext();
 	const { updateBuild } = useUpdateBuild();
 	const { addBuildToFolder } = useAddBuildToFolder();
-	const { filterBuilds } = useFilters();
-	const { fetchedBuilds } = useContext(BuildsContext);
-	const { loadedBuild } = useContext(BuildContext);
-	const { sortBy } = useContext(FiltersContext);
-	const [sortedBuilds, setSortedBuilds] = useState([]);
-
-	// Listen for changes to the sorting and filter the builds accordingly
-	useEffect(() => {
-		let newFetchedBuilds = cloneDeep(fetchedBuilds);
-
-		setSortedBuilds(filterBuilds(newFetchedBuilds));
-	}, [fetchedBuilds, sortBy]);
+	const [filteredBuilds] = useGetFilteredBuilds([]);
 
 	const handleSaveFolderChange = async () => {
 		await addBuildToFolder(buildToAddToFolder);
@@ -114,7 +102,7 @@ function AddBuildToFolderModal() {
 						<div className="flex flex-row w-full justify-end mb-4">
 							<Sort />
 						</div>
-						{openedFolder ? <Builds buildsToDisplay={sortedBuilds} /> : null}
+						{openedFolder ? <Builds buildsToDisplay={filteredBuilds} /> : null}
 					</div>
 				</div>
 			</div>

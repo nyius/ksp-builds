@@ -1,4 +1,5 @@
 import React from 'react';
+import { createDateFromFirebaseTimestamp } from '../../../utilities/createDateFromFirebaseTimestamp';
 
 /**
  * Displays the date the user joined
@@ -6,7 +7,7 @@ import React from 'react';
  * @returns
  */
 function UserJoined({ timestamp }) {
-	return <p className="text-xl 2k:text-2xl text-slate-400 italic">joined {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(timestamp.seconds * 1000)}</p>;
+	return <p className="text-xl 2k:text-2xl text-slate-400 italic">joined {createDateFromFirebaseTimestamp(timestamp.seconds)}</p>;
 }
 
 export default UserJoined;

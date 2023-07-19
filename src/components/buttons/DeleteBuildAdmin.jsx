@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import { useDeleteBuild } from '../../context/build/BuildActions';
 
 function DeleteBuildAdmin({ style, id, userID }) {
-	const { user, authLoading } = useContext(AuthContext);
+	const { user, authLoading } = useAuthContext();
 	const { deleteBuild } = useDeleteBuild();
 
 	//---------------------------------------------------------------------------------------------------//

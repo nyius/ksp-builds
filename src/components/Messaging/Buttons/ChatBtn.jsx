@@ -1,6 +1,6 @@
-import React, { useContext, useState, useEffect } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
-import { setConvosOpen } from '../../../context/auth/AuthActions';
+import React from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
+import { setConvosOpen, useGetNewMessages } from '../../../context/auth/AuthActions';
 import Button from '../../buttons/Button';
 
 /**
@@ -9,28 +9,8 @@ import Button from '../../buttons/Button';
  * @returns
  */
 function ChatBtn() {
-	const { dispatchAuth, conversations, user } = useContext(AuthContext);
-	const [newMessages, setNewMessages] = useState(0);
-
-	/**
-	 * Handles checking for anew message
-	 * @returns
-	 */
-	const checkForNewMessages = () => {
-		let newMessages = 0;
-		if (conversations?.length > 0) {
-			for (let i = 0; i < conversations.length; i++) {
-				if (conversations[i]?.newMessage && conversations[i]?.lastMessageFrom !== user.uid && conversations[i]?.lastMessageFrom !== undefined) {
-					newMessages++;
-				}
-			}
-		}
-		return newMessages > 99 ? '99+' : newMessages;
-	};
-
-	useEffect(() => {
-		setNewMessages(checkForNewMessages());
-	}, [conversations]);
+	const { dispatchAuth } = useAuthContext();
+	const [newMessages] = useGetNewMessages(0);
 
 	//---------------------------------------------------------------------------------------------------//
 	return (

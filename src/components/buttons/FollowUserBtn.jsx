@@ -1,7 +1,7 @@
-import React, { useContext, useState, useEffect } from 'react';
-import AuthContext from '../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import Button from './Button';
-import { useHandleFollowingUser } from '../../context/auth/AuthActions';
+import { useHandleFollowingUser, useSetUserToFollow } from '../../context/auth/AuthActions';
 
 /**
  * Button for following a user
@@ -10,34 +10,20 @@ import { useHandleFollowingUser } from '../../context/auth/AuthActions';
  * @returns
  */
 function FollowUserBtn({ usersProfile, text }) {
-	const { user, openProfile } = useContext(AuthContext);
+	const { user } = useAuthContext();
 	const { handleFollowingUser } = useHandleFollowingUser();
-	const [userProfile, setUserProfile] = useState(null);
-
-	useEffect(() => {
-		if (usersProfile) {
-			setUserProfile(usersProfile);
-		} else {
-			setUserProfile(openProfile);
-		}
-	}, []);
-
-	useEffect(() => {
-		if (openProfile && openProfile?.uid === userProfile?.uid) {
-			setUserProfile(openProfile);
-		}
-	}, [openProfile]);
+	const [userToFollow] = useSetUserToFollow(null, usersProfile);
 
 	//---------------------------------------------------------------------------------------------------//
-	if (user && userProfile && user.uid !== userProfile.uid) {
+	if (user && userToFollow && user.uid !== userToFollow.uid) {
 		return (
-			<div className="tooltip" data-tip={`${userProfile.followers?.includes(user.uid) ? 'Unfollow' : 'Follow'}`}>
+			<div className="tooltip" data-tip={`${userToFollow.followers?.includes(user.uid) ? 'Unfollow' : 'Follow'}`}>
 				<Button
-					text={`${text ? (userProfile.followers?.includes(user.uid) ? 'Unfollow' : 'Follow') : ''}`}
+					text={`${text ? (userToFollow.followers?.includes(user.uid) ? 'Unfollow' : 'Follow') : ''}`}
 					size="w-full"
-					icon={`${userProfile.followers?.includes(user.uid) ? 'fill-heart' : 'outline-heart'}`}
+					icon={`${userToFollow.followers?.includes(user.uid) ? 'fill-heart' : 'outline-heart'}`}
 					color="btn-primary"
-					onClick={() => handleFollowingUser(userProfile)}
+					onClick={() => handleFollowingUser(userToFollow)}
 				/>
 			</div>
 		);

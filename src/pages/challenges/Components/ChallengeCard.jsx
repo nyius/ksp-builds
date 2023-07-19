@@ -9,21 +9,6 @@ import DefaultChallengeImg from '../../../assets/defaultChallenge.png';
  * @returns
  */
 function ChallengeCard({ challenge, i }) {
-	/*
-	// This was when the challenge article was scraped from the website. New way is through RSS 
-	useEffect(() => {
-		if (challenge) {
-			if (challenge.article.model.article) {
-				setParsedArticle(findAllByKey(challenge.article.model.article.richText.json, 'value'));
-			} else {
-				if (typeof challenge.article !== 'object') {
-					setParsedArticle(EditorState.createWithContent(convertFromRaw(JSON.parse(challenge.article))));
-				}
-			}
-		}
-	}, []);
-	*/
-
 	return (
 		<Link to={`/challenges/${challenge.articleId}`} className="flex w-full p-4 hover:bg-primary rounded-xl cursor-pointer">
 			<div className="flex flex-col lg:flex-row bg-base-900 w-full rounded-xl gap-4 lg:h-102">

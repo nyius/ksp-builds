@@ -1,23 +1,18 @@
-import React, { useContext, useRef, useEffect, Fragment } from 'react';
-import AuthContext from '../../context/auth/AuthContext';
+import React, { useRef, Fragment } from 'react';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import LeftMessage from './Components/LeftMessage';
 import RightMessage from './Components/RightMessage';
+import { useScrollToElement } from '../../hooks/ScrollToElement';
 
 /**
  * Displays an open conversation with a user
  * @returns
  */
 function Conversation() {
-	const { messageTab } = useContext(AuthContext);
+	const { messageTab } = useAuthContext();
 	const messagesEndRef = useRef(null);
 
-	const scrollToBottom = () => {
-		messagesEndRef.current?.scrollIntoView();
-	};
-
-	useEffect(() => {
-		scrollToBottom();
-	}, [messageTab]);
+	useScrollToElement(messagesEndRef, [messageTab]);
 
 	//---------------------------------------------------------------------------------------------------//
 	if (messageTab.messages?.length === 0) {

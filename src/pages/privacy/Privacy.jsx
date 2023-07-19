@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import useResetStates from '../../utilities/useResetStates';
+import React from 'react';
+import useResetStates from '../../hooks/useResetStates';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import AstroBiff from '../../assets/astrobiff-balloon.png';
@@ -10,11 +10,7 @@ import Helmet from '../../components/Helmet/Helmet';
  * @returns
  */
 function Privacy() {
-	const { resetStates } = useResetStates();
-
-	useEffect(() => {
-		resetStates();
-	}, []);
+	useResetStates();
 
 	//---------------------------------------------------------------------------------------------------//
 	return (

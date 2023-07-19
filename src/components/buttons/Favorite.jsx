@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from './Button';
-import AuthContext from '../../context/auth/AuthContext';
-import BuildContext from '../../context/build/BuildContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
+import { useBuildContext } from '../../context/build/BuildContext';
 import { useHandleFavoriting } from '../../context/auth/AuthActions';
 import CheckCredentials from '../credentials/CheckCredentials';
 
@@ -12,8 +12,8 @@ import CheckCredentials from '../credentials/CheckCredentials';
  * @returns
  */
 function Favorite({ id }) {
-	const { user } = useContext(AuthContext);
-	const { loadedBuild } = useContext(BuildContext);
+	const { user } = useAuthContext();
+	const { loadedBuild } = useBuildContext();
 	const { handleFavoriting } = useHandleFavoriting();
 
 	return (

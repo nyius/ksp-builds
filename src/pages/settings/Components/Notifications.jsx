@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import { useUpdateProfile } from '../../../context/auth/AuthActions';
 import { toast } from 'react-toastify';
 import NotificationOption from './NotificationOption';
@@ -9,7 +9,7 @@ import NotificationOption from './NotificationOption';
  * @returns
  */
 function Notifications() {
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthContext();
 	const { updateUserDb } = useUpdateProfile();
 
 	/**

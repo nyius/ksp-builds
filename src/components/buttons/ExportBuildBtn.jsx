@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useCopyBuildToClipboard } from '../../context/build/BuildActions';
 import Button from './Button';
 

@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import NewsContext from '../../../context/news/NewsContext';
+import React from 'react';
+import { useNewsContext } from '../../../context/news/NewsContext';
 import ChallengeCard from './ChallengeCard';
 
 /**
@@ -7,7 +7,7 @@ import ChallengeCard from './ChallengeCard';
  * @returns
  */
 function ChallengesList() {
-	const { challenges } = useContext(NewsContext);
+	const { challenges } = useNewsContext();
 
 	return (
 		<>

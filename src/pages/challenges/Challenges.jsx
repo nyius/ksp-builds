@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import NewsContext from '../../context/news/NewsContext';
+import React from 'react';
+import { useNewsContext } from '../../context/news/NewsContext';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import Spinner1 from '../../components/spinners/Spinner1';
@@ -11,7 +11,7 @@ import ChallengesList from './Components/ChallengesList';
  * @returns
  */
 function Challenges() {
-	const { articlesLoading } = useContext(NewsContext);
+	const { articlesLoading } = useNewsContext();
 
 	if (articlesLoading) {
 		return (

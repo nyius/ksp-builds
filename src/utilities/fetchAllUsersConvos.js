@@ -1,5 +1,6 @@
 import { getDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../firebase.config';
+import { createDateFromFirebaseTimestamp } from './createDateFromFirebaseTimestamp';
 
 /**
  * Fetches all of a users conversations that exist
@@ -15,7 +16,7 @@ const fetchAllUsersConvos = async usersConvos => {
 				if (fetchedConvoRef.exists()) {
 					let fetchedConvoData = fetchedConvoRef.data();
 					fetchedConvoData.id = convo.id;
-					fetchedConvoData.lastMessage = new Intl.DateTimeFormat('en-US', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(convo.lastMessage.seconds * 1000);
+					fetchedConvoData.lastMessage = createDateFromFirebaseTimestamp(convo.lastMessage.seconds, 'long');
 
 					// Fetch the other users profile
 					const userToFetch = fetchedConvoData.users.filter(user => {

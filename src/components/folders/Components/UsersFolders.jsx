@@ -1,33 +1,15 @@
-import React, { useContext, useState, useEffect } from 'react';
-import FoldersContext from '../../../context/folders/FoldersContext';
-import AuthContext from '../../../context/auth/AuthContext';
+import React from 'react';
+import { useFoldersContext } from '../../../context/folders/FoldersContext';
 import Folder from './Folder';
-import { buildNameToUrl } from '../../../utilities/buildNameToUrl';
+import { useSetPersonalBuildsFolder } from '../../../context/folders/FoldersActions';
 
 /**
  * Displays another users folders
  * @returns
  */
 function UsersFolders() {
-	const { usersFolders, folderLocation } = useContext(FoldersContext);
-	const { openProfile, fetchingProfile } = useContext(AuthContext);
-	const [usersBuildsFolder, setUsersBuildsFolder] = useState({ id: 'users-builds', folderName: '', builds: [], urlName: '' }); // usersBuildsFolder is for all of the users builds
-
-	useEffect(() => {
-		if (folderLocation === 'user') {
-			if (!fetchingProfile && openProfile) {
-				setUsersBuildsFolder(prevState => {
-					return {
-						...prevState,
-						builds: openProfile.builds,
-						folderName: `${openProfile.username}'s Builds`,
-						id: `${buildNameToUrl(openProfile.username)}s-builds`,
-						urlName: `${buildNameToUrl(openProfile.username)}s-builds`,
-					};
-				});
-			}
-		}
-	}, [fetchingProfile, openProfile]);
+	const { usersFolders, folderLocation } = useFoldersContext();
+	const [usersBuildsFolder] = useSetPersonalBuildsFolder({ id: 'users-builds', folderName: '', builds: [], urlName: '' }); // usersBuildsFolder is for all of the users builds
 
 	if (folderLocation === 'user') {
 		return (

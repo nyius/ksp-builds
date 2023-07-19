@@ -1,13 +1,13 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { setFetchAmount } from '../../context/builds/BuildsActions';
-import BuildsContext from '../../context/builds/BuildsContext';
+import { useBuildsContext } from '../../context/builds/BuildsContext';
 
 /**
  * Diaplays the amount of builds to fetch
  * @returns
  */
 function FetchAmount() {
-	const { dispatchBuilds, gridSize } = useContext(BuildsContext);
+	const { dispatchBuilds, gridSize } = useBuildsContext();
 
 	//---------------------------------------------------------------------------------------------------//
 	return (

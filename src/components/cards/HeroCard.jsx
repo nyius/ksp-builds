@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import BuildOfTheWeekCard from './BuildOfTheWeekCard';
 import ChallengeCard from './ChallengeCard';
-import NewsContext from '../../context/news/NewsContext';
+import { useNewsContext } from '../../context/news/NewsContext';
 
 let inputTimeout;
 
@@ -13,7 +13,7 @@ let inputTimeout;
  */
 function HeroCard({ cardItem, i }) {
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-	const { currentHeroSlide, heroSlidesLength } = useContext(NewsContext);
+	const { currentHeroSlide, heroSlidesLength } = useNewsContext();
 
 	if (currentHeroSlide === i) {
 		return (

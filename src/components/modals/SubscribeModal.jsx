@@ -1,20 +1,20 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../buttons/Button';
 import AstrobiffHeart from '../../assets/astrobiff-heart.png';
 import Tier1Badge from '../../assets/badges/tier1/tier1_badge36.png';
 import Tier2Badge from '../../assets/badges/tier2/tier2_badge36.png';
 import Tier3Badge from '../../assets/badges/tier3/tier3_badge36.png';
-import AuthContext from '../../context/auth/AuthContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import { setNewSub } from '../../context/auth/AuthActions';
 import { FaHeart } from 'react-icons/fa';
 import PlanetHeader from '../header/PlanetHeader';
 
 function SubscribeModal() {
-	const { dispatchAuth, user, authLoading, newSub } = useContext(AuthContext);
+	const { dispatchAuth, user, isAuthenticated, authLoading, newSub } = useAuthContext();
 
 	return (
 		<>
-			{!authLoading && user?.username && (
+			{!authLoading && isAuthenticated && (
 				<>
 					<input type="checkbox" id="subscribe-modal" className="modal-toggle" />
 					<div className="modal">
@@ -33,7 +33,7 @@ function SubscribeModal() {
 								</h4>
 							) : (
 								<>
-									<div className="p-4 2k:p-8 bg-base-800 rounded-xl border border-2 border-slate-600 border-dashed mb-8 2k:mb-16 ">
+									<div className="p-4 2k:p-8 bg-base-800 rounded-xl border-2 border-slate-600 border-dashed mb-8 2k:mb-16 ">
 										<h4 className="text-xl 2k:text-3xl text-center text-white">Support every month by Subscribing to help keep KSP Builds running.</h4>
 									</div>
 

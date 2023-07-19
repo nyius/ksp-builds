@@ -1,11 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../buttons/Button';
 import PlanetHeader from '../header/PlanetHeader';
 import TextInput from '../input/TextInput';
 import emailLogin from '../../utilities/emailLogin';
 import { toast } from 'react-toastify';
-import AuthContext from '../../context/auth/AuthContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import useAuth, { setResetPassword } from '../../context/auth/AuthActions';
 
 function LoginModal() {
@@ -13,7 +13,7 @@ function LoginModal() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [wrongLogin, setWrongLogin] = useState('');
-	const { user, authLoading, resetPasswordState, dispatchAuth } = useContext(AuthContext);
+	const { isAuthenticated, authLoading, resetPasswordState, dispatchAuth } = useAuthContext();
 	const { loginWithGoogle } = useAuth();
 
 	/**
@@ -36,7 +36,7 @@ function LoginModal() {
 		setWrongLogin(status);
 	};
 
-	if (!authLoading && !user?.username && !resetPasswordState) {
+	if (!authLoading && !isAuthenticated && !resetPasswordState) {
 		return (
 			<>
 				{/* Login */}

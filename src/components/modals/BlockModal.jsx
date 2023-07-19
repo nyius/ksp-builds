@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import AuthContext from '../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import Button from '../buttons/Button';
 import PlanetHeader from '../header/PlanetHeader';
 import { setUserToBlock, useBlockUser } from '../../context/auth/AuthActions';
@@ -9,7 +9,7 @@ import { setUserToBlock, useBlockUser } from '../../context/auth/AuthActions';
  * @returns
  */
 function BlockModal() {
-	const { dispatchAuth, user, userToBlock } = useContext(AuthContext);
+	const { dispatchAuth, user, userToBlock } = useAuthContext();
 	const { blockUser } = useBlockUser();
 
 	/**

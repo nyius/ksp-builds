@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { setDeletingComment } from '../../../context/build/BuildActions';
-import BuildContext from '../../../context/build/BuildContext';
+import { useBuildContext } from '../../../context/build/BuildContext';
 
 /**
  * Displays the delete comment button
@@ -8,7 +8,7 @@ import BuildContext from '../../../context/build/BuildContext';
  * @returns
  */
 function CommentDeleteBtn({ comment }) {
-	const { dispatchBuild } = useContext(BuildContext);
+	const { dispatchBuild } = useBuildContext();
 
 	//---------------------------------------------------------------------------------------------------//
 	if (comment.comment !== 'deleted') {

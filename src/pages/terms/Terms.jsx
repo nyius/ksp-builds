@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import AstroBiffComputer from '../../assets/astrobiff-computer.png';
-import useResetStates from '../../utilities/useResetStates';
+import useResetStates from '../../hooks/useResetStates';
 import Helmet from '../../components/Helmet/Helmet';
 
 /**
@@ -10,11 +10,7 @@ import Helmet from '../../components/Helmet/Helmet';
  * @returns
  */
 function Terms() {
-	const { resetStates } = useResetStates();
-
-	useEffect(() => {
-		resetStates();
-	}, []);
+	useResetStates();
 
 	//---------------------------------------------------------------------------------------------------//
 	return (

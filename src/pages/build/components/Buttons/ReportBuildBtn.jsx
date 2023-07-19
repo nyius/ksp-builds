@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../../../components/buttons/Button';
-import AuthContext from '../../../../context/auth/AuthContext';
-import BuildContext from '../../../../context/build/BuildContext';
+import { useAuthContext } from '../../../../context/auth/AuthContext';
+import { useBuildContext } from '../../../../context/build/BuildContext';
 import { setReport } from '../../../../context/auth/AuthActions';
 
 /**
@@ -9,8 +9,8 @@ import { setReport } from '../../../../context/auth/AuthActions';
  * @returns
  */
 function ReportBuildBtn() {
-	const { dispatchAuth } = useContext(AuthContext);
-	const { loadedBuild } = useContext(BuildContext);
+	const { dispatchAuth } = useAuthContext();
+	const { loadedBuild } = useBuildContext();
 
 	//---------------------------------------------------------------------------------------------------//
 	return <Button tooltip="Report" htmlFor="report-modal" color="bg-base-800 text-error" icon="report" onClick={() => setReport(dispatchAuth, 'build', loadedBuild)} />;

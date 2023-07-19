@@ -36,6 +36,8 @@ function Contact() {
 		});
 	};
 
+	//---------------------------------------------------------------------------------------------------//
+
 	if (submitted) {
 		return (
 			<MiddleContainer>
@@ -47,7 +49,6 @@ function Contact() {
 		);
 	}
 
-	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
 			<Helmet title="Contact" pageLink="https://kspbuilds.com/contact" description="Contact page for KSP Builds. Submit bugs, ask a question, share ideas, or simply reach out for a conversation!" />

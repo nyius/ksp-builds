@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 //---------------------------------------------------------------------------------------------------//
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
@@ -13,23 +13,16 @@ import SavePatchEditBtn from './Components/Buttons/SavePatchEditBtn';
 import CancelEditPatchBtn from './Components/Buttons/CancelEditPatchBtn';
 import PatchNoteEditor from './Components/PatchNoteEditor';
 import PatchNote from './Components/PatchNote';
-import { fetchPatchNotes } from '../../context/news/NewsUtils';
+import { useFetchPatchNotes } from '../../context/news/NewsActions';
+import { createDateFromFirebaseTimestamp } from '../../utilities/createDateFromFirebaseTimestamp';
 
 /**
  * KSP Builds Patch notes Page
  * @returns
  */
 function PatchNotes() {
-	const [patchNotes, setPatchNotes] = useState(null);
-	const [loading, setLoading] = useState(true);
+	const [patchNotes, loading] = useFetchPatchNotes(null);
 	const [editedPatchNotes, setEditedPatchNote] = useState(null);
-
-	useEffect(() => {
-		fetchPatchNotes().then(patchNotes => {
-			setPatchNotes(patchNotes);
-			setLoading(false);
-		});
-	}, []);
 
 	//---------------------------------------------------------------------------------------------------//
 	if (loading) {
@@ -50,7 +43,7 @@ function PatchNotes() {
 
 	return (
 		<>
-			<Helmet title="Patch Notes" pageLink="https://kspbuilds.com/patch-notes" description="See the latest updates and fixes to the KSP Builds website." />
+			<Helmet title="Patch Notes" pageLink="https://kspbuilds.com/patch-notes" type="article" description="See the latest updates and fixes to the KSP Builds website." />
 
 			<MiddleContainer>
 				<PlanetHeader text="KSP Builds Patch Notes" />
@@ -59,7 +52,7 @@ function PatchNotes() {
 					{patchNotes.map((patchNote, i) => {
 						return (
 							<div key={i} className="bg-base-600 rounded-xl p-10 2k:p-16">
-								<h2 className="font-bold text-2xl 2k:text-4xl text-white">Update - {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(patchNote.timestamp.seconds * 1000)}</h2>
+								<h2 className="font-bold text-2xl 2k:text-4xl text-white">Update - {createDateFromFirebaseTimestamp(patchNote.timestamp.seconds)}</h2>
 								<PatchNote patchNote={patchNote} />
 								<PatchNoteEditor patchNote={patchNote} setEditedPatchNote={setEditedPatchNote} />
 

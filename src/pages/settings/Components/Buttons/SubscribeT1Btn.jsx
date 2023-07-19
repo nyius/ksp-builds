@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../../context/auth/AuthContext';
 import Button from '../../../../components/buttons/Button';
 
 /**
@@ -7,7 +7,7 @@ import Button from '../../../../components/buttons/Button';
  * @returns
  */
 function SubscribeT1Btn() {
-	const { user } = useContext(AuthContext);
+	const { user } = useAuthContext();
 
 	return (
 		<Button

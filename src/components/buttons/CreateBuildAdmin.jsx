@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '../../firebase.config';
+import { auth } from '../../firebase.config';
 import { cloneDeep } from 'lodash';
 //---------------------------------------------------------------------------------------------------//
 import KspImage from '../../assets/kspImage.jpg';
@@ -11,24 +11,24 @@ import KspImage4 from '../../assets/kspimage-4.jpg';
 import KspImage5 from '../../assets/kspimage-5.jpg';
 import Button from './Button';
 //---------------------------------------------------------------------------------------------------//
-import AuthContext from '../../context/auth/AuthContext';
-import BuildContext from '../../context/build/BuildContext';
-import useBuild, { setUploadingBuild, useUploadBuild } from '../../context/build/BuildActions';
+import { useAuthContext } from '../../context/auth/AuthContext';
+import { useBuildContext } from '../../context/build/BuildContext';
+import { setUploadingBuild, useUploadBuild } from '../../context/build/BuildActions';
 //---------------------------------------------------------------------------------------------------//
 import shipBuildTestMedium from '../../utilities/shipBuildTestMedium.json';
 import { standardBuild } from '../../utilities/standardBuild';
 
+const types = ['Interplanetary', 'Interstellar', 'Satellite', 'Space Station', 'Lander', 'Rover', 'SSTO', 'Spaceplane', 'Probe'];
+const images = [KspImage, KspImage2, KspImage3, KspImage4, KspImage5];
+
 function CreateBuildAdmin() {
-	const { user } = useContext(AuthContext);
-	const { dispatchBuild } = useContext(BuildContext);
+	const { dispatchBuild } = useBuildContext();
+	const { user } = useAuthContext();
 	const { uploadBuild } = useUploadBuild();
-	const types = ['Interplanetary', 'Interstellar', 'Satellite', 'Space Station', 'Lander', 'Rover', 'SSTO', 'Spaceplane', 'Probe'];
 	/**
 	 * handles creating a new fully done build
 	 */
 	const createBuild = async () => {
-		const images = [KspImage, KspImage2, KspImage3, KspImage4, KspImage5];
-
 		const build = cloneDeep(standardBuild);
 
 		build.name = 'test-' + uuidv4().slice(0, 4);

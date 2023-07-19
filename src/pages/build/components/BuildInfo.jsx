@@ -1,16 +1,17 @@
-import React, { useContext } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
+import React from 'react';
+import { useBuildContext } from '../../../context/build/BuildContext';
 import BuildInfoCard from '../../../components/cards/BuildInfoCard';
 import BotwBadge from '../../../assets/BotW_badge2.png';
 import UsernameLink from '../../../components/username/UsernameLink';
 import Button from '../../../components/buttons/Button';
+import { createDateFromFirebaseTimestamp } from '../../../utilities/createDateFromFirebaseTimestamp';
 
 /**
  * Displays build info like date created, author, part count, etc
  * @returns
  */
 function BuildInfo() {
-	const { loadedBuild } = useContext(BuildContext);
+	const { loadedBuild } = useBuildContext();
 
 	return (
 		<div className="flex flex-row flex-wrap gap-4 2k:gap-5 bg-base-900 w-full justify-center p-2 2k:p-4 mb-6 2k:mb-12 rounded-xl">
@@ -19,11 +20,11 @@ function BuildInfo() {
 			</BuildInfoCard>
 
 			<BuildInfoCard title="Date Created">
-				<p className="text-xl 2k:text-2xl text-accent">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.timestamp.seconds * 1000)}</p>
+				<p className="text-xl 2k:text-2xl text-accent">{createDateFromFirebaseTimestamp(loadedBuild.timestamp.seconds)}</p>
 			</BuildInfoCard>
 
 			<BuildInfoCard title="Last Updated">
-				<p className="text-xl 2k:text-2xl text-accent">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.lastModified.seconds * 1000)}</p>
+				<p className="text-xl 2k:text-2xl text-accent">{createDateFromFirebaseTimestamp(loadedBuild.lastModified.seconds)}</p>
 			</BuildInfoCard>
 
 			<BuildInfoCard title="KSP Version">
@@ -45,7 +46,7 @@ function BuildInfo() {
 			{loadedBuild.buildOfTheWeek ? (
 				<BuildInfoCard title="Build of the Week">
 					<img src={BotwBadge} alt="" className="w-22 2k:w-30" />
-					<p className="text-lg xl:text-xl 2k:text-2xl italic text-slate-500 ">{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: '2-digit' }).format(loadedBuild.buildOfTheWeek.seconds * 1000)}</p>
+					<p className="text-lg xl:text-xl 2k:text-2xl italic text-slate-500 ">{createDateFromFirebaseTimestamp(loadedBuild.buildOfTheWeek.seconds)}</p>
 				</BuildInfoCard>
 			) : null}
 

@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from './Button';
-import BuildsContext from '../../context/builds/BuildsContext';
+import { useBuildsContext } from '../../context/builds/BuildsContext';
 import { setBuildsView } from '../../context/builds/BuildsActions';
 import { setLocalStoredBuildsView } from '../../context/builds/BuildsUtils';
 
@@ -9,7 +9,7 @@ import { setLocalStoredBuildsView } from '../../context/builds/BuildsUtils';
  * @returns
  */
 function BuildsViewBtn() {
-	const { buildsView, dispatchBuilds } = useContext(BuildsContext);
+	const { buildsView, dispatchBuilds } = useBuildsContext();
 
 	if (buildsView === 'list') {
 		return (

@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
+import React from 'react';
+import { useBuildContext } from '../../../context/build/BuildContext';
 import { AiFillEye } from 'react-icons/ai';
 
 /**
@@ -7,7 +7,7 @@ import { AiFillEye } from 'react-icons/ai';
  * @returns
  */
 function BuildViews() {
-	const { loadedBuild } = useContext(BuildContext);
+	const { loadedBuild } = useBuildContext();
 
 	return (
 		<p className="flex flex-row text-2xl items-center gap-2 2k:text-4xl">

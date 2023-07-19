@@ -19,6 +19,7 @@ const AuthReducer = (state, action) => {
 				newUsername: '',
 				newBio: '',
 				editingBio: false,
+				isAuthenticated: false,
 				editingEmail: false,
 				verifyEditedEmail: null,
 				cancelEditProfile: false,
@@ -58,6 +59,7 @@ const AuthReducer = (state, action) => {
 				...state,
 				user: updatedUserState,
 				newUsername: updatedUserState?.username,
+				isAuthenticated: updatedUserState?.username ? true : false,
 			};
 		case 'SET_DELETE_CONVO_ID':
 			return {

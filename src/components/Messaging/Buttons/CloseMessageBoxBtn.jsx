@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../../buttons/Button';
-import AuthContext from '../../../context/auth/AuthContext';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import { setConvosOpen } from '../../../context/auth/AuthActions';
 
 /**
@@ -8,7 +8,7 @@ import { setConvosOpen } from '../../../context/auth/AuthActions';
  * @returns
  */
 function CloseMessageBoxBtn() {
-	const { dispatchAuth } = useContext(AuthContext);
+	const { dispatchAuth } = useAuthContext();
 
 	return <Button onClick={() => setConvosOpen(dispatchAuth, false)} icon="chevron-down" style="btn-circle" color="btn-primary" />;
 }

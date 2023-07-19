@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import { db } from '../../firebase.config';
 import { updateDoc, doc, getDoc, collection, deleteDoc, query, getDocs, serverTimestamp, setDoc, addDoc, limit, orderBy, startAfter, where, increment } from 'firebase/firestore';
 import { signInWithPopup, createUserWithEmailAndPassword, updateEmail } from 'firebase/auth';
@@ -9,8 +8,8 @@ import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import { checkMatchingEmails, fetchUserProfileFromServer, sendNotification } from './AuthUtils';
 //---------------------------------------------------------------------------------------------------//
-import AuthContext from './AuthContext';
-import BuildContext from '../build/BuildContext';
+import { useAuthContext } from './AuthContext';
+import { useBuildContext } from '../build/BuildContext';
 import { updateWeeklyUpvoted } from './AuthUtils';
 //---------------------------------------------------------------------------------------------------//
 import standardUser from '../../utilities/standardUser';
@@ -19,9 +18,11 @@ import standardUserProfile from '../../utilities/standardUserProfile';
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
 import subscribeToConvo from '../../utilities/subscribeToConvo';
 import { checkLocalUserAge, getUserFromLocalStorage, setLocalStoredUser } from '../../utilities/userLocalStorage';
+import { useEffect, useState } from 'react';
+import { createDateFromFirebaseTimestamp } from '../../utilities/createDateFromFirebaseTimestamp';
 
 const useAuth = () => {
-	const { dispatchAuth } = useContext(AuthContext);
+	const { dispatchAuth } = useAuthContext();
 
 	/**
 	 * Handles creating a new users account on the DB. Sets up a 'users' doc, a 'usersProfile' doc, and their 'notifications' doc.
@@ -156,9 +157,10 @@ export default useAuth;
  * @returns
  */
 export const useFetchUser = () => {
-	const { dispatchAuth, fetchedUserProfiles } = useContext(AuthContext);
+	const { dispatchAuth, fetchedUserProfiles } = useAuthContext();
 	/**
-	 * Handles fetching a profile. First check the local storage, then the server
+	 * Handles fetching a profile. First checks the local storage, then the server.
+	 * Stores the result in the auth context
 	 * @param {string} id - the id of the user to fetch
 	 * @param {set function} setLoading - (optional) - a setter function for a loading state
 	 * @returns the found user
@@ -237,7 +239,7 @@ export const useFetchUser = () => {
  * @returns
  */
 export const useHandleVoting = () => {
-	const { user } = useContext(AuthContext);
+	const { user, isAuthenticated } = useAuthContext();
 	const { updateUserDb, updateUserProfilesAndDb } = useUpdateProfile();
 
 	/**
@@ -247,7 +249,7 @@ export const useHandleVoting = () => {
 	 */
 	const handleVoting = async (type, build) => {
 		try {
-			if (!user?.username) return;
+			if (!isAuthenticated) return;
 			let newUpVotes = cloneDeep(user.upVotes);
 			let newDownVotes = cloneDeep(user.downVotes);
 
@@ -332,7 +334,7 @@ export const useHandleVoting = () => {
  * @returns
  */
 export const useUpdateProfile = () => {
-	const { user, dispatchAuth, editingEmail, verifyEditedEmail } = useContext(AuthContext);
+	const { user, dispatchAuth, editingEmail, verifyEditedEmail } = useAuthContext();
 	/**
 	 * Handles updating the users profile picture on the server and context
 	 * @param {*} profilePicture
@@ -440,7 +442,7 @@ export const useUpdateProfile = () => {
  * Hook with functions for notifications
  */
 export const useHandleNotifications = () => {
-	const { user, dispatchAuth, lastFetchedNotification } = useContext(AuthContext);
+	const { user, dispatchAuth, lastFetchedNotification } = useAuthContext();
 	/**
 	 * Handles deleting all of a users notifications
 	 * @returns
@@ -542,7 +544,7 @@ export const useHandleNotifications = () => {
  * @returns
  */
 export const useDeleteConversation = () => {
-	const { user, dispatchAuth, conversations } = useContext(AuthContext);
+	const { user, dispatchAuth, conversations } = useAuthContext();
 	/**
 	 * Handles removing a conversation from a user. Doesn't delete the actual conversation
 	 * @param {string} id - id of the convo to delete
@@ -575,8 +577,8 @@ export const useDeleteConversation = () => {
  * @returns
  */
 export const useSubmitReport = () => {
-	const { dispatchAuth, user, reportType, reportingContent } = useContext(AuthContext);
-	const { loadedBuild } = useContext(BuildContext);
+	const { dispatchAuth, user, reportType, reportingContent, isAuthenticated } = useAuthContext();
+	const { loadedBuild } = useBuildContext();
 
 	/**
 	 * Handles submitting a report. Takes in an optional message
@@ -596,7 +598,7 @@ export const useSubmitReport = () => {
 					type: 'comment',
 				};
 
-				if (user?.username) {
+				if (isAuthenticated) {
 					report.username = user.username;
 					report.uid = user.uid;
 				} else {
@@ -615,7 +617,7 @@ export const useSubmitReport = () => {
 					type: 'build',
 				};
 
-				if (user?.username) {
+				if (isAuthenticated) {
 					report.username = user.username;
 					report.uid = user.uid;
 				} else {
@@ -632,7 +634,7 @@ export const useSubmitReport = () => {
 					type: 'user',
 				};
 
-				if (user?.username) {
+				if (isAuthenticated) {
 					report.username = user.username;
 					report.uid = user.uid;
 				} else {
@@ -670,7 +672,7 @@ export const useSubmitReport = () => {
  * @returns
  */
 export const useSendMessage = () => {
-	const { user, dispatchAuth, messageTab } = useContext(AuthContext);
+	const { user, dispatchAuth, messageTab } = useAuthContext();
 	/**
 	 * Handles sending a message to a user
 	 * @param {string} message - the message to send
@@ -769,7 +771,7 @@ export const useSendMessage = () => {
  * @returns
  */
 export const useFetchConversation = () => {
-	const { conversations, user, dispatchAuth } = useContext(AuthContext);
+	const { conversations, user, dispatchAuth } = useAuthContext();
 
 	/**
 	 * Handles checking if we have a conversation with this user, or if its a new one
@@ -804,7 +806,7 @@ export const useFetchConversation = () => {
 								const convo = convoDoc.data();
 								if (convo.users.includes(user.uid) && convo.users.includes(userProfile.uid)) {
 									convo.id = convoDoc.id;
-									convo.lastMessage = new Intl.DateTimeFormat('en-US', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(convo.lastMessage.seconds * 1000);
+									convo.lastMessage = createDateFromFirebaseTimestamp(convo.lastMessage.seconds, 'long');
 
 									// Fetch the other users profile
 									const userToFetch = convo.users.filter(user => {
@@ -882,7 +884,7 @@ export const useFetchConversation = () => {
  * @returns
  */
 export const useHandleFollowingUser = () => {
-	const { dispatchAuth, user, openProfile } = useContext(AuthContext);
+	const { dispatchAuth, user, openProfile } = useAuthContext();
 	/**
 	 * Handles following a users
 	 * @param {obj} userProfile - the profile of the user to follow
@@ -921,11 +923,59 @@ export const useHandleFollowingUser = () => {
 };
 
 /**
+ * Handles setting the user to follow.
+ * @param {*} initialState
+ * @param {*} usersProfile - (optional) a users profile to follow. If no profile is passed in, it uses the current openProfile from context
+ * @returns [userToFollow, setUserToFollow]
+ */
+export const useSetUserToFollow = (initialState, usersProfile) => {
+	const [userToFollow, setUserToFollow] = useState(initialState);
+	const { openProfile } = useAuthContext();
+
+	useEffect(() => {
+		if (usersProfile) {
+			setUserToFollow(usersProfile);
+		} else {
+			setUserToFollow(openProfile);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (openProfile && openProfile?.uid === userToFollow?.uid) {
+			setUserToFollow(openProfile);
+		}
+	}, [openProfile]);
+
+	return [userToFollow, setUserToFollow];
+};
+
+/**
+ * Handles setting the user to message.
+ * @param {*} initialState
+ * @param {*} usersProfile - (optional) a users profile to message. If no profile is passed in, it uses the current openProfile from context
+ * @returns [userToFollow, setUserToFollow]
+ */
+export const useSetUserToMessage = (initialState, usersProfile) => {
+	const [userToMessage, setUserToMessage] = useState(initialState);
+	const { openProfile } = useAuthContext();
+
+	useEffect(() => {
+		if (usersProfile) {
+			setUserToMessage(usersProfile);
+		} else {
+			setUserToMessage(openProfile);
+		}
+	}, []);
+
+	return [userToMessage, setUserToMessage];
+};
+
+/**
  * Hook with functions to handle favoriting a build
  * @returns
  */
 export const useHandleFavoriting = () => {
-	const { user, dispatchAuth } = useContext(AuthContext);
+	const { user, dispatchAuth } = useAuthContext();
 	const { updateUserDb } = useUpdateProfile();
 
 	/**
@@ -961,7 +1011,7 @@ export const useHandleFavoriting = () => {
  * @returns
  */
 export const useBlockUser = () => {
-	const { user, dispatchAuth, userToBlock } = useContext(AuthContext);
+	const { user, dispatchAuth, userToBlock } = useAuthContext();
 	const { updateUserProfilesAndDb } = useUpdateProfile();
 
 	/**
@@ -1002,6 +1052,190 @@ export const useBlockUser = () => {
 	};
 
 	return { blockUser };
+};
+
+/**
+ * Returns the current users conversations, sorted by date (newest)
+ * @param {*} initialState
+ * @returns [convos, setConvos]
+ */
+export const useSetConversations = initialState => {
+	const { conversations } = useAuthContext();
+	const [convos, setConvos] = useState(initialState);
+
+	useEffect(() => {
+		let sorted = conversations.sort((a, b) => {
+			let aDate = a.lastMessage;
+			let bDate = b.lastMessage;
+
+			return aDate < bDate ? 1 : -1;
+		});
+		setConvos(sorted);
+	}, [conversations]);
+
+	return [convos, setConvos];
+};
+
+/**
+ * Returns the current new messages that a user has
+ * @param {*} initialState
+ * @returns
+ */
+export const useGetNewMessages = initialState => {
+	const { conversations, user } = useAuthContext();
+	const [newMessages, setNewMessages] = useState(initialState);
+	/**
+	 * Handles checking for anew message
+	 * @returns
+	 */
+	const checkForNewMessages = () => {
+		let newMessages = 0;
+		if (conversations?.length > 0) {
+			for (let i = 0; i < conversations.length; i++) {
+				if (conversations[i]?.newMessage && conversations[i]?.lastMessageFrom !== user.uid && conversations[i]?.lastMessageFrom !== undefined) {
+					newMessages++;
+				}
+			}
+		}
+		return newMessages > 99 ? '99+' : newMessages;
+	};
+
+	useEffect(() => {
+		setNewMessages(checkForNewMessages());
+	}, [conversations]);
+
+	return [newMessages, setNewMessages];
+};
+
+/**
+ * Returns the current new notifications that a user has
+ * @param {*} initialState
+ * @returns [totalUnreadNotifs, setTotalUnreadNotifs]
+ */
+export const useGetNewNotifs = initialState => {
+	const { authLoading, user, isAuthenticated } = useAuthContext();
+	const [totalUnreadNotifs, setTotalUnreadNotifs] = useState(initialState);
+	/**
+	 * Calculates total unread notifications
+	 */
+	const calcUnreadNotifs = () => {
+		setTotalUnreadNotifs(0);
+		user.notifications.map(notif => {
+			if (!notif.read) {
+				setTotalUnreadNotifs(prevstate => (prevstate += 1));
+			}
+		});
+	};
+
+	useEffect(() => {
+		if (!authLoading && isAuthenticated) {
+			if (user.notifications) {
+				calcUnreadNotifs();
+			}
+		}
+	}, [authLoading, isAuthenticated, user]);
+	return [totalUnreadNotifs, setTotalUnreadNotifs];
+};
+
+/**
+ * Returns a users profile. First check if we already have them loaded in context, then local storage, then new fetch from server.
+ * Returns a profile and a loading state
+ * @param {*} initialState
+ * @param {*} uid
+ * @returns [usersProfile, loadingProfile]
+ */
+export const useReturnUserProfile = (initialState, uid) => {
+	const { fetchedUserProfiles } = useAuthContext();
+	const [usersProfile, setUsersProfile] = useState(initialState);
+	const [loadingProfile, setLoadingProfile] = useState(true);
+	const { fetchUsersProfile, checkIfUserInContext } = useFetchUser();
+
+	useEffect(() => {
+		if (uid) {
+			let foundProfile = checkIfUserInContext(uid);
+			if (foundProfile) {
+				setUsersProfile(foundProfile);
+				setLoadingProfile(false);
+			} else {
+				fetchUsersProfile(uid, setLoadingProfile).then(fetchedUser => {
+					setUsersProfile(fetchedUser);
+					setLoadingProfile(false);
+				});
+			}
+		}
+	}, [uid]);
+
+	useEffect(() => {
+		if (usersProfile) {
+			let foundProfile = checkIfUserInContext(uid);
+			if (foundProfile) {
+				setUsersProfile(foundProfile);
+				setLoadingProfile(false);
+			} else {
+				fetchUsersProfile(uid, setLoadingProfile).then(fetchedUser => {
+					setUsersProfile(fetchedUser);
+					setLoadingProfile(false);
+				});
+			}
+		}
+	}, [usersProfile, fetchedUserProfiles]);
+
+	return [usersProfile, loadingProfile];
+};
+
+/**
+ * Handles getting a users profile. Sets it in the context as openProfile
+ * @param {*} usersId
+ */
+export const useGetAndSetOpenUserProfile = usersId => {
+	const { dispatchAuth } = useAuthContext();
+	const { fetchUsersProfile, checkIfUserInContext } = useFetchUser();
+
+	useEffect(() => {
+		setOpenProfile(dispatchAuth, null);
+		setFetchingProfile(dispatchAuth, true);
+
+		let foundProfile = checkIfUserInContext(usersId);
+		if (foundProfile) {
+			setOpenProfile(dispatchAuth, foundProfile);
+			setFetchingProfile(dispatchAuth, false);
+		} else {
+			fetchUsersProfile(usersId).then(fetchedUser => {
+				setOpenProfile(dispatchAuth, fetchedUser);
+			});
+		}
+	}, []);
+};
+
+/**
+ * Handles returning the current usernames custom color
+ * @returns [usernameColor, setUsernameColor]
+ */
+export const useReturnUsernameCustomColor = initialState => {
+	const { user, authLoading, isAuthenticated } = useAuthContext();
+	const [usernameColor, setUsernameColor] = useState(initialState);
+
+	useEffect(() => {
+		if (!authLoading && isAuthenticated) {
+			if (user.customUsernameColor) {
+				setUsernameColor(user.customUsernameColor);
+			}
+		}
+	}, [authLoading, isAuthenticated, user]);
+
+	return [usernameColor, setUsernameColor];
+};
+
+/**
+ *
+ * @param {*} profile
+ */
+export const useSetOpenProfile = profile => {
+	const { dispatchAuth } = useAuthContext();
+
+	useEffect(() => {
+		setOpenProfile(dispatchAuth, profile);
+	}, [profile]);
 };
 
 // State Updaters ---------------------------------------------------------------------------------------------------//
@@ -1266,5 +1500,19 @@ export const setUpdateFetchedProfile = (dispatchAuth, updatedUser) => {
 	dispatchAuth({
 		type: 'UPDATE_FETCHED_USERS_PROFILE',
 		payload: updatedUser,
+	});
+};
+
+/**
+ * handles setting if a user is authenticated
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {bool} authenticated - true or false if the user is authenticated
+ */
+export const setAuthenticated = (dispatchAuth, authenticated) => {
+	dispatchAuth({
+		type: 'SET_AUTH',
+		payload: {
+			isAuthenticated: authenticated,
+		},
 	});
 };

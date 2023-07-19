@@ -1,37 +1,14 @@
-import React, { useContext, useState, useEffect } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
-import { setBuildToUpload } from '../../../context/build/BuildActions';
-import fetchBuildFromAWS from '../../../utilities/fetchBuildFromAws';
-import { toast } from 'react-toastify';
+import React from 'react';
+import { useBuildContext } from '../../../context/build/BuildContext';
+import { setBuildToUpload, useGetEditingBuildRawBuild } from '../../../context/build/BuildActions';
 
 /**
  * Input the field for the builds name
  * @returns
  */
 function UploadBuildRawBuild() {
-	const { dispatchBuild, buildToUpload, editingBuild } = useContext(BuildContext);
-	const [loadingRawBuild, setLoadingRawBuild] = useState(true);
-
-	useEffect(() => {
-		if (editingBuild) {
-			setLoadingRawBuild(true);
-
-			const fetchRawBuild = async () => {
-				try {
-					const fetchedRawBuild = await fetchBuildFromAWS(editingBuild.id);
-					return fetchedRawBuild;
-				} catch (error) {
-					console.log(error);
-					toast.error('Something went wrong fetching the Raw build');
-				}
-			};
-
-			fetchRawBuild().then(fetchedRawBuild => {
-				setBuildToUpload(dispatchBuild, { ...buildToUpload, build: fetchedRawBuild });
-				setLoadingRawBuild(false);
-			});
-		}
-	}, [editingBuild]);
+	const { dispatchBuild, buildToUpload, editingBuild } = useBuildContext();
+	const [loadingRawBuild] = useGetEditingBuildRawBuild(true);
 
 	//---------------------------------------------------------------------------------------------------//
 	if (buildToUpload) {

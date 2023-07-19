@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Button from '../buttons/Button';
 import { setCancelBuilEdit } from '../../context/build/BuildActions';
-import BuildContext from '../../context/build/BuildContext';
+import { useBuildContext } from '../../context/build/BuildContext';
 import PlanetHeader from '../header/PlanetHeader';
 
 /**
@@ -9,7 +9,7 @@ import PlanetHeader from '../header/PlanetHeader';
  * @returns
  */
 function CancelBuildEditModal() {
-	const { dispatchBuild, loadedBuild } = useContext(BuildContext);
+	const { dispatchBuild, loadedBuild } = useBuildContext();
 
 	return (
 		<>

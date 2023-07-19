@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import AuthContext from '../../../../context/auth/AuthContext';
+import { useAuthContext } from '../../../../context/auth/AuthContext';
 import CheckCredentials from '../../../../components/credentials/CheckCredentials';
 import Button from '../../../../components/buttons/Button';
 import { setAccountToDelete } from '../../../../context/auth/AuthActions';
@@ -10,7 +10,7 @@ import { setAccountToDelete } from '../../../../context/auth/AuthActions';
  * @returns
  */
 function DeleteAccountBtn() {
-	const { dispatchAuth } = useContext(AuthContext);
+	const { dispatchAuth } = useAuthContext();
 	const usersId = useParams().id;
 
 	return (

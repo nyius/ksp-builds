@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import NewsContext from '../../../context/news/NewsContext';
+import React from 'react';
+import { useNewsContext } from '../../../context/news/NewsContext';
 import NewsCard from '../../../components/cards/NewsCard';
 
 /**
@@ -7,7 +7,7 @@ import NewsCard from '../../../components/cards/NewsCard';
  * @returns
  */
 function NewsArticles() {
-	const { articles } = useContext(NewsContext);
+	const { articles } = useNewsContext();
 
 	return (
 		<div className="grid grid-cols-2 lg:grid-cols-3 2k:grid-cols-4 flex-wrap gap-6 2k:gap-12">

@@ -1,13 +1,13 @@
-import React, { useState, useContext } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../buttons/Button';
 import PlanetHeader from '../header/PlanetHeader';
-import AuthContext from '../../context/auth/AuthContext';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import { deleteUserAccount } from '../../context/auth/AuthUtils';
 
 function DeleteAccount() {
 	const navigate = useNavigate();
-	const { authLoading, user, accountToDelete } = useContext(AuthContext);
+	const { authLoading, user, accountToDelete, isAuthenticated } = useAuthContext();
 
 	/**
 	 * Handles a user starting the login process
@@ -18,7 +18,7 @@ function DeleteAccount() {
 		navigate('/');
 	};
 
-	if (!authLoading && user?.username) {
+	if (!authLoading && isAuthenticated) {
 		return (
 			<>
 				{/* Delete */}

@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer } from 'react';
+import React, { createContext, useContext, useEffect, useReducer } from 'react';
 import BuildsReducer from './BuildsReducer';
 import { getDoc, doc, getDocFromCache } from 'firebase/firestore';
 import { db } from '../../firebase.config';
@@ -153,6 +153,16 @@ export const BuildsProvider = ({ children }) => {
 	const [state, dispatchBuilds] = useReducer(BuildsReducer, initialState);
 
 	return <BuildsContext.Provider value={{ ...state, dispatchBuilds }}>{children}</BuildsContext.Provider>;
+};
+
+/**
+ * Builds Context
+ * @returns
+ */
+export const useBuildsContext = () => {
+	const context = useContext(BuildsContext);
+
+	return context;
 };
 
 export default BuildsContext;

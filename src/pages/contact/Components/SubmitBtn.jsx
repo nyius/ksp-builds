@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import AuthContext from '../../../context/auth/AuthContext';
+import React from 'react';
+import { useAuthContext } from '../../../context/auth/AuthContext';
 import Button from '../../../components/buttons/Button';
 import { toast } from 'react-toastify';
 import { db } from '../../../firebase.config';
@@ -15,7 +15,7 @@ import { sendNotification } from '../../../context/auth/AuthUtils';
  * @returns
  */
 function SubmitBtn({ formData, setSubmitted }) {
-	const { user } = useContext(AuthContext);
+	const { user, isAuthenticated } = useAuthContext();
 
 	/**
 	 * Handles submitting a message
@@ -25,7 +25,7 @@ function SubmitBtn({ formData, setSubmitted }) {
 		try {
 			const newFormData = cloneDeep(formData);
 
-			if (user?.username) {
+			if (isAuthenticated) {
 				newFormData.username = user.username;
 				newFormData.uid = user.uid;
 			} else {

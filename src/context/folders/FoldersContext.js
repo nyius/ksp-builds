@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useEffect } from 'react';
+import React, { createContext, useReducer, useEffect, useContext } from 'react';
 import FoldersReducer from './FoldersReducer';
 
 const FoldersContext = createContext();
@@ -26,6 +26,7 @@ export const FoldersProvider = ({ children }) => {
 		folderLocation: null,
 		usersFolders: null,
 		collapsedFolders: false,
+		currentFolderOwner: null,
 	};
 
 	useEffect(() => {
@@ -42,6 +43,16 @@ export const FoldersProvider = ({ children }) => {
 	const [state, dispatchFolders] = useReducer(FoldersReducer, initialState);
 
 	return <FoldersContext.Provider value={{ ...state, dispatchFolders }}>{children}</FoldersContext.Provider>;
+};
+
+/**
+ * Folder Context
+ * @returns
+ */
+export const useFoldersContext = () => {
+	const context = useContext(FoldersContext);
+
+	return context;
 };
 
 export default FoldersContext;

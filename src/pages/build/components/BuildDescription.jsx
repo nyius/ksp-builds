@@ -1,7 +1,6 @@
-import React, { useState, useContext, useEffect } from 'react';
-import BuildContext from '../../../context/build/BuildContext';
+import React from 'react';
 import { Editor } from 'react-draft-wysiwyg';
-import { convertFromRaw, EditorState } from 'draft-js';
+import { useGetBuildDesc } from '../../../context/build/BuildActions';
 
 /**
  * Displays the builds description
@@ -9,14 +8,7 @@ import { convertFromRaw, EditorState } from 'draft-js';
  * @returns
  */
 function BuildDescription() {
-	const { loadedBuild, loadingBuild } = useContext(BuildContext);
-	const [buildDesc, setBuildDesc] = useState(null);
-
-	useEffect(() => {
-		if (!loadingBuild && loadedBuild) {
-			setBuildDesc(EditorState.createWithContent(convertFromRaw(JSON.parse(loadedBuild.description))));
-		}
-	}, [loadingBuild, loadedBuild]);
+	const [buildDesc] = useGetBuildDesc(null);
 
 	//---------------------------------------------------------------------------------------------------//
 	return (

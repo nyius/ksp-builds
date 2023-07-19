@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import AuthContext from '../../context/auth/AuthContext';
+import React, { useState } from 'react';
+import { useAuthContext } from '../../context/auth/AuthContext';
 import Button from '../buttons/Button';
 import PlanetHeader from '../header/PlanetHeader';
 import { setReport } from '../../context/auth/AuthActions';
@@ -8,7 +8,7 @@ import { useSubmitReport } from '../../context/auth/AuthActions';
 function ReportModal() {
 	const [message, setMessage] = useState('');
 	const { submitReport } = useSubmitReport();
-	const { dispatchAuth, reportingContent } = useContext(AuthContext);
+	const { dispatchAuth, reportingContent } = useAuthContext();
 
 	/**
 	 * Handles submitting a report

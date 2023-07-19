@@ -1,27 +1,28 @@
-import { useContext } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import FoldersContext from './FoldersContext';
-import AuthContext from '../auth/AuthContext';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useFoldersContext } from './FoldersContext';
+import { useAuthContext } from '../auth/AuthContext';
 import { doc, updateDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
-import { updateUserState } from '../auth/AuthActions';
+import { setFetchingProfile, updateUserState, useFetchUser } from '../auth/AuthActions';
 import { cloneDeep } from 'lodash';
 import { db } from '../../firebase.config';
 import { profanity } from '@2toad/profanity';
 import { buildNameToUrl } from '../../utilities/buildNameToUrl';
 import { checkForSameNameFolder, checkIfBuildInFolder } from './FoldersUtilils';
 import { setLocalStoredUser } from '../../utilities/userLocalStorage';
-import BuildContext from '../build/BuildContext';
+import { useBuildContext } from '../build/BuildContext';
 import { useUpdateBuild } from '../build/BuildActions';
+import { useEffect, useState } from 'react';
+import useBuilds from '../builds/BuildsActions';
 
 /**
  * Hook with functions for adding a new folder
  * @returns
  */
 function useAddNewFolder() {
-	const { dispatchFolders, newFolderName } = useContext(FoldersContext);
-	const { user, dispatchAuth } = useContext(AuthContext);
+	const { dispatchFolders, newFolderName } = useFoldersContext();
+	const { user, dispatchAuth } = useAuthContext();
 
 	/**
 	 * Handles making a new folder
@@ -91,8 +92,8 @@ function useAddNewFolder() {
  * @returns
  */
 export const useDeleteFolder = () => {
-	const { user, dispatchAuth } = useContext(AuthContext);
-	const { dispatchFolders, deleteFolderId } = useContext(FoldersContext);
+	const { user, dispatchAuth } = useAuthContext();
+	const { dispatchFolders, deleteFolderId } = useFoldersContext();
 
 	/**
 	 * Handles deleting a folder
@@ -120,10 +121,10 @@ export const useDeleteFolder = () => {
  * @returns
  */
 export const useAddBuildToFolder = () => {
-	const { user } = useContext(AuthContext);
-	const { dispatchFolders, selectedFolders } = useContext(FoldersContext);
+	const { user } = useAuthContext();
+	const { dispatchFolders, selectedFolders } = useFoldersContext();
 	const { updateAllFolders } = useUpdateFolder();
-	const { loadedBuild } = useContext(BuildContext);
+	const { loadedBuild } = useBuildContext();
 	const { updateBuild } = useUpdateBuild();
 
 	/**
@@ -187,7 +188,7 @@ export const useAddBuildToFolder = () => {
  * @returns
  */
 export const useHandleFolderInteraction = () => {
-	const { dispatchFolders, makingNewFolder, editingFolder, lastClickTime, selectedFolders, editingFolderName, longClickStart, lastSelectedFolderId, openedFolder } = useContext(FoldersContext);
+	const { dispatchFolders, makingNewFolder, editingFolder, lastClickTime, selectedFolders, editingFolderName, longClickStart, lastSelectedFolderId, openedFolder } = useFoldersContext();
 	const { updateFolder } = useUpdateFolder();
 	const { handleAddNewFolder } = useAddNewFolder();
 	const navigate = useNavigate();
@@ -346,7 +347,7 @@ export const useHandleFolderInteraction = () => {
  * Hook that contains functions to update folders on the server
  */
 export const useUpdateFolder = () => {
-	const { user, dispatchAuth } = useContext(AuthContext);
+	const { user, dispatchAuth } = useAuthContext();
 
 	/**
 	 * handles updating a single folder
@@ -420,6 +421,306 @@ export const useUpdateFolder = () => {
 	};
 
 	return { updateFolder, updateAllFolders };
+};
+
+/**
+ * handles setting the folders we are viewing owner
+ */
+export const useSetCurrentFolderOwner = () => {
+	const location = useLocation();
+	let currentUser = location.pathname.split('/')[2];
+	//---------------------------------------------------------------------------------------------------//
+	const { folderLocation, dispatchFolders } = useFoldersContext();
+	const { user } = useAuthContext();
+
+	useEffect(() => {
+		if (folderLocation === 'user') {
+			setCurrentFolderOwner(dispatchFolders, currentUser);
+		} else if (folderLocation === 'profile') {
+			setCurrentFolderOwner(dispatchFolders, user?.username);
+		}
+	}, [folderLocation, dispatchFolders, currentUser, user]);
+
+	useEffect(() => {
+		if (folderLocation !== 'user') {
+			setUsersFolders(dispatchFolders, null);
+		}
+	}, [folderLocation, dispatchFolders]);
+};
+
+/**
+ * Handles clearing the current open folder
+ */
+export const useResetOpenFolder = () => {
+	const { dispatchFolders } = useFoldersContext();
+	useEffect(() => {
+		setOpenedFolder(dispatchFolders, null);
+	}, []);
+};
+
+/**
+ * Handles setting if the users own personal folder (Likes "Nyius's builds") should be hidden or visible
+ * This is hidden where we dont want the user to add someone elses build to their own personal builds list
+ * @param {bool} initialState
+ * @returns
+ */
+export const useHideOwnFolder = initialState => {
+	const { folderLocation } = useFoldersContext();
+	const [hideOwnFolder, setHideOwnFolder] = useState(initialState);
+
+	useEffect(() => {
+		if (folderLocation === 'popup') {
+			setHideOwnFolder(true);
+		} else if (folderLocation === 'upload') {
+			setHideOwnFolder(false);
+		} else if (folderLocation === 'profile') {
+			setHideOwnFolder(false);
+		} else if (folderLocation === 'user') {
+			setHideOwnFolder(true);
+		}
+	}, [folderLocation]);
+
+	return [hideOwnFolder, setHideOwnFolder];
+};
+
+/**
+ * Handles returning a users personal builds folder
+ * @param {*} initialState
+ * @returns [personalBuildsFolder, setPersonalBuildsFolder]
+ */
+export const useSetPersonalBuildsFolder = initialState => {
+	const [personalBuildsFolder, setPersonalBuildsFolder] = useState(initialState);
+	const { folderLocation } = useFoldersContext();
+	const { user, authLoading, isAuthenticated, openProfile, fetchingProfile } = useAuthContext();
+
+	useEffect(() => {
+		if (folderLocation !== 'user') {
+			if (!authLoading && isAuthenticated) {
+				setPersonalBuildsFolder(prevState => {
+					return {
+						...prevState,
+						builds: user.builds,
+					};
+				});
+			}
+		} else if (folderLocation === 'user') {
+			if (!fetchingProfile && openProfile) {
+				setPersonalBuildsFolder(prevState => {
+					return {
+						...prevState,
+						builds: openProfile.builds,
+						folderName: `${openProfile.username}'s Builds`,
+						id: `${buildNameToUrl(openProfile.username)}s-builds`,
+						urlName: `${buildNameToUrl(openProfile.username)}s-builds`,
+					};
+				});
+			}
+		}
+	}, [authLoading, folderLocation, isAuthenticated, fetchingProfile, openProfile]);
+
+	return [personalBuildsFolder, setPersonalBuildsFolder];
+};
+
+/**
+ * Handles setting a builds pinned folder. uses the current loaded build.
+ */
+export const useSetPinnedFolder = pinnedFolder => {
+	const { loadingBuild, loadedBuild } = useBuildContext();
+	const { dispatchFolders } = useFoldersContext();
+
+	useEffect(() => {
+		if (loadingBuild) return;
+		setPinnedFolder(dispatchFolders, pinnedFolder ? pinnedFolder : loadedBuild?.pinnedFolder);
+	}, [loadingBuild, loadedBuild, dispatchFolders, pinnedFolder]);
+};
+
+/**
+ * Handles fetching a pinned folder and all of its builds.
+ * @param {*} initialState - [fetchedFolder, setFetchedFolder]
+ * @returns
+ */
+export const useFetchPinnedFolder = initialState => {
+	const [fetchedFolder, setFetchedFolder] = useState(initialState);
+	const { loadingBuild, loadedBuild } = useBuildContext();
+	const { dispatchFolders } = useFoldersContext();
+	const { dispatchAuth } = useAuthContext();
+	const { fetchUsersProfile, checkIfUserInContext } = useFetchUser();
+	const { fetchBuildsById } = useBuilds();
+
+	useEffect(() => {
+		if (loadingBuild) return;
+		if (loadedBuild.pinnedFolder) {
+			// If the current opened build has a pinned folder, Get the profile of the builds author
+			// Then get this pinned folder from their list of folders
+			// Loop over that folder and fetch all of the builds in that folder
+			let foundProfile = checkIfUserInContext(loadedBuild.uid);
+			if (foundProfile) {
+				const foundFolder = foundProfile.folders.filter(folder => loadedBuild.pinnedFolder === folder.id);
+				if (foundFolder.length > 0) {
+					fetchBuildsById(foundFolder[0].builds, null, 'public');
+					setFetchedFolder(foundFolder[0]);
+					setFetchedPinnedFolder(dispatchFolders, foundFolder[0]);
+					setFetchingProfile(dispatchAuth, false);
+				} else {
+					console.log('Couldnt find folder from user in context');
+				}
+			} else {
+				setFetchingProfile(dispatchAuth, true);
+				fetchUsersProfile(loadedBuild.uid)
+					.then(fetchedUser => {
+						const foundFolder = fetchedUser.folders.filter(folder => loadedBuild.pinnedFolder === folder.id);
+						if (foundFolder.length > 0) {
+							setFetchedFolder(foundFolder[0]);
+							setFetchedPinnedFolder(dispatchFolders, foundFolder[0]);
+							fetchBuildsById(foundFolder[0].builds, null, 'public');
+							setFetchingProfile(dispatchAuth, false);
+						} else {
+							throw new Error("Couldn't find folder from server");
+						}
+					})
+					.catch(err => {
+						console.log(err);
+						setFetchingProfile(dispatchAuth, false);
+					});
+			}
+		}
+	}, [loadedBuild, loadingBuild]);
+
+	return [fetchedFolder, setFetchedFolder];
+};
+
+/**
+ * handles setting the ID of the build we want to add to a folder in context
+ * @param {string} buildId - id of the build to add
+ */
+export const useSetBuildToAddToFolder = buildId => {
+	const { dispatchFolders } = useFoldersContext();
+	const { user } = useAuthContext();
+
+	useEffect(() => {
+		dispatchFolders({
+			type: 'SET_FOLDERS',
+			payload: { buildToAddToFolder: buildId },
+		});
+
+		/*	
+		let folders = [];
+
+		user?.folders?.map(folder => {
+			if (checkIfBuildInFolder(buildId, folder.id, user)) {
+				folders.push(folder);
+			}
+		});
+
+		dispatchFolders({
+			type: 'SET_FOLDERS',
+			payload: { selectedFolders: folders },
+		});
+		*/
+	}, []);
+};
+
+/**
+ * handles setting the start time for a long click on a folder (like for editing its name)
+ * @param {obj} selectedFolder - the selected folder
+ */
+export const useSetSelectedFolders = newSelectedFolder => {
+	const { dispatchFolders, selectedFolders, buildToAddToFolder } = useFoldersContext();
+
+	useEffect(() => {
+		if (!newSelectedFolder) {
+			dispatchFolders({
+				type: 'SET_FOLDERS',
+				payload: { selectedFolders: [] },
+			});
+
+			return;
+		}
+		let newSelectedFolders = cloneDeep(selectedFolders);
+		const folderIndex = selectedFolders.findIndex(folder => folder.id === newSelectedFolder.id);
+
+		// If we've already selected the folder, remove it
+		if (folderIndex >= 0) {
+			newSelectedFolders.splice(folderIndex, 1);
+		} else {
+			if (buildToAddToFolder) {
+				newSelectedFolders.push(newSelectedFolder);
+			} else {
+				newSelectedFolders = [newSelectedFolder];
+			}
+		}
+
+		dispatchFolders({
+			type: 'SET_FOLDERS',
+			payload: { selectedFolders: newSelectedFolders },
+		});
+	}, [newSelectedFolder, buildToAddToFolder]);
+};
+
+/**
+ * Handles setting the current folder location
+ * @param {*} location
+ */
+export const useSetFolderLocation = location => {
+	const { dispatchFolders } = useFoldersContext();
+
+	useEffect(() => {
+		setFolderLocation(dispatchFolders, location);
+	}, [location]);
+};
+
+/**
+ * Handles setting the current open users profile
+ */
+export const useSetOpenUsersFolders = () => {
+	const { openProfile } = useAuthContext();
+	const { dispatchFolders } = useFoldersContext();
+
+	// Fetches the users builds once we get their profile
+	useEffect(() => {
+		// Check if we found the users profile
+		if (openProfile && openProfile.username) {
+			setUsersFolders(dispatchFolders, openProfile.folders ? openProfile.folders : []);
+		}
+	}, [openProfile]);
+};
+
+/**
+ * Checks the URL for a folder id. If we have a folder in the url, sets that as open folder and fetches all of the builds.
+ * If theres no folder in the url, fetches the users own builds.
+ * @param {*} usersId
+ */
+export const useCheckOpenProfileFolderAndFetchBuilds = usersId => {
+	const { openProfile } = useAuthContext();
+	const { dispatchFolders } = useFoldersContext();
+	const folderId = useParams().folderId;
+	const navigate = useNavigate();
+	const { fetchBuildsById } = useBuilds();
+
+	// Fetches the users builds once we get their profile
+	useEffect(() => {
+		// Check if we found the users profile
+		if (openProfile && openProfile.username) {
+			if (folderId) {
+				const folderToFetchId = openProfile.folders?.filter(folder => folder.id === folderId);
+
+				if (folderToFetchId.length > 0) {
+					setOpenedFolder(dispatchFolders, folderToFetchId[0]);
+				} else {
+					const folderToFetchName = openProfile.folders?.filter(folder => folder.urlName === folderId);
+
+					if (folderToFetchName.length > 0) {
+						setOpenedFolder(dispatchFolders, folderToFetchName[0]);
+					} else {
+						navigate(`/user/${usersId}`);
+						fetchBuildsById(openProfile.builds, openProfile.uid, 'user');
+					}
+				}
+			} else {
+				fetchBuildsById(openProfile.builds, openProfile.uid, 'user');
+			}
+		}
+	}, [openProfile]);
 };
 
 export default useAddNewFolder;
@@ -547,7 +848,6 @@ export const setSelectedFolder = (dispatchFolders, selectedFolder, selectedFolde
 	});
 };
 
-//---------------------------------------------------------------------------------------------------//
 /**
  * handles setting if the user is making a new folder
  * @param {function} dispatchFolders - dispatch function
@@ -679,5 +979,17 @@ export const setFetchedPinnedFolder = (dispatchFolders, folder) => {
 	dispatchFolders({
 		type: 'SET_FOLDERS',
 		payload: { fetchedPinnedFolder: folder },
+	});
+};
+
+/**
+ * Handles setting the user of the folder we are currently openign
+ * @param {function} dispatchFolders - dispatch function
+ * @param {string} user - the fetched folder
+ */
+export const setCurrentFolderOwner = (dispatchFolders, user) => {
+	dispatchFolders({
+		type: 'SET_FOLDERS',
+		payload: { currentFolderOwner: user },
 	});
 };

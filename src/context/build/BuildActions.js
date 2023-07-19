@@ -883,6 +883,18 @@ export const useSetUploadBuildTypes = types => {
 	}, [types]);
 };
 
+/**
+ * Handles setting the build description in the current build to upload.
+ * @param {arr} description - the builds description
+ */
+export const useSetUploadBuildDesc = description => {
+	const { dispatchBuild, buildToUpload } = useBuildContext();
+
+	useEffect(() => {
+		setBuildToUpload(dispatchBuild, { ...buildToUpload, description });
+	}, [description]);
+};
+
 // State Updaters ---------------------------------------------------------------------------------------------------//
 /**
  * handles getting ready to set the build of the week. Saves it to the context

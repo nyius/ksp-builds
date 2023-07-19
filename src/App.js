@@ -22,7 +22,7 @@ import './App.css';
 import 'react-popper-tooltip/dist/styles.css';
 
 /*TODO
-useEffect cleanup functions
+useEffect cleanup functions (lesson 154)
 create a 'message popup' func that displays an error/success toast popup, as well as console logs the error
 go through all component props and set defaults if possible (like color = "#fff", size="24", etc)
 creating an account needs to have matching passwords. Also be much stricter on emails (needs @, etc)

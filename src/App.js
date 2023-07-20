@@ -79,29 +79,29 @@ t-shirts, merch
 function App() {
 	return (
 		<Router>
-			<Suspense fallback={<FullPageSpinner />}>
-				<ContextsProvider>
-					<Stars />
-					{/* background Styling */}
-					<div className="gradient">
-						<div className="planet" style={{ backgroundImage: `url("${backgroundplanet}")` }}>
-							{/* Navbar/ notifications */}
-							<Navbar />
-							<CookieConsent flipButtons enableDeclineButton declineButtonText="Decline">
-								This website uses cookies to enhance the user experience.
-							</CookieConsent>
-							<ToastContainer theme="dark" />
+			<ContextsProvider>
+				<Stars />
+				{/* background Styling */}
+				<div className="gradient">
+					<div className="planet" style={{ backgroundImage: `url("${backgroundplanet}")` }}>
+						{/* Navbar/ notifications */}
+						<Navbar />
+						<CookieConsent flipButtons enableDeclineButton declineButtonText="Decline">
+							This website uses cookies to enhance the user experience.
+						</CookieConsent>
+						<ToastContainer theme="dark" />
 
-							{/* Main layout sizing */}
-							<div className="main-container flex w-full justify-center mb-6 min-h-screen">
-								{/* Content Layout*/}
-								<div className="flex flex-col md:grid md:grid-cols-6 2k:grid-cols-8 gap-4 xl:gap-20 2k:gap-32 w-full mt-20 xl:mt-24 2k:mt-32">
-									{/* xl:w-5/6  */}
-									<div className="md:col-start-1 md:col-end-3 lg:col-end-2">
-										<LeftBar />
-									</div>
-									{/* Center Content */}
-									<div className="md:col-start-3 md:col-end-7 lg:col-start-2 xl:col-end-6 2k:col-end-8">
+						{/* Main layout sizing */}
+						<div className="main-container flex w-full justify-center mb-6 min-h-screen">
+							{/* Content Layout*/}
+							<div className="flex flex-col md:grid md:grid-cols-6 2k:grid-cols-8 gap-4 xl:gap-20 2k:gap-32 w-full mt-20 xl:mt-24 2k:mt-32">
+								{/* xl:w-5/6  */}
+								<div className="md:col-start-1 md:col-end-3 lg:col-end-2">
+									<LeftBar />
+								</div>
+								{/* Center Content */}
+								<div className="md:col-start-3 md:col-end-7 lg:col-start-2 xl:col-end-6 2k:col-end-8">
+									<Suspense fallback={<FullPageSpinner />}>
 										<ScrollToTop />
 										<Routes>
 											<Route exact path="/" element={<Index />} />
@@ -184,19 +184,19 @@ function App() {
 											/>
 											<Route path="*" element={<NotFound />} />
 										</Routes>
-									</div>
-									<div className="hidden xl:block">
-										<RightBar />
-									</div>
+									</Suspense>
+								</div>
+								<div className="hidden xl:block">
+									<RightBar />
 								</div>
 							</div>
-							<Messaging />
-							<Modals />
-							<Footer />
 						</div>
+						<Messaging />
+						<Modals />
+						<Footer />
 					</div>
-				</ContextsProvider>
-			</Suspense>
+				</div>
+			</ContextsProvider>
 		</Router>
 	);
 }

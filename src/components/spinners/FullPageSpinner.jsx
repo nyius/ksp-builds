@@ -7,7 +7,7 @@ import Spinner1 from './Spinner1';
  */
 function FullPageSpinner() {
 	return (
-		<div className="w-screen h-screen bg-base-600 flex flex-col items-center justify-center">
+		<div className="w-full h-full bg-base-600 flex flex-col items-center justify-center">
 			<Spinner1 />
 		</div>
 	);

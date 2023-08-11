@@ -20,6 +20,7 @@ import subscribeToConvo from '../../utilities/subscribeToConvo';
 import { checkLocalUserAge, getUserFromLocalStorage, setLocalStoredUser } from '../../utilities/userLocalStorage';
 import { useEffect, useState } from 'react';
 import { createDateFromFirebaseTimestamp } from '../../utilities/createDateFromFirebaseTimestamp';
+import errorReport from '../../utilities/errorReport';
 
 const useAuth = () => {
 	const { dispatchAuth } = useAuthContext();
@@ -27,9 +28,9 @@ const useAuth = () => {
 	/**
 	 * Handles creating a new users account on the DB. Sets up a 'users' doc, a 'usersProfile' doc, and their 'notifications' doc.
 	 * We havent set up username yet as that comes after initial setup.
-	 * @param {*} name
-	 * @param {*} email
-	 * @param {*} uid
+	 * @param {string} name
+	 * @param {string} email
+	 * @param {string} uid
 	 */
 	const createNewUserAccount = async (name, email, uid) => {
 		try {
@@ -74,7 +75,7 @@ const useAuth = () => {
 				notifications: [notification],
 			});
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'createNewUserAccount');
 		}
 	};
 
@@ -83,11 +84,7 @@ const useAuth = () => {
 	 */
 	const loginWithGoogle = async () => {
 		try {
-			const userCredential = await signInWithPopup(auth, googleProvider).catch(err => {
-				console.log(err);
-				toast.error('Something went wrong. Please try again');
-				return;
-			});
+			const userCredential = await signInWithPopup(auth, googleProvider);
 
 			// Get user information.
 			const uid = userCredential.user.uid;
@@ -106,7 +103,7 @@ const useAuth = () => {
 				createNewUserAccount(name, email, uid, createdAt);
 			}
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'loginWithGoogle');
 			toast.error('Something went wrong. Please try again');
 		}
 	};
@@ -138,7 +135,7 @@ const useAuth = () => {
 			setNewSignup(dispatchAuth, true);
 			createNewUserAccount(name, email, uid, createdAt);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'newEmailAccount');
 			return error;
 		}
 	};
@@ -157,7 +154,7 @@ export default useAuth;
  * @returns
  */
 export const useFetchUser = () => {
-	const { dispatchAuth, fetchedUserProfiles } = useAuthContext();
+	const { dispatchAuth, fetchedUserProfiles, user } = useAuthContext();
 	/**
 	 * Handles fetching a profile. First checks the local storage, then the server.
 	 * Stores the result in the auth context
@@ -187,7 +184,7 @@ export const useFetchUser = () => {
 				return fetchedUser;
 			}
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, false, 'fetchUsersProfile');
 			return null;
 		}
 	};
@@ -211,7 +208,7 @@ export const useFetchUser = () => {
 				throw new Error(`Couldn't find profile`);
 			}
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, false, 'handleFetchUserProfileFromServer');
 			return null;
 		}
 	};
@@ -322,7 +319,7 @@ export const useHandleVoting = () => {
 				}
 			}
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'handleVoting');
 			toast.error('Something went wrong D:');
 		}
 	};
@@ -345,7 +342,7 @@ export const useUpdateProfile = () => {
 			updateUserState(dispatchAuth, { profilePicture });
 			toast.success('Profile Picture updated!');
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'updateUserProfilePic');
 			toast.error('Something went wrong. Please try again');
 		}
 	};
@@ -360,7 +357,7 @@ export const useUpdateProfile = () => {
 			updateUserState(dispatchAuth, { bio });
 			toast.success('Bio updated!');
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'updateUserBio');
 			toast.error('Something went wrong. Please try again');
 		}
 	};
@@ -380,7 +377,7 @@ export const useUpdateProfile = () => {
 			updateUserState(dispatchAuth, { email: editingEmail });
 			toast.success('Email updated!');
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'updateUserEmail');
 			toast.error('Something went wrong. Please try again');
 		}
 	};
@@ -402,7 +399,7 @@ export const useUpdateProfile = () => {
 			}
 			await updateDoc(doc(db, 'users', userUid ? userUid : user.uid), update);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'updateUserDb');
 			toast.error('Something went wrong. Please try again');
 		}
 	};
@@ -416,7 +413,7 @@ export const useUpdateProfile = () => {
 		try {
 			await updateDoc(doc(db, 'userProfiles', userUid ? userUid : user.uid), update);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'updateUserProfiles');
 		}
 	};
 
@@ -431,7 +428,7 @@ export const useUpdateProfile = () => {
 			await updateUserDb(update, userUid ? userUid : user.uid);
 			await updateUserProfiles(update, userUid ? userUid : user.uid);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'updateUserProfilesAndDb');
 		}
 	};
 
@@ -457,7 +454,7 @@ export const useHandleNotifications = () => {
 			});
 			setNotifications(dispatchAuth, []);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'handleDeleteAllNotifications');
 			return;
 		}
 	};
@@ -472,10 +469,10 @@ export const useHandleNotifications = () => {
 			let newNotifs = cloneDeep(user.notifications);
 			newNotifs.splice(index, 1);
 
-			await deleteDoc(doc(db, 'users', user.uid, 'notifications', id)).catch(err => console.log(err));
+			await deleteDoc(doc(db, 'users', user.uid, 'notifications', id));
 			setNotifications(dispatchAuth, newNotifs);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'handleDeleteNotification');
 		}
 	};
 
@@ -505,7 +502,7 @@ export const useHandleNotifications = () => {
 				payload: { lastFetchedNotification: notifsSnap.docs.length < process.env.REACT_APP_NOTIFS_FETCH_NUM ? 'end' : notifsSnap.docs[notifsSnap.docs.length - 1], notificationsLoading: false },
 			});
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'fetchMoreNotifications');
 		}
 	};
 
@@ -521,7 +518,7 @@ export const useHandleNotifications = () => {
 					const updateNotif = async () => {
 						notif.read = true;
 						newNotifs.push(notif);
-						await updateDoc(doc(db, 'users', user.uid, 'notifications', notif.id), notif).catch(err => console.log(err));
+						await updateDoc(doc(db, 'users', user.uid, 'notifications', notif.id), notif);
 					};
 
 					updateNotif();
@@ -532,7 +529,7 @@ export const useHandleNotifications = () => {
 
 			setNotifications(dispatchAuth, newNotifs);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'setNotificationsRead');
 		}
 	};
 
@@ -566,7 +563,7 @@ export const useDeleteConversation = () => {
 			});
 			toast.success('Conversation Removed.');
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'deleteConversation');
 		}
 	};
 
@@ -660,7 +657,7 @@ export const useSubmitReport = () => {
 			await sendNotification('ZyVrojY9BZU5ixp09LftOd240LH3', newNotif);
 			setReport(dispatchAuth, null, null);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'submitReport');
 		}
 	};
 
@@ -760,7 +757,7 @@ export const useSendMessage = () => {
 			}
 		} catch (error) {
 			toast.error('Something went wrong. Please try again');
-			console.log(error);
+			errorReport(error.message, true, 'sendMessage');
 		}
 	};
 
@@ -844,7 +841,7 @@ export const useFetchConversation = () => {
 							})
 						);
 					} catch (error) {
-						console.log(error);
+						errorReport(error.message, true, 'checkForConvo');
 					}
 				};
 
@@ -872,7 +869,7 @@ export const useFetchConversation = () => {
 				});
 			}
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'fetchConversation');
 		}
 	};
 
@@ -914,7 +911,7 @@ export const useHandleFollowingUser = () => {
 				toast.success(`Now following ${userProfile.username}!`);
 			}
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'handleFollowingUser');
 			return;
 		}
 	};
@@ -999,7 +996,7 @@ export const useHandleFavoriting = () => {
 				updateUserDb({ favorites: newFavorites });
 			}
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'handleFavoriting');
 		}
 	};
 
@@ -1047,7 +1044,7 @@ export const useBlockUser = () => {
 
 			setUserToBlock(dispatchAuth, null);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'blockUser');
 		}
 	};
 

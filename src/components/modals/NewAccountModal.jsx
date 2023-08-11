@@ -12,6 +12,7 @@ import { profanity } from '@2toad/profanity';
 import TextInput from '../input/TextInput';
 import { uploadProfilePicture } from '../../context/auth/AuthUtils';
 import Regex from 'regex-username';
+import errorReport from '../../utilities/errorReport';
 
 function NewAccountModal() {
 	const navigate = useNavigate();
@@ -28,32 +29,32 @@ function NewAccountModal() {
 	 */
 	const finalizeAccount = e => {
 		if (!newUsername || newUsername === '') {
-			console.log(`No username entered!`);
+			errorReport(`No username entered!`, false, 'finalizeAccount');
 			toast.error('You need a username!');
 			return;
 		}
 
 		if (newUsername.includes(' ')) {
 			toast.error('Username cannot contain spaces!');
-			console.log(`Username cannot contain spaces!`);
+			errorReport(`Username cannot contain spaces!`, false, 'finalizeAccount');
 			return;
 		}
 
 		if (newUsername.length > 50) {
 			toast.error('Username is too long! Must be less than 50 characters');
-			console.log(`Username too long`);
+			errorReport(`Username too long`, false, 'finalizeAccount');
 			return;
 		}
 
 		if (profanity.exists(newUsername)) {
 			toast.error('Username not acceptable!');
-			console.log(`Username not acceptable`);
+			errorReport(`Username not acceptable`, false, 'finalizeAccount');
 			return;
 		}
 
 		if (!Regex().test(newUsername)) {
 			toast.error('Username not valid!');
-			console.log(`Username not valid`);
+			errorReport(`Username not valid`, false, 'finalizeAccount');
 			return;
 		}
 
@@ -71,6 +72,7 @@ function NewAccountModal() {
 
 				// Check if the user exists
 				if (docSnapUser.exists()) {
+					errorReport('That username already exists! Try another one.', false, 'checkIfUserExists');
 					toast.error('That username already exists! Try another one.');
 				} else {
 					const updateUser = {
@@ -89,10 +91,8 @@ function NewAccountModal() {
 							toast.success('Account Created!');
 						})
 						.catch(err => {
-							console.log(err);
-							toast.error('Something went wrong :(');
 							setAuthenticated(dispatchAuth, false);
-							return;
+							throw new Error(err);
 						});
 
 					const newUsername = {
@@ -100,10 +100,7 @@ function NewAccountModal() {
 					};
 
 					// this adds the user to the 'usernames' db. This is so we can check if a username is already taken or not, quickly and simply
-					await setDoc(doc(db, 'usernames', username), newUsername).catch(err => {
-						console.log(err);
-						toast.error('Something went wrong :(');
-					});
+					await setDoc(doc(db, 'usernames', username), newUsername);
 
 					// Update the userProfiles DB. This is for visiting a users page so we don't have to pull all sensitive data
 					await updateDoc(doc(db, 'userProfiles', user.uid), updateUser);
@@ -111,7 +108,7 @@ function NewAccountModal() {
 					navigate('/');
 				}
 			} catch (error) {
-				console.log(error);
+				errorReport(error.message, true, 'checkIfUserExists');
 				toast.error('Something went wrong :(');
 			}
 		};
@@ -131,7 +128,7 @@ function NewAccountModal() {
 				setUploadingImage(false);
 			})
 			.catch(err => {
-				console.log(err);
+				errorReport(err.message, true, 'handleNewProfilePhoto');
 				toast.error('Something went wrong');
 				setUploadingImage(false);
 			});

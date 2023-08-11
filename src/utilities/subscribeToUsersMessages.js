@@ -1,5 +1,6 @@
 import { collection, where, query, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../firebase.config';
+import errorReport from './errorReport';
 
 /**
  * Handles subscribing to a users messages DB to listen for any new messages
@@ -29,7 +30,7 @@ const subscribeToUsersMessages = async dispatchAuth => {
 			});
 		});
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'subscribeToUsersMessages');
 	}
 };
 

@@ -1,5 +1,6 @@
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase.config';
+import errorReport from './errorReport';
 
 /**
  * Handles logging in with email
@@ -8,11 +9,9 @@ import { auth } from '../firebase.config';
  */
 const emailLogin = async (email, password) => {
 	try {
-		await signInWithEmailAndPassword(auth, email, password).catch(err => {
-			console.log(err);
-			throw new Error(err.code);
-		});
+		await signInWithEmailAndPassword(auth, email, password);
 	} catch (error) {
+		errorReport(error.message, true, 'emailLogin');
 		return error.message;
 	}
 };

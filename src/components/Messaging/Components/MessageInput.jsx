@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuthContext } from '../../../context/auth/AuthContext';
 import { useSendMessage } from '../../../context/auth/AuthActions';
 import { toast } from 'react-toastify';
+import errorReport from '../../../utilities/errorReport';
 
 /**
  * Displays the input box for sending a message
@@ -20,7 +21,7 @@ function MessageInput() {
 	const handleSendMessage = e => {
 		if (e.key === 'Enter') {
 			if (message === '') {
-				console.log(`No message`);
+				errorReport('No message', false, 'handleSendMessage');
 				toast.error('No message entered!');
 				return;
 			}

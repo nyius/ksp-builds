@@ -5,6 +5,7 @@ import { deleteDoc, doc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { db } from '../../firebase.config';
 import { setDeletePatchNoteId } from '../../context/news/NewsActions';
+import errorReport from '../../utilities/errorReport';
 
 /**
  * Modal for deleting a patch note
@@ -22,7 +23,7 @@ function DeletePatchNotesModal() {
 			setDeletePatchNoteId(dispatchNews, null);
 			toast.success('Patch note deleted');
 		} catch (error) {
-			console.log(error);
+			errorReport(error, false, 'deletePatchNote');
 			toast.error('Something went wrong deleting post');
 		}
 	};

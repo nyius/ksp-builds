@@ -1,6 +1,7 @@
 import { getDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../firebase.config';
 import { createDateFromFirebaseTimestamp } from './createDateFromFirebaseTimestamp';
+import errorReport from './errorReport';
 
 /**
  * Fetches all of a users conversations that exist
@@ -40,7 +41,7 @@ const fetchAllUsersConvos = async usersConvos => {
 
 		return fetchedConvos;
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'fetchAllUsersConvos');
 	}
 };
 

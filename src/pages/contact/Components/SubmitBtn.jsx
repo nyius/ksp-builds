@@ -7,6 +7,7 @@ import { cloneDeep } from 'lodash';
 import { addDoc, collection } from 'firebase/firestore';
 import standardNotifications from '../../../utilities/standardNotifications';
 import { sendNotification } from '../../../context/auth/AuthUtils';
+import errorReport from '../../../utilities/errorReport';
 
 /**
  * Button for submitting the submit form
@@ -50,7 +51,7 @@ function SubmitBtn({ formData, setSubmitted }) {
 
 			await sendNotification('ZyVrojY9BZU5ixp09LftOd240LH3', newNotif);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'handleSubmit');
 			toast.error('Something went wrong, please try again');
 		}
 	};

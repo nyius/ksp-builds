@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import { auth } from '../firebase.config';
 import { compressAccurately } from 'image-conversion';
+import errorReport from './errorReport';
 
 /**
  * Handles uploading an Image. takes in the image file, a setLoadingState, a users uid. Returns new URL.
@@ -15,7 +16,7 @@ export const uploadImage = async (image, setLoadingState, uid) => {
 	setLoadingState(true);
 
 	return new Promise((resolve, reject) => {
-		const fileName = `${uid}-${image.name}-${uuidv4().slice(0, 10)}`;
+		const fileName = `${uid}-${uuidv4().slice(0, 10)}`;
 
 		const storageRef = ref(storage, 'images/' + fileName);
 		const uploadTask = uploadBytesResumable(storageRef, image, { cacheControl: 'public,max-age=31536000' });
@@ -37,7 +38,7 @@ export const uploadImage = async (image, setLoadingState, uid) => {
 				}
 			},
 			error => {
-				console.log(error.code);
+				errorReport(`${error.message}; code:${error.code}`, true, 'uploadImage');
 				// A full list of error codes is available at
 				// https://firebase.google.com/docs/storage/web/handle-errors
 				switch (error.code) {
@@ -163,7 +164,7 @@ export const uploadImages = async (images, setLoadingState, imageKb, imageWidth)
 				resolve(compressesImage);
 			});
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'compressImg');
 		}
 	};
 

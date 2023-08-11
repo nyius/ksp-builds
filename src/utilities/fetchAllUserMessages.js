@@ -1,5 +1,6 @@
 import { collection, getDocs, getDoc, doc, query, where } from 'firebase/firestore';
 import { db, auth } from '../firebase.config';
+import errorReport from './errorReport';
 
 /**
  * handles fetching a users messages from their own DB
@@ -15,7 +16,7 @@ const fetchAllUserMessages = async () => {
 		});
 		return usersMessages;
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'fetchAllUserMessages');
 	}
 };
 
@@ -35,7 +36,7 @@ const fetchUserMessage = async id => {
 			return null;
 		}
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'fetchUserMessage');
 	}
 };
 

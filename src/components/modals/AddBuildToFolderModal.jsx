@@ -13,6 +13,7 @@ import { useBuildContext } from '../../context/build/BuildContext';
 import { useUpdateBuild } from '../../context/build/BuildActions';
 import { toast } from 'react-toastify';
 import { useGetFilteredBuilds } from '../../context/builds/BuildsActions';
+import errorReport from '../../utilities/errorReport';
 
 /**
  * Modal for adding a build to a folder
@@ -32,7 +33,7 @@ function AddBuildToFolderModal() {
 		if (pinnedFolder !== loadedBuild?.pinnedFolder) {
 			if (loadedBuild?.uid !== user.uid) {
 				toast.error('Cant pin a folder to a build thats not yours!');
-				console.log('Cant pin a folder to a build thats not yours!');
+				errorReport('Cant pin a folder to a build thats not yours!', false, 'handleSaveFolderChange');
 				return;
 			}
 

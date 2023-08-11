@@ -11,6 +11,7 @@ import fetchConvosMessages from '../../utilities/fetchConvosMessages';
 import subscribeToUsersMessages from '../../utilities/subscribeToUsersMessages';
 import subscribeToConvo from '../../utilities/subscribeToConvo';
 import { checkLocalBuildAge } from '../build/BuildUtils';
+import errorReport from '../../utilities/errorReport';
 
 const AuthContext = createContext();
 
@@ -38,7 +39,7 @@ export const AuthProvider = ({ children }) => {
 
 				// if the user exists but they dont have a username, must be a new account so prompt for a new one
 				if (!user.username) {
-					console.log('No username!');
+					errorReport('No username!', false, 'blockUser');
 					dispatchAuth({ type: 'SET_NEW_SIGNUP', payload: true });
 					setAuthLoading(false);
 				}
@@ -91,7 +92,7 @@ export const AuthProvider = ({ children }) => {
 				throw new Error('User does not exist');
 			}
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'getUser');
 		}
 	};
 

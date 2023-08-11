@@ -3,6 +3,8 @@ import { buildNameToUrl } from '../../utilities/buildNameToUrl';
 import { db } from '../../firebase.config';
 import { toast } from 'react-toastify';
 import { profanity } from '@2toad/profanity';
+import errorReport from '../../utilities/errorReport';
+import { auth } from '../../firebase.config';
 
 /**
  * Handles updating the builds view count
@@ -13,7 +15,7 @@ export const updateDownloadCount = async id => {
 		const ref = doc(db, process.env.REACT_APP_BUILDSDB, id);
 		await updateDoc(ref, { downloads: increment(1) });
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'updateDownloadCount');
 	}
 };
 
@@ -26,7 +28,7 @@ export const updateViewCount = async build => {
 		const ref = doc(db, process.env.REACT_APP_BUILDSDB, build.id);
 		await updateDoc(ref, { views: increment(1) });
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'updateViewCount');
 	}
 };
 
@@ -44,7 +46,7 @@ export const updateComment = async (comment, commentId, buildId) => {
 
 		toast.success('Comment Edited');
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'updateComment');
 		toast.error('Something went wrong with editing your comment. Please try again');
 	}
 };
@@ -153,7 +155,7 @@ export const searchBuilds = async (num, buildName) => {
 			return num;
 		}
 	} catch (error) {
-		throw new Error(error);
+		errorReport(error.message, true, 'searchBuilds');
 	}
 };
 

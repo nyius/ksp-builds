@@ -1,6 +1,7 @@
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase.config';
 import { toast } from 'react-toastify';
+import errorReport from './errorReport';
 
 /**
  * Handles sending a reset password to the users email
@@ -11,7 +12,7 @@ const resetPassword = async email => {
 		await sendPasswordResetEmail(auth, email);
 		toast.success('Email sent!');
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'resetPassword');
 	}
 };
 

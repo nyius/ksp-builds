@@ -5,6 +5,7 @@ import { s3Client } from '../../S3.config';
 import { doc, getDocs, where, limit, query, collection } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { createDateFromFirebaseTimestamp } from '../../utilities/createDateFromFirebaseTimestamp';
+import errorReport from '../../utilities/errorReport';
 
 const NewsContext = createContext();
 
@@ -76,7 +77,7 @@ export const NewsProvider = ({ children }) => {
 					payload: false,
 				});
 			} catch (error) {
-				console.log(error);
+				errorReport(error.message, true, 'fetchNews');
 				dispatchNews({
 					type: 'SET_ARTICLES_LOADING',
 					payload: false,
@@ -107,7 +108,7 @@ export const NewsProvider = ({ children }) => {
 					payload: false,
 				});
 			} catch (error) {
-				console.log(error);
+				errorReport(error.message, true, 'fetchLiveStreams');
 				dispatchNews({
 					type: 'SET_STREAMS_LOADING',
 					payload: false,

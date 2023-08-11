@@ -7,6 +7,7 @@ import { useBuildsContext } from '../builds/BuildsContext';
 import { useParams } from 'react-router-dom';
 import { convertFromRaw, EditorState } from 'draft-js';
 import { fetchPatchNotes } from './NewsUtils';
+import errorReport from '../../utilities/errorReport';
 
 /**
  * News actions
@@ -45,7 +46,7 @@ function useNews() {
 			toast.success('Deleted challenge.');
 		} catch (error) {
 			toast.error('Something went wrong deleting that challenge');
-			console.log(error);
+			errorReport(error.message, false, 'deleteChallenge');
 		}
 	};
 

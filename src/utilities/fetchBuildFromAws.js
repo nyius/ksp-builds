@@ -1,6 +1,8 @@
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { s3Client } from '../S3.config';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { auth } from '../firebase.config';
+import errorReport from './errorReport';
 
 /**
  * Handles fetching a raw build from AWS. Takes in an id
@@ -28,7 +30,7 @@ const fetchBuildFromAWS = async id => {
 			parsedBuild = JSON.parse(decompress);
 		}
 	} catch (error) {
-		throw new Error(error);
+		errorReport(error.message, true, 'fetchBuildFromAWS', auth?.currentUser ? auth.currentUser : null);
 	}
 
 	return parsedBuild;

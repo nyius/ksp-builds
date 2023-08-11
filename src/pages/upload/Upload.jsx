@@ -33,6 +33,7 @@ import UploadBuildRawBuild from './Components/UploadBuildRawBuild';
 import SubmitBtn from './Components/Buttons/SubmitBtn';
 import CancelEditBtn from './Components/Buttons/CancelEditBtn';
 import UpdateBuildBtn from './Components/Buttons/UpdateBuildBtn';
+import errorReport from '../../utilities/errorReport';
 
 const buildId = uuidv4().slice(0, 30);
 
@@ -83,7 +84,7 @@ function Upload() {
 			}
 		} catch (error) {
 			toast.error('Something went wrong!');
-			console.log(error);
+			errorReport(error.message, true, 'submitBuild');
 		}
 	};
 

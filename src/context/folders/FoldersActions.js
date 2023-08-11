@@ -15,6 +15,7 @@ import { useBuildContext } from '../build/BuildContext';
 import { useUpdateBuild } from '../build/BuildActions';
 import { useEffect, useState } from 'react';
 import useBuilds from '../builds/BuildsActions';
+import errorReport from '../../utilities/errorReport';
 
 /**
  * Hook with functions for adding a new folder
@@ -32,19 +33,19 @@ function useAddNewFolder() {
 			setNewFolderName(dispatchFolders, '');
 			setMakingNewFolder(dispatchFolders, false);
 			toast.error('Folder needs a name!');
-			console.log(`Folder needs a name!`);
+			errorReport(`Folder needs a name!`, false, 'handleAddNewFolder');
 			return;
 		}
 
 		if (newFolderName.length > 50) {
 			toast.error('Folder name too long!');
-			console.log(`Folder name too long!`);
+			errorReport(`Folder name too long!`, false, 'handleAddNewFolder');
 			return;
 		}
 
 		if (profanity.exists(newFolderName)) {
 			toast.error('Folder name not acceptable!');
-			console.log(`Folder name  not acceptable`);
+			errorReport(`Folder name  not acceptable`, false, 'handleAddNewFolder');
 			return;
 		}
 
@@ -77,7 +78,7 @@ function useAddNewFolder() {
 
 			toast.success('Folder added!');
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'addNewFolder');
 			toast.error('Something went wrong, please try again');
 		}
 	};
@@ -109,7 +110,7 @@ export const useDeleteFolder = () => {
 			await updateDoc(doc(db, 'userProfiles', user.uid), { folders: newFolders });
 			toast.success('Folder deleted.');
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'useDeleteFolder');
 			toast.error('Something went wrong, please try again');
 		}
 	};
@@ -175,7 +176,7 @@ export const useAddBuildToFolder = () => {
 			setMakingNewFolder(dispatchFolders, false);
 			setNewFolderName(dispatchFolders, null);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'addBuildToFolder');
 			toast.error('Something went wrong, please try again');
 		}
 	};
@@ -360,19 +361,19 @@ export const useUpdateFolder = () => {
 			if (newFolders[updatedFolderIndex].folderName !== updatedFolder.folderName) {
 				if (!updatedFolder.folderName || updatedFolder.folderName.trim() === '') {
 					toast.error('Folder needs a name!');
-					console.log(`Folder needs a name!`);
+					errorReport(`Folder needs a name!`, false, 'updateFolder');
 					return;
 				}
 
 				if (updatedFolder.folderName.length > 50) {
 					toast.error('Folder name too long!');
-					console.log(`Folder name too long!`);
+					errorReport(`Folder name too long!`, false, 'updateFolder');
 					return;
 				}
 
 				if (profanity.exists(updatedFolder.folderName)) {
 					toast.error('Folder name not acceptable!');
-					console.log(`Folder name  not acceptable`);
+					errorReport(`Folder name  not acceptable`, false, 'updateFolder');
 					return;
 				}
 
@@ -394,7 +395,7 @@ export const useUpdateFolder = () => {
 
 			toast.success('Folder Updated!');
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'updateFolder');
 			toast.error('Something went wrong, please try again');
 		}
 	};
@@ -415,7 +416,7 @@ export const useUpdateFolder = () => {
 
 			toast.success('Folders Saved!');
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'updateAllFolders');
 			toast.error('Something went wrong, please try again');
 		}
 	};
@@ -562,7 +563,7 @@ export const useFetchPinnedFolder = initialState => {
 					setFetchedPinnedFolder(dispatchFolders, foundFolder[0]);
 					setFetchingProfile(dispatchAuth, false);
 				} else {
-					console.log('Couldnt find folder from user in context');
+					errorReport('Couldnt find folder from user in context', false, 'useFetchPinnedFolder');
 				}
 			} else {
 				setFetchingProfile(dispatchAuth, true);
@@ -578,8 +579,8 @@ export const useFetchPinnedFolder = initialState => {
 							throw new Error("Couldn't find folder from server");
 						}
 					})
-					.catch(err => {
-						console.log(err);
+					.catch(error => {
+						errorReport(error.message, true, 'useFetchPinnedFolder');
 						setFetchingProfile(dispatchAuth, false);
 					});
 			}

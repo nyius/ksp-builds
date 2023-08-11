@@ -10,6 +10,7 @@ import { checkLocalBuildAge, getBuildFromLocalStorage, setLocalStoredBuild } fro
 import { useFoldersContext } from '../folders/FoldersContext';
 import { useParams, useSearchParams } from 'react-router-dom';
 import algoliasearch from 'algoliasearch/lite';
+import errorReport from '../../utilities/errorReport';
 
 const searchClient = algoliasearch('ASOR7A703R', process.env.REACT_APP_ALGOLIA_KEY);
 const searchIndex = searchClient.initIndex('builds');
@@ -45,9 +46,8 @@ const useBuilds = () => {
 			setLastfetchedBuild(dispatchBuilds, buildsSnap.docs.length < fetchAmount ? 'end' : buildsSnap.docs[buildsSnap.docs.length - 1]);
 			setStoredBuilds(dispatchBuilds, [builds]);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'fetchBuilds');
 			setBuildsLoading(dispatchBuilds, false);
-			throw new Error(error);
 		}
 	};
 
@@ -112,7 +112,7 @@ const useBuilds = () => {
 			// Now recombine the fetched builds vs local builds
 			setFetchedBuilds(dispatchBuilds, sortedBuilds);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'fetchBuildsById');
 			setBuildsLoading(dispatchBuilds, false);
 			throw new Error(error);
 		}
@@ -147,7 +147,7 @@ const useBuilds = () => {
 			setStoredBuilds(dispatchBuilds, [...storedBuilds, builds]);
 			setCurrentPage(dispatchBuilds, currentPageNum);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'fetchMoreBuilds');
 			setBuildsLoading(dispatchBuilds, false);
 			throw new Error(error);
 		}

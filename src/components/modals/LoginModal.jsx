@@ -7,6 +7,7 @@ import emailLogin from '../../utilities/emailLogin';
 import { toast } from 'react-toastify';
 import { useAuthContext } from '../../context/auth/AuthContext';
 import useAuth, { setResetPassword } from '../../context/auth/AuthActions';
+import errorReport from '../../utilities/errorReport';
 
 function LoginModal() {
 	const navigate = useNavigate();
@@ -22,12 +23,12 @@ function LoginModal() {
 	 */
 	const handleEmailLogin = async () => {
 		if (!email) {
-			console.log(`No email`);
+			errorReport('No Email', false, 'handleEmailLogin');
 			toast.error('You forgot to enter a email');
 			return;
 		}
 		if (!password) {
-			console.log(`No password`);
+			errorReport('No password', false, 'handleEmailLogin');
 			toast.error('You forgot to enter a password');
 			return;
 		}

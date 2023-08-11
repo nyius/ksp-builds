@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useBuilds from '../../context/builds/BuildsActions';
 import { RiSearchEyeFill } from 'react-icons/ri';
+import errorReport from '../../utilities/errorReport';
 
 /**
  * Displays the search bar
@@ -28,7 +29,7 @@ function SearchBar() {
 				}
 			}
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'handleSearch');
 		}
 	};
 

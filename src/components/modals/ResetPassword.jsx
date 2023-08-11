@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import resetPassword from '../../utilities/resetPassword';
 import { useAuthContext } from '../../context/auth/AuthContext';
 import { setResetPassword } from '../../context/auth/AuthActions';
+import errorReport from '../../utilities/errorReport';
 
 function ResetPassword() {
 	const [email, setEmail] = useState('');
@@ -17,7 +18,7 @@ function ResetPassword() {
 	 */
 	const handleResetPassword = async () => {
 		if (!email) {
-			console.log(`No email`);
+			errorReport('No Email', false, 'handleResetPassword');
 			toast.error('You forgot to enter a email');
 			return;
 		}

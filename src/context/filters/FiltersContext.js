@@ -3,6 +3,7 @@ import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import FiltersReducer from './FiltersReducer';
 import useCheckUrlForType from '../../hooks/useCheckUrlForType';
+import errorReport from '../../utilities/errorReport';
 
 const FiltersContext = createContext();
 
@@ -27,7 +28,7 @@ export const FiltersProvider = ({ children }) => {
 				});
 				setFiltersLoading(false);
 			} catch (error) {
-				console.log(error);
+				errorReport(error.message, true, 'fetchKspInfo');
 				setFiltersLoading(false);
 			}
 		};

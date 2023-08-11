@@ -1,6 +1,7 @@
-import { getDoc, doc, getDocs, collection, onSnapshot } from 'firebase/firestore';
+import { getDoc, doc } from 'firebase/firestore';
 import { db, auth } from '../firebase.config';
 import subscribeToConvo from './subscribeToConvo';
+import errorReport from './errorReport';
 
 /**
  * Fetches all messages from a conversation
@@ -17,7 +18,7 @@ const fetchConvosMessages = async (convo, dispatchAuth) => {
 			convo.unsubscribe = await subscribeToConvo(convo.id, dispatchAuth);
 		}
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'fetchConvosMessages');
 	}
 };
 

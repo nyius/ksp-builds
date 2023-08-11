@@ -47,18 +47,11 @@ const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 
 /*TODO
 useEffect cleanup functions (lesson 154)
-create a 'message popup' func that displays an error/success toast popup, as well as console logs the error
 go through all component props and set defaults if possible (like color = "#fff", size="24", etc)
 creating an account needs to have matching passwords. Also be much stricter on emails (needs @, etc)
 use useMemo to improve performance
 more space themed loading spinner
 Change allowed folders to max like 5, then have users that support get access to unlimited folders (even level 1 support)
-error reporting to server and logged
-	-username (if one)
-	-uid (if one)
-	-url
-	-Error
-	-Action that caused error
 drag and drop your own builds into a folder? 
 	When on home page allow drag and drop of a build. Sidebar appears with folders in it
 Should be able to login with username/password

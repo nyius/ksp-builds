@@ -1,5 +1,6 @@
 import { onSnapshot, collection } from 'firebase/firestore';
 import { db } from '../firebase.config';
+import errorReport from './errorReport';
 
 /**
  * Handles subscribing to a convo to listen for any changes on the DB. This automatically grabs all items from the DB and adds them to the convo
@@ -29,7 +30,7 @@ const subscribeToConvo = async (id, dispatchAuth) => {
 
 		return unsubscribeMessage;
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'subscribeToConvo');
 	}
 };
 

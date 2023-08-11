@@ -5,6 +5,7 @@ import { updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../../../firebase.config';
 import { toast } from 'react-toastify';
 import { setEditingPatchNotes } from '../../../../context/news/NewsActions';
+import errorReport from '../../../../utilities/errorReport';
 
 /**
  * Button for saving an edit to a patch note
@@ -25,7 +26,7 @@ function SavePatchEditBtn({ id, editedPatchNotes }) {
 
 			setEditingPatchNotes(dispatchNews, false);
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, true, 'SavePatchEditBtn');
 			toast.error('Something went wrong updating those notes');
 		}
 	};

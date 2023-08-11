@@ -5,6 +5,7 @@ import { setEditingEmail } from '../../../../context/auth/AuthActions';
 import { useUpdateProfile } from '../../../../context/auth/AuthActions';
 import { checkMatchingEmails } from '../../../../context/auth/AuthUtils';
 import { toast } from 'react-toastify';
+import errorReport from '../../../../utilities/errorReport';
 
 /**
  * Button for editing the users bio
@@ -20,13 +21,13 @@ function SaveEmailBtn() {
 	const handleSubmitEmailUpdate = async () => {
 		if (editingEmail !== false) {
 			if (editingEmail.trim() === '') {
-				console.log('No email');
+				errorReport('No email', false, 'handleSubmitEmailUpdate');
 				toast.error('You forgot an email!');
 				return;
 			}
 
 			if (!checkMatchingEmails(editingEmail, verifyEditedEmail)) {
-				console.log("Emails don't match!");
+				errorReport("Emails don't match!", false, 'handleSubmitEmailUpdate');
 				toast.error("Emails don't match!");
 				return;
 			}

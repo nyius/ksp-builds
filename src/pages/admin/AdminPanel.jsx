@@ -30,6 +30,8 @@ function AdminPanel() {
 	const [uploadingChallengeImage, setUploadingChallengeImage] = useState(false);
 	const [reportRepliedFilter, setReportRepliedFilter] = useState(false);
 	const [messagesLoading, setMessagesLoading] = useState(true);
+	const [errorsLoading, setErrorsLoading] = useState(true);
+	const [reportTab, setReportTab] = useState(0);
 	const [replying, setReplying] = useState({ uid: '', i: '' });
 	const [siteNotification, setSiteNotification] = useState('');
 	const [challengeContent, setChallengeContent] = useState('');
@@ -51,6 +53,7 @@ function AdminPanel() {
 	const [newVersion, setNewVersion] = useState('');
 	const [versions, setVersions] = useState([]);
 	const [reports, setReports] = useState([]);
+	const [errors, setErrors] = useState([]);
 	const [stats, setStats] = useState(null);
 
 	useEffect(() => {
@@ -104,6 +107,27 @@ function AdminPanel() {
 		};
 
 		fetchAdminPanel();
+
+		const fetchErrors = async () => {
+			try {
+				let reportsData = [];
+				const q = query(collection(db, 'errorReports'), orderBy('date', 'desc'));
+				const reportsSnap = await getDocs(q);
+
+				reportsSnap.forEach(report => {
+					const reportData = report.data();
+					reportData.id = report.id;
+					reportsData.push(reportData);
+				});
+
+				setErrors(reportsData);
+				setErrorsLoading(false);
+			} catch (error) {
+				console.log(error);
+			}
+		};
+
+		fetchErrors();
 	}, []);
 
 	const submitNewVersion = async () => {
@@ -137,6 +161,23 @@ function AdminPanel() {
 		try {
 			await deleteDoc(doc(db, 'reports', id));
 			setReports(prevState => {
+				const newState = [...prevState];
+				newState.splice(i, 1);
+				return newState;
+			});
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
+	 * Handles deleting the error report
+	 * @param {*} id
+	 */
+	const deleteError = async (id, i) => {
+		try {
+			await deleteDoc(doc(db, 'errorReports', id));
+			setErrors(prevState => {
 				const newState = [...prevState];
 				newState.splice(i, 1);
 				return newState;
@@ -567,105 +608,162 @@ function AdminPanel() {
 				<div className="divider my-10"></div>
 
 				{/* ------------------ Reports---------------------- */}
-				<div className="flex flex-row place-content-between mt-10 2k:mt-20">
-					<p className="text-2xl 2k:text-4xl font-bold text-slate-200">Reports/Messages</p>
-					<div className="flex flex-row gap-4">
-						<p className="text-xl 2k:text-3xl">Hide Replied Reports</p>
-						<input type="checkbox" className="checkbox checkbox-lg" onChange={() => setReportRepliedFilter(!reportRepliedFilter)} />
-					</div>
+				<div className="tabs">
+					<a className={`tab tab-lg text-2xl text-slate-200 tab-lifted ${reportTab === 0 ? 'tab-active' : ''}`} onClick={() => setReportTab(0)}>
+						Reports/Messages
+					</a>
+					<a className={`tab tab-lg text-2xl text-slate-200 tab-lifted ${reportTab === 1 ? 'tab-active' : ''}`} onClick={() => setReportTab(1)}>
+						Errors
+					</a>
 				</div>
 				<div className="flex flex-col gap-10">
-					{messagesLoading ? (
-						<Spinner1 />
-					) : (
+					{reportTab === 0 ? (
 						<>
-							{reports.length === 0 && <p className="text-2xl 2k:text-4xl font-bold mb-10 2k:mb-20">No Messages</p>}
-							{sortedReports.map((report, i) => {
-								return (
-									<div key={i} className="flex flex-col w-full h-fit p-5 2k:p-10 bg-base-200 gap-10 rounded-xl relative">
-										{/* Replied badge */}
-										<div className="absolute right-2 top-2">
-											<div className={`alert ${report.replied ? 'alert-success' : 'alert-error'} font-bold shadow-lg`}>
-												<div>{report.replied ? <p className="text-xl 2k:text-2xl">Replied</p> : <p className="text-xl 2k:text-2xl">Not Replied</p>}</div>
+							{messagesLoading ? (
+								<Spinner1 />
+							) : (
+								<>
+									{reports.length === 0 && <p className="text-2xl 2k:text-4xl font-bold mb-10 2k:mb-20">No Messages</p>}
+									{sortedReports.map((report, i) => {
+										return (
+											<div key={i} className="flex flex-col w-full h-fit p-5 2k:p-10 bg-base-200 gap-10 rounded-xl relative">
+												{/* Replied badge */}
+												<div className="absolute right-2 top-2">
+													<div className={`alert ${report.replied ? 'alert-success' : 'alert-error'} font-bold shadow-lg`}>
+														<div>{report.replied ? <p className="text-xl 2k:text-2xl">Replied</p> : <p className="text-xl 2k:text-2xl">Not Replied</p>}</div>
+													</div>
+												</div>
+
+												{/* date/type */}
+												<div className="flex flex-row gap-5 2k:gap-10">
+													<p className="text-xl 2k:text-2xl">{createDateFromFirebaseTimestamp(report.date.seconds, 'long')}</p>
+													<div
+														className={`badge ${report.type === 'contact' && 'badge-primary'} ${report.type === 'comment' && 'badge-secondary'} ${report.type === 'build' && 'badge-accent'} ${
+															report.type === 'user' && 'badge-info'
+														}  p-4 2k:p-6 text-xl 2k:text-3xl`}
+													>
+														{report.type}
+													</div>
+												</div>
+
+												{/* Submitter Username */}
+												<div className="text-xl 2k:text-2xl text-slate-100">
+													<span className="italic text-slate-400">Submitter Username: </span> {report.uid ? <UsernameLink username={report.username} uid={report.uid} /> : 'Anon'}
+												</div>
+
+												{/* Submitter name */}
+												{report.name && (
+													<p className="text-xl 2k:text-2xl text-slate-100">
+														<span className="italic text-slate-400"> Submitter Name: </span> {report.name}
+													</p>
+												)}
+
+												{/* Submitter email */}
+												{report.email && (
+													<p className="text-xl 2k:text-2xl text-slate-100">
+														<span className="italic text-slate-400"> Submitter Email: </span> {report.email}
+													</p>
+												)}
+
+												{/* Submitters messge */}
+												<p className="text-xl 2k:text-2xl text-slate-200">
+													<span className="italic text-slate-400"> Submitter Message: </span>
+													{report.message}
+												</p>
+
+												{report.reportedUsername && (
+													<div className="text-xl 2k:text-2xl text-slate-200">
+														<span className="italic text-slate-400"> Reported username: </span>
+														{report.reportedUid ? <UsernameLink username={report.reportedUsername} uid={report.reportedUid} /> : 'Anon'}
+													</div>
+												)}
+
+												{report.reportedComment && (
+													<p className="text-xl 2k:text-2xl text-slate-200">
+														<span className="italic text-slate-400"> Reported Comment: </span>
+														{report.reportedComment}
+													</p>
+												)}
+
+												{report.reportedBuild && (
+													<p className="text-xl 2k:text-2xl text-slate-200">
+														<span className="italic text-slate-400"> Reported Build: </span>
+														{report.reportedBuild}
+													</p>
+												)}
+
+												<div className="flex flex-row gap-2">
+													<Button text="Delete" size="w-fit" icon="delete" onClick={() => deleteReport(report.id, i)} />
+													{report.uid && <Button text="Reply" size="w-fit" icon="upload" onClick={() => setReplying({ uid: report.uid, i, id: report.id })} />}
+													{report.buildId && <Button type="ahref" target="blank" href={`/build/${report.buildId}`} text="Go to build" size="w-fit" icon="right2" />}
+												</div>
+
+												{replying.i === i && <TextEditor setState={setReplyMessage} />}
+												{replying.i === i && (
+													<div className="flex flex-row gap-2">
+														<Button text="Send" size="w-fit" icon="save" color="btn-primary" onClick={() => replyToReport()} />
+														<Button text="Cancel" size="w-fit" icon="cancel" onClick={handleClearReply} />
+													</div>
+												)}
 											</div>
-										</div>
-
-										{/* date/type */}
-										<div className="flex flex-row gap-5 2k:gap-10">
-											<p className="text-xl 2k:text-2xl">{createDateFromFirebaseTimestamp(report.date.seconds, 'long')}</p>
-											<div
-												className={`badge ${report.type === 'contact' && 'badge-primary'} ${report.type === 'comment' && 'badge-secondary'} ${report.type === 'build' && 'badge-accent'} ${
-													report.type === 'user' && 'badge-info'
-												}  p-4 2k:p-6 text-xl 2k:text-3xl`}
-											>
-												{report.type}
-											</div>
-										</div>
-
-										{/* Submitter Username */}
-										<div className="text-xl 2k:text-2xl text-slate-100">
-											<span className="italic text-slate-400">Submitter Username: </span> {report.uid ? <UsernameLink username={report.username} uid={report.uid} /> : 'Anon'}
-										</div>
-
-										{/* Submitter name */}
-										{report.name && (
-											<p className="text-xl 2k:text-2xl text-slate-100">
-												<span className="italic text-slate-400"> Submitter Name: </span> {report.name}
-											</p>
-										)}
-
-										{/* Submitter email */}
-										{report.email && (
-											<p className="text-xl 2k:text-2xl text-slate-100">
-												<span className="italic text-slate-400"> Submitter Email: </span> {report.email}
-											</p>
-										)}
-
-										{/* Submitters messge */}
-										<p className="text-xl 2k:text-2xl text-slate-200">
-											<span className="italic text-slate-400"> Submitter Message: </span>
-											{report.message}
-										</p>
-
-										{report.reportedUsername && (
-											<div className="text-xl 2k:text-2xl text-slate-200">
-												<span className="italic text-slate-400"> Reported username: </span>
-												{report.reportedUid ? <UsernameLink username={report.reportedUsername} uid={report.reportedUid} /> : 'Anon'}
-											</div>
-										)}
-
-										{report.reportedComment && (
-											<p className="text-xl 2k:text-2xl text-slate-200">
-												<span className="italic text-slate-400"> Reported Comment: </span>
-												{report.reportedComment}
-											</p>
-										)}
-
-										{report.reportedBuild && (
-											<p className="text-xl 2k:text-2xl text-slate-200">
-												<span className="italic text-slate-400"> Reported Build: </span>
-												{report.reportedBuild}
-											</p>
-										)}
-
-										<div className="flex flex-row gap-2">
-											<Button text="Delete" size="w-fit" icon="delete" onClick={() => deleteReport(report.id, i)} />
-											{report.uid && <Button text="Reply" size="w-fit" icon="upload" onClick={() => setReplying({ uid: report.uid, i, id: report.id })} />}
-											{report.buildId && <Button type="ahref" target="blank" href={`/build/${report.buildId}`} text="Go to build" size="w-fit" icon="right2" />}
-										</div>
-
-										{replying.i === i && <TextEditor setState={setReplyMessage} />}
-										{replying.i === i && (
-											<div className="flex flex-row gap-2">
-												<Button text="Send" size="w-fit" icon="save" color="btn-primary" onClick={() => replyToReport()} />
-												<Button text="Cancel" size="w-fit" icon="cancel" onClick={handleClearReply} />
-											</div>
-										)}
-									</div>
-								);
-							})}
+										);
+									})}
+								</>
+							)}
 						</>
-					)}
+					) : null}
+
+					{reportTab === 1 ? (
+						<>
+							{errorsLoading ? (
+								<Spinner1 />
+							) : (
+								<>
+									{errors.length === 0 && <p className="text-2xl 2k:text-4xl font-bold mb-10 2k:mb-20">No Errors</p>}
+									{errors.map((report, i) => {
+										return (
+											<div key={i} className="flex flex-col w-full h-fit p-5 2k:p-10 bg-base-200 gap-10 rounded-xl relative">
+												{/* date/type */}
+												<div className="flex flex-row gap-5 2k:gap-10">
+													<p className="text-xl 2k:text-2xl">{createDateFromFirebaseTimestamp(report.date.seconds, 'long')}</p>
+												</div>
+
+												{/* error uid */}
+												{report.uid && (
+													<p className="text-xl 2k:text-2xl text-slate-100">
+														<span className="italic text-slate-400"> Error UID: </span> {report.uid}
+													</p>
+												)}
+
+												{/* error url */}
+												<p className="text-xl 2k:text-2xl text-slate-200">
+													<span className="italic text-slate-400"> Error URL: </span>
+													{report.url}
+												</p>
+
+												{/* error function */}
+												{report.func && (
+													<p className="text-xl 2k:text-2xl text-slate-100">
+														<span className="italic text-slate-400"> Error Function: </span> {report.func}
+													</p>
+												)}
+
+												{/* error message */}
+												<p className="text-xl 2k:text-2xl text-slate-200">
+													<span className="italic text-slate-400"> Error Message: </span>
+													{report.error}
+												</p>
+
+												<div className="flex flex-row gap-2">
+													<Button text="Delete" size="w-fit" icon="delete" onClick={() => deleteError(report.id, i)} />
+												</div>
+											</div>
+										);
+									})}
+								</>
+							)}
+						</>
+					) : null}
 				</div>
 			</MiddleContainer>
 		</>

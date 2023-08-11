@@ -25,9 +25,7 @@ function ProfilePicture() {
 				updateUserProfilePic(url);
 				setUploadingProfilePhoto(false);
 			})
-			.catch(err => {
-				console.log(err);
-				toast.error('Something went wrong');
+			.catch(() => {
 				setUploadingProfilePhoto(false);
 			});
 	};

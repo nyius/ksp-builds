@@ -5,6 +5,7 @@ import { db } from '../../firebase.config';
 import { useLocation, useParams } from 'react-router-dom';
 import { setBuildsForcedView, setBuildsView } from './BuildsActions';
 import { checkLocalBuildAge } from '../build/BuildUtils';
+import errorReport from '../../utilities/errorReport';
 
 const BuildsContext = createContext();
 
@@ -73,7 +74,8 @@ export const BuildsProvider = ({ children }) => {
 
 				await fetchServerBuild(data.id);
 			} catch (error) {
-				console.log(`Couldn't find BotW`);
+				errorReport(`Couldn't find BotW: ${error.message}`, true, 'fetchServerWeeklyFeatured');
+
 				dispatchBuilds({
 					type: 'SET_LOADING_BUILD_OF_THE_WEEK',
 					payload: false,
@@ -105,7 +107,7 @@ export const BuildsProvider = ({ children }) => {
 					payload: buildSnapData,
 				});
 			} catch (error) {
-				console.log(error);
+				errorReport(error.message, true, 'fetchServerBuild');
 				dispatchBuilds({
 					type: 'SET_LOADING_BUILD_OF_THE_WEEK',
 					payload: false,

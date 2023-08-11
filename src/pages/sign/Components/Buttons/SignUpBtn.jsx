@@ -3,6 +3,7 @@ import Button from '../../../../components/buttons/Button';
 import { toast } from 'react-toastify';
 import useAuth from '../../../../context/auth/AuthActions';
 import { checkMatchingEmails } from '../../../../context/auth/AuthUtils';
+import errorReport from '../../../../utilities/errorReport';
 
 /**
  * Button for signing up a user
@@ -15,22 +16,22 @@ function SignUpBtn({ newUser, setAccountExists }) {
 
 	const signUp = async () => {
 		if (!newUser.email) {
-			console.log('No email');
+			errorReport('No email', false, 'signUp');
 			toast.error('You forgot an email!');
 			return;
 		}
 		if (!newUser.password) {
-			console.log(`No password`);
+			errorReport(`No password`, false, 'signUp');
 			toast.error('You forget a password');
 			return;
 		}
 		if (newUser.password.length < 6) {
-			console.log(`Password too Short`);
+			errorReport(`Password too Short`, false, 'signUp');
 			toast.error('Password must be more than 6 characters');
 			return;
 		}
 		if (!checkMatchingEmails(newUser.email, newUser.emailVerify)) {
-			console.log(`Emails don't match`);
+			errorReport(`Emails don't match`, false, 'signUp');
 			toast.error("Your emails don't match");
 			return;
 		}

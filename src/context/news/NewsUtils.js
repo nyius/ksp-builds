@@ -1,6 +1,7 @@
 import { db } from '../../firebase.config';
 import { collection, getDocs } from 'firebase/firestore';
 import { toast } from 'react-toastify';
+import errorReport from '../../utilities/errorReport';
 
 /**
  * Handles fetching patch notes
@@ -27,7 +28,7 @@ export const fetchPatchNotes = async () => {
 
 		return sortedPatchNotes;
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'fetchPatchNotes');
 		toast.error("Couldn't fetch patch notes");
 	}
 };

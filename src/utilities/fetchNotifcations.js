@@ -1,5 +1,6 @@
 import { db, auth } from '../firebase.config';
 import { collection, orderBy, getDocs, deleteDoc, limit, query, doc, where, getDocsFromCache } from 'firebase/firestore';
+import errorReport from './errorReport';
 
 /**
  * Handles fetching current users notifications. Deletes any notifications that the user filters
@@ -56,7 +57,7 @@ const fetchNotifications = async (user, dispatchAuth) => {
 
 		return filteredNotifications; // Set the notifs
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'fetchNotifications');
 	}
 };
 
@@ -85,12 +86,12 @@ const fetchAllUsersNotifs = async () => {
 			}
 		} else {
 			// Users first time/ no localNewest saved, fetch all builds so they're cached
-			console.log(`No local stored timestamp`);
+			errorReport(`No local stored timestamp`, false, 'fetchAllUsersNotifs');
 			await getDocs(notificationsRef);
 			localStorage.setItem('newestNotif', JSON.stringify(newestDoc.timestamp));
 		}
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'fetchAllUsersNotifs');
 	}
 };
 

@@ -27,6 +27,7 @@ import { useFiltersContext } from '../filters/FiltersContext';
 import { updateDownloadCount, updateViewCount, makeBuildReadyToUpload, searchBuilds, setLocalStoredBuild, getBuildFromLocalStorage, checkLocalBuildAge, deleteBuildFromLocalStorage } from './BuildUtils';
 import { useAddBuildToFolder } from '../folders/FoldersActions';
 import { useNewsContext } from '../news/NewsContext';
+import errorReport from '../../utilities/errorReport';
 //---------------------------------------------------------------------------------------------------//
 
 /**
@@ -60,8 +61,7 @@ const useFetchBuild = async id => {
 				}
 			} catch (error) {
 				setLoadedBuild(dispatchBuild, '');
-				console.log(error);
-				throw new Error(`Error fetching build: ${error}`);
+				errorReport(`Error fetching build: ${error.message}`, true, 'fetchBuild');
 			}
 		};
 		fetchBuild();
@@ -110,8 +110,7 @@ const useFetchBuild = async id => {
 			}
 		} catch (error) {
 			setLoadedBuild(dispatchBuild, '');
-			console.log(error);
-			throw new Error(`Error fetching build: ${error}`);
+			errorReport(`Error fetching build: ${error.message}`, true, 'fetchBuildFromServer');
 		}
 	};
 };
@@ -147,12 +146,11 @@ export const useFetchComments = () => {
 				payload: { comments: commentsList, commentsLoading: false },
 			});
 		} catch (error) {
-			console.log(error);
 			dispatchBuild({
 				type: 'SET_BUILD',
 				payload: { commentsLoading: false },
 			});
-			throw new Error(`Error fetching comments: ${error}`);
+			errorReport(`Error fetching comments: ${error.message}`, true, 'fetchComments');
 		}
 	};
 
@@ -206,8 +204,8 @@ export const useMakeBuildOfTheWeek = () => {
 
 			toast.success('Made build of the week!');
 		} catch (error) {
-			console.log(error);
-			toast.error(`Whoops... Something went wrong: ${error} `);
+			errorReport(`Whoops... Something went wrong: ${error.message}`, false, 'makeBuildOfTheWeek');
+			toast.error(`Whoops... Something went wrong: ${error}`);
 		}
 	};
 
@@ -703,15 +701,7 @@ export const useUploadBuild = () => {
 
 					if (followers) {
 						followers.map(follower => {
-							const sendNotif = async () => {
-								try {
-									await sendNotification(follower, newNotif);
-								} catch (error) {
-									console.log(error);
-								}
-							};
-
-							sendNotif();
+							sendNotification(follower, newNotif);
 						});
 					}
 				}
@@ -726,7 +716,7 @@ export const useUploadBuild = () => {
 				return newId;
 			}
 		} catch (error) {
-			console.log(error);
+			errorReport(error.message, false, 'uploadBuild');
 			setUploadingBuild(dispatchBuild, false);
 		}
 	};
@@ -856,7 +846,6 @@ export const useGetEditingBuildRawBuild = () => {
 					const fetchedRawBuild = await fetchBuildFromAWS(editingBuild.id);
 					return fetchedRawBuild;
 				} catch (error) {
-					console.log(error);
 					toast.error('Something went wrong fetching the Raw build');
 				}
 			};

@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { db } from '../../firebase.config';
 import { compressAccurately } from 'image-conversion';
 import { uploadImage } from '../../utilities/uploadImage';
+import errorReport from '../../utilities/errorReport';
 
 /**
  * Updates server when a user has 'read' a new message
@@ -14,7 +15,7 @@ export const readMessage = async (convoId, userId) => {
 	try {
 		await updateDoc(doc(db, 'users', userId, 'messages', convoId), { newMessage: false });
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'readMessage');
 	}
 };
 
@@ -30,7 +31,7 @@ export const updateUsernameColor = async (userId, color) => {
 
 		toast.success('Color updated!');
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'updateUsernameColor');
 		toast.error('Something went wrong, please try again');
 	}
 };
@@ -45,7 +46,7 @@ export const sendNotification = async (uid, notification) => {
 		const userRef = collection(db, 'users', uid, 'notifications');
 		await addDoc(userRef, notification);
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'sendNotification');
 		return;
 	}
 };
@@ -88,7 +89,7 @@ export const deleteUserAccount = async (uid, currentUserUid) => {
 
 		toast.success('Account Deleted.');
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'deleteUserAccount');
 	}
 };
 
@@ -161,7 +162,7 @@ export const updateWeeklyUpvoted = async (id, type, userUid) => {
 			}
 		}
 	} catch (error) {
-		console.log(error);
+		errorReport(error.message, true, 'updateWeeklyUpvoted');
 	}
 };
 

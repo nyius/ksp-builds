@@ -3,7 +3,7 @@ import MiddleContainer from '../../components/containers/middleContainer/MiddleC
 import PlanetHeader from '../../components/header/PlanetHeader';
 import { useNewsContext } from '../../context/news/NewsContext';
 import Helmet from '../../components/Helmet/Helmet';
-import Spinner1 from '../../components/spinners/Spinner1';
+import Spinner2 from '../../components/spinners/Spinner2';
 import NewsArticles from './Components/NewsArticles';
 
 /**
@@ -17,7 +17,7 @@ function News() {
 	if (articlesLoading) {
 		return (
 			<MiddleContainer>
-				<Spinner1 />
+				<Spinner2 />
 			</MiddleContainer>
 		);
 	}

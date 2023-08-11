@@ -2,7 +2,7 @@ import React from 'react';
 import { useNewsContext } from '../../context/news/NewsContext';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
-import Spinner1 from '../../components/spinners/Spinner1';
+import Spinner2 from '../../components/spinners/Spinner2';
 import Helmet from '../../components/Helmet/Helmet';
 import ChallengesList from './Components/ChallengesList';
 
@@ -16,7 +16,7 @@ function Challenges() {
 	if (articlesLoading) {
 		return (
 			<MiddleContainer>
-				<Spinner1 />
+				<Spinner2 />
 			</MiddleContainer>
 		);
 	}

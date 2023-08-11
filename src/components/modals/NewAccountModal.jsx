@@ -4,7 +4,7 @@ import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { toast } from 'react-toastify';
 import Astrobiff from '../../assets/astrobiff.png';
-import Spinner1 from '../spinners/Spinner1';
+import Spinner2 from '../spinners/Spinner2';
 import { useAuthContext } from '../../context/auth/AuthContext';
 import { setNewSignup, useUpdateProfile, updateUserState, setAuthenticated } from '../../context/auth/AuthActions';
 import Button from '../buttons/Button';
@@ -180,7 +180,7 @@ function NewAccountModal() {
 						</label>
 
 						<div className="flex flex-row flex-wrap items-center">
-							<div className="mr-4">{uploadingImage ? <Spinner1 /> : <img className="avatar-round 2k:w-18" src={newProfilePicture} />}</div>
+							<div className="mr-4">{uploadingImage ? <Spinner2 /> : <img className="avatar-round 2k:w-18" src={newProfilePicture} />}</div>
 							<input type="file" id="profile-picture" max="1" accept=".jpg,.png,.jpeg" className="file-input 2k:file-input-lg 2k:text-3xl" onChange={handleNewProfilePhoto} />
 						</div>
 					</div>

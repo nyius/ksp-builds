@@ -9,7 +9,7 @@ import useFetchBuild, { setBuildOfTheWeek, useFetchBuildAuthorProfile, useNaviga
 import { useFoldersContext } from '../../context/folders/FoldersContext';
 //---------------------------------------------------------------------------------------------------//
 import VoteArrows from '../../components/buttons/VoteArrows';
-import Spinner1 from '../../components/spinners/Spinner1';
+import Spinner2 from '../../components/spinners/Spinner2';
 import DeleteBuildModal from '../../components/modals/DeleteBuildModal';
 import MakeBuildOfTheWeekModal from '../../components/modals/MakeBuildOfTheWeekModal';
 import Carousel from '../../components/carousel/Carousel';
@@ -57,7 +57,7 @@ function Build() {
 	if (loadingBuild) {
 		return (
 			<MiddleContainer>
-				<Spinner1 />
+				<Spinner2 />
 			</MiddleContainer>
 		);
 	}

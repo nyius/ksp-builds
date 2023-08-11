@@ -3,7 +3,7 @@ import { useBuildContext } from '../../../context/build/BuildContext';
 import { FiCameraOff } from 'react-icons/fi';
 import { setBuildToUpload, useGetEditingBuildRawImages } from '../../../context/build/BuildActions';
 import { uploadImages } from '../../../utilities/uploadImage';
-import Spinner1 from '../../../components/spinners/Spinner1';
+import Spinner2 from '../../../components/spinners/Spinner2';
 import RemoveImageBtn from './Buttons/RemoveImageBtn';
 
 /**
@@ -150,7 +150,7 @@ function UploadBuildImages() {
 								);
 						  })
 						: null}
-					{uploadingImage ? <Spinner1 /> : null}
+					{uploadingImage ? <Spinner2 /> : null}
 				</div>
 
 				{/* Upload build image */}

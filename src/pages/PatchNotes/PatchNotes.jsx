@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 //---------------------------------------------------------------------------------------------------//
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
-import Spinner1 from '../../components/spinners/Spinner1';
+import Spinner2 from '../../components/spinners/Spinner2';
 import CantFind from '../../components/cantFind/CantFind';
 import DeletePatchNotesModal from '../../components/modals/DeletePatchNoteModal';
 import Helmet from '../../components/Helmet/Helmet';
@@ -28,7 +28,7 @@ function PatchNotes() {
 	if (loading) {
 		return (
 			<MiddleContainer>
-				<Spinner1 />
+				<Spinner2 />
 			</MiddleContainer>
 		);
 	}

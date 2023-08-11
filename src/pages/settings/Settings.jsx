@@ -5,7 +5,7 @@ import PlanetHeader from '../../components/header/PlanetHeader';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import useResetStates from '../../hooks/useResetStates';
 import { useAuthContext } from '../../context/auth/AuthContext';
-import Spinner1 from '../../components/spinners/Spinner1';
+import Spinner2 from '../../components/spinners/Spinner2';
 import Notifications from './Components/Notifications';
 import UsernameColor from './Components/UsernameColor';
 import Subscription from './Components/Subscription';
@@ -27,7 +27,7 @@ function Settings() {
 	if (authLoading) {
 		return (
 			<MiddleContainer>
-				<Spinner1 />
+				<Spinner2 />
 			</MiddleContainer>
 		);
 	}

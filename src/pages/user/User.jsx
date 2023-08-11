@@ -6,7 +6,7 @@ import { useAuthContext } from '../../context/auth/AuthContext';
 import { useGetAndSetOpenUserProfile } from '../../context/auth/AuthActions';
 import { useGetFilteredBuilds } from '../../context/builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
-import Spinner1 from '../../components/spinners/Spinner1';
+import Spinner2 from '../../components/spinners/Spinner2';
 import { useCheckOpenProfileFolderAndFetchBuilds, useResetOpenFolder, useSetBuildToAddToFolder, useSetFolderLocation, useSetOpenUsersFolders } from '../../context/folders/FoldersActions';
 import Sort from '../../components/sort/Sort';
 import CantFind from '../../components/cantFind/CantFind';
@@ -51,7 +51,7 @@ function User() {
 	if (fetchingProfile) {
 		return (
 			<MiddleContainer>
-				<Spinner1 />
+				<Spinner2 />
 			</MiddleContainer>
 		);
 	}

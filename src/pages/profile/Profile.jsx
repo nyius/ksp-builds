@@ -8,7 +8,7 @@ import { useSetBuildToAddToFolder, useSetFolderLocation, useSetSelectedFolders }
 import { useFoldersContext } from '../../context/folders/FoldersContext';
 //---------------------------------------------------------------------------------------------------//
 import useResetStates from '../../hooks/useResetStates';
-import Spinner1 from '../../components/spinners/Spinner1';
+import Spinner2 from '../../components/spinners/Spinner2';
 import Sort from '../../components/sort/Sort';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
@@ -42,7 +42,7 @@ function Profile() {
 	if (authLoading) {
 		return (
 			<MiddleContainer>
-				<Spinner1 />
+				<Spinner2 />
 			</MiddleContainer>
 		);
 	}

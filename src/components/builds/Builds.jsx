@@ -3,7 +3,7 @@ import React, { Fragment } from 'react';
 import { useBuildsContext } from '../../context/builds/BuildsContext';
 import { useFetchOpenFolderBuilds, useLoadedBuilds, useSetCurrentPage } from '../../context/builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
-import Spinner1 from '../spinners/Spinner1';
+import Spinner2 from '../spinners/Spinner2';
 import BuildCard from '../cards/BuildCard/BuildCard';
 import CantFind from '../cantFind/CantFind';
 import PrevPageBtn from './Buttons/PrevPageBtn';
@@ -31,7 +31,7 @@ function Builds({ buildsToDisplay }) {
 			<BuildsContainer>
 				<div className="flex flex-row w-full justify-center items-center">
 					<div className="w-20">
-						<Spinner1 />
+						<Spinner2 />
 					</div>
 				</div>
 			</BuildsContainer>

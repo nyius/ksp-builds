@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+$blue: #0182ff;
+$violet: #7d82ff;
+$lightPink: #c082ff;
+$pink: #ff47ff;
+
+body {
+	font-family: 'Raleway', sans-serif;
+}
+
+$colorsList: $blue, $violet, $lightPink, $pink;
+.container {
+	background-color: #fff9f0;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+}
+.spinner {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	height: 10px;
+	width: 10px;
+	transform: translate(-50%, -50%) rotateY(0deg);
+	list-style-type: none;
+	padding: 0;
+	transform-style: preserve-3d;
+	li {
+		transform-style: preserve-3d;
+		position: absolute;
+		top: -200%;
+		left: -1000%;
+		right: -1000%;
+		bottom: -200%;
+		border: 5px solid #f2fdff;
+		margin: auto;
+		border-radius: 5000px;
+
+		&::after {
+			content: '';
+			position: absolute;
+			height: 20px;
+			width: 20px;
+			background-color: #f2fdff;
+			border-radius: 500px;
+			left: 0;
+			right: 0;
+			top: -10px;
+			margin: auto;
+		}
+	}
+	@for $i from 1 through 4 {
+		li:nth-child(#{$i}) {
+			border-color: nth($colorsList, $i);
+			&::after {
+				background-color: nth($colorsList, $i);
+			}
+			height: #{$i * 50}px;
+			width: #{$i * 50}px;
+			animation: rotate #{abs(($i)-5) * 0.85}s linear infinite;
+		}
+	}
+}
+
+@keyframes rotate {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+/*link*/
+.info {
+	position: fixed;
+	bottom: 10px;
+	right: 10px;
+	margin: auto;
+	text-align: center;
+	color: #212121;
+	font-weight: 600;
+	width: 200px;
+	font-size: 1.2rem;
+	a {
+		font-size: 3rem;
+		display: block;
+		color: inherit;
+	}
+}
+
+/*inspired*/
+.inspired {
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	position: absolute;
+	margin: auto;
+	padding: 10px;
+	background-color: $blue;
+	color: #fff;
+	font-weight: 600;
+	border-radius: 5px;
+}

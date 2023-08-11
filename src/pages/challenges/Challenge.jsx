@@ -5,7 +5,7 @@ import { useNewsContext } from '../../context/news/NewsContext';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import Button from '../../components/buttons/Button';
 import CantFind from '../../components/cantFind/CantFind';
-import Spinner1 from '../../components/spinners/Spinner1';
+import Spinner2 from '../../components/spinners/Spinner2';
 import DeleteChallengeModal from '../../components/modals/DeleteChallengeModal';
 import Helmet from '../../components/Helmet/Helmet';
 import SubmitBuildChallengeBtn from './Components/Buttons/SubmitBuildChallengeBtn';
@@ -26,7 +26,7 @@ function Challenge() {
 	const articleId = useParams().id;
 
 	//---------------------------------------------------------------------------------------------------//
-	if (articlesLoading) return <Spinner1 />;
+	if (articlesLoading) return <Spinner2 />;
 
 	if (!articlesLoading && !challenge) {
 		return (

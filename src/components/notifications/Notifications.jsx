@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuthContext } from '../../context/auth/AuthContext';
 import Notification from './Notification';
-import Spinner1 from '../spinners/Spinner1';
+import Spinner2 from '../spinners/Spinner2';
 import NotificationsIcon from './Components/NotificationsIcon';
 import NewNotificationIcon from './Components/NewNotificationIcon';
 import DeleteAllNotifsBtn from './Buttons/DeleteAllNotifsBtn';
@@ -27,7 +27,7 @@ function Notifications() {
 						<div className="w-full h-20 flex flex-row items-center justify-center bg-primary text-xl 2k:text-3xl text-white font-bold p-3 2k:p-6">Notifications</div>
 						<DeleteAllNotifsBtn />
 						{notificationsLoading ? (
-							<Spinner1 />
+							<Spinner2 />
 						) : (
 							<>
 								<div className="p-5 2k:p-6 flex flex-col gap-2 2k:gap-4">

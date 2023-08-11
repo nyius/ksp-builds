@@ -17,7 +17,7 @@ import { uploadImages } from '../../utilities/uploadImage';
 //---------------------------------------------------------------------------------------------------//
 import TextInput from '../../components/input/TextInput';
 import Button from '../../components/buttons/Button';
-import Spinner1 from '../../components/spinners/Spinner1';
+import Spinner2 from '../../components/spinners/Spinner2';
 import TextEditor from '../../components/textEditor/TextEditor';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
@@ -476,7 +476,7 @@ function AdminPanel() {
 				{/* ------------------Stats------------------ */}
 				<div className="w-full rounded-xl text-white bg-base-900 flex flex-row p-4 2k:p-8">
 					{statsLoading ? (
-						<Spinner1 />
+						<Spinner2 />
 					) : (
 						<>
 							<div className="flex flex-col gap-4 2k:gap-8 p-4 2k:p-8">
@@ -496,7 +496,7 @@ function AdminPanel() {
 
 				{/* ------------------Versions------------------ */}
 				{infoLoading ? (
-					<Spinner1 />
+					<Spinner2 />
 				) : (
 					<div className="flex flex-row flex-wrap bg-base-600 gap-4 rounded-xl p-4 2k:p-8 ">
 						<div className="flex flex-col gap-4">
@@ -584,7 +584,7 @@ function AdminPanel() {
 							<span className="font-bold p-4">Image</span>
 							<input type="file" id="build-image" max="1" accept=".jpg,.png,.jpeg" className="file-input w-full max-w-xs mb-6 2k:file-input-lg text-slate-200" onChange={handleUploadChallengeImage} />
 						</label>
-						{uploadingChallengeImage && <Spinner1 />}
+						{uploadingChallengeImage && <Spinner2 />}
 						{challenge.image && <img src={challenge.image} alt="" className="w-56" />}
 					</div>
 
@@ -620,7 +620,7 @@ function AdminPanel() {
 					{reportTab === 0 ? (
 						<>
 							{messagesLoading ? (
-								<Spinner1 />
+								<Spinner2 />
 							) : (
 								<>
 									{reports.length === 0 && <p className="text-2xl 2k:text-4xl font-bold mb-10 2k:mb-20">No Messages</p>}
@@ -716,7 +716,7 @@ function AdminPanel() {
 					{reportTab === 1 ? (
 						<>
 							{errorsLoading ? (
-								<Spinner1 />
+								<Spinner2 />
 							) : (
 								<>
 									{errors.length === 0 && <p className="text-2xl 2k:text-4xl font-bold mb-10 2k:mb-20">No Errors</p>}

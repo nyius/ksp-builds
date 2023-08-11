@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import Sort from '../../components/sort/Sort';
-import Spinner1 from '../../components/spinners/Spinner1';
+import Spinner2 from '../../components/spinners/Spinner2';
 import CantFind from '../../components/cantFind/CantFind';
 import Button from '../../components/buttons/Button';
 //---------------------------------------------------------------------------------------------------//
@@ -53,7 +53,7 @@ function Favorites() {
 						{loadingBuilds ? (
 							<div className="flex flex-row w-full justify-center items-center">
 								<div className="w-20">
-									<Spinner1 />
+									<Spinner2 />
 								</div>
 							</div>
 						) : (

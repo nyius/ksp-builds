@@ -12,7 +12,7 @@ import { useFoldersContext } from '../../context/folders/FoldersContext';
 import { useSetBuildToAddToFolder, useSetFolderLocation, useSetPinnedFolder } from '../../context/folders/FoldersActions';
 import { useBuildContext } from '../../context/build/BuildContext';
 //---------------------------------------------------------------------------------------------------//
-import Spinner1 from '../../components/spinners/Spinner1';
+import Spinner2 from '../../components/spinners/Spinner2';
 import LogoBackground from '../../assets/logo_bg_dark.png';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import CancelBuildEditModal from '../../components/modals/CancelBuildEditModal';
@@ -94,7 +94,7 @@ function Upload() {
 			<MiddleContainer>
 				<div className="flex flex-col items-center justify-cener">
 					<p className="text-2xl 2k:text-4xl font-bold">Uploading Build</p>
-					<Spinner1 />
+					<Spinner2 />
 				</div>
 			</MiddleContainer>
 		);

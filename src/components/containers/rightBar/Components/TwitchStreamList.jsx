@@ -3,7 +3,7 @@ import { useNewsContext } from '../../../../context/news/NewsContext';
 import TwitchStreamCard from './TwitchStreamCard';
 import { FaRocket } from 'react-icons/fa';
 
-import Spinner1 from '../../../spinners/Spinner1';
+import Spinner2 from '../../../spinners/Spinner2';
 
 /**
  * Displays the list of twitch streams
@@ -12,7 +12,7 @@ import Spinner1 from '../../../spinners/Spinner1';
 function TwitchStreamList() {
 	const { streams, streamsLoading } = useNewsContext();
 
-	if (streamsLoading) return <Spinner1 />;
+	if (streamsLoading) return <Spinner2 />;
 
 	if (streams.length === 0) {
 		return (

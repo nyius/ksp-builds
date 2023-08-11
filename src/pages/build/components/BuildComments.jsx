@@ -2,7 +2,7 @@ import React from 'react';
 import { useBuildContext } from '../../../context/build/BuildContext';
 import { useAuthContext } from '../../../context/auth/AuthContext';
 import { useComment } from '../../../context/build/BuildActions';
-import Spinner1 from '../../../components/spinners/Spinner1';
+import Spinner2 from '../../../components/spinners/Spinner2';
 import Comment from '../../../components/comments/Comment';
 import CheckCredentials from '../../../components/credentials/CheckCredentials';
 import TextEditor from '../../../components/textEditor/TextEditor';
@@ -21,7 +21,7 @@ function BuildComments() {
 	const { setComment } = useComment();
 
 	if (commentsLoading) {
-		return <Spinner1 />;
+		return <Spinner2 />;
 	}
 
 	//---------------------------------------------------------------------------------------------------//

@@ -11,7 +11,11 @@ const emailLogin = async (email, password) => {
 	try {
 		await signInWithEmailAndPassword(auth, email, password);
 	} catch (error) {
-		errorReport(error.message, true, 'emailLogin');
+		if (!error.message.includes('wrong-password')) {
+			errorReport(error.message, true, 'emailLogin');
+		} else {
+			errorReport(error.message, false, 'emailLogin');
+		}
 		return error.message;
 	}
 };

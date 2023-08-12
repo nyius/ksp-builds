@@ -77,7 +77,11 @@ export const NewsProvider = ({ children }) => {
 					payload: false,
 				});
 			} catch (error) {
-				errorReport(error.message, true, 'fetchNews');
+				if (error.message !== 'The difference between the request time and the current time is too large.') {
+					errorReport(error.message, true, 'fetchNews');
+				} else {
+					errorReport(error.message, false, 'fetchNews');
+				}
 				dispatchNews({
 					type: 'SET_ARTICLES_LOADING',
 					payload: false,
@@ -108,7 +112,11 @@ export const NewsProvider = ({ children }) => {
 					payload: false,
 				});
 			} catch (error) {
-				errorReport(error.message, true, 'fetchLiveStreams');
+				if (error.message !== 'The difference between the request time and the current time is too large.') {
+					errorReport(error.message, true, 'fetchLiveStreams');
+				} else {
+					errorReport(error.message, false, 'fetchLiveStreams');
+				}
 				dispatchNews({
 					type: 'SET_STREAMS_LOADING',
 					payload: false,

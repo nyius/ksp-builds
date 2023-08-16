@@ -712,6 +712,7 @@ export const useUploadBuild = () => {
 				toast.success('Build created!');
 
 				setUploadingBuild(dispatchBuild, false);
+				resetUploadBuild(dispatchBuild);
 
 				return newId;
 			}
@@ -1020,5 +1021,16 @@ export const setBuildToUpload = (dispatchBuild, build) => {
 	dispatchBuild({
 		type: 'SET_BUILD',
 		payload: { buildToUpload: { ...build } },
+	});
+};
+
+/**
+ * handles clearing the build to be uploaded when a user submits an upload
+ * @param {function} dispatchBuild - The dispatch function
+ */
+export const resetUploadBuild = dispatchBuild => {
+	dispatchBuild({
+		type: 'SET_BUILD',
+		payload: { buildToUpload: null },
 	});
 };

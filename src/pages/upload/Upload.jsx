@@ -35,8 +35,6 @@ import CancelEditBtn from './Components/Buttons/CancelEditBtn';
 import UpdateBuildBtn from './Components/Buttons/UpdateBuildBtn';
 import errorReport from '../../utilities/errorReport';
 
-const buildId = uuidv4().slice(0, 30);
-
 /**
  * Handles displaying the container for creating & editing a build.
  *
@@ -48,6 +46,7 @@ function Upload() {
 	const { user } = useAuthContext();
 	const { uploadBuild } = useUploadBuild();
 	const navigate = useNavigate();
+	const buildId = uuidv4().slice(0, 30);
 
 	useSetBuildToUpload(editingBuild ? cloneDeep(editingBuild) : cloneDeep(standardBuild));
 	useSetBuildToAddToFolder(editingBuild ? editingBuild.id : buildId);

@@ -102,8 +102,8 @@ const useFilters = () => {
 	};
 
 	/**
-	 * Handles filtering the decks. Returns an array of decks that match the filters
-	 * @param {*} decks
+	 * Handles filtering the builds. Returns an array of builds that match the filters
+	 * @param {*} builds
 	 * @returns
 	 */
 	const filterBuilds = builds => {

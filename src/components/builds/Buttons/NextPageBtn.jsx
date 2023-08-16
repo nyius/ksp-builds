@@ -12,12 +12,12 @@ function NextPageBtn() {
 
 	return (
 		<>
-			{!loadingBuilds && fetchedBuilds.length == fetchAmount ? (
+			{!loadingBuilds && fetchedBuilds?.length == fetchAmount ? (
 				<button
 					className="btn btn-lg text-xl 2k:text-2xl"
 					onClick={() => {
 						window.scrollTo(0, 0);
-						fetchMoreBuilds(fetchAmount);
+						fetchMoreBuilds();
 					}}
 				>
 					»

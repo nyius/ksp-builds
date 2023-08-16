@@ -56,7 +56,6 @@ drag and drop your own builds into a folder?
 Should be able to login with username/password
 	-automatically generate an email auth with the new username (eg steve@kspbuilds.com)
 		-when the user signs in with username, stick @kspbuilds.com to the end and then attempt the email login
-builds fetched by ID need to be paginated. break them up into folders and then iterate over them
 create backup database on an entirely new firebase instance - updates once a week
 email notifs for botw
 make type searching work for your own builds/visiting a users builds

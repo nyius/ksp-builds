@@ -5,10 +5,10 @@ import { useBuildsContext } from './BuildsContext';
 import { useAuthContext } from '../auth/AuthContext';
 import { useFiltersContext } from '../filters/FiltersContext';
 import useFilters from '../filters/FiltersActions';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, sortBy } from 'lodash';
 import { checkLocalBuildAge, getBuildFromLocalStorage, setLocalStoredBuild } from '../build/BuildUtils';
 import { useFoldersContext } from '../folders/FoldersContext';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import algoliasearch from 'algoliasearch/lite';
 import errorReport from '../../utilities/errorReport';
 
@@ -58,7 +58,6 @@ const useBuilds = () => {
 	 * @param {string} type - public/private/unlisted
 	 */
 	const fetchBuildsById = async (buildsToFetch, fetchUid, type) => {
-		const buildsToFetchCopy = cloneDeep(buildsToFetch);
 		try {
 			setFetchedBuilds(dispatchBuilds, []);
 			setBuildsLoading(dispatchBuilds, true);
@@ -83,7 +82,7 @@ const useBuilds = () => {
 			});
 
 			// filter the builds we are keeping from local storage from those to fetch
-			const filteredBuildsToFetch = buildsToFetchCopy.filter(id => !localBuildsToKeepIds.includes(id));
+			const filteredBuildsToFetch = buildsToFetch.filter(id => !localBuildsToKeepIds.includes(id));
 
 			const batches = [];
 
@@ -103,14 +102,25 @@ const useBuilds = () => {
 				setLocalStoredBuild(build);
 			});
 
+			// Now recombine the fetched builds vs local builds
 			localBuildsToKeep.map((build, i) => {
 				builds.splice(localBuildsToKeepIndex[i], 0, build);
 			});
 
 			const sortedBuilds = filterBuilds(builds);
 
-			// Now recombine the fetched builds vs local builds
-			setFetchedBuilds(dispatchBuilds, sortedBuilds);
+			const buildsToStore = [];
+
+			// because firestore only allows query 'in' by groups of 10, we have to break it up into chunks of 10
+			// by using splice, we alter the original input 'buildsToFetchCopy' arr by removing 10 at a time
+			while (sortedBuilds.length) {
+				const batch = sortedBuilds.splice(0, fetchAmount);
+				// this gets all of the docs from our query, then loops over them and returns the raw data to our array
+				buildsToStore.push(batch);
+			}
+
+			setFetchedBuilds(dispatchBuilds, buildsToStore[0] ? buildsToStore[0] : []);
+			setStoredBuilds(dispatchBuilds, buildsToStore);
 		} catch (error) {
 			errorReport(error.message, true, 'fetchBuildsById');
 			setBuildsLoading(dispatchBuilds, false);
@@ -165,19 +175,23 @@ export default useBuilds;
  * @param {string} type - public/private/unlisted
  */
 export const useFetchBuildsById = (buildIds, fetchUid, type) => {
+	const { sortBy } = useFiltersContext();
 	const { dispatchBuilds } = useBuildsContext();
 	const { fetchBuildsById } = useBuilds();
+	const { fetchAmount } = useBuildsContext();
+	const { openedFolder } = useFoldersContext();
 
 	useEffect(() => {
-		clearFetchedBuilds(dispatchBuilds);
 		if (!buildIds) return;
 
 		if (buildIds.length > 0) {
-			fetchBuildsById(buildIds, fetchUid, type);
+			if (!openedFolder) {
+				fetchBuildsById(buildIds, fetchUid, type);
+			}
 		} else {
 			setBuildsLoading(dispatchBuilds, false);
 		}
-	}, [dispatchBuilds, buildIds]);
+	}, [sortBy, fetchAmount]);
 };
 
 /**
@@ -296,12 +310,14 @@ export const useCreateFirestoreQuery = () => {
 export const useFetchOpenFolderBuilds = () => {
 	const { openedFolder } = useFoldersContext();
 	const { fetchBuildsById } = useBuilds();
+	const { sortBy } = useFiltersContext();
+	const { fetchAmount } = useBuildsContext();
 
 	useEffect(() => {
 		if (openedFolder) {
 			fetchBuildsById(openedFolder.builds, null, 'public');
 		}
-	}, [openedFolder]);
+	}, [openedFolder, sortBy, fetchAmount]);
 };
 
 /**

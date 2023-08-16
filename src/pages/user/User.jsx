@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
 import { useAuthContext } from '../../context/auth/AuthContext';
 import { useGetAndSetOpenUserProfile } from '../../context/auth/AuthActions';
-import { useGetFilteredBuilds } from '../../context/builds/BuildsActions';
+import useBuilds, { setFetchedBuilds, useGetFilteredBuilds } from '../../context/builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
 import Spinner2 from '../../components/spinners/Spinner2';
 import { useCheckOpenProfileFolderAndFetchBuilds, useResetOpenFolder, useSetBuildToAddToFolder, useSetFolderLocation, useSetOpenUsersFolders } from '../../context/folders/FoldersActions';
@@ -27,6 +27,7 @@ import UserBio from './Components/UserBio';
 import UserDetails from './Components/UserDetails';
 import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
 import { useFoldersContext } from '../../context/folders/FoldersContext';
+import { useBuildsContext } from '../../context/builds/BuildsContext';
 
 /**
  * The page to display a user
@@ -39,6 +40,11 @@ function User() {
 	const [sortedBuilds] = useGetFilteredBuilds([]);
 	const { openProfile, fetchingProfile, user, authLoading, isAuthenticated } = useAuthContext();
 	const { openedFolder } = useFoldersContext();
+	const { dispatchBuilds } = useBuildsContext();
+
+	useEffect(() => {
+		setFetchedBuilds(dispatchBuilds, []);
+	}, []);
 
 	useGetAndSetOpenUserProfile(usersId);
 	useCheckOpenProfileFolderAndFetchBuilds(usersId);

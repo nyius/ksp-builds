@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
 import { useAuthContext } from '../../context/auth/AuthContext';
-import { useGetFilteredBuilds, useFetchBuildsById } from '../../context/builds/BuildsActions';
+import { useFetchBuildsById } from '../../context/builds/BuildsActions';
 import { useResetFilters } from '../../context/filters/FiltersActions';
 import { useSetBuildToAddToFolder, useSetFolderLocation, useSetSelectedFolders } from '../../context/folders/FoldersActions';
 import { useFoldersContext } from '../../context/folders/FoldersContext';
@@ -18,6 +18,7 @@ import Helmet from '../../components/Helmet/Helmet';
 import ProfilePicture from './Components/ProfilePicture';
 import ProfileInfo from './Components/ProfileInfo';
 import ProfileDetails from './Components/ProfileDetails';
+import FetchAmount from '../../components/fetchAmount/FetchAmount';
 import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
 
 /**
@@ -27,7 +28,6 @@ import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
 function Profile() {
 	const { openedFolder } = useFoldersContext();
 	const { user, authLoading, isAuthenticated } = useAuthContext();
-	const [sortedBuilds] = useGetFilteredBuilds([]);
 	const navigate = useNavigate();
 
 	useResetFilters();
@@ -73,10 +73,11 @@ function Profile() {
 					<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">{openedFolder ? openedFolder?.folderName : 'Your Builds'}</h2>
 					<div className="flex flex-row gap-3 2k:gap-5">
 						<Sort />
+						<FetchAmount />
 						<BuildsViewBtn />
 					</div>
 				</div>
-				<Builds buildsToDisplay={sortedBuilds} />
+				<Builds />
 			</MiddleContainer>
 		</>
 	);

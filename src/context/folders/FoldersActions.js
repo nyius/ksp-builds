@@ -437,7 +437,7 @@ export const useSetCurrentFolderOwner = () => {
 	useEffect(() => {
 		if (folderLocation === 'user') {
 			setCurrentFolderOwner(dispatchFolders, currentUser);
-		} else if (folderLocation === 'profile') {
+		} else if (folderLocation === 'profile' || folderLocation === 'popup') {
 			setCurrentFolderOwner(dispatchFolders, user?.username);
 		}
 	}, [folderLocation, dispatchFolders, currentUser, user]);

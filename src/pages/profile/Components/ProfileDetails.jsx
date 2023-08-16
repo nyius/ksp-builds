@@ -21,7 +21,7 @@ function ProfileDetails() {
 					<p className="text-xl 2k:text-3xl text-accent">{createDateFromFirebaseTimestamp(user?.dateCreated?.seconds)}</p>
 				</BuildInfoCard>
 				<BuildInfoCard title="Total Builds">
-					<p className="text-xl 2k:text-3xl text-accent">{fetchedBuilds.length}</p>
+					<p className="text-xl 2k:text-3xl text-accent">{fetchedBuilds?.length}</p>
 				</BuildInfoCard>
 				<BuildInfoCard title="Rocket Reputation">
 					<p className="text-xl 2k:text-3xl text-accent">{user.rocketReputation}</p>

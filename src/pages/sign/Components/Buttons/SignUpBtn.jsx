@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '../../../../components/buttons/Button';
 import { toast } from 'react-toastify';
 import useAuth from '../../../../context/auth/AuthActions';
-import { checkMatchingEmails } from '../../../../context/auth/AuthUtils';
+import { checkMatchingEmails, validateEmail } from '../../../../context/auth/AuthUtils';
 import errorReport from '../../../../utilities/errorReport';
 
 /**
@@ -15,6 +15,12 @@ function SignUpBtn({ newUser, setAccountExists }) {
 	const { newEmailAccount } = useAuth();
 
 	const signUp = async () => {
+		if (!validateEmail(newUser.email)) {
+			errorReport(`Not a valid email address!`, false, 'signUp');
+			toast.error('Not a valid email address!');
+			return;
+		}
+
 		if (!newUser.email) {
 			errorReport('No email', false, 'signUp');
 			toast.error('You forgot an email!');

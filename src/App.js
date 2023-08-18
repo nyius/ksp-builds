@@ -48,7 +48,6 @@ const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 
 /*TODO
 useEffect cleanup functions (lesson 154)
-go through all component props and set defaults if possible (like color = "#fff", size="24", etc)
 creating an account needs to have matching passwords. Also be much stricter on emails (needs @, etc)
 Change allowed folders to max like 5, then have users that support get access to unlimited folders (even level 1 support)
 Should be able to login with username/password

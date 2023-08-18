@@ -220,3 +220,15 @@ export const checkMatchingEmails = (email1, email2) => {
 		}
 	}
 };
+
+/**
+ * Handles validating if real email or not
+ * @param {string} email - the users email
+ * @returns
+ */
+export const validateEmail = email => {
+	if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+		return true;
+	}
+	return false;
+};

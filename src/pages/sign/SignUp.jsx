@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useResetStates from '../../hooks/useResetStates';
 //---------------------------------------------------------------------------------------------------//
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
@@ -10,7 +10,7 @@ import SignUpBtn from './Components/Buttons/SignUpBtn';
 import LoginBtn from './Components/Buttons/LoginBtn';
 import ResetPasswordBtn from './Components/Buttons/ResetPasswordBtn';
 import GoogleLoginBtn from './Components/Buttons/GoogleLoginBtn';
-import { checkMatchingEmails } from '../../context/auth/AuthUtils';
+import { checkMatchingEmails, validateEmail } from '../../context/auth/AuthUtils';
 
 /**
  * Sign up page
@@ -21,8 +21,11 @@ function SignUp() {
 		email: '',
 		emailVerify: '',
 		password: '',
+		passwordVerify: '',
 	});
 	const [accountExists, setAccountExists] = useState(false);
+	const [emailError, setEmailError] = useState(null);
+	const [passwordError, setPasswordError] = useState(null);
 
 	useResetStates();
 
@@ -39,6 +42,27 @@ function SignUp() {
 		});
 	};
 
+	useEffect(() => {
+		if (newUser.email !== newUser.emailVerify) {
+			setEmailError(`Email doesn't match!`);
+		} else {
+			if (newUser.email !== '' && !validateEmail(newUser.email)) {
+				setEmailError(`Not a valid email address!`);
+			} else {
+				setEmailError(null);
+			}
+		}
+		if (newUser.password !== '' && newUser.password.length < 6) {
+			setPasswordError('Password needs to be longer than 6 characters!');
+		} else {
+			if (newUser.password !== newUser.passwordVerify) {
+				setPasswordError('Passwords need to match!');
+			} else {
+				setPasswordError(null);
+			}
+		}
+	}, [newUser]);
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
@@ -54,20 +78,14 @@ function SignUp() {
 							<TextInput onChange={handleFieldChange} type="email" id="email" placeholder="Enter email" required={true} color="text-white" margin="mb-2" />
 
 							<TextInput onChange={handleFieldChange} type="email" id="emailVerify" placeholder="Re-enter email" required={true} color="text-white" margin="mb-2" />
-							{newUser.email && newUser.emailVerify ? (
-								<>
-									{checkMatchingEmails(newUser.email, newUser.emailVerify) ? (
-										<p className="text-xl 2k:text-2xl italic text-emerald-500">Emails match!</p>
-									) : (
-										<p className="text-xl 2k:text-2xl italic text-red-500">Emails must match</p>
-									)}
-								</>
-							) : null}
+							{newUser.email && newUser.emailVerify && !emailError ? <>{checkMatchingEmails(newUser.email, newUser.emailVerify) ? <p className="text-xl 2k:text-2xl italic text-emerald-500">Emails match!</p> : null}</> : null}
+							{emailError ? <p className="text-xl 2k:text-2xl italic text-red-500">{emailError}</p> : null}
 
 							{/* Password */}
 							<p className="text-xl 2k:text-3xl text-slate-200 mt-6 2k:mt-10">Password</p>
 							<TextInput onChange={handleFieldChange} type="password" id="password" placeholder="Enter password" required={true} color="text-white" margin="mb-2" />
-							{newUser.password && newUser.password.length < 6 ? <p className="text-xl 2k:text-2xl italic text-red-500">Password must be more than 6 characters</p> : null}
+							<TextInput onChange={handleFieldChange} type="password" id="passwordVerify" placeholder="Confirm password" required={true} color="text-white" margin="mb-2" />
+							{passwordError ? <p className="text-xl 2k:text-2xl italic text-red-500">{passwordError}</p> : null}
 
 							{accountExists ? (
 								<div className="flex flex-col flex-wrap items-center gap-3 mt-4 2k:mt-8">

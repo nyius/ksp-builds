@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/auth/AuthContext';
 import { useFetchBuildsById } from '../../context/builds/BuildsActions';
 import { useResetFilters } from '../../context/filters/FiltersActions';
-import { useSetBuildToAddToFolder, useSetFolderLocation, useSetSelectedFolders } from '../../context/folders/FoldersActions';
+import { useCheckOpenProfileFolderAndFetchBuilds, useSetBuildToAddToFolder, useSetFolderLocation, useSetSelectedFolders } from '../../context/folders/FoldersActions';
 import { useFoldersContext } from '../../context/folders/FoldersContext';
 //---------------------------------------------------------------------------------------------------//
 import useResetStates from '../../hooks/useResetStates';
@@ -34,6 +34,7 @@ function Profile() {
 	useResetStates();
 
 	useFetchBuildsById(user?.builds);
+	useCheckOpenProfileFolderAndFetchBuilds(user.uid);
 	useSetBuildToAddToFolder(null);
 	useSetSelectedFolders(null);
 	useSetFolderLocation('profile');

@@ -131,43 +131,82 @@ export const useAddBuildToFolder = () => {
 	/**
 	 * handles adding a build to a folder/folders
 	 * @param {string} buildId - buildId of build to add
+	 * @param {string} folderId - (optional) the id of the folder to add the build to. (if no folderId supplied, it will add the build to all folders currently selected)
 	 */
-	const addBuildToFolder = async buildId => {
+	const addBuildToFolder = async (buildId, folderId) => {
 		try {
 			let newFolders = cloneDeep(selectedFolders);
 			let usersFolders = cloneDeep(user.folders);
+			setSavingToFolder(dispatchFolders, folderId ? folderId : true);
+			setTimeout(() => {
+				setSavingToFolder(dispatchFolders, false);
+			}, 1500);
 
-			// Loop over the users existing folders
-			usersFolders.map(folder => {
-				// check if a folder contains the build we want to save
-				if (folder.builds.includes(buildId)) {
-					// If this existing folder contains our build, see if we have this folder selected
-					// If this folder was not selected but contains the build, it means the user wants to remove the build from this folder
-					const folderIndex = newFolders.findIndex(newFolder => newFolder.id !== 'your-builds' && newFolder.id === folder.id);
+			if (folderId) {
+				// Loop over the users existing folders
+				usersFolders.map(folder => {
+					// check if a folder contains the build we want to save
+					if (folder.builds.includes(buildId)) {
+						// See if this folder is the folder we want to save to.
+						// if it is, that means that the user wants to remove the build from that folder
+						if (folder.id === folderId) {
+							const buildIndex = folder.builds.indexOf(buildId);
+							folder.builds.splice(buildIndex, 1);
+							toast.success('Build Removed.');
 
-					if (folderIndex < 0) {
-						const buildIndex = folder.builds.indexOf(buildId);
-						folder.builds.splice(buildIndex, 1);
+							// Check if the build has the folder pinned. If it does, remove the pin from the folder
+							if (loadedBuild) {
+								if (loadedBuild.pinnedFolder === folder.id) {
+									const buildToUpdate = cloneDeep(loadedBuild);
+									buildToUpdate.pinnedFolder = null;
 
-						// Check if the build has the folder pinned. If it does, remove the pin from the folder
-						if (loadedBuild) {
-							if (loadedBuild.pinnedFolder === folder.id) {
-								const buildToUpdate = cloneDeep(loadedBuild);
-								buildToUpdate.pinnedFolder = null;
-
-								updateBuild(buildToUpdate);
+									updateBuild(buildToUpdate);
+								}
 							}
 						}
+					} else {
+						// if the folder doesnt include the builds id, check if we have this folder selected.
+						// If we do have this folder selected, add the build to it
+						if (folder.id === folderId) {
+							folder.builds.push(buildId);
+							toast.success('Build Saved!');
+						}
 					}
-				} else {
-					// if the folder doesnt include the builds id, check if we have this folder selected.
-					// If we do have this folder selected, add the build to it
-					const folderIndex = newFolders.findIndex(newFolder => newFolder.id !== 'your-builds' && newFolder.id === folder.id);
-					if (folderIndex >= 0) {
-						folder.builds.push(buildId);
+				});
+			} else {
+				// Loop over the users existing folders
+				usersFolders.map(folder => {
+					// check if a folder contains the build we want to save
+					if (folder.builds.includes(buildId)) {
+						// If this existing folder contains our build, see if we have this folder selected
+						// If this folder was not selected but contains the build, it means the user wants to remove the build from this folder
+						const folderIndex = newFolders.findIndex(newFolder => newFolder.id !== 'your-builds' && newFolder.id === folder.id);
+
+						if (folderIndex < 0) {
+							const buildIndex = folder.builds.indexOf(buildId);
+							folder.builds.splice(buildIndex, 1);
+
+							// Check if the build has the folder pinned. If it does, remove the pin from the folder
+							if (loadedBuild) {
+								if (loadedBuild.pinnedFolder === folder.id) {
+									const buildToUpdate = cloneDeep(loadedBuild);
+									buildToUpdate.pinnedFolder = null;
+
+									updateBuild(buildToUpdate);
+								}
+							}
+						}
+					} else {
+						// if the folder doesnt include the builds id, check if we have this folder selected.
+						// If we do have this folder selected, add the build to it
+						const folderIndex = newFolders.findIndex(newFolder => newFolder.id !== 'your-builds' && newFolder.id === folder.id);
+						if (folderIndex >= 0) {
+							folder.builds.push(buildId);
+						}
 					}
-				}
-			});
+				});
+				toast.success('Folders Saved!');
+			}
 
 			await updateAllFolders(usersFolders);
 			setSelectedFolder(dispatchFolders, null);
@@ -192,6 +231,7 @@ export const useHandleFolderInteraction = () => {
 	const { dispatchFolders, makingNewFolder, editingFolder, lastClickTime, selectedFolders, editingFolderName, longClickStart, lastSelectedFolderId, openedFolder } = useFoldersContext();
 	const { updateFolder } = useUpdateFolder();
 	const { handleAddNewFolder } = useAddNewFolder();
+	const { user } = useAuthContext();
 	const navigate = useNavigate();
 	const location = useLocation();
 
@@ -215,6 +255,12 @@ export const useHandleFolderInteraction = () => {
 					const currentUserId = location.pathname.split('/')[2];
 
 					navigate(`/user/${currentUserId}/folder/${folder.urlName}`);
+				} else {
+					if (folder.id === 'your-builds') {
+						navigate(`/profile`);
+					} else {
+						navigate(`/profile/folder/${folder.urlName}`);
+					}
 				}
 			} else {
 				setLastClickTime(dispatchFolders, currentTime);
@@ -413,8 +459,6 @@ export const useUpdateFolder = () => {
 			await updateDoc(doc(db, 'users', user.uid), { folders: newFolders });
 			await updateDoc(doc(db, 'userProfiles', user.uid), { folders: newFolders });
 			setLocalStoredUser(user.uid, updatedUser);
-
-			toast.success('Folders Saved!');
 		} catch (error) {
 			errorReport(error.message, true, 'updateAllFolders');
 			toast.error('Something went wrong, please try again');
@@ -697,11 +741,12 @@ export const useCheckOpenProfileFolderAndFetchBuilds = usersId => {
 	const folderId = useParams().folderId;
 	const navigate = useNavigate();
 	const { fetchBuildsById } = useBuilds();
+	const { user } = useAuthContext();
 
 	// Fetches the users builds once we get their profile
 	useEffect(() => {
 		// Check if we found the users profile
-		if (openProfile && openProfile.username) {
+		if (openProfile && openProfile.username && usersId) {
 			if (folderId) {
 				const folderToFetchId = openProfile.folders?.filter(folder => folder.id === folderId);
 
@@ -719,6 +764,25 @@ export const useCheckOpenProfileFolderAndFetchBuilds = usersId => {
 				}
 			} else {
 				fetchBuildsById(openProfile.builds, openProfile.uid, 'user');
+			}
+		} else {
+			if (folderId) {
+				const folderToFetchId = user.folders?.filter(folder => folder.id === folderId);
+
+				if (folderToFetchId.length > 0) {
+					setOpenedFolder(dispatchFolders, folderToFetchId[0]);
+				} else {
+					const folderToFetchName = user.folders?.filter(folder => folder.urlName === folderId);
+
+					if (folderToFetchName.length > 0) {
+						setOpenedFolder(dispatchFolders, folderToFetchName[0]);
+					} else {
+						navigate(`/profile`);
+						fetchBuildsById(user.builds, user.uid, 'user');
+					}
+				}
+			} else {
+				fetchBuildsById(user.builds, user.uid, 'user');
 			}
 		}
 	}, [openProfile]);
@@ -992,5 +1056,17 @@ export const setCurrentFolderOwner = (dispatchFolders, user) => {
 	dispatchFolders({
 		type: 'SET_FOLDERS',
 		payload: { currentFolderOwner: user },
+	});
+};
+
+/**
+ * Handles setting if we are currently saving something to a folder or not
+ * @param {function} dispatchFolders - dispatch function
+ * @param {bool} savingToFolder
+ */
+export const setSavingToFolder = (dispatchFolders, savingToFolder) => {
+	dispatchFolders({
+		type: 'SET_FOLDERS',
+		payload: { savingToFolder: savingToFolder },
 	});
 };

@@ -16,6 +16,7 @@ function BuildsViewBtn() {
 			<Button
 				tooltip="Change to Grid View"
 				color={`bg-base-900 ${buildsView === 'grid' ? 'text-white' : ''}`}
+				css="hover:text-slate-100"
 				icon="grid"
 				onClick={() => {
 					setBuildsView(dispatchBuilds, 'grid');
@@ -28,6 +29,7 @@ function BuildsViewBtn() {
 			<Button
 				tooltip="Change to List View"
 				color={`bg-base-900 ${buildsView === 'list' ? 'text-white' : ''}`}
+				css="hover:text-slate-100"
 				icon="list"
 				onClick={() => {
 					setBuildsView(dispatchBuilds, 'list');

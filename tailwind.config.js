@@ -84,6 +84,20 @@ module.exports = {
 				'1/2': '50%',
 				'1/4': '25%',
 			},
+			dropShadow: {
+				green: '0 0px 10px rgba(54, 211, 153, 0.6)',
+			},
+			animation: {
+				saved: 'saved 1s ease-in 1',
+			},
+			keyframes: {
+				saved: {
+					'0%': { transform: 'translateY(0rem)', opacity: '100%', scale: '15%' },
+					'25%': { scale: '100%' },
+					'50%': { opacity: '100%' },
+					'100%': { transform: 'translateY(-7rem)', opacity: '0%' },
+				},
+			},
 		},
 	},
 	plugins: [require('daisyui')],

@@ -22,6 +22,7 @@ export const BuildProvider = ({ children }) => {
 		resetTextEditor: '',
 		buildOfTheWeek: null,
 		buildToUpload: null,
+		dragBuild: null,
 	};
 
 	const [state, dispatchBuild] = useReducer(BuildReducer, initialState);

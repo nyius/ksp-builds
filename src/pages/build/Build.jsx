@@ -115,7 +115,7 @@ function Build() {
 					<BuildDescription />
 
 					<div className="flex flex-col md:flex-row place-content-between">
-						<div className="flex flex-col sm:flex-row flex-wrap items-center gap-4 mb-10 w-full">
+						<div className="flex flex-row flex-wrap items-center gap-4 mb-10 w-full">
 							<ExportBuildBtn id={loadedBuild.id} />
 							<HowToImportBtn />
 							<SaveBuildToFolderBtn />

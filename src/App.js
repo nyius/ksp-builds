@@ -25,6 +25,7 @@ import './App.css';
 import 'react-popper-tooltip/dist/styles.css';
 import GridLayout from './components/containers/GridLayout';
 import CenterContainer from './components/containers/CenterContainer';
+import FolderBar from './components/containers/folderBar/FolderBar';
 
 const SignUp = lazy(() => import('./pages/sign/SignUp'));
 const Build = lazy(() => import('./pages/build/Build'));
@@ -49,10 +50,7 @@ const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 useEffect cleanup functions (lesson 154)
 go through all component props and set defaults if possible (like color = "#fff", size="24", etc)
 creating an account needs to have matching passwords. Also be much stricter on emails (needs @, etc)
-use useMemo to improve performance
 Change allowed folders to max like 5, then have users that support get access to unlimited folders (even level 1 support)
-drag and drop your own builds into a folder? 
-	When on home page allow drag and drop of a build. Sidebar appears with folders in it
 Should be able to login with username/password
 	-automatically generate an email auth with the new username (eg steve@kspbuilds.com)
 		-when the user signs in with username, stick @kspbuilds.com to the end and then attempt the email login
@@ -151,6 +149,15 @@ function App() {
 										/>
 										<Route
 											exact
+											path="/profile/folder/:folderId"
+											element={
+												<PrivateRoute>
+													<Profile />
+												</PrivateRoute>
+											}
+										/>
+										<Route
+											exact
 											path="/favorites"
 											element={
 												<PrivateRoute>
@@ -172,6 +179,7 @@ function App() {
 								</Suspense>
 							</CenterContainer>
 
+							<FolderBar />
 							<RightBar />
 						</GridLayout>
 					</FullContainer>

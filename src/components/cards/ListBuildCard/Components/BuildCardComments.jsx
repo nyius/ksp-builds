@@ -8,7 +8,7 @@ import { BiComment } from 'react-icons/bi';
  */
 function BuildCardComments({ commentCount }) {
 	return (
-		<div className="flex flex-row items-center gap-2 text-xl 2k:text-2xl text-slate-400 font-bold">
+		<div className="flex flex-row items-center gap-2 text-xl 2k:text-2xl text-slate-400">
 			<BiComment /> {commentCount} comments
 		</div>
 	);

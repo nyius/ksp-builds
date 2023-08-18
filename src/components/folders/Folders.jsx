@@ -10,7 +10,6 @@ import { useSetCurrentFolderOwner } from '../../context/folders/FoldersActions';
 
 /**
  * handles displaying a users folders
- * @param {bool} hideOwnFolder - if we want to hide the users own folder
  * @returns
  */
 function Folders() {
@@ -22,7 +21,7 @@ function Folders() {
 			<div className="flex flex-row place-content-between">
 				<FolderNavbar />
 
-				<div className="flex flex-row text-3xl 2k:text-4xl">
+				<div className={`flex flex-row text-3xl 2k:text-4xl`}>
 					<RenameFolderBtn />
 					<DeleteFolderBtn />
 					<FolderViewBtn />

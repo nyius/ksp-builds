@@ -46,7 +46,7 @@ function Conversations() {
 				return (
 					<Fragment key={i}>
 						{message?.messages?.length > 0 && (
-							<div key={i} className="flex flex-row gap-2 2k:gap-4 items-center rounded-xl py-2 2k:py-4 hover:bg-primary cursor-pointer relative" onClick={e => handleOpenConvo(message, e)}>
+							<div key={i} className="flex flex-row gap-4 2k:gap-6 items-center rounded-xl py-2 2k:py-4 hover:bg-primary cursor-pointer relative" onClick={e => handleOpenConvo(message, e)}>
 								<ConvosAvatar profilePicture={message.userProfilePic} />
 								<div className="flex flex-col w-full">
 									<div className="flex flex-row w-full place-content-between pr-9">

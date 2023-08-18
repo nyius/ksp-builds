@@ -27,6 +27,7 @@ export const FoldersProvider = ({ children }) => {
 		usersFolders: null,
 		collapsedFolders: false,
 		currentFolderOwner: null,
+		savingToFolder: false,
 	};
 
 	useEffect(() => {

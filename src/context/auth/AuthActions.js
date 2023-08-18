@@ -390,12 +390,24 @@ export const useUpdateProfile = () => {
 	const updateUserDb = async (update, userUid) => {
 		try {
 			if (!userUid) {
-				updateUserState(dispatchAuth, { ...update });
-				setLocalStoredUser(user.uid, user);
+				if (update.rocketReputation?.wa) {
+					update.rocketReputation = user.rocketReputation += update.rocketReputation.wa;
+					updateUserState(dispatchAuth, { ...update });
+					setLocalStoredUser(user.uid, user);
+				} else {
+					updateUserState(dispatchAuth, { ...update });
+					setLocalStoredUser(user.uid, user);
+				}
 			}
 			if (userUid && userUid === user.uid) {
-				updateUserState(dispatchAuth, { ...update });
-				setLocalStoredUser(user.uid, user);
+				if (update.rocketReputation?.wa) {
+					update.rocketReputation = user.rocketReputation += update.rocketReputation.wa;
+					updateUserState(dispatchAuth, { ...update });
+					setLocalStoredUser(user.uid, user);
+				} else {
+					updateUserState(dispatchAuth, { ...update });
+					setLocalStoredUser(user.uid, user);
+				}
 			}
 			await updateDoc(doc(db, 'users', userUid ? userUid : user.uid), update);
 		} catch (error) {

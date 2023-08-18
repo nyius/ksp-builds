@@ -10,6 +10,13 @@ import BuildCardName from './Components/BuildCardName';
 import BuildCardImage from './Components/BuildCardImage';
 import BuildCardExportBtn from './Buttons/BuildCardExportBtn';
 import BuildCardVoting from './Components/BuildCardVoting';
+import { setDragBuild } from '../../../context/build/BuildActions';
+import { useBuildContext } from '../../../context/build/BuildContext';
+import { setBuildToAddToFolder } from '../../../context/folders/FoldersActions';
+import { useFoldersContext } from '../../../context/folders/FoldersContext';
+import { useAuthContext } from '../../../context/auth/AuthContext';
+import DragImg from '../../../assets/build_drag_grid_img.png';
+import BuildCardSaved from './Components/BuildCardSaved';
 
 /**
  * Displays a build card in list form
@@ -18,23 +25,52 @@ import BuildCardVoting from './Components/BuildCardVoting';
  */
 function ListBuildCard({ build }) {
 	const [hover, setHover] = useState(false);
+	const { dispatchBuild } = useBuildContext();
+	const { dispatchFolders } = useFoldersContext();
+	const { user } = useAuthContext();
+
+	const drag = e => {
+		setDragBuild(dispatchBuild, build.id);
+		setBuildToAddToFolder(dispatchFolders, build.id, user);
+		e.dataTransfer.setData('text', build.id);
+		const img = new Image();
+		img.src = DragImg;
+		e.dataTransfer.setDragImage(img, 150, 150);
+	};
+
+	/**
+	 * Handles dropping a build (not onto a folder)
+	 * @param {*} e
+	 */
+	const drop = e => {
+		setBuildToAddToFolder(dispatchFolders, null, user);
+		setDragBuild(dispatchBuild, null);
+	};
 
 	return (
-		<a href={`/build/${build.urlName}`} className="flex flex-row gap-4 2k:gap-6 w-full bg-base-300 cursor-pointer h-80 lg:h-44 rounded-lg p-4 hover:shadow-lg relative" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+		<a
+			id={build.id}
+			href={`/build/${build.urlName}`}
+			className="flex flex-row gap-4 2k:gap-6 w-full bg-base-300 cursor-pointer h-80 lg:h-44 rounded-lg p-4 hover:shadow-lg relative"
+			onMouseEnter={() => setHover(true)}
+			onMouseLeave={() => setHover(false)}
+			draggable={true}
+			onDragStart={drag}
+			onDragEnd={drop}
+		>
 			<BuildCardVoting build={build} />
 			<BuildCardImage build={build} />
 			<div className="flex flex-col gap-3 2k:gap-4 w-full h-full">
 				<BuildCardName name={build.name} />
-
 				<div className="flex flex-row flex-wrap gap-4 2k:gap-6">
 					<BuildCardUploadDate build={build} />
 					<BuildCardTypes types={build.types} />
 				</div>
-
 				<div className="flex flex-row gap-4 2k:gap-6 flex-wrap">
 					<BuildCardViews views={build.views} />
 					<BuildCardComments commentCount={build.commentCount} />
 					<BuildCardDownloads downloads={build.downloads} />
+					<BuildCardSaved id={build.id} />
 					<Favorite id={build.id} text="favorite" />
 					<BuildCardReportBtn build={build} />
 				</div>

@@ -905,7 +905,7 @@ export const setBuildOfTheWeek = (dispatchBuild, build) => {
  */
 export const setResetTextEditorState = (dispatchBuild, bool) => {
 	dispatchBuild({
-		type: 'ESET_TEXT_EDITOR',
+		type: 'RESET_TEXT_EDITOR',
 		payload: bool,
 	});
 };
@@ -1032,5 +1032,16 @@ export const resetUploadBuild = dispatchBuild => {
 	dispatchBuild({
 		type: 'SET_BUILD',
 		payload: { buildToUpload: null },
+	});
+};
+
+/**
+ * handles storing the id of the current build being dragged
+ * @param {function} dispatchBuild - The dispatch function
+ */
+export const setDragBuild = (dispatchBuild, buildID) => {
+	dispatchBuild({
+		type: 'SET_BUILD',
+		payload: { dragBuild: buildID },
 	});
 };

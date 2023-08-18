@@ -120,14 +120,14 @@ function UploadBuildImages() {
 	if (buildToUpload) {
 		return (
 			<>
-				{/* Image Carousel */}
+				{/* No images */}
 				{buildToUpload.images.length === 0 ? (
 					<div className="flex items-center justify-center w-36 h-36 rounded-xl bg-base-300 border-dashed border-2 border-slate-400">
 						<p className="text-4xl">{<FiCameraOff />}</p>
 					</div>
 				) : null}
 
-				{/* Image Carousel */}
+				{/* Images */}
 				<div className="flex flex-row flex-wrap gap-2 2k:gap-4 mb-5 2k:mb-10">
 					{buildToUpload.images.length > 0
 						? buildToUpload.images.map((image, i) => {

@@ -8,7 +8,7 @@ import { FiDownload } from 'react-icons/fi';
  */
 function BuildCardDownloads({ downloads }) {
 	return (
-		<div className="flex flex-row items-center gap-2 text-xl 2k:text-2xl text-slate-400 font-bold">
+		<div className="flex flex-row items-center gap-2 text-xl 2k:text-2xl text-slate-400">
 			<FiDownload /> {downloads} {downloads === 1 ? 'download' : 'downloads'}
 		</div>
 	);

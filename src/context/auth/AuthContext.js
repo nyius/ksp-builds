@@ -148,6 +148,7 @@ export const AuthProvider = ({ children }) => {
 		newSub: false,
 		convosOpen: false,
 		convosLoading: true,
+		subscribeModal: false,
 	};
 
 	// Set up the reducer

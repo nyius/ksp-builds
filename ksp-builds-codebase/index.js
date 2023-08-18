@@ -530,7 +530,7 @@ exports.handleStripePayments = functions.https.onRequest(async (req, res) => {
 			try {
 				event = stripe.webhooks.constructEvent(req.rawBody, signature, endpointSecret);
 			} catch (err) {
-				console.log(`⚠️  Webhook signature verification failed.`, err.message);
+				functions.logger.log(`⚠️  Webhook signature verification failed. ${err.message}`);
 				return res.sendStatus(400);
 			}
 		}
@@ -538,11 +538,14 @@ exports.handleStripePayments = functions.https.onRequest(async (req, res) => {
 		// Handle the event
 		switch (event.type) {
 			case 'payment_intent.succeeded':
+				functions.logger.log(`Payment Intent Succeeded`);
 				const paymentIntent = event.data.object;
 				break;
 			case 'checkout.session.async_payment_succeeded':
+				functions.logger.log(`Async payment succeeded`);
 				const checkoutSessionAsyncPaymentSucceeded = event.data.object;
 			case 'customer.subscription.created':
+				functions.logger.log(`Subscription created`);
 				const subscriptionObj = event.data.object;
 				break;
 			case 'checkout.session.completed':
@@ -624,7 +627,7 @@ exports.handleStripePayments = functions.https.onRequest(async (req, res) => {
 				break;
 			default:
 				// Unexpected event type
-				console.log(`Unhandled event type ${event.type}.`);
+				functions.logger.log(`Unhandled event type ${event.type}.`);
 		}
 
 		// Return a 200 res to acknowledge receipt of the event

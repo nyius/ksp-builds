@@ -48,8 +48,6 @@ const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 
 /*TODO
 useEffect cleanup functions (lesson 154)
-creating an account needs to have matching passwords. Also be much stricter on emails (needs @, etc)
-Change allowed folders to max like 5, then have users that support get access to unlimited folders (even level 1 support)
 Should be able to login with username/password
 	-automatically generate an email auth with the new username (eg steve@kspbuilds.com)
 		-when the user signs in with username, stick @kspbuilds.com to the end and then attempt the email login

@@ -12,6 +12,7 @@ import SubscribeModal from './SubscribeModal';
 import AddBuildToFolderModal from './AddBuildToFolderModal';
 import DeleteFolderModal from './DeleteFolderModal';
 import WhatIsFolderModal from './WhatIsFolderModal';
+import FolderLimitModal from './FolderLimitModal';
 
 /**
  * Stores (mostly) all modals
@@ -33,6 +34,7 @@ function Modals() {
 			<SubscribeModal />
 			<AddBuildToFolderModal />
 			<WhatIsFolderModal />
+			<FolderLimitModal />
 		</>
 	);
 }

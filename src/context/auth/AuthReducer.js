@@ -272,7 +272,6 @@ const AuthReducer = (state, action) => {
 					conversations: conversationsCloneNew,
 				};
 			}
-
 		default:
 			return state;
 	}

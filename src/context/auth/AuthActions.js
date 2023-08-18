@@ -1235,16 +1235,38 @@ export const useReturnUsernameCustomColor = initialState => {
 	return [usernameColor, setUsernameColor];
 };
 
-/**
- *
- * @param {*} profile
- */
-export const useSetOpenProfile = profile => {
-	const { dispatchAuth } = useAuthContext();
+export const useCheckMinSubscriptionTier = () => {
+	const { user, isAuthenticated } = useAuthContext();
 
-	useEffect(() => {
-		setOpenProfile(dispatchAuth, profile);
-	}, [profile]);
+	/**
+	 * Checks if the current subscription tier of a user meets the minimum tier required
+	 * @param {int} minTier - the minimum tier the user needs to be
+	 */
+	const checkMinSubscriptionTier = minTier => {
+		if (isAuthenticated) {
+			if (minTier === 1) {
+				if (user.subscribed === 'tier1' || user.subscribed === 'tier2' || user.subscribed === 'tier3') {
+					return true;
+				} else {
+					return false;
+				}
+			} else if (minTier === 2) {
+				if (user.subscribed === 'tier2' || user.subscribed === 'tier3') {
+					return true;
+				} else {
+					return false;
+				}
+			} else if (minTier === 3) {
+				if (user.subscribed === 'tier3') {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}
+	};
+
+	return { checkMinSubscriptionTier };
 };
 
 // State Updaters ---------------------------------------------------------------------------------------------------//
@@ -1522,6 +1544,20 @@ export const setAuthenticated = (dispatchAuth, authenticated) => {
 		type: 'SET_AUTH',
 		payload: {
 			isAuthenticated: authenticated,
+		},
+	});
+};
+
+/**
+ * handles setting if the subscribe modal is open or closed
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {bool} value - true or false if the user is authenticated
+ */
+export const setSubscribeModal = (dispatchAuth, value) => {
+	dispatchAuth({
+		type: 'SET_AUTH',
+		payload: {
+			subscribeModal: value,
 		},
 	});
 };

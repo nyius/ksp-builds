@@ -1082,3 +1082,15 @@ export const setSavingToFolder = (dispatchFolders, savingToFolder) => {
 		payload: { savingToFolder: savingToFolder },
 	});
 };
+
+/**
+ * Handles setting if we are displaying the folder limit modal or not
+ * @param {function} dispatchFolders - dispatch function
+ * @param {bool} value - true or false
+ */
+export const setFolderLimitModal = (dispatchFolders, value) => {
+	dispatchFolders({
+		type: 'SET_FOLDERS',
+		payload: { folderLimitModal: value },
+	});
+};

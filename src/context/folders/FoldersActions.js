@@ -530,17 +530,18 @@ export const useHideOwnFolder = initialState => {
 
 /**
  * Handles returning a users personal builds folder
- * @param {*} initialState
+ * @param {obj} initialState
+ * @param {bool} sidebar - if the folder is on the sidebar
  * @returns [personalBuildsFolder, setPersonalBuildsFolder]
  */
-export const useSetPersonalBuildsFolder = initialState => {
+export const useSetPersonalBuildsFolder = (initialState, sidebar) => {
 	const [personalBuildsFolder, setPersonalBuildsFolder] = useState(initialState);
 	const { folderLocation } = useFoldersContext();
 	const { user, authLoading, isAuthenticated, openProfile, fetchingProfile } = useAuthContext();
 
 	useEffect(() => {
-		if (folderLocation !== 'user') {
-			if (!authLoading && isAuthenticated) {
+		if (sidebar) {
+			if (isAuthenticated) {
 				setPersonalBuildsFolder(prevState => {
 					return {
 						...prevState,
@@ -548,17 +549,28 @@ export const useSetPersonalBuildsFolder = initialState => {
 					};
 				});
 			}
-		} else if (folderLocation === 'user') {
-			if (!fetchingProfile && openProfile) {
-				setPersonalBuildsFolder(prevState => {
-					return {
-						...prevState,
-						builds: openProfile.builds,
-						folderName: `${openProfile.username}'s Builds`,
-						id: `${buildNameToUrl(openProfile.username)}s-builds`,
-						urlName: `${buildNameToUrl(openProfile.username)}s-builds`,
-					};
-				});
+		} else {
+			if (folderLocation !== 'user') {
+				if (!authLoading && isAuthenticated) {
+					setPersonalBuildsFolder(prevState => {
+						return {
+							...prevState,
+							builds: user.builds,
+						};
+					});
+				}
+			} else if (folderLocation === 'user') {
+				if (!fetchingProfile && openProfile) {
+					setPersonalBuildsFolder(prevState => {
+						return {
+							...prevState,
+							builds: openProfile.builds,
+							folderName: `${openProfile.username}'s Builds`,
+							id: `${buildNameToUrl(openProfile.username)}s-builds`,
+							urlName: `${buildNameToUrl(openProfile.username)}s-builds`,
+						};
+					});
+				}
 			}
 		}
 	}, [authLoading, folderLocation, isAuthenticated, fetchingProfile, openProfile]);
@@ -741,7 +753,7 @@ export const useCheckOpenProfileFolderAndFetchBuilds = usersId => {
 	const folderId = useParams().folderId;
 	const navigate = useNavigate();
 	const { fetchBuildsById } = useBuilds();
-	const { user } = useAuthContext();
+	const { user, isAuthenticated } = useAuthContext();
 
 	// Fetches the users builds once we get their profile
 	useEffect(() => {
@@ -766,7 +778,7 @@ export const useCheckOpenProfileFolderAndFetchBuilds = usersId => {
 				fetchBuildsById(openProfile.builds, openProfile.uid, 'user');
 			}
 		} else {
-			if (folderId) {
+			if (folderId && isAuthenticated) {
 				const folderToFetchId = user.folders?.filter(folder => folder.id === folderId);
 
 				if (folderToFetchId.length > 0) {
@@ -781,7 +793,7 @@ export const useCheckOpenProfileFolderAndFetchBuilds = usersId => {
 						fetchBuildsById(user.builds, user.uid, 'user');
 					}
 				}
-			} else {
+			} else if (isAuthenticated) {
 				fetchBuildsById(user.builds, user.uid, 'user');
 			}
 		}

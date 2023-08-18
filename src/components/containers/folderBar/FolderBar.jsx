@@ -12,7 +12,7 @@ function FolderBar() {
 	const { dragBuild } = useBuildContext();
 	const { savingToFolder } = useFoldersContext();
 	const [visible, setVisible] = useState(false);
-	const [ownBuildsFolder] = useSetPersonalBuildsFolder({ id: 'your-builds', folderName: 'Your Builds', builds: [], urlName: '' });
+	const [ownBuildsFolder] = useSetPersonalBuildsFolder({ id: 'your-builds', folderName: 'Your Builds', builds: [], urlName: '' }, true);
 
 	useEffect(() => {
 		if (dragBuild) {

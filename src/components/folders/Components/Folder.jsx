@@ -31,7 +31,7 @@ function Folder({ folder, editable, type, sidebar }) {
 		e.preventDefault();
 
 		if (sidebar) {
-			if (e.target.id === 'folder-your-builds' || e.target.closest('.folder').id === 'folder-your-builds') return;
+			if (e.target.id === 'folder-your-builds' || e.target.closest('.folder')?.id === 'folder-your-builds') return;
 			if (e.target.id.includes('folder')) {
 				const folderId = e.target.id.replace('folder-', '');
 				if (folderId !== hoverFolder) {
@@ -168,7 +168,7 @@ function Folder({ folder, editable, type, sidebar }) {
 				{(buildToAddToFolder && !sidebar) || (sidebar && dragBuild) ? <AddToFolderCheckbox folderId={folder.id} /> : null}
 				{buildToAddToFolder && !sidebar ? <PinFolderCheckbox folder={folder} /> : null}
 
-				{sidebar && hoverFolder === folder.id ? <>{checkIfBuildInFolder(dragBuild, folder.id, user) ? <FaFolderMinus /> : <FaFolderPlus />}</> : <FaFolder />}
+				{sidebar && hoverFolder === folder.id ? <> {checkIfBuildInFolder(dragBuild, folder.id, user) ? <FaFolderMinus /> : <FaFolderPlus />}</> : <FaFolder />}
 
 				{editingFolder && editingFolder.id === folder.id ? (
 					<input

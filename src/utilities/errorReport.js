@@ -14,7 +14,7 @@ const errorReport = (error, sendToServer, func) => {
 		func,
 		date: serverTimestamp(),
 		url: window.location.href,
-		uid: auth?.currentUser ? auth.currentUser : null,
+		uid: auth?.currentUser ? auth.currentUser.uid : null,
 	};
 
 	console.error(errorReport);

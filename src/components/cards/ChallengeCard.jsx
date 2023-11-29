@@ -20,7 +20,9 @@ function ChallengeCard({ challenge, i }) {
 
 	return (
 		<>
-			<img src={challenge?.image ? challenge?.image : DefaultChallengeImg} alt={challenge?.title} className="rounded-lg object-contain h-full z-50 cursor-pointer" onClick={() => navigate(`/challenges/${challenge?.articleId}`)} />
+			<div className="2xl:w-300 h-full flex flex-col items-center justify-center overflow-hidden z-50">
+				<img src={challenge?.image ? challenge?.image : DefaultChallengeImg} alt={challenge?.title} className="rounded-lg z-50 cursor-pointer" onClick={() => navigate(`/challenges/${challenge?.articleId}`)} />
+			</div>
 
 			<div className="flex flex-col w-full px-4 justify-center">
 				<div className="flex flex-row flex-wrap gap-2 2k:gap-4 mb-2 2k:mb-4">

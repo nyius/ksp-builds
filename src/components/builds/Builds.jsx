@@ -5,6 +5,7 @@ import { useFetchOpenFolderBuilds, useLoadedBuilds, useSetCurrentPage } from '..
 //---------------------------------------------------------------------------------------------------//
 import Spinner2 from '../spinners/Spinner2';
 import BuildCard from '../cards/BuildCard/BuildCard';
+import BuildCardNew from '../cards/BuildCard/BuildCardNew';
 import CantFind from '../cantFind/CantFind';
 import PrevPageBtn from './Buttons/PrevPageBtn';
 import NextPageBtn from './Buttons/NextPageBtn';
@@ -51,7 +52,9 @@ function Builds({ buildsToDisplay }) {
 			<BuildsContainer>
 				{builds.map(build => {
 					return (
-						<Fragment key={build.id}>{buildsView === 'grid' && forcedView !== 'pinnedList' ? <BuildCard build={build} /> : forcedView === 'pinnedList' ? <PinnedListBuildCard build={build} /> : <ListBuildCard build={build} />}</Fragment>
+						<Fragment key={build.id}>
+							{buildsView === 'grid' && forcedView !== 'pinnedList' ? <BuildCardNew build={build} /> : forcedView === 'pinnedList' ? <PinnedListBuildCard build={build} /> : <ListBuildCard build={build} />}
+						</Fragment>
 					);
 				})}
 			</BuildsContainer>

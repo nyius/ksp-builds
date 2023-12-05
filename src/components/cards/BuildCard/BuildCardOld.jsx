@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import VoteArrows from '../../buttons/VoteArrows';
 import UsernameLink from '../../username/UsernameLink';
 import Favorite from '../../buttons/Favorite';
@@ -7,19 +7,15 @@ import BuildCardViews from './Components/BuildCardViews';
 import BuildCardImage from './Components/BuildCardImage';
 import BuildCardUploadDate from './Components/BuildCardUploadDate';
 import BuildCardVersion from './Components/BuildCardVersion';
-import BuildCardVersionNew from './Components/BuildCardVersionNew';
 import BuildCardMods from './Components/BuildCardMods';
-import BuildCardModsNew from './Components/BuildCardModsNew';
 import BuildCardChallenge from './Components/BuildCardChallenge';
 import BuildCardDesc from './Components/BuildCardDesc';
 import ExportBuildBtn from '../../buttons/ExportBuildBtn';
-import ExportBuildBtnNew from '../../buttons/ExportBuildBtnNew';
 import BuildCardComments from './Components/BuildCardComments';
 import BuildCardDownloads from './Components/BuildCardDownloads';
 import BuildCardTypes from './Components/BuildCardTypes';
 import BuildCardName from './Components/BuildCardName';
 import BuildCardContainer from './Components/BuildCardContainer';
-import BuildCardContainerNew from './Components/BuildCardContainerNew';
 
 /**
  * Displays a builds card
@@ -32,8 +28,8 @@ function BuildCard({ build }) {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<BuildCardContainerNew build={build} setHover={setHover} setHoverAnim={setHoverAnim}>
-			<div className="card card-compact card-sizing grow bg-base-400 cursor-pointer w-full absolute top-0 right-0 left-0 bottom-0">
+		<BuildCardContainer build={build} setHover={setHover} setHoverAnim={setHoverAnim}>
+			<div className="card card-compact card-sizing grow bg-base-400  cursor-pointer w-full 5k:hover:w-180 4k:hover:w-170 2k:hover:w-150 xl:hover:w-130 lg:hover:w-120 hover:md:w-130 hover:aspect-3/4 hover:z-51 absolute top-0 right-0 left-0 bottom-0">
 				<a href={`/build/${build.urlName}`} className="flex flex-col buildCardHover w-full">
 					<figure className="bg-base-900 relative">
 						<BuildCardViews views={build.views} />
@@ -49,30 +45,29 @@ function BuildCard({ build }) {
 								<BuildCardUploadDate timestamp={build.timestamp} />
 							</div>
 
-							<div className="flex transition-all flex-row gap-4 2k:gap-6 mb-3 2k:mb-6">
-								<BuildCardVersionNew version={build.kspVersion} />
-								<BuildCardModsNew modsUsed={build.modsUsed} />
+							<div className={`${hover === build.urlName ? 'opacity-100' : 'opacity-0'} ${hoverAnim ? 'flex' : 'hidden'} transition-all flex-col gap-3 2k:gap-5 mb-3 2k:mb-6`}>
+								<BuildCardVersion version={build.kspVersion} />
+								<BuildCardMods modsUsed={build.modsUsed} />
+								<BuildCardChallenge challenge={build.challengeTitle} />
+								<BuildCardDesc description={build.description} />
+								{hover === build.urlName ? <ExportBuildBtn id={build.id} /> : null}
 							</div>
-
-							<div className="divider mt-1 mb-2"></div>
-
-							<BuildCardTypes types={build.types} />
 						</div>
 					</div>
 				</a>
 
-				<div className={`flex flex-row flex-wrap absolute ${hover === build.urlName ? 'bottom-12 2k:bottom-14 ' : 'bottom-0'} z-50 transition-all left-0 bg-base-800 w-full px-2 xl:px-4`}>
+				<div className="flex flex-row flex-wrap absolute bottom-0  left-0 bg-base-800 w-full px-2 xl:px-4">
 					<div className="flex flex-row place-content-between w-full flex-wrap gap-2 items-center">
 						<VoteArrows build={build} />
 						<BuildCardComments commentCount={build.commentCount} />
 						<BuildCardDownloads downloads={build.downloads} />
 						<Favorite id={build.id} />
 					</div>
-				</div>
 
-				<ExportBuildBtnNew id={build.id} />
+					<BuildCardTypes types={build.types} />
+				</div>
 			</div>
-		</BuildCardContainerNew>
+		</BuildCardContainer>
 	);
 }
 

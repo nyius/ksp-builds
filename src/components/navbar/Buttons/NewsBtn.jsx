@@ -6,7 +6,7 @@ import Button from '../../buttons/Button';
  * @returns
  */
 function NewsBtn() {
-	return <Button type="ahref" href="/news" css="text-white hidden lg:flex" text="News" icon="news" />;
+	return <Button type="ahref" href="/news" css="text-white hidden lg:flex" text="KSP News" icon="news" />;
 }
 
 export default NewsBtn;

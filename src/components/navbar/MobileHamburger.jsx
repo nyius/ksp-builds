@@ -22,7 +22,7 @@ function MobileHamburger() {
 				<MobileBtn text="Upload" href="/upload" icon="plus" />
 				<MobileBtn text="Challenges" href="/challenges" icon="mountain" />
 				<MobileBtn text="F.A.Q" href="/faq" icon="help" />
-				<MobileBtn text="News" href="/news" icon="news" />
+				<MobileBtn text="KSP News" href="/news" icon="news" />
 				<MobileBtn text="Contact" href="/contact" icon="email" />
 			</ul>
 		</div>

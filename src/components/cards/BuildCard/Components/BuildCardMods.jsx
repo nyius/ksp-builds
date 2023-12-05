@@ -7,7 +7,7 @@ import React from 'react';
  */
 function BuildCardMods({ modsUsed }) {
 	return (
-		<h3 className="text-slate-300 text-xl 2k:text-2xl sm:text-lg">
+		<h3 className="flex flex-col items-center justify-center text-slate-300 text-xl 2k:text-2xl sm:text-lg">
 			<span className="text-slate-500 italic"> Uses Mods:</span> {modsUsed ? 'Yes' : 'No'}
 		</h3>
 	);

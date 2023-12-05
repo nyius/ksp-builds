@@ -696,45 +696,6 @@ exports.fetchLiveKspStreams = functions.pubsub.schedule('every 1 minutes').onRun
 });
 
 /**
- * Handles scraping the KSP website for news articles
- * @returns
- */
-const scrapeKspNews = async () => {
-	const articles = [];
-	// Scrape the new articles
-	const axiosResponse = await axios.request({
-		method: 'GET',
-		url: 'https://www.kerbalspaceprogram.com/news',
-		headers: {
-			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-		},
-	});
-
-	const $ = cheerio.load(axiosResponse.data);
-
-	const htmlElement = $('.css-180q35u');
-
-	$('.css-180q35u')
-		.find('.css-1ti1acs')
-		.each((i, element) => {
-			// Extract data
-			const image = $(element).find('.css-1hbpsw3').find('.css-llahnu').find('img').attr('srcset');
-			const date = $(element).find('.css-jwjfk5').find('.css-og1fvt').find('time').text();
-			const title = $(element).find('.css-jwjfk5').find('.css-kv05w6').text();
-			const article = {
-				image,
-				date,
-				title,
-				type: 'news',
-				url: 'https://www.kerbalspaceprogram.com/news',
-			};
-
-			articles.push(article);
-		});
-	const dataJSON = articles;
-	return dataJSON;
-};
-/**
  * Handles scraping the KSP website for patch notes
  * @returns
  */
@@ -840,5 +801,34 @@ const scrapeKspChallenges = async () => {
 	});
 
 	const dataJSON = challenges;
+	return dataJSON;
+};
+/**
+ * Handles fetching the news from the forums RSS Feed
+ * @returns
+ */
+const scrapeKspNews = async () => {
+	const news = [];
+
+	let feed = await parser.parseURL('https://forum.kerbalspaceprogram.com/forum/139-ksp2-dev-updates.xml/?member=169308&key=a55960987e65bf9880247b7deb6f43b3');
+	const urlRegex = /(https?:\/\/[^\s"]+\.(?:png|jpg|jpeg|webm))/i;
+
+	feed.items.forEach(article => {
+		article.url = article.link;
+		delete article.link;
+		article.date = article.pubDate;
+		delete article.pubDate;
+		delete article.isoDate;
+		article.articleId = article.guid;
+		delete article.guid;
+		delete article.message;
+
+		const foundImages = article.content.match(urlRegex);
+		const firstImageLink = foundImages ? foundImages[1] : null;
+		if (firstImageLink) article.image = firstImageLink;
+		news.push(article);
+	});
+
+	const dataJSON = news;
 	return dataJSON;
 };

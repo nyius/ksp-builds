@@ -51,14 +51,13 @@ useEffect cleanup functions (lesson 154)
 Should be able to login with username/password
 	-automatically generate an email auth with the new username (eg steve@kspbuilds.com)
 		-when the user signs in with username, stick @kspbuilds.com to the end and then attempt the email login
-create backup database on an entirely new firebase instance - updates once a week
 email notifs for botw
 make type searching work for your own builds/visiting a users builds
 implement react-popper to replace tooltips and username hover
 pagination allowing user to jump right to a page? might result in a large amount of firebase calls
 competitions/ways to give users accolades/awards
-Volunteer positions (moderate, write posts, create challenges, etc) - this will include all the features they may need to see/have access to
 Quick share builds (without needing to create a whole build)
+Volunteer positions (moderate, write posts, create challenges, etc) - this will include all the features they may need to see/have access to
 switch to vite?
 Mission generation page - would get destroyed by chatGPT charges so maybe in the future
 t-shirts, merch

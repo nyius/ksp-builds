@@ -48,11 +48,6 @@ const PatchNotes = lazy(() => import('./pages/PatchNotes/PatchNotes'));
 const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 
 /*NOTES
-NEED TO ADD:
-     "homepage": ".",
-TO PACKAGE.JSON BEFORE I DO NOM RUN BUILD FOR OVERWOLF
- */
-
 /*TODO
 Code split everything
 	https://create-react-app.dev/docs/code-splitting/

@@ -10,7 +10,6 @@ import Helmet from '../../components/Helmet/Helmet';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import errorReport from '../../utilities/errorReport';
-import { useEffect } from 'react';
 
 function Login() {
 	const navigate = useNavigate();
@@ -39,10 +38,6 @@ function Login() {
 		const status = await emailLogin(email, password);
 		setWrongLogin(status);
 	};
-
-	useEffect(() => {
-		console.log(authLoading, isAuthenticated, resetPasswordState);
-	}, []);
 
 	if (!authLoading && !isAuthenticated && !resetPasswordState) {
 		return (

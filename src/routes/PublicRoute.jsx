@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuthContext } from '../context/auth/AuthContext';
+import { useAuthContext } from '../../../ksp2-builds/src/context/auth/AuthContext';
 import { Navigate } from 'react-router-dom';
 
 /**

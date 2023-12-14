@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import VoteArrows from '../../buttons/VoteArrows';
 import UsernameLink from '../../username/UsernameLink';
 import Favorite from '../../buttons/Favorite';
@@ -8,9 +8,6 @@ import BuildCardImage from './Components/BuildCardImage';
 import BuildCardUploadDate from './Components/BuildCardUploadDate';
 import BuildCardVersion from './Components/BuildCardVersion';
 import BuildCardMods from './Components/BuildCardMods';
-import BuildCardChallenge from './Components/BuildCardChallenge';
-import BuildCardDesc from './Components/BuildCardDesc';
-import ExportBuildBtn from '../../buttons/ExportBuildBtn';
 import ExportBuildBtnNew from '../../buttons/ExportBuildBtnNew';
 import BuildCardComments from './Components/BuildCardComments';
 import BuildCardDownloads from './Components/BuildCardDownloads';
@@ -58,8 +55,8 @@ function BuildCard({ build }) {
 					</div>
 				</a>
 
-				<div className={`flex flex-row flex-wrap absolute ${hover === build.urlName ? 'bottom-12 2k:bottom-14 ' : 'bottom-0'} z-50 transition-all left-0 bg-base-800 w-full px-2 xl:px-4`}>
-					<div className="flex flex-row place-content-between w-full flex-wrap gap-2 items-center">
+				<div className={`flex flex-row flex-wrap absolute ${hover === build.urlName ? 'bottom-12 2k:bottom-14 ' : 'bottom-0'} py-2 items-center justify-center z-50 transition-all left-0 bg-base-800 w-full px-2 xl:px-4`}>
+					<div className="flex flex-row place-content-between w-full flex-wrap gap-2 h-full items-center">
 						<VoteArrows build={build} />
 						<BuildCardComments commentCount={build.commentCount} />
 						<BuildCardDownloads downloads={build.downloads} />
@@ -67,7 +64,7 @@ function BuildCard({ build }) {
 					</div>
 				</div>
 
-				<ExportBuildBtnNew id={build.id} />
+				<ExportBuildBtnNew build={build} hover={hover} />
 			</div>
 		</BuildCardContainer>
 	);

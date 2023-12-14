@@ -20,7 +20,7 @@ function UploadBtn() {
 		}
 	};
 
-	return <Button type="ahref" href="/upload" onClick={handleUploadNavigate} color="btn-accent" css="text-white hidden md:flex" text="Upload" icon="plus" />;
+	return <Button type="ahref" href={isAuthenticated ? `/upload` : '/login'} onClick={handleUploadNavigate} color="btn-accent" css="text-white hidden md:flex" text="Upload" icon="plus" />;
 }
 
 export default UploadBtn;

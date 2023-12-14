@@ -50,15 +50,15 @@ function LoginModal() {
 						{/* Email Login */}
 						<form onSubmit={handleEmailLogin} className="mb-4">
 							<p className="text-xl 2k:text-3xl">Email</p>
-							<TextInput onChange={e => setEmail(e.target.value)} id="username" size="w-full" margin="mt-2 mb-2 2k:mb-4" color="bg-base-200" required={true} type="email" />
+							<TextInput onChange={e => setEmail(e.target.value)} id="username" size="w-full" margin="mt-2 mb-2 2k:mb-4" color="bg-base-200 text-white" required={true} type="email" />
 							{wrongLogin && wrongLogin.includes('invalid-email') && <p className="text-xl 2k-text-2xl text-red-300 italic">Invalid Email</p>}
 							{wrongLogin && wrongLogin.includes('user-not-found') && <p className="text-xl 2k-text-2xl text-red-300 italic">User not found</p>}
 
 							<p className="text-xl 2k:text-3xl mt-5 2k:mt-10">Password</p>
-							<TextInput onChange={e => setPassword(e.target.value)} id="password" size="w-full" margin="mb-4 mt-2" color="bg-base-200" required={true} type="password" />
+							<TextInput onChange={e => setPassword(e.target.value)} id="password" size="w-full" margin="mb-4 mt-2" color="bg-base-200 text-white" required={true} type="password" />
 							{wrongLogin && wrongLogin.includes('password') && <p className="text-xl 2k-text-2xl text-red-300 italic">Invalid Password</p>}
 							<div className="flex flex-row gap-4 flex-wrap">
-								<Button onClick={handleEmailLogin} text="Login" icon="login" margin="mt-4 2k:mt-10 mb-5 2k:mb-10" />
+								<Button onClick={handleEmailLogin} text="Login" icon="login" color="btn-primary" margin="mt-4 2k:mt-10 mb-5 2k:mb-10" />
 								<Button onClick={() => setResetPassword(dispatchAuth, true)} text="Reset Password" icon="reset" margin="mt-4 2k:mt-10 mb-5 2k:mb-10" />
 							</div>
 						</form>
@@ -70,7 +70,7 @@ function LoginModal() {
 
 						{/* Google Login */}
 						<div className="flex justify-center align-center mt-2 w-full">
-							<Button htmlFor="login-modal" icon="google" text="Login with Google" onClick={loginWithGoogle} />
+							<Button htmlFor="login-modal" icon="google" color="btn-primary" text="Login with Google" onClick={loginWithGoogle} />
 						</div>
 					</div>
 				</div>

@@ -8,16 +8,16 @@ import { TiExport } from 'react-icons/ti';
  * @param {string} id - takes in the ID of the build to copy to the clipboard
  * @returns
  */
-function ExportBuildBtn({ id }) {
+function ExportBuildBtn({ build, hover }) {
 	const { copyBuildToClipboard } = useCopyBuildToClipboard();
 	const [fetchingRawBuild, setFetchingRawBuild] = useState(false);
 
 	return (
 		<div
-			className="bg-primary absolute bottom-0 hover:bg-primary-focus w-full flex flex-row gap-4 h-12 2k:h-14 mb-0 items-center justify-center p-2 text-white text-2xl rounded-b-xl font-bold"
+			className={`bg-primary ${hover === build.urlName ? 'absolute' : 'hidden'} bottom-0 hover:bg-primary-focus w-full flex flex-row gap-4 h-12 2k:h-14 mb-0 items-center justify-center p-2 text-white text-2xl rounded-b-xl font-bold"`}
 			onClick={e => {
 				e.preventDefault();
-				copyBuildToClipboard(setFetchingRawBuild, id);
+				copyBuildToClipboard(setFetchingRawBuild, build.id);
 			}}
 		>
 			<TiExport />

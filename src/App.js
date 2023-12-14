@@ -28,6 +28,7 @@ import CenterContainer from './components/containers/CenterContainer';
 import FolderBar from './components/containers/folderBar/FolderBar';
 
 const SignUp = lazy(() => import('./pages/sign/SignUp'));
+const Login = lazy(() => import('./pages/sign/Login'));
 const Build = lazy(() => import('./pages/build/Build'));
 const NotFound = lazy(() => import('./pages/notFound/NotFound'));
 const Upload = lazy(() => import('./pages/upload/Upload'));
@@ -46,7 +47,15 @@ const Faq = lazy(() => import('./pages/faq/Faq'));
 const PatchNotes = lazy(() => import('./pages/PatchNotes/PatchNotes'));
 const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 
+/*NOTES
+NEED TO ADD:
+     "homepage": ".",
+TO PACKAGE.JSON BEFORE I DO NOM RUN BUILD FOR OVERWOLF
+ */
+
 /*TODO
+Code split everything
+	https://create-react-app.dev/docs/code-splitting/
 useEffect cleanup functions (lesson 154)
 Should be able to login with username/password
 	-automatically generate an email auth with the new username (eg steve@kspbuilds.com)
@@ -104,6 +113,15 @@ function App() {
 											element={
 												<PublicRoute>
 													<SignUp />
+												</PublicRoute>
+											}
+										/>
+										<Route
+											exact
+											path="/login"
+											element={
+												<PublicRoute>
+													<Login />
 												</PublicRoute>
 											}
 										/>

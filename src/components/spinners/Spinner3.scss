@@ -60,7 +60,7 @@ $colorsList: $blue, $violet, $lightPink, $pink;
 			}
 			height: #{$i * 50}px;
 			width: #{$i * 50}px;
-			animation: rotate #{abs(($i)-5) * 0.85}s linear infinite;
+			animation: rotate #{abs(($i) - 5) * 0.85}s linear infinite;
 		}
 	}
 }

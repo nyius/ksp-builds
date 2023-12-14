@@ -68,10 +68,10 @@ function SignUp() {
 		<>
 			<Helmet title="Sign Up" pageLink="https://kspbuilds.com/sign-up" description="Sign up for free to KSP Builds! Create an account to upload your creations, save your favorites, and comment/chat with others" />
 
-			<MiddleContainer>
+			<MiddleContainer size="w-full lg:w-[60rem] xl:w-[70rem] 2k:w-[90rem] 4k:w-[100rem] place-self-center">
 				<PlanetHeader text="Sign Up" />
-				<div className="flex flex-col sm:flex-row gap-5 2k:gap-10 items-center justify-center">
-					<div className="w-full sm:w-1/2 self-center flex flex-col">
+				<div className="flex flex-col md:flex-row gap-5 2k:gap-10 items-center justify-center">
+					<div className="w-full md:w-1/2 self-center flex flex-col">
 						<form className="w-full flex flex-col self-center" action="">
 							{/* Emails */}
 							<p className="text-xl 2k:text-3xl text-slate-200">Email</p>

@@ -6,10 +6,13 @@ import ContextsProvider from './context/ContextProvider';
 import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoute';
 import AdminRoute from './routes/AdminRoute';
-import backgroundplanet from './assets/planet.png';
 import ScrollToTop from './routes/ScrollToTop';
 //---------------------------------------------------------------------------------------------------//
+import { SpeedInsights } from '@vercel/speed-insights/react';
+import { Analytics } from '@vercel/analytics/react';
+//---------------------------------------------------------------------------------------------------//
 import { Index } from './pages';
+import backgroundplanet from './assets/planet.png';
 import RightBar from './components/containers/rightBar/RightBar';
 //---------------------------------------------------------------------------------------------------//
 import { Navbar, Footer } from './components';
@@ -79,6 +82,7 @@ function App() {
 					<CookieConsent flipButtons enableDeclineButton declineButtonText="Decline">
 						This website uses cookies to enhance the user experience.
 					</CookieConsent>
+					<SpeedInsights />
 					<ToastContainer theme="dark" />
 
 					<FullContainer>
@@ -197,6 +201,7 @@ function App() {
 					<Messaging />
 					<Modals />
 					<Footer />
+					<Analytics />
 				</div>
 			</ContextsProvider>
 		</Router>

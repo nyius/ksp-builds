@@ -54,10 +54,10 @@ function Carousel({ images }) {
 			</Slide> */}
 			{images.length > 1 ? (
 				<>
-					<div onClick={goBack} className="absolute top-1/2 left-6 rounded-full bg-slate-300 hover:border-r-2 hover:bg-slate-200 border-solid border-primary cursor-pointer text-black text-3xl 2k:text-5xl ">
+					<div onClick={goBack} className="absolute top-1/2 left-6 rounded-full bg-slate-300 hover:border-r-2 hover:bg-slate-200 border-solid border-primary cursor-pointer text-[#0c0e12] text-3xl 2k:text-5xl ">
 						<BsFillArrowLeftCircleFill />
 					</div>
-					<div onClick={goForward} className="absolute top-1/2 right-6 rounded-full bg-slate-300 hover:border-l-2 hover:bg-slate-200 border-solid border-primary cursor-pointer text-black text-3xl 2k:text-5xl ">
+					<div onClick={goForward} className="absolute top-1/2 right-6 rounded-full bg-slate-300 hover:border-l-2 hover:bg-slate-200 border-solid border-primary cursor-pointer text-[#0c0e12] text-3xl 2k:text-5xl ">
 						<BsFillArrowRightCircleFill />
 					</div>
 				</>

@@ -1,6 +1,8 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const cheerio = require('cheerio');
+const dotenv = require('dotenv');
+dotenv.config();
 const firestore = require('firebase/firestore');
 const axios = require('axios');
 const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
@@ -9,10 +11,226 @@ const { TwitterApi } = require('twitter-api-v2');
 const { firebase } = require('googleapis/build/src/apis/firebase');
 const Parser = require('rss-parser');
 let parser = new Parser();
+//Stripe -------------------------------------------------------------------------------------------------------------------------------------------------//
 const stripe = require('stripe')(process.env.REACT_APP_STRIPE_SECRET);
 const endpointSecret = process.env.REACT_APP_STRIPE_SUCCESS_ENDPOINT_PROD;
 // const endpointSecret = 'whsec_ba90833eb62f59831b3b58cd308b311dbeee87a326899886ccdeb196e450e96d';
 
+// For Google Login ------------------------------------------------------------------------------------------------------------------------------------------ //
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const express = require('express');
+const http = require('http');
+const WebSocket = require('ws');
+const session = require('express-session');
+
+//This eliminates retry even on wake (surprisingly)
+function initialRequest() {
+	const req = http.request({ hostname: '127.0.0.1', port: 8080, path: '/', method: 'GET' });
+	req.end();
+}
+initialRequest();
+
+const PROTOCOL = process.env.PROTOCOL || 'http',
+	PORT = parseInt(process.env.PORT || 3002),
+	RETURN_HOST = process.env.RETURN_HOST || `localhost:${PORT}`,
+	SUBDIR = process.env.SUBDIR || '/google';
+
+// Get your Google app's client ID & secret from environment variables, these
+// can also be set in an .env file
+// You can obtain your client ID & secret at https://console.cloud.google.com/apis/dashboard
+const AUTH_SCOPE = ['profile'];
+
+const socketConnections = new Map(),
+	usersStore = new Map();
+
+const googleStrategy = new GoogleStrategy(
+	{
+		clientID: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+		clientSecret: process.env.REACT_APP_GOOGLE_CLIENT_SECRET,
+		callbackURL: `${PROTOCOL}://${RETURN_HOST}${SUBDIR}/auth/return`,
+	},
+	(accessToken, refreshToken, profile, done) => {
+		done(null, {
+			...profile,
+			googleAccessToken: accessToken,
+			googleRefreshToken: refreshToken,
+		});
+	}
+);
+
+passport.serializeUser((user, done) => {
+	done(null, user);
+});
+
+passport.deserializeUser((userSerialized, done) => {
+	done(null, userSerialized);
+});
+
+passport.use('google', googleStrategy);
+
+const sessionParser = session({
+	secret: 'google ow login',
+	name: 'sid',
+	resave: false,
+	saveUninitialized: false,
+});
+
+const loginServerApp = express(),
+	// server = http.createServer(loginServerApp),
+	// wss = new WebSocket.Server({ clientTracking: false, server });
+	wss = new WebSocket.Server({ clientTracking: false, noServer: true });
+
+loginServerApp.use(sessionParser);
+
+// Initialize Passport! Also use passport.session() middleware, to support
+// persistent login sessions (recommended).
+loginServerApp.use(passport.initialize());
+loginServerApp.use(passport.session());
+
+// Format JSON output in a nice way
+loginServerApp.set('json spaces', 2);
+
+// Gets Google User (if user is arleady logged in) --------------------------------------------------------------------------------------------
+loginServerApp.get(`${SUBDIR}/get-user`, async (req, res) => {
+	const sessionId = req.query?.sessionId;
+
+	if (!sessionId) {
+		res.sendStatus(401);
+		return;
+	}
+
+	if (!usersStore.has(sessionId)) {
+		res.sendStatus(404);
+		return;
+	}
+
+	res.json(usersStore.get(sessionId));
+});
+
+// Log out --------------------------------------------------------------------------------------------
+loginServerApp.get(`${SUBDIR}/logout`, (req, res) => {
+	req.logout();
+
+	const sessionId = req.query?.sessionId;
+
+	if (sessionId) {
+		socketConnections.delete(sessionId);
+		usersStore.delete(sessionId);
+	}
+
+	res.redirect('/');
+});
+
+// Use passport.authenticate() as route middleware to authenticate the
+// request. The first step in Google authentication will involve redirecting
+// the user to google.com. After authenticating, Google will redirect the
+// user back to this Application at /auth/steam/return
+loginServerApp.get(
+	`${SUBDIR}/auth`,
+	(req, res, next) => {
+		if (req.query?.sessionId && validateUUID(req.query?.sessionId) && socketConnections.has(req.query?.sessionId)) {
+			req.session.sessionId = req.query.sessionId;
+			next();
+		} else {
+			res.sendStatus(401);
+		}
+	},
+	passport.authenticate('google', {
+		scope: AUTH_SCOPE,
+		failureRedirect: '/',
+	}),
+	(req, res) => res.redirect('/')
+);
+
+// Use passport.authenticate() as route middleware to authenticate the
+// request. If authentication fails, the user will be redirected back to the
+// login page. Otherwise, the primary route function function will be called,
+// which, in this example, will redirect the user to the home page.
+loginServerApp.get(
+	`${SUBDIR}/auth/return`,
+	(req, res, next) => {
+		if (req.session?.sessionId && validateUUID(req.session?.sessionId) && socketConnections.has(req.session?.sessionId)) {
+			next();
+		} else {
+			res.sendStatus(401);
+		}
+	},
+	passport.authenticate('google', { failureRedirect: '/' }),
+	(req, res) => {
+		if (!req.isAuthenticated()) {
+			res.sendStatus(401);
+			return;
+		}
+
+		const ws = socketConnections.get(req.session.sessionId);
+
+		if (!ws) {
+			res.sendStatus(401);
+			return;
+		}
+
+		usersStore.set(req.session.sessionId, req.user);
+
+		ws.send(
+			JSON.stringify({
+				messageType: 'login',
+				user: req.user,
+			})
+		);
+
+		res.redirect(`${SUBDIR}/auth/success`);
+
+		ws.close();
+	}
+);
+
+loginServerApp.get(`${SUBDIR}/auth/success`, (req, res) => {
+	res.send(`Logged in successfully, see message in Overwolf loginServerApp's console`);
+});
+
+wss.on('connection', ws => {
+	const sessionId = uuid();
+
+	functions.logger.log(`Websocket client ${sessionId} connected`);
+
+	ws.send(
+		JSON.stringify({
+			messageType: 'sessionId',
+			sessionId,
+		})
+	);
+
+	socketConnections.set(sessionId, ws);
+
+	ws.on('message', message => {
+		functions.logger.log(`message from client ${sessionId}:`, message);
+	});
+
+	ws.on('close', () => {
+		functions.logger.log(`websocket client ${sessionId} disconnected`);
+		socketConnections.delete(sessionId);
+	});
+});
+
+exports.loginServerApp = functions.https.onRequest((req, res) => {
+	const reqServer = req.socket.server;
+	if (reqServer === server) return;
+	server = reqServer;
+
+	server.on('upgrade', (request, socket, head) => {
+		wss.handleUpgrade(request, socket, head, ws => {
+			wss.emit('connection', ws, request);
+		});
+	});
+
+	// server.emit("request", req, res); // this is not sufficient
+	res.setHeader('Retry-After', 0).status(503).send('Websockets now ready');
+});
+
+// exports.loginServerApp = functions.https.onRequest(loginServerApp);
+
+// Amazon S3 Client ------------------------------------------------------------------------------------------------------------------------------------------
 const s3Client = new S3Client({
 	apiVersion: 'latest',
 	region: 'us-east-1',

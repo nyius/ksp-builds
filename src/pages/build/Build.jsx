@@ -90,7 +90,7 @@ function Build() {
 						<Button text="Make build of the week" color="btn-primary" icon="fill-star" htmlFor="build-of-the-week-modal" onClick={() => setBuildOfTheWeek(dispatchBuild, loadedBuild)} />
 					</CheckCredentials>
 
-					<div className="flex flex-col lg:flex-row w-full lg:h-61rem 2k:h-75rem gap-3 2k:gap-6">
+					<div className="flex flex-col lg:flex-row w-full h-96 lg:h-61rem 2k:h-75rem 4k:h-[100rem] gap-3 2k:gap-6">
 						<div className={`flex h-full flex-col ${loadedBuild.pinnedFolder && fetchedPinnedFolder ? 'w-full lg:w-3/4' : 'w-full'}`}>
 							<Carousel images={loadedBuild.images} />
 						</div>

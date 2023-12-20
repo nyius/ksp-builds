@@ -3,6 +3,7 @@
 		"rules": "firestore.rules",
 		"indexes": "firestore.indexes.json"
 	},
+
 	"storage": {
 		"rules": "storage.rules"
 	},
@@ -12,5 +13,11 @@
 			"codebase": "ksp-builds-codebase",
 			"ignore": ["node_modules", ".git", "firebase-debug.log", "firebase-debug.*.log"]
 		}
-	]
+	],
+	"emulators": {
+		"logging": {
+			"host": "0.0.0.0",
+			"port": 5001
+		}
+	}
 }

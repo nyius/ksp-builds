@@ -29,6 +29,7 @@ import FolderBar from './components/containers/folderBar/FolderBar';
 
 const SignUp = lazy(() => import('./pages/sign/SignUp'));
 const Login = lazy(() => import('./pages/sign/Login'));
+const OverwolfLogin = lazy(() => import('./pages/sign/OverwolfLogin'));
 const Build = lazy(() => import('./pages/build/Build'));
 const NotFound = lazy(() => import('./pages/notFound/NotFound'));
 const Upload = lazy(() => import('./pages/upload/Upload'));
@@ -120,6 +121,7 @@ function App() {
 												</PublicRoute>
 											}
 										/>
+										<Route exact path="/overwolf-login" element={<OverwolfLogin />} />
 										<Route
 											exact
 											path="/upload"

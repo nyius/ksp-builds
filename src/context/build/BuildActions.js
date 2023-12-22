@@ -110,7 +110,11 @@ const useFetchBuild = async id => {
 			}
 		} catch (error) {
 			setLoadedBuild(dispatchBuild, '');
-			errorReport(`Error fetching build: ${error.message}`, true, 'fetchBuildFromServer');
+			if (error.message !== 'Error fetching build: Failed to get document because the client is offline.') {
+				errorReport(`Error fetching build: ${error.message}`, true, 'fetchBuildFromServer');
+			} else {
+				errorReport(`Error fetching build: ${error.message}`, false, 'fetchBuildFromServer');
+			}
 		}
 	};
 };

@@ -51,6 +51,14 @@ export const updateComment = async (comment, commentId, buildId) => {
 	}
 };
 
+const isAlphanumeric = inputString => {
+	// Regular expression to match only alphanumeric characters
+	const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+
+	// Test if the inputString matches the alphanumeric pattern
+	return alphanumericRegex.test(inputString);
+};
+
 /**
  * Hadles saving the new build to the server
  * @param {object} build - takes in a build to check if its ready to upload
@@ -67,6 +75,11 @@ export const makeBuildReadyToUpload = async build => {
 
 		if (build.name.length > 50) {
 			toast.error('Build name too long');
+			return;
+		}
+
+		if (build.name.includes('?')) {
+			toast.error("Build name can't include '?'");
 			return;
 		}
 

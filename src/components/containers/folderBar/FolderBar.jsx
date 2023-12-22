@@ -28,7 +28,7 @@ function FolderBar() {
 		}
 	}, [dragBuild]);
 
-	if (isAuthenticated) {
+	if (isAuthenticated && user?.folders) {
 		return (
 			<div
 				className={`fixed left-2 lg:left-auto lg:top-1/2 lg:-translate-y-1/2 rounded-xl ${

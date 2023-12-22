@@ -28,7 +28,11 @@ export const FiltersProvider = ({ children }) => {
 				});
 				setFiltersLoading(false);
 			} catch (error) {
-				errorReport(error.message, true, 'fetchKspInfo');
+				if (error.message !== 'Failed to get document because the client is offline.') {
+					errorReport(error.message, true, 'fetchKspInfo');
+				} else {
+					errorReport(error.message, false, 'fetchKspInfo');
+				}
 				setFiltersLoading(false);
 			}
 		};

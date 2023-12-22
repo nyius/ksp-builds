@@ -11,8 +11,8 @@ const emailLogin = async (email, password) => {
 	try {
 		await signInWithEmailAndPassword(auth, email, password);
 	} catch (error) {
-		if (!error.message.includes('wrong-password')) {
-			errorReport(error.message, true, 'emailLogin');
+		if (!error.message.includes('wrong-password') || error.message !== 'Firebase: Error (auth/user-not-found).') {
+			errorReport(`email:${email} | error: ${error.message}`, true, 'emailLogin');
 		} else {
 			errorReport(error.message, false, 'emailLogin');
 		}

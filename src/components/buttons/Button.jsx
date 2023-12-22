@@ -1,7 +1,7 @@
 import React from 'react';
 import { GiCancel, GiPeaks } from 'react-icons/gi';
 import { ImCloudUpload } from 'react-icons/im';
-import { FaSave, FaUserAstronaut, FaHome, FaList, FaDiscord, FaGithub } from 'react-icons/fa';
+import { FaSave, FaUserAstronaut, FaCheckSquare, FaRegSquare, FaHome, FaList, FaDiscord, FaGithub } from 'react-icons/fa';
 import { FiLogOut, FiShare2 } from 'react-icons/fi';
 import { TiExport, TiPlusOutline } from 'react-icons/ti';
 import { RiDeleteBin2Fill, RiEditFill, RiLoginCircleLine } from 'react-icons/ri';
@@ -44,6 +44,8 @@ const buttonIcon = icon => {
 	if (icon === 'email') return <MdEmail />;
 	if (icon === 'head') return <FaUserAstronaut />;
 	if (icon === 'fill-pin') return <AiFillPushpin />;
+	if (icon === 'checked') return <FaCheckSquare />;
+	if (icon === 'unchecked') return <FaRegSquare />;
 	if (icon === 'outline-pin') return <AiOutlinePushpin />;
 	if (icon === 'settings') return <MdSettingsInputComponent />;
 	if (icon === 'home') return <FaHome />;
@@ -68,6 +70,7 @@ const buttonIcon = icon => {
 
 /**
  *
+ * @param {*} id - An ID for the button
  * @param {*} text - The text to display in the button
  * @param {*} onClick - function to execute on click
  * @param {*} color - input daisyui/tailwin colors (btn-primary, etc)
@@ -85,12 +88,12 @@ const buttonIcon = icon => {
  * @param {*} type - enter 'submit' for submitting a form, 'button' to make it not submit, 'ahref' for a link to a page for google, leave blank for 'label'
  * @returns
  */
-function Button({ text, onClick, color, size, icon, css, style, position, htmlFor, margin, type, href, target, tabIndex, tooltip }) {
+function Button({ id, text, onClick, color, size, icon, css, style, position, htmlFor, margin, type, href, target, tabIndex, tooltip }) {
 	// The button is a label becuase then we can use htmlFor tag to open modals. Not sure if this breaks things but it seems to work fine
 	if (type) {
 		if (type === 'ahref') {
 			return (
-				<div className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''}`} data-tip={tooltip ? tooltip : ''}>
+				<div id={id} className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''}`} data-tip={tooltip ? tooltip : ''}>
 					<Link to={href} target={target} className={`btn 2k:btn-lg 2k:text-xl ${style ? style : ''} ${color ? color : ''} ${css ? css : ''} ${size ? size : ''} ${position ? position : ''} ${margin ? margin : ''} `} onClick={onClick}>
 						{icon ? <span className={`text-2xl 2k:text-3xl ${text ? 'mr-4 2k:mr-6' : ''}`}>{buttonIcon(icon)}</span> : null}
 						{text !== '' ? text : null}
@@ -99,7 +102,7 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 			);
 		} else {
 			return (
-				<div className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''}`} data-tip={tooltip ? tooltip : ''}>
+				<div id={id} className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''}`} data-tip={tooltip ? tooltip : ''}>
 					<button type={type} className={`btn 2k:btn-lg 2k:text-xl ${style ? style : ''} ${color ? color : ''} ${css ? css : ''} ${size ? size : ''} ${position ? position : ''} ${margin ? margin : ''} `} onClick={onClick}>
 						{icon ? <span className={`text-2xl 2k:text-3xl ${text ? 'mr-4 2k:mr-6' : null}`}>{buttonIcon(icon)}</span> : null}
 						{text !== '' ? text : null}
@@ -111,6 +114,7 @@ function Button({ text, onClick, color, size, icon, css, style, position, htmlFo
 		return (
 			<div className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''} ${position ? position : ''}`} data-tip={tooltip ? tooltip : ''}>
 				<label
+					id={id}
 					type={type}
 					tabIndex={tabIndex}
 					htmlFor={htmlFor}

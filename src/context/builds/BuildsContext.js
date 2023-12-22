@@ -74,7 +74,11 @@ export const BuildsProvider = ({ children }) => {
 
 				await fetchServerBuild(data.id);
 			} catch (error) {
-				errorReport(`Couldn't find BotW: ${error.message}`, true, 'fetchServerWeeklyFeatured');
+				if (error.message !== 'Failed to get document because the client is offline.') {
+					errorReport(`Couldn't find BotW: ${error.message}`, true, 'fetchServerWeeklyFeatured');
+				} else {
+					errorReport(`Couldn't find BotW: ${error.message}`, false, 'fetchServerWeeklyFeatured');
+				}
 
 				dispatchBuilds({
 					type: 'SET_LOADING_BUILD_OF_THE_WEEK',

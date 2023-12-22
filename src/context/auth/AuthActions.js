@@ -103,7 +103,11 @@ const useAuth = () => {
 				createNewUserAccount(name, email, uid, createdAt);
 			}
 		} catch (error) {
-			errorReport(error.message, true, 'loginWithGoogle');
+			if (error.message !== 'Firebase: Error (auth/cancelled-popup-request).' || error.message !== 'Firebase: Error (auth/popup-closed-by-user).' || error.message !== 'Firebase: Error (auth/popup-blocked).') {
+				errorReport(error.message, true, 'loginWithGoogle');
+			} else {
+				errorReport(error.message, false, 'loginWithGoogle');
+			}
 			toast.error('Something went wrong. Please try again');
 		}
 	};

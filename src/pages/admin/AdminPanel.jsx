@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, getDoc, setDoc, getCountFromServer, serverTimestamp, addDoc, getDocFromCache, getDocsFromCache } from 'firebase/firestore';
 import { updateMetadata, ref, listAll } from 'firebase/storage';
 import { db } from '../../firebase.config';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, indexOf } from 'lodash';
 import { Helmet } from 'react-helmet';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
@@ -28,15 +28,11 @@ function AdminPanel() {
 	const { user } = useAuthContext();
 	//---------------------------------------------------------------------------------------------------//
 	const [uploadingChallengeImage, setUploadingChallengeImage] = useState(false);
-	const [reportRepliedFilter, setReportRepliedFilter] = useState(false);
-	const [messagesLoading, setMessagesLoading] = useState(true);
-	const [errorsLoading, setErrorsLoading] = useState(true);
-	const [reportTab, setReportTab] = useState(0);
 	const [replying, setReplying] = useState({ uid: '', i: '' });
 	const [siteNotification, setSiteNotification] = useState('');
-	const [challengeContent, setChallengeContent] = useState('');
 	const [patchNotes, setPatchNotes] = useState('');
 	const [patchNotesNotif, setPatchNotesNotif] = useState('');
+	const [challengeContent, setChallengeContent] = useState('');
 	const [challenge, setChallenge] = useState({
 		image: '',
 		title: '',
@@ -46,15 +42,23 @@ function AdminPanel() {
 		url: '',
 		article: '',
 	});
-	const [sortedReports, setSortedReports] = useState([]);
 	const [statsLoading, setStatsLoading] = useState(true);
 	const [infoLoading, setInfoLoading] = useState(true);
+	const [messagesLoading, setMessagesLoading] = useState(true);
 	const [replyMessage, setReplyMessage] = useState('');
+	const [stats, setStats] = useState(null);
 	const [newVersion, setNewVersion] = useState('');
 	const [versions, setVersions] = useState([]);
+	const [reportTab, setReportTab] = useState(0);
+	const [reportRepliedFilter, setReportRepliedFilter] = useState(false);
 	const [reports, setReports] = useState([]);
+	const [sortedReports, setSortedReports] = useState([]);
+	const [errorsLoading, setErrorsLoading] = useState(true);
+	const [errorFilters, setErrorFilters] = useState({ function: 'all' });
 	const [errors, setErrors] = useState([]);
-	const [stats, setStats] = useState(null);
+	const [filteredErrors, setFilteredErrors] = useState([]);
+	const [errorKeys, setErrorKeys] = useState({});
+	const [selectedErrors, setSelectedErrors] = useState([]);
 
 	useEffect(() => {
 		const fetchMessages = async () => {
@@ -110,17 +114,20 @@ function AdminPanel() {
 
 		const fetchErrors = async () => {
 			try {
-				let reportsData = [];
+				let errorsArr = [];
+				let errKeys = {};
 				const q = query(collection(db, 'errorReports'), orderBy('date', 'desc'));
-				const reportsSnap = await getDocs(q);
+				const errorsSnap = await getDocs(q);
 
-				reportsSnap.forEach(report => {
-					const reportData = report.data();
-					reportData.id = report.id;
-					reportsData.push(reportData);
+				errorsSnap.forEach(error => {
+					const errorData = error.data();
+					errorData.id = error.id;
+					errorsArr.push(errorData);
+					errKeys[errorData.func] = errorData.func;
 				});
 
-				setErrors(reportsData);
+				setErrorKeys(errKeys);
+				setErrors(errorsArr);
 				setErrorsLoading(false);
 			} catch (error) {
 				console.log(error);
@@ -129,6 +136,18 @@ function AdminPanel() {
 
 		fetchErrors();
 	}, []);
+
+	useEffect(() => {
+		if (errors) {
+			setFilteredErrors(prevState => {
+				if (errorFilters.function === 'all') {
+					return errors;
+				} else {
+					return errors.filter(error => error.func === errorFilters.function);
+				}
+			});
+		}
+	}, [errors, errorFilters]);
 
 	const submitNewVersion = async () => {
 		try {
@@ -174,17 +193,103 @@ function AdminPanel() {
 	 * Handles deleting the error report
 	 * @param {*} id
 	 */
-	const deleteError = async (id, i) => {
+	const deleteError = async error => {
 		try {
-			await deleteDoc(doc(db, 'errorReports', id));
+			await deleteDoc(doc(db, 'errorReports', error));
 			setErrors(prevState => {
 				const newState = [...prevState];
-				newState.splice(i, 1);
+				const index = prevState.findIndex(tempError => tempError.id === error);
+
+				if (index !== -1) {
+					newState.splice(index, 1);
+				}
 				return newState;
 			});
+			setSelectedErrors([]);
 		} catch (error) {
 			console.log(error);
 		}
+	};
+
+	/**
+	 * Handles deleting multiple errors
+	 */
+	const deleteMultipleErrors = async () => {
+		try {
+			selectedErrors.map(error => {
+				deleteError(error);
+			});
+
+			const errorCheckBoxes = document.getElementsByClassName('errorCheckbox');
+
+			for (let i = 0; i < errorCheckBoxes.length; i++) {
+				errorCheckBoxes[i].checked = false;
+			}
+
+			setSelectedErrors([]);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
+	 * handles selecting multiple errors to delete
+	 * @param {*} e
+	 */
+	const handleSelectingError = e => {
+		if (e.target.id === 'selectAllErrors') {
+			let ids = [];
+			filteredErrors.map(error => {
+				ids.push(error.id);
+			});
+
+			ids.map(id => {
+				const errorEl = document.getElementById(id);
+				errorEl.checked = true;
+			});
+
+			setSelectedErrors(ids);
+		} else if (e.target.id === 'deselectAllErrors') {
+			const errorCheckBoxes = document.getElementsByClassName('errorCheckbox');
+
+			for (let i = 0; i < errorCheckBoxes.length; i++) {
+				errorCheckBoxes[i].checked = false;
+			}
+
+			setSelectedErrors([]);
+		} else if (selectedErrors.includes(e.target.id)) {
+			setSelectedErrors(prevState => {
+				const tempArr = [...prevState];
+				const index = tempArr.indexOf(e.target.id);
+				tempArr.splice(index, 1);
+				return tempArr;
+			});
+		} else {
+			setSelectedErrors(prevState => {
+				return [...prevState, e.target.id];
+			});
+		}
+	};
+
+	/**
+	 * Handles setting the filter for the errors
+	 * @param {*} e
+	 */
+	const handleSetErrorFilters = e => {
+		setErrorFilters(prevState => {
+			return {
+				...prevState,
+				[e.target.id]: e.target.value,
+			};
+		});
+
+		const errorCheckBoxes = document.getElementsByClassName('errorCheckbox');
+
+		for (let i = 0; i < errorCheckBoxes.length; i++) {
+			errorCheckBoxes[i].checked = false;
+		}
+
+		setSelectedErrors([]);
 	};
 
 	/**
@@ -421,6 +526,9 @@ function AdminPanel() {
 		}
 	};
 
+	/**
+	 * Updates a specific user
+	 */
 	const updateUser = async () => {
 		try {
 			await updateDoc(doc(db, 'users', 'ZyVrojY9BZU5ixp09LftOd240LH3'), { lastModified: user.dateCreated });
@@ -431,6 +539,9 @@ function AdminPanel() {
 		}
 	};
 
+	/**
+	 * Updates all image items on firebase storage
+	 */
 	const updateAllStorageItems = async () => {
 		try {
 			const imagesRef = ref(storage, 'images');
@@ -615,7 +726,36 @@ function AdminPanel() {
 					<a className={`tab tab-lg text-2xl text-slate-200 tab-lifted ${reportTab === 1 ? 'tab-active' : ''}`} onClick={() => setReportTab(1)}>
 						Errors
 					</a>
+
+					{reportTab === 1 ? (
+						<div className="flex flex-row gap-4 items-center px-10">
+							<div className="text-3xl font-bold px-6 text-slate-200">{errors.length} Errors</div>
+							{errorFilters.function !== 'all' ? (
+								<div className="text-3xl font-bold px-6 text-slate-200">
+									{filteredErrors.length} {errorFilters.function} Errors
+								</div>
+							) : (
+								''
+							)}
+							<select name="errorFunctionFilter" id="function" className="select h-16 w-fit text-3xl ml-5" onChange={handleSetErrorFilters}>
+								<option value="all">All</option>
+								{Object.keys(errorKeys).map((functionName, i) => {
+									return (
+										<option key={functionName} value={functionName}>
+											{functionName}
+										</option>
+									);
+								})}
+							</select>
+							<Button id="selectAllErrors" text="Select All" icon="checked" color="btn-primary" onClick={handleSelectingError} />
+							{selectedErrors.length > 0 ? <Button id="deselectAllErrors" text="Deselect" icon="unchecked" onClick={handleSelectingError} /> : null}
+							{selectedErrors.length > 0 ? <Button text="Delete Selected" color="btn-error" icon="delete" onClick={deleteMultipleErrors} /> : null}
+						</div>
+					) : (
+						''
+					)}
 				</div>
+
 				<div className="flex flex-col gap-10">
 					{reportTab === 0 ? (
 						<>
@@ -720,42 +860,43 @@ function AdminPanel() {
 							) : (
 								<>
 									{errors.length === 0 && <p className="text-2xl 2k:text-4xl font-bold mb-10 2k:mb-20">No Errors</p>}
-									{errors.map((report, i) => {
+									{filteredErrors.map((error, i) => {
 										return (
 											<div key={i} className="flex flex-col w-full h-fit p-5 2k:p-10 bg-base-200 gap-10 rounded-xl relative">
 												{/* date/type */}
 												<div className="flex flex-row gap-5 2k:gap-10">
-													<p className="text-xl 2k:text-2xl">{createDateFromFirebaseTimestamp(report.date.seconds, 'long')}</p>
+													<p className="text-2xl 2k:text-3xl">{createDateFromFirebaseTimestamp(error.date.seconds, 'long')}</p>
 												</div>
 
 												{/* error uid */}
-												{report.uid && (
-													<p className="text-xl 2k:text-2xl text-slate-100">
-														<span className="italic text-slate-400"> Error UID: </span> {report.uid}
+												{error.uid && (
+													<p className="text-2xl 2k:text-3xl text-slate-100">
+														<span className="italic text-slate-400"> Error UID: </span> {error.uid}
 													</p>
 												)}
 
 												{/* error url */}
-												<p className="text-xl 2k:text-2xl text-slate-200">
+												<p className="text-2xl 2k:text-3xl text-slate-200">
 													<span className="italic text-slate-400"> Error URL: </span>
-													{report.url}
+													{error.url}
 												</p>
 
 												{/* error function */}
-												{report.func && (
-													<p className="text-xl 2k:text-2xl text-slate-100">
-														<span className="italic text-slate-400"> Error Function: </span> {report.func}
+												{error.func && (
+													<p className="text-2xl 2k:text-3xl text-slate-100">
+														<span className="italic text-slate-400"> Error Function: </span> {error.func}
 													</p>
 												)}
 
 												{/* error message */}
-												<p className="text-xl 2k:text-2xl text-slate-200">
+												<p className="text-2xl 2k:text-3xl text-slate-200">
 													<span className="italic text-slate-400"> Error Message: </span>
-													{report.error}
+													{error.error}
 												</p>
 
-												<div className="flex flex-row gap-2">
-													<Button text="Delete" size="w-fit" icon="delete" onClick={() => deleteError(report.id, i)} />
+												<div className="flex flex-row gap-10 items-center">
+													<input type="checkbox" id={error.id} className="checkbox errorCheckbox checkbox-primary checkbox-lg border-white" onChange={handleSelectingError} />
+													<Button text="Delete" size="w-fit" icon="delete" onClick={() => deleteError(error.id)} />
 												</div>
 											</div>
 										);

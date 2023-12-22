@@ -77,7 +77,7 @@ export const NewsProvider = ({ children }) => {
 					payload: false,
 				});
 			} catch (error) {
-				if (error.message !== 'The difference between the request time and the current time is too large.') {
+				if (error.message !== 'NetworkError when attempting to fetch resource.' || error.message !== 'Load failed') {
 					errorReport(error.message, true, 'fetchNews');
 				} else {
 					errorReport(error.message, false, 'fetchNews');
@@ -112,11 +112,7 @@ export const NewsProvider = ({ children }) => {
 					payload: false,
 				});
 			} catch (error) {
-				if (error.message !== 'The difference between the request time and the current time is too large.') {
-					errorReport(error.message, true, 'fetchLiveStreams');
-				} else {
-					errorReport(error.message, false, 'fetchLiveStreams');
-				}
+				errorReport(error.message, false, 'fetchLiveStreams');
 				dispatchNews({
 					type: 'SET_STREAMS_LOADING',
 					payload: false,

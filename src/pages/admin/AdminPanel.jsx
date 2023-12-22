@@ -720,16 +720,16 @@ function AdminPanel() {
 
 				{/* ------------------ Reports---------------------- */}
 				<div className="tabs">
-					<a className={`tab tab-lg text-2xl text-slate-200 tab-lifted ${reportTab === 0 ? 'tab-active' : ''}`} onClick={() => setReportTab(0)}>
+					<a className={`tab tab-lg h-20 px-10 text-3xl text-slate-200 tab-lifted ${reportTab === 0 ? 'tab-active !bg-primary' : 'bg-base-100'}`} onClick={() => setReportTab(0)}>
 						Reports/Messages
 					</a>
-					<a className={`tab tab-lg text-2xl text-slate-200 tab-lifted ${reportTab === 1 ? 'tab-active' : ''}`} onClick={() => setReportTab(1)}>
-						Errors
+					<a className={`tab tab-lg h-20 px-10 text-3xl text-slate-200 tab-lifted ${reportTab === 1 ? 'tab-active !bg-primary' : 'bg-base-100'}`} onClick={() => setReportTab(1)}>
+						Errors | {errors.length} Errors
 					</a>
 
 					{reportTab === 1 ? (
 						<div className="flex flex-row gap-4 items-center px-10">
-							<div className="text-3xl font-bold px-6 text-slate-200">{errors.length} Errors</div>
+							<div className="text-3xl font-bold px-6 text-slate-200"></div>
 							{errorFilters.function !== 'all' ? (
 								<div className="text-3xl font-bold px-6 text-slate-200">
 									{filteredErrors.length} {errorFilters.function} Errors

@@ -11,7 +11,7 @@ function TwitchStreamCard({ stream }) {
 
 	return (
 		<>
-			<a target="_blank" href={`https://www.twitch.tv/${stream.user_name}`} ref={setTriggerRef} className="flex flex-row gap-3 2k:gap-4 items-center rounded-lg bg-base-400 p-4 cursor-pointer hover:!bg-primary place-content-between">
+			<a target="_blank" href={`https://www.twitch.tv/${stream.user_name}`} ref={setTriggerRef} className="flex flex-row gap-3 2k:gap-4 items-center rounded-lg p-4 cursor-pointer hover:!bg-primary place-content-between">
 				<div className="avatar">
 					<div className="w-14 rounded-full">
 						<img src={stream.thumbnail_url.replace('{width}', '128').replace('{height}', '128')} alt="" />

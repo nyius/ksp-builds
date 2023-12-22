@@ -32,7 +32,7 @@ function TwitchStreamList() {
 	}
 
 	return (
-		<div className="flex flex-col gap-3 2k:gap-6">
+		<div className="flex flex-col gap-3 2k:gap-2">
 			{!streamsLoading &&
 				streams.map(stream => {
 					return <TwitchStreamCard key={stream.user_id} stream={stream} />;

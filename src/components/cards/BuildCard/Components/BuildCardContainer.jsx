@@ -55,7 +55,7 @@ function BuildCardContainer({ children, build, setHoverAnim, setHover }) {
 			draggable={true}
 			onDragStart={drag}
 			onDragEnd={drop}
-			className="flex p-2 2k:p-4 max-w-xl aspect-square md:aspect-5/6 xl:aspect-3/4 2k:aspect-5/6' shadow-lg hover:shadow-xl w-full relative"
+			className="flex w-[25rem] 2k:w-[30rem] max-w-[30rem] border-1 border-solid border-slate-700 hover:border-primary flex-grow relative"
 			onMouseEnter={() => handleHover(build.urlName)}
 			onMouseLeave={() => handleHover(false)}
 		>

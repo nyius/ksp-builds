@@ -8,7 +8,7 @@ import HeroCard from '../../cards/HeroCard';
  */
 function HeroList({ slides }) {
 	return (
-		<div className="w-full h-full flex flex-col lg:flex-row items-center justify-center gap-10 2k:gap-20 relative">
+		<div className="w-full h-full flex flex-row lg:flex-row items-center justify-center gap-10 2k:gap-20 relative">
 			{slides.map((article, i) => {
 				return <HeroCard key={i} cardItem={article} i={i} />;
 			})}

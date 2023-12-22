@@ -27,7 +27,7 @@ function Index() {
 
 			<Hero />
 
-			<div className="flex flex-row flex-wrap gap-4 w-full place-content-end sm:mb-4">
+			<div className="flex flex-row flex-wrap gap-4 w-full h-fit place-content-end sm:mb-4">
 				<SearchBar />
 				<Sort />
 				<FetchAmount />

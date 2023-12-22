@@ -27,39 +27,36 @@ function BuildCard({ build }) {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<BuildCardContainer build={build} setHover={setHover} setHoverAnim={setHoverAnim}>
-			<div className="card bg-base-300 cursor-pointer shadow-lg rounded-xl">
-				<a href={`/build/${build.urlName}`} className="flex flex-col h-full place-content-between buildCardHover">
-					<div>
-						<figure className="bg-base-700 rounded-t-xl relative">
-							<BuildCardViews views={build.views} />
-							<BuildCardImage build={build} />
-						</figure>
+			<div className="card card-compact card-sizing grow bg-base-400 cursor-pointer w-full absolute top-0 right-0 left-0 bottom-0">
+				<a href={`/build/${build.urlName}`} className="flex flex-col buildCardHover w-full">
+					<figure className="bg-base-900 relative">
+						<BuildCardViews views={build.views} />
+						<BuildCardImage build={build} />
+					</figure>
 
-						<div className="flex flex-col w-full px-7 py-5 place-content-between">
-							<div className="flex flex-col gap-2 w-full">
-								<BuildCardName name={build.name} />
+					<div className="flex flex-col w-full p-4 2k:p-6 place-content-between">
+						<div className="flex flex-col gap-2 w-full">
+							<BuildCardName name={build.name} />
 
-								<div className="flex flex-col flex-wrap gap-2 place-content-between my-4">
-									<UsernameLink hoverPosition="top" username={build.author} uid={build.uid} />
-									<BuildCardUploadDate timestamp={build.timestamp} />
-								</div>
-
-								<div className="flex transition-all flex-row place-content-between gap-4 2k:gap-6 mb-3 2k:mb-6">
-									<BuildCardVersion version={build.kspVersion} />
-									<BuildCardMods modsUsed={build.modsUsed} />
-								</div>
+							<div className="flex flex-row flex-wrap place-content-between mb-2 2k:mb-4">
+								<UsernameLink hoverPosition="top" username={build.author} uid={build.uid} />
+								<BuildCardUploadDate timestamp={build.timestamp} />
 							</div>
-						</div>
-					</div>
-					<div className="mb-16 px-7">
-						<div className="w-full mb-3 h-1 border-b-1 border-dashed border-slate-600"></div>
 
-						<BuildCardTypes types={build.types} />
+							<div className="flex transition-all flex-row gap-4 2k:gap-6 mb-3 2k:mb-6">
+								<BuildCardVersion version={build.kspVersion} />
+								<BuildCardMods modsUsed={build.modsUsed} />
+							</div>
+
+							<div className="divider mt-1 mb-2"></div>
+
+							<BuildCardTypes types={build.types} />
+						</div>
 					</div>
 				</a>
 
-				<div className={`flex flex-row flex-wrap absolute ${hover === build.urlName ? 'bottom-14' : 'bottom-0'} items-center justify-center z-50 transition-all left-0 bg-base-600 w-full px-2 xl:px-4`}>
-					<div className="flex flex-row place-content-between w-full flex-wrap gap-2 py-3 h-full items-center">
+				<div className={`flex flex-row flex-wrap absolute ${hover === build.urlName ? 'bottom-12 2k:bottom-14 ' : 'bottom-0'} py-2 items-center justify-center z-50 transition-all left-0 bg-base-800 w-full px-2 xl:px-4`}>
+					<div className="flex flex-row place-content-between w-full flex-wrap gap-2 h-full items-center">
 						<VoteArrows build={build} />
 						<BuildCardComments commentCount={build.commentCount} />
 						<BuildCardDownloads downloads={build.downloads} />

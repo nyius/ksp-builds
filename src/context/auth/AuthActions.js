@@ -103,10 +103,10 @@ const useAuth = () => {
 				createNewUserAccount(name, email, uid, createdAt);
 			}
 		} catch (error) {
-			if (error.message !== 'Firebase: Error (auth/cancelled-popup-request).' || error.message !== 'Firebase: Error (auth/popup-closed-by-user).' || error.message !== 'Firebase: Error (auth/popup-blocked).') {
-				errorReport(error.message, true, 'loginWithGoogle');
-			} else {
+			if (error.message.includes('cancelled-popup-request') || error.message.includes('popup-closed-by-user') || error.message.includes('auth/popup-blocked')) {
 				errorReport(error.message, false, 'loginWithGoogle');
+			} else {
+				errorReport(error.message, true, 'loginWithGoogle');
 			}
 			toast.error('Something went wrong. Please try again');
 		}

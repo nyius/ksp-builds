@@ -77,10 +77,10 @@ export const NewsProvider = ({ children }) => {
 					payload: false,
 				});
 			} catch (error) {
-				if (error.message !== 'NetworkError when attempting to fetch resource.' || error.message !== 'Load failed') {
-					errorReport(error.message, true, 'fetchNews');
-				} else {
+				if (error.includes('NetworkError') || error.message === 'Load failed' || error.includes('between the request time')) {
 					errorReport(error.message, false, 'fetchNews');
+				} else {
+					errorReport(error.message, true, 'fetchNews');
 				}
 				dispatchNews({
 					type: 'SET_ARTICLES_LOADING',

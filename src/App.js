@@ -28,7 +28,7 @@ import './App.css';
 import 'react-popper-tooltip/dist/styles.css';
 import GridLayout from './components/containers/GridLayout';
 import CenterContainer from './components/containers/CenterContainer';
-import FolderBar from './components/containers/folderBar/FolderBar';
+import HangarBar from './components/containers/hangarBar/HangarBar';
 
 const SignUp = lazy(() => import('./pages/sign/SignUp'));
 const Login = lazy(() => import('./pages/sign/Login'));
@@ -53,10 +53,13 @@ const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 
 /*NOTES
 /*TODO
+-finish switching folders to hangars
+-let users change hangar icons/colors
 Code split everything
 	https://create-react-app.dev/docs/code-splitting/
 useEffect cleanup functions (lesson 154)
 Should be able to login with username/password
+builds in a hanger should have a sort by date added filter
 	-automatically generate an email auth with the new username (eg steve@kspbuilds.com)
 		-when the user signs in with username, stick @kspbuilds.com to the end and then attempt the email login
 email notifs for botw
@@ -105,7 +108,7 @@ function App() {
 										<Route exact path="/challenges" element={<Challenges />} />
 										<Route exact path="/patch-notes" element={<PatchNotes />} />
 										<Route exact path="/user/:id" element={<User />} />
-										<Route exact path="/user/:id/folder/:folderId" element={<User />} />
+										<Route exact path="/user/:id/hangar/:hangarId" element={<User />} />
 										<Route exact path="/build/:id" element={<Build />} />
 										<Route
 											exact
@@ -164,7 +167,7 @@ function App() {
 										/>
 										<Route
 											exact
-											path="/profile/folder/:folderId"
+											path="/profile/hangar/:hangarId"
 											element={
 												<PrivateRoute>
 													<Profile />
@@ -194,7 +197,7 @@ function App() {
 								</Suspense>
 							</CenterContainer>
 
-							<FolderBar />
+							<HangarBar />
 							<RightBar />
 						</GridLayout>
 					</FullContainer>

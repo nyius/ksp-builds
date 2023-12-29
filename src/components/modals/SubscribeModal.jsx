@@ -79,7 +79,7 @@ function SubscribeModal() {
 										<img src={UsernameColor} alt="" className="mb-5 2k:mb-7 rounded-lg" />
 
 										<h4 className="text-xl 2k:text-3xl text-white mb-3 2k:mb-4">
-											• Increase folder count from <span className="text-error">5</span> to <span className="font-bold text-accent">20</span>
+											• Increase Hangar count from <span className="text-error">5</span> to <span className="font-bold text-accent">20</span>
 										</h4>
 										<h4 className="text-xl 2k:text-3xl text-white mb-8 2k:mb-12">• Support an amazing community of space enthusiasts</h4>
 										<h4 className="text-xl 2k:text-3xl text-white mb-8 2k:mb-12">And many new features being worked on!</h4>

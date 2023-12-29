@@ -12,8 +12,8 @@ import BuildCardExportBtn from './Buttons/BuildCardExportBtn';
 import BuildCardVoting from './Components/BuildCardVoting';
 import { setDragBuild } from '../../../context/build/BuildActions';
 import { useBuildContext } from '../../../context/build/BuildContext';
-import { setBuildToAddToFolder } from '../../../context/folders/FoldersActions';
-import { useFoldersContext } from '../../../context/folders/FoldersContext';
+import { setBuildToAddToHangar } from '../../../context/hangars/HangarActions';
+import { useHangarContext } from '../../../context/hangars/HangarContext';
 import { useAuthContext } from '../../../context/auth/AuthContext';
 import DragImg from '../../../assets/build_drag_grid_img.png';
 import BuildCardSaved from './Components/BuildCardSaved';
@@ -26,12 +26,12 @@ import BuildCardSaved from './Components/BuildCardSaved';
 function ListBuildCard({ build }) {
 	const [hover, setHover] = useState(false);
 	const { dispatchBuild } = useBuildContext();
-	const { dispatchFolders } = useFoldersContext();
+	const { dispatchHangars } = useHangarContext();
 	const { user } = useAuthContext();
 
 	const drag = e => {
 		setDragBuild(dispatchBuild, build.id);
-		setBuildToAddToFolder(dispatchFolders, build.id, user);
+		setBuildToAddToHangar(dispatchHangars, build.id, user);
 		e.dataTransfer.setData('text', build.id);
 		const img = new Image();
 		img.src = DragImg;
@@ -39,11 +39,11 @@ function ListBuildCard({ build }) {
 	};
 
 	/**
-	 * Handles dropping a build (not onto a folder)
+	 * Handles dropping a build (not onto a hangar)
 	 * @param {*} e
 	 */
 	const drop = e => {
-		setBuildToAddToFolder(dispatchFolders, null, user);
+		setBuildToAddToHangar(dispatchHangars, null, user);
 		setDragBuild(dispatchBuild, null);
 	};
 

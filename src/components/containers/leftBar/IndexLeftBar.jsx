@@ -16,7 +16,7 @@ function IndexLeftBar() {
 				<IndexLeftBarTypes />
 				<IndexLeftBarVersions />
 				<IndexLeftBarMods />
-				<IndexLeftBarChallenges />
+				{/* <IndexLeftBarChallenges /> */}
 				<ResetFiltersBtn />
 			</div>
 		</>

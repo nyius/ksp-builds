@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { setEditingComment, setEditingBuild } from '../context/build/BuildActions';
 import { useBuildContext } from '../context/build/BuildContext';
-import { setOpenedFolder } from '../context/folders/FoldersActions';
-import { useFoldersContext } from '../context/folders/FoldersContext';
+import { setOpenedHangar } from '../context/hangars/HangarActions';
+import { useHangarContext } from '../context/hangars/HangarContext';
 
 /**
  * Hook to reset states
@@ -10,13 +10,13 @@ import { useFoldersContext } from '../context/folders/FoldersContext';
  */
 function useResetStates() {
 	const { dispatchBuild } = useBuildContext();
-	const { dispatchFolders } = useFoldersContext();
+	const { dispatchHangars } = useHangarContext();
 
 	// Reset edidtingBuild/editingComment stats on page load
 	useEffect(() => {
 		setEditingBuild(dispatchBuild, false);
 		setEditingComment(dispatchBuild, false);
-		setOpenedFolder(dispatchFolders, null);
+		setOpenedHangar(dispatchHangars, null);
 	}, [dispatchBuild]);
 }
 

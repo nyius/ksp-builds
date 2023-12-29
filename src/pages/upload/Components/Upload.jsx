@@ -8,8 +8,8 @@ import { standardBuild } from '../../utilities/standardBuild';
 //---------------------------------------------------------------------------------------------------//
 import { useAuthContext } from '../../context/auth/AuthContext';
 import { useUploadBuild, useSetBuildToUpload } from '../../context/build/BuildActions';
-import { useFoldersContext } from '../../context/folders/FoldersContext';
-import { useSetBuildToAddToFolder, useSetFolderLocation, useSetPinnedFolder } from '../../context/folders/FoldersActions';
+import { useHangarContext } from '../../context/hangars/HangarContext';
+import { useSetBuildToAddToHangar, useSetHangarLocation, useSetPinnedHangar } from '../../context/hangars/HangarActions';
 import { useBuildContext } from '../../context/build/BuildContext';
 //---------------------------------------------------------------------------------------------------//
 import Spinner2 from '../../components/spinners/Spinner2';
@@ -28,7 +28,7 @@ import UploadBuildDesc from './Components/UploadBuildDesc';
 import UploadBuildVideo from './Components/UploadBuildVideo';
 import UploadBuildTypes from './Components/UploadBuildTypes';
 import UploadBuildTags from './Components/UploadBuildTags';
-import UploadBuildFolders from './Components/UploadBuildFolders';
+import UploadBuildHangars from './Components/UploadBuildHangars';
 import UploadBuildRawBuild from './Components/UploadBuildRawBuild';
 import SubmitBtn from './Components/Buttons/SubmitBtn';
 import CancelEditBtn from './Components/Buttons/CancelEditBtn';
@@ -42,16 +42,16 @@ import errorReport from '../../utilities/errorReport';
  */
 function Upload() {
 	const { editingBuild, uploadingBuild, buildToUpload } = useBuildContext();
-	const { pinnedFolder } = useFoldersContext();
+	const { pinnedHangar } = useHangarContext();
 	const { user } = useAuthContext();
 	const { uploadBuild } = useUploadBuild();
 	const navigate = useNavigate();
 	const buildId = uuidv4().slice(0, 30);
 
 	useSetBuildToUpload(editingBuild ? cloneDeep(editingBuild) : cloneDeep(standardBuild));
-	useSetBuildToAddToFolder(editingBuild ? editingBuild.id : buildId);
-	useSetPinnedFolder(editingBuild ? editingBuild.pinnedFolder : null);
-	useSetFolderLocation('upload');
+	useSetBuildToAddToHangar(editingBuild ? editingBuild.id : buildId);
+	useSetPinnedHangar(editingBuild ? editingBuild.pinnedHangar : null);
+	useSetHangarLocation('upload');
 
 	/**
 	 * Handles submitting the build
@@ -72,7 +72,7 @@ function Upload() {
 			makeReadyBuild.images.length === 0 && (makeReadyBuild.images = [LogoBackground]);
 			makeReadyBuild.author = user.username;
 			makeReadyBuild.uid = user.uid;
-			if (pinnedFolder) makeReadyBuild.pinnedFolder = pinnedFolder;
+			if (pinnedHangar) makeReadyBuild.pinnedHangar = pinnedHangar;
 			if (makeReadyBuild.rawImageFiles.length > 0) {
 				makeReadyBuild.thumbnail = makeReadyBuild.rawImageFiles[0];
 			}
@@ -123,7 +123,7 @@ function Upload() {
 							<UploadBuildVideo />
 							<UploadBuildTypes />
 							<UploadBuildTags />
-							<UploadBuildFolders />
+							<UploadBuildHangars />
 							<UploadBuildRawBuild />
 
 							{editingBuild ? (

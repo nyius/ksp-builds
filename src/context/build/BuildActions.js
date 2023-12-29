@@ -25,7 +25,7 @@ import { useUpdateProfile, useHandleVoting, useFetchUser } from '../auth/AuthAct
 import { sendNotification } from '../auth/AuthUtils';
 import { useFiltersContext } from '../filters/FiltersContext';
 import { updateDownloadCount, updateViewCount, makeBuildReadyToUpload, searchBuilds, setLocalStoredBuild, getBuildFromLocalStorage, checkLocalBuildAge, deleteBuildFromLocalStorage } from './BuildUtils';
-import { useAddBuildToFolder } from '../folders/FoldersActions';
+import { useAddBuildToHangar } from '../hangars/HangarActions';
 import { useNewsContext } from '../news/NewsContext';
 import errorReport from '../../utilities/errorReport';
 //---------------------------------------------------------------------------------------------------//
@@ -594,7 +594,7 @@ export const useDeleteBuild = () => {
  * @returns
  */
 export const useUploadBuild = () => {
-	const { addBuildToFolder } = useAddBuildToFolder();
+	const { addBuildToHangar } = useAddBuildToHangar();
 	const { dispatchBuild } = useBuildContext();
 	const { user } = useAuthContext();
 	const { updateUserProfilesAndDb } = useUpdateProfile();
@@ -710,8 +710,8 @@ export const useUploadBuild = () => {
 					}
 				}
 
-				// Add the build to the users folders (if they selected to)
-				await addBuildToFolder(newId);
+				// Add the build to the users hangars (if they selected to)
+				await addBuildToHangar(newId);
 
 				toast.success('Build created!');
 

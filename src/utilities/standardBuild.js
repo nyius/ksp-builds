@@ -27,5 +27,5 @@ export const standardBuild = {
 	forChallenge: false,
 	lastModified: serverTimestamp(),
 	rawImageFiles: [],
-	pinnedFolder: null,
+	pinnedHangar: null,
 };

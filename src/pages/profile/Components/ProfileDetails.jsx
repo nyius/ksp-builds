@@ -6,7 +6,7 @@ import BotwBadge from '../../../assets/BotW_badge2.png';
 import { createDateFromFirebaseTimestamp } from '../../../utilities/createDateFromFirebaseTimestamp';
 
 /**
- * Displays the profiles details (joined, total builds, etc)
+ * Displays the profiles details (joined, uploads, etc)
  * @returns
  */
 function ProfileDetails() {
@@ -20,7 +20,7 @@ function ProfileDetails() {
 				<BuildInfoCard title="Joined">
 					<p className="text-xl 2k:text-3xl text-accent">{createDateFromFirebaseTimestamp(user?.dateCreated?.seconds)}</p>
 				</BuildInfoCard>
-				<BuildInfoCard title="Total Builds">
+				<BuildInfoCard title="Uploads">
 					<p className="text-xl 2k:text-3xl text-accent">{fetchedBuilds?.length}</p>
 				</BuildInfoCard>
 				<BuildInfoCard title="Rocket Reputation">

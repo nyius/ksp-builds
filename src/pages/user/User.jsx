@@ -3,17 +3,17 @@ import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
 import { useAuthContext } from '../../context/auth/AuthContext';
-import { useGetAndSetOpenUserProfile } from '../../context/auth/AuthActions';
+import { setOpenProfile, useGetAndSetOpenUserProfile } from '../../context/auth/AuthActions';
 import { setFetchedBuilds, useGetFilteredBuilds } from '../../context/builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
 import Spinner2 from '../../components/spinners/Spinner2';
-import { useCheckOpenProfileFolderAndFetchBuilds, useResetOpenFolder, useSetBuildToAddToFolder, useSetFolderLocation, useSetOpenUsersFolders } from '../../context/folders/FoldersActions';
+import { useCheckOpenProfileHangarAndFetchBuilds, useResetOpenHangar, useSetBuildToAddToHangar, useSetHangarLocation, useSetOpenUsersHangars } from '../../context/hangars/HangarActions';
 import Sort from '../../components/sort/Sort';
 import CantFind from '../../components/cantFind/CantFind';
 import Button from '../../components/buttons/Button';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import Builds from '../../components/builds/Builds';
-import Folders from '../../components/folders/Folders';
+import Hangars from '../../components/folders/Hangars';
 import Helmet from '../../components/Helmet/Helmet';
 //---------------------------------------------------------------------------------------------------//
 import DeleteAccountBtn from './Components/Buttons/DeleteAccountBtn';
@@ -26,7 +26,7 @@ import Username from './Components/Username';
 import UserBio from './Components/UserBio';
 import UserDetails from './Components/UserDetails';
 import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
-import { useFoldersContext } from '../../context/folders/FoldersContext';
+import { useHangarContext } from '../../context/hangars/HangarContext';
 import { useBuildsContext } from '../../context/builds/BuildsContext';
 
 /**
@@ -38,20 +38,24 @@ function User() {
 	const navigate = useNavigate();
 	//---------------------------------------------------------------------------------------------------//
 	const [sortedBuilds] = useGetFilteredBuilds([]);
-	const { openProfile, fetchingProfile, user, authLoading, isAuthenticated } = useAuthContext();
-	const { openedFolder } = useFoldersContext();
+	const { openProfile, fetchingProfile, user, authLoading, dispatchAuth, isAuthenticated } = useAuthContext();
+	const { openedHangar } = useHangarContext();
 	const { dispatchBuilds } = useBuildsContext();
 
 	useEffect(() => {
 		setFetchedBuilds(dispatchBuilds, []);
 	}, []);
 
+	useEffect(() => {
+		return () => setOpenProfile(dispatchAuth, null);
+	}, []);
+
+	useSetHangarLocation('user');
 	useGetAndSetOpenUserProfile(usersId);
-	useCheckOpenProfileFolderAndFetchBuilds(usersId);
-	useSetOpenUsersFolders();
-	useSetFolderLocation('user');
-	useResetOpenFolder();
-	useSetBuildToAddToFolder(null);
+	useCheckOpenProfileHangarAndFetchBuilds(usersId);
+	useSetOpenUsersHangars();
+	useResetOpenHangar();
+	useSetBuildToAddToHangar(null);
 
 	//---------------------------------------------------------------------------------------------------//
 	if (fetchingProfile) {
@@ -104,13 +108,13 @@ function User() {
 						</div>
 					</div>
 
-					{/* Folders */}
-					<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">{openProfile.username}'s Folders</h2>
-					<Folders />
+					{/* hangars */}
+					<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">{openProfile.username}'s Hangars</h2>
+					<Hangars />
 
 					{/* Builds */}
 					<div className="flex flex-row flex-wrap gap-4 w-full place-content-between sm:mb-4">
-						<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">{openedFolder ? openedFolder?.folderName : `${openProfile.username}'s Builds`}</h2>
+						<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">{openedHangar ? openedHangar?.hangarName : `${openProfile.username}'s Builds`}</h2>
 
 						<div className="flex flex-row gap-3 2k:gap-6">
 							<Sort />

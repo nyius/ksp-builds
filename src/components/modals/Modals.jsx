@@ -9,10 +9,10 @@ import DeleteAccount from './DeleteAccount';
 import ReportModal from './ReportModal';
 import BlockModal from './BlockModal';
 import SubscribeModal from './SubscribeModal';
-import AddBuildToFolderModal from './AddBuildToFolderModal';
-import DeleteFolderModal from './DeleteFolderModal';
-import WhatIsFolderModal from './WhatIsFolderModal';
-import FolderLimitModal from './FolderLimitModal';
+import AddBuildToHangarModal from './AddBuildToHangarModal';
+import DeleteHangarModal from './DeleteHangarModal';
+import WhatIsHangarModal from './WhatIsHangarModal';
+import HangarLimitModal from './HangarLimitModal';
 
 /**
  * Stores (mostly) all modals
@@ -29,12 +29,12 @@ function Modals() {
 			<ResetPassword />
 			<ReportModal />
 			<DeleteAccount />
-			<DeleteFolderModal />
+			<DeleteHangarModal />
 			<BlockModal />
 			<SubscribeModal />
-			<AddBuildToFolderModal />
-			<WhatIsFolderModal />
-			<FolderLimitModal />
+			<AddBuildToHangarModal />
+			<WhatIsHangarModal />
+			<HangarLimitModal />
 		</>
 	);
 }

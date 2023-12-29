@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 //---------------------------------------------------------------------------------------------------//
 import { useBuildsContext } from '../../context/builds/BuildsContext';
-import { useFetchOpenFolderBuilds, useLoadedBuilds, useSetCurrentPage } from '../../context/builds/BuildsActions';
+import { useFetchOpenHangarBuilds, useLoadedBuilds, useSetCurrentPage } from '../../context/builds/BuildsActions';
 //---------------------------------------------------------------------------------------------------//
 import Spinner2 from '../spinners/Spinner2';
 import BuildCard from '../cards/BuildCard/BuildCard';
@@ -23,7 +23,7 @@ function Builds({ buildsToDisplay }) {
 	const [builds] = useLoadedBuilds([], buildsToDisplay);
 
 	useSetCurrentPage(0);
-	useFetchOpenFolderBuilds();
+	useFetchOpenHangarBuilds();
 
 	//---------------------------------------------------------------------------------------------------//
 	if (loadingBuilds) {

@@ -4,7 +4,7 @@ import { FiltersProvider } from './filters/FiltersContext';
 import { BuildsProvider } from './builds/BuildsContext';
 import { BuildProvider } from './build/BuildContext';
 import { NewsProvider } from './news/NewsContext';
-import { FoldersProvider } from './folders/FoldersContext';
+import { HangarProvider } from './hangars/HangarContext';
 
 /**
  * Stores all the contexts in one place
@@ -17,9 +17,9 @@ function ContextsProvider({ children }) {
 			<FiltersProvider>
 				<BuildsProvider>
 					<BuildProvider>
-						<FoldersProvider>
+						<HangarProvider>
 							<NewsProvider>{children}</NewsProvider>
-						</FoldersProvider>
+						</HangarProvider>
 					</BuildProvider>
 				</BuildsProvider>
 			</FiltersProvider>

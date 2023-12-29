@@ -7,8 +7,8 @@ import { useFiltersContext } from '../filters/FiltersContext';
 import useFilters from '../filters/FiltersActions';
 import { cloneDeep, sortBy } from 'lodash';
 import { checkLocalBuildAge, getBuildFromLocalStorage, setLocalStoredBuild } from '../build/BuildUtils';
-import { useFoldersContext } from '../folders/FoldersContext';
-import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useHangarContext } from '../hangars/HangarContext';
+import { useParams, useSearchParams } from 'react-router-dom';
 import algoliasearch from 'algoliasearch/lite';
 import errorReport from '../../utilities/errorReport';
 
@@ -179,13 +179,13 @@ export const useFetchBuildsById = (buildIds, fetchUid, type) => {
 	const { dispatchBuilds } = useBuildsContext();
 	const { fetchBuildsById } = useBuilds();
 	const { fetchAmount } = useBuildsContext();
-	const { openedFolder } = useFoldersContext();
+	const { openedHangar } = useHangarContext();
 
 	useEffect(() => {
 		if (!buildIds) return;
 
 		if (buildIds.length > 0) {
-			if (!openedFolder) {
+			if (!openedHangar) {
 				fetchBuildsById(buildIds, fetchUid, type);
 			}
 		} else {
@@ -305,19 +305,19 @@ export const useCreateFirestoreQuery = () => {
 };
 
 /**
- * Fetches builds for the current open folder
+ * Fetches builds for the current open hangar
  */
-export const useFetchOpenFolderBuilds = () => {
-	const { openedFolder } = useFoldersContext();
+export const useFetchOpenHangarBuilds = () => {
+	const { openedHangar } = useHangarContext();
 	const { fetchBuildsById } = useBuilds();
 	const { sortBy } = useFiltersContext();
 	const { fetchAmount } = useBuildsContext();
 
 	useEffect(() => {
-		if (openedFolder) {
-			fetchBuildsById(openedFolder.builds, null, 'public');
+		if (openedHangar) {
+			fetchBuildsById(openedHangar.builds, null, 'public');
 		}
-	}, [openedFolder, sortBy, fetchAmount]);
+	}, [openedHangar, sortBy, fetchAmount]);
 };
 
 /**

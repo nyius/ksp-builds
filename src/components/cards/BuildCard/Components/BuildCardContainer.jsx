@@ -1,9 +1,9 @@
 import React from 'react';
 import { setDragBuild } from '../../../../context/build/BuildActions';
 import { useBuildContext } from '../../../../context/build/BuildContext';
-import { useFoldersContext } from '../../../../context/folders/FoldersContext';
+import { useHangarContext } from '../../../../context/hangars/HangarContext';
 import { useAuthContext } from '../../../../context/auth/AuthContext';
-import { setBuildToAddToFolder } from '../../../../context/folders/FoldersActions';
+import { setBuildToAddToHangar } from '../../../../context/hangars/HangarActions';
 import DragImg from '../../../../assets/build_drag_grid_img.png';
 
 /**
@@ -16,7 +16,7 @@ import DragImg from '../../../../assets/build_drag_grid_img.png';
  */
 function BuildCardContainer({ children, build, setHoverAnim, setHover }) {
 	const { dispatchBuild } = useBuildContext();
-	const { dispatchFolders } = useFoldersContext();
+	const { dispatchHangars } = useHangarContext();
 	const { user } = useAuthContext();
 
 	const handleHover = state => {
@@ -28,11 +28,11 @@ function BuildCardContainer({ children, build, setHoverAnim, setHover }) {
 	};
 
 	/**
-	 * Handles dragging a build (not onto a folder)
+	 * Handles dragging a build (not onto a hangar)
 	 * @param {*} e
 	 */
 	const drag = e => {
-		setBuildToAddToFolder(dispatchFolders, build.id, user);
+		setBuildToAddToHangar(dispatchHangars, build.id, user);
 		setDragBuild(dispatchBuild, build.id);
 		e.dataTransfer.setData('text', build.id);
 		const img = new Image();
@@ -41,11 +41,11 @@ function BuildCardContainer({ children, build, setHoverAnim, setHover }) {
 	};
 
 	/**
-	 * Handles dropping a build (not onto a folder)
+	 * Handles dropping a build (not onto a hangar)
 	 * @param {*} e
 	 */
 	const drop = e => {
-		setBuildToAddToFolder(dispatchFolders, null, user);
+		setBuildToAddToHangar(dispatchHangars, null, user);
 		setDragBuild(dispatchBuild, null);
 	};
 

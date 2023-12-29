@@ -3,8 +3,8 @@ import Button from '../../../../components/buttons/Button';
 import { cloneDeep } from 'lodash';
 import { useBuildContext } from '../../../../context/build/BuildContext';
 import { useUpdateBuild } from '../../../../context/build/BuildActions';
-import { useFoldersContext } from '../../../../context/folders/FoldersContext';
-import { useAddBuildToFolder } from '../../../../context/folders/FoldersActions';
+import { useHangarContext } from '../../../../context/hangars/HangarContext';
+import { useAddBuildToHangar } from '../../../../context/hangars/HangarActions';
 
 /**
  * Button to save a builds update
@@ -12,17 +12,17 @@ import { useAddBuildToFolder } from '../../../../context/folders/FoldersActions'
  */
 function UpdateBuildBtn() {
 	const { buildToUpload } = useBuildContext();
-	const { pinnedFolder } = useFoldersContext();
+	const { pinnedHangar } = useHangarContext();
 	const { updateBuild } = useUpdateBuild();
-	const { addBuildToFolder } = useAddBuildToFolder();
+	const { addBuildToHangar } = useAddBuildToHangar();
 
 	/**
 	 * Handles a user updatin a build
 	 */
 	const handleUpdateBuild = async () => {
 		const makeReadyBuild = cloneDeep(buildToUpload);
-		if (pinnedFolder) makeReadyBuild.pinnedFolder = pinnedFolder;
-		await addBuildToFolder(makeReadyBuild.id);
+		if (pinnedHangar) makeReadyBuild.pinnedHangar = pinnedHangar;
+		await addBuildToHangar(makeReadyBuild.id);
 		await updateBuild(makeReadyBuild);
 	};
 

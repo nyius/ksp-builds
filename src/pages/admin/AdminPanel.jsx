@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, getDoc, setDoc, getCountFromServer, serverTimestamp, addDoc, getDocFromCache, getDocsFromCache } from 'firebase/firestore';
+import { doc, deleteDoc, getDocs, query, collection, orderBy, updateDoc, deleteField, getDoc, setDoc, getCountFromServer, serverTimestamp, addDoc, getDocFromCache, getDocsFromCache } from 'firebase/firestore';
 import { updateMetadata, ref, listAll } from 'firebase/storage';
 import { db } from '../../firebase.config';
 import { cloneDeep, indexOf } from 'lodash';
@@ -13,6 +13,8 @@ import { useAuthContext } from '../../context/auth/AuthContext';
 import { sendNotification } from '../../context/auth/AuthUtils';
 //---------------------------------------------------------------------------------------------------//
 import standardNotifications from '../../utilities/standardNotifications';
+import standardUser from '../../utilities/standardUser';
+import standardUserProfile from '../../utilities/standardUserProfile';
 import { uploadImages } from '../../utilities/uploadImage';
 //---------------------------------------------------------------------------------------------------//
 import TextInput from '../../components/input/TextInput';
@@ -372,26 +374,6 @@ function AdminPanel() {
 	};
 
 	/**
-	 * Some function to update all users
-	 */
-	const updateAllUsers = async () => {
-		try {
-			const usersRef = collection(db, 'users');
-			const usersSnap = await getDocs(usersRef);
-
-			usersSnap.forEach(user => {
-				const data = user.data();
-				// updateDoc(doc(db, 'users', user.id), { folders: [] });
-				updateDoc(doc(db, 'userProfiles', user.id), { type: 'userProfile' });
-			});
-
-			toast.success('All users updated!');
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	/**
 	 * Handles updating every build
 	 */
 	const updateAllBuilds = async () => {
@@ -531,11 +513,90 @@ function AdminPanel() {
 	 */
 	const updateUser = async () => {
 		try {
-			await updateDoc(doc(db, 'users', 'ZyVrojY9BZU5ixp09LftOd240LH3'), { lastModified: user.dateCreated });
-			await updateDoc(doc(db, 'userProfiles', 'ZyVrojY9BZU5ixp09LftOd240LH3'), { lastModified: user.dateCreated });
+			const userDoc = await getDoc(doc(db, 'users', 'ZyVrojY9BZU5ixp09LftOd240LH3'));
+			const userProfileDoc = await getDoc(doc(db, 'users', 'ZyVrojY9BZU5ixp09LftOd240LH3'));
+			const userData = userDoc.data();
+			const userProfileData = userProfileDoc.data();
+			userData.hangars = userData.folders;
+			userProfileData.hangars = userProfileData.folders;
+
+			delete userData.folders;
+			delete userProfileData.folders;
+
+			userData.hangars?.map(hangar => {
+				hangar.hangarName = hangar.folderName;
+				delete hangar.folderName;
+			});
+
+			userProfileData.hangars?.map(hangar => {
+				hangar.hangarName = hangar.folderName;
+				delete hangar.folderName;
+			});
+
+			await updateDoc(doc(db, 'users', 'ZyVrojY9BZU5ixp09LftOd240LH3'), { ...userData, folders: deleteField() });
+			await updateDoc(doc(db, 'userProfiles', 'ZyVrojY9BZU5ixp09LftOd240LH3'), { ...userProfileData, folders: deleteField() });
 			toast.success('User updated');
 		} catch (error) {
 			console.log(error);
+		}
+	};
+
+	/**
+	 * Some function to update all users
+	 */
+	const updateAllUsers = async () => {
+		try {
+			const usersRef = collection(db, 'users');
+			const usersSnap = await getDocs(usersRef);
+
+			usersSnap.forEach(user => {
+				const userData = user.data();
+				userData.hangars = userData.folders;
+
+				userData.hangars.map(hangar => {
+					hangar.hangarName = hangar.folderName;
+					delete hangar.folderName;
+				});
+
+				updateDoc(doc(db, 'users', user.id), { hangars: userData.hangars, folders: deleteField() });
+				updateDoc(doc(db, 'userProfiles', user.id), { hangars: userData.hangars, folders: deleteField() });
+			});
+
+			toast.success('All users updated!');
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	/**
+	 * Adds 10 users to the test DB
+	 */
+	const addTestUsers = async () => {
+		try {
+			for (let i = 0; i < 10; i++) {
+				let newUser = { ...standardUser };
+				let newUserProfile = { ...standardUserProfile };
+				let newUsername = uuidv4().slice(0, 10);
+				let newId = uuidv4().slice(0, 10);
+				let folderName = uuidv4().slice(0, 10);
+				let buildNum = uuidv4().slice(0, 10);
+				let folderID = uuidv4().slice(0, 10);
+				let folderUrlName = uuidv4().slice(0, 10);
+
+				newUser.username = newUsername;
+				newUserProfile.username = newUsername;
+				newUser.dateCreated = serverTimestamp();
+				newUserProfile.dateCreated = serverTimestamp();
+
+				newUser.folders = [{ builds: [buildNum], folderName, id: folderID, urlName: folderUrlName }];
+				newUserProfile.folders = [{ builds: [buildNum], folderName, id: folderID, urlName: folderUrlName }];
+
+				await setDoc(doc(db, 'testUsers', newId), newUser);
+				await setDoc(doc(db, 'testUserProfiles', newId), newUserProfile);
+			}
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong');
 		}
 	};
 
@@ -645,6 +706,11 @@ function AdminPanel() {
 						</div>
 
 						<div className="divider divider-horizontal"></div>
+
+						<div className="flex flex-col gap-4 place-content-between">
+							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Add 10 Test Users</p>
+							<Button color="btn-primary" text="Add" onClick={addTestUsers} />
+						</div>
 
 						{/* <div className="flex flex-col gap-4 place-content-between">
 							<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Verify Twitter</p>

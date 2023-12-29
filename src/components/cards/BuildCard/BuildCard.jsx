@@ -27,7 +27,7 @@ function BuildCard({ build }) {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<BuildCardContainer build={build} setHover={setHover} setHoverAnim={setHoverAnim}>
-			<div className="card bg-base-300 cursor-pointer shadow-lg rounded-xl">
+			<div className="card bg-base-300 cursor-pointer shadow-lg rounded-xl w-full">
 				<a href={`/build/${build.urlName}`} className="flex flex-col h-full place-content-between buildCardHover">
 					<div>
 						<figure className="bg-base-700 rounded-t-xl relative">

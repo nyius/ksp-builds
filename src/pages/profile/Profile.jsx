@@ -2,10 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
 import { useAuthContext } from '../../context/auth/AuthContext';
-import { useFetchBuildsById } from '../../context/builds/BuildsActions';
 import { useResetFilters } from '../../context/filters/FiltersActions';
-import { useCheckOpenProfileFolderAndFetchBuilds, useSetBuildToAddToFolder, useSetFolderLocation, useSetSelectedFolders } from '../../context/folders/FoldersActions';
-import { useFoldersContext } from '../../context/folders/FoldersContext';
+import { useCheckOpenProfileHangarAndFetchBuilds, useSetBuildToAddToHangar, useSetHangarLocation, useSetSelectedHangars } from '../../context/hangars/HangarActions';
+import { useHangarContext } from '../../context/hangars/HangarContext';
 //---------------------------------------------------------------------------------------------------//
 import useResetStates from '../../hooks/useResetStates';
 import Spinner2 from '../../components/spinners/Spinner2';
@@ -13,7 +12,7 @@ import Sort from '../../components/sort/Sort';
 import MiddleContainer from '../../components/containers/middleContainer/MiddleContainer';
 import PlanetHeader from '../../components/header/PlanetHeader';
 import Builds from '../../components/builds/Builds';
-import Folders from '../../components/folders/Folders';
+import Hangars from '../../components/folders/Hangars';
 import Helmet from '../../components/Helmet/Helmet';
 import ProfilePicture from './Components/ProfilePicture';
 import ProfileInfo from './Components/ProfileInfo';
@@ -26,18 +25,17 @@ import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
  * @returns
  */
 function Profile() {
-	const { openedFolder } = useFoldersContext();
+	const { openedHangar } = useHangarContext();
 	const { user, authLoading, isAuthenticated } = useAuthContext();
 	const navigate = useNavigate();
 
 	useResetFilters();
 	useResetStates();
 
-	useFetchBuildsById(user?.builds);
-	useCheckOpenProfileFolderAndFetchBuilds(user.uid);
-	useSetBuildToAddToFolder(null);
-	useSetSelectedFolders(null);
-	useSetFolderLocation('profile');
+	useSetHangarLocation('profile');
+	useCheckOpenProfileHangarAndFetchBuilds(user.uid);
+	useSetBuildToAddToHangar(null);
+	useSetSelectedHangars(null);
 
 	//---------------------------------------------------------------------------------------------------//
 	if (authLoading) {
@@ -67,11 +65,11 @@ function Profile() {
 					<ProfileDetails />
 				</div>
 
-				<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">Your Folders</h2>
-				<Folders />
+				<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">Your Hangars</h2>
+				<Hangars />
 
 				<div className="flex flex-row flex-wrap gap-4 w-full place-content-between sm:mb-4">
-					<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">{openedFolder ? openedFolder?.folderName : 'Your Builds'}</h2>
+					<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">{openedHangar ? openedHangar?.hangarName : 'Your Builds'}</h2>
 					<div className="flex flex-row gap-3 2k:gap-5">
 						<Sort />
 						<FetchAmount />

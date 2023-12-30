@@ -37,6 +37,7 @@ import BuildVideo from './components/BuildVideo';
 import BuildComments from './components/BuildComments';
 import ReturnHomeBtn from './components/Buttons/ReturnHomeBtn';
 import BuildPinnedHangar from './components/BuildPinnedHangar';
+import BuildAlert from './components/BuildAlert';
 
 function Build() {
 	const { dispatchBuild, loadingBuild, loadedBuild, editingBuild } = useBuildContext();
@@ -98,6 +99,7 @@ function Build() {
 					</div>
 
 					<BuildInfo />
+					<OldBuildWarning />
 
 					<BuildName />
 
@@ -144,3 +146,15 @@ function Build() {
 }
 
 export default Build;
+
+/**
+ * Displays an error if this version of the game is older than 0.2.0.0 (breaking)
+ * @returns
+ */
+const OldBuildWarning = () => {
+	const { loadedBuild } = useBuildContext();
+
+	if (loadedBuild?.kspVersion === '1.0.0' || loadedBuild?.kspVersion === '1.2.0' || loadedBuild?.kspVersion === '1.3.0' || loadedBuild?.kspVersion === '1.4.1' || loadedBuild?.kspVersion === '1.5.0') {
+		return <BuildAlert icon="warning" color="red" text="This build is saved on an older version of the game (older than version 0.2.0.0) and will not work when imported into newer save games." />;
+	}
+};

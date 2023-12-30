@@ -14,7 +14,7 @@ function BuildInfo() {
 	const { loadedBuild } = useBuildContext();
 
 	return (
-		<div className="flex flex-row flex-wrap gap-4 2k:gap-5 bg-base-900 w-full justify-center p-2 2k:p-4 mb-6 2k:mb-12 rounded-xl">
+		<div className="flex flex-row flex-wrap gap-4 2k:gap-5 bg-base-900 w-full justify-center p-2 2k:p-4 rounded-xl">
 			<BuildInfoCard title="Author">
 				<UsernameLink username={loadedBuild.author} uid={loadedBuild.uid} />
 			</BuildInfoCard>

@@ -30,7 +30,11 @@ const fetchBuildFromAWS = async id => {
 			parsedBuild = JSON.parse(decompress);
 		}
 	} catch (error) {
-		errorReport(error.message, true, 'fetchBuildFromAWS', auth?.currentUser ? auth.currentUser : null);
+		if (error.message.includes('network error') || error.message.includes(`NetworkError`)) {
+			errorReport(error.message, false, 'fetchBuildFromAWS', auth?.currentUser ? auth.currentUser : null);
+		} else {
+			errorReport(error.message, true, 'fetchBuildFromAWS', auth?.currentUser ? auth.currentUser : null);
+		}
 	}
 
 	return parsedBuild;

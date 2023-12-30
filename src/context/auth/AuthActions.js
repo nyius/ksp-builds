@@ -139,7 +139,11 @@ const useAuth = () => {
 			setNewSignup(dispatchAuth, true);
 			createNewUserAccount(name, email, uid, createdAt);
 		} catch (error) {
-			errorReport(error.message, true, 'newEmailAccount');
+			if (error.message.includes(`exists`)) {
+				errorReport(error.message, false, 'newEmailAccount');
+			} else {
+				errorReport(error.message, true, 'newEmailAccount');
+			}
 			return error;
 		}
 	};

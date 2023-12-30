@@ -155,6 +155,6 @@ const OldBuildWarning = () => {
 	const { loadedBuild } = useBuildContext();
 
 	if (loadedBuild?.kspVersion === '1.0.0' || loadedBuild?.kspVersion === '1.2.0' || loadedBuild?.kspVersion === '1.3.0' || loadedBuild?.kspVersion === '1.4.1' || loadedBuild?.kspVersion === '1.5.0') {
-		return <BuildAlert icon="warning" color="red" text="This build is saved on an older version of the game (older than version 0.2.0.0) and will not work when imported into newer save games." />;
+		return <BuildAlert icon="warning" color="red" text="This build is saved on an older version of the game (older than version 0.2.0.0) and may not work when imported into newer save games." />;
 	}
 };

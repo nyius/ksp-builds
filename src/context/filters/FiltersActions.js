@@ -22,7 +22,7 @@ const useFilters = () => {
 			type: 'SET_FILTERS',
 			payload: {
 				filter: 'sortBy',
-				value: e.target.value,
+				value: e.target.id,
 			},
 		});
 		setCurrentPage(dispatchBuilds, 0);

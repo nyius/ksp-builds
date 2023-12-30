@@ -1,26 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { setFetchAmount } from '../../context/builds/BuildsActions';
 import { useBuildsContext } from '../../context/builds/BuildsContext';
+import Select, { Option } from '../selects/Select';
 
 /**
  * Diaplays the amount of builds to fetch
  * @returns
  */
 function FetchAmount() {
-	const { dispatchBuilds, gridSize } = useBuildsContext();
+	const [visible, setVisible] = useState(false);
+	const { dispatchBuilds, gridSize, fetchAmount } = useBuildsContext();
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<select onChange={e => setFetchAmount(dispatchBuilds, Number(e.target.value))} className="select select-bordered 2k:select-lg 2k:text-2xl 2k:font-thin max-w-xs bg-base-900">
-			<optgroup>
-				<option value="" hidden defaultValue={true}>
-					Builds to Load
-				</option>
-				<option value={gridSize * 4}>{gridSize * 4}</option>
-				<option value={gridSize * 6}>{gridSize * 6}</option>
-				<option value={gridSize * 8}>{gridSize * 8}</option>
-			</optgroup>
-		</select>
+		<Select selectedOption={fetchAmount} visibleState={visible} visibleSetter={setVisible} size="w-52" selectText="Show:">
+			<Option displayText={gridSize * 4} id={gridSize * 4} handlerFunc={e => setFetchAmount(dispatchBuilds, Number(e.target.id))}>
+				{gridSize * 4}
+			</Option>
+			<Option displayText={gridSize * 6} id={gridSize * 6} handlerFunc={e => setFetchAmount(dispatchBuilds, Number(e.target.id))}>
+				{gridSize * 6}
+			</Option>
+			<Option displayText={gridSize * 8} id={gridSize * 8} handlerFunc={e => setFetchAmount(dispatchBuilds, Number(e.target.id))}>
+				{gridSize * 8}
+			</Option>
+		</Select>
 	);
 }
 

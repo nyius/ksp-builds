@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useBuilds from '../../context/builds/BuildsActions';
-import { RiSearchEyeFill } from 'react-icons/ri';
 import errorReport from '../../utilities/errorReport';
+import SearchIcon from '../../assets/search.svg';
 
 /**
  * Displays the search bar
@@ -32,13 +32,12 @@ function SearchBar() {
 			errorReport(error.message, true, 'handleSearch');
 		}
 	};
-
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="flex flex-row gap-1 items-center">
-			<input onChange={e => setSearchTerm(e.target.value)} onKeyUp={e => handleSearch(e)} type="text" placeholder="Search" className="input input-bordered bg-base-900 2k:input-lg 2k:text-2xl" />
-			<div className="btn btn-circle text-xl 2k:text-2xl text-slate-300 bg-base-900 hover:text-slate-100" onClick={e => handleSearch(e)}>
-				<RiSearchEyeFill />
+		<div className="flex flex-row gap-1 items-center w-[30rem] 2k:w-[60rem] relative">
+			<input id="build-search" onChange={e => setSearchTerm(e.target.value)} onKeyUp={handleSearch} type="text" placeholder="Search" className="input bg-base-200 border-solid border-1 border-slate-700 input-lg w-full !text-2xl" />
+			<div className="btn btn-circle text-2xl h-12 w-12 text-slate-400 bg-base-600 hover:text-slate-100 absolute right-2" onClick={handleSearch}>
+				<img src={SearchIcon} alt="" className="h-7" />
 			</div>
 		</div>
 	);

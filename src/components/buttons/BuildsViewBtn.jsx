@@ -15,9 +15,10 @@ function BuildsViewBtn() {
 		return (
 			<Button
 				tooltip="Change to Grid View"
-				color={`bg-base-900 ${buildsView === 'grid' ? 'text-white' : ''}`}
+				color={`bg-base-200 !border-slate-700 !border-1 !border-solid ${buildsView === 'grid' ? 'text-white' : ''}`}
 				css="hover:text-slate-100"
 				icon="grid"
+				size="!h-16"
 				onClick={() => {
 					setBuildsView(dispatchBuilds, 'grid');
 					setLocalStoredBuildsView('grid');
@@ -28,9 +29,10 @@ function BuildsViewBtn() {
 		return (
 			<Button
 				tooltip="Change to List View"
-				color={`bg-base-900 ${buildsView === 'list' ? 'text-white' : ''}`}
+				color={`bg-base-200 !border-slate-700 !border-1 !border-solid ${buildsView === 'list' ? 'text-white' : ''}`}
 				css="hover:text-slate-100"
 				icon="list"
+				size="!h-16"
 				onClick={() => {
 					setBuildsView(dispatchBuilds, 'list');
 					setLocalStoredBuildsView('list');

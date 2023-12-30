@@ -15,6 +15,7 @@ import { sendNotification } from '../../context/auth/AuthUtils';
 import standardNotifications from '../../utilities/standardNotifications';
 import standardUser from '../../utilities/standardUser';
 import standardUserProfile from '../../utilities/standardUserProfile';
+import { standardAlert } from '../../utilities/standardAlert';
 import { uploadImages } from '../../utilities/uploadImage';
 //---------------------------------------------------------------------------------------------------//
 import TextInput from '../../components/input/TextInput';
@@ -61,6 +62,7 @@ function AdminPanel() {
 	const [filteredErrors, setFilteredErrors] = useState([]);
 	const [errorKeys, setErrorKeys] = useState({});
 	const [selectedErrors, setSelectedErrors] = useState([]);
+	const [alert, setAlert] = useState(standardAlert);
 
 	useEffect(() => {
 		const fetchMessages = async () => {
@@ -639,6 +641,40 @@ function AdminPanel() {
 		}
 	};
 
+	/**
+	 * Handles adding an alert to the site
+	 */
+	const addSiteAlert = async () => {
+		try {
+			if (alert.text === '') {
+				toast.error('No text!');
+				return;
+			}
+			await updateDoc(doc(db, 'kspInfo', 'alert'), alert);
+			toast.success('Success');
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong');
+		}
+	};
+
+	/**
+	 * handles clearing the sits alert
+	 */
+	const clearAlert = async () => {
+		try {
+			await updateDoc(doc(db, 'kspInfo', 'alert'), standardAlert);
+			toast.success('Success');
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong');
+		}
+	};
+
+	const handleCollapse = e => {
+		localStorage.setItem(e.target.id, e.target.value);
+	};
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
@@ -735,6 +771,53 @@ function AdminPanel() {
 					<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Send Site-wide message</p>
 					<TextEditor setState={setSiteNotification} />
 					<Button text="send" color="btn-primary" icon="upload" size="w-fit" onClick={() => sendSiteMessage('', 'message')} />
+				</div>
+
+				<div className="divider my-10"></div>
+
+				{/* ------------------ Site Alert ---------------------- */}
+				<div className="bg-base-500 rounded-xl p-4 2k:p-8 flex flex-col gap-4">
+					<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Create alert</p>
+					<div className="flex flex-col gap-2 2k:gap-4">
+						<div className="text-xl 2k:text-2xl text-slate-200">message</div>
+						<input
+							type="text"
+							className="input w-full"
+							onChange={e =>
+								setAlert(prevState => {
+									return { ...prevState, text: e.target.value };
+								})
+							}
+						/>
+					</div>
+					<div className="flex flex-col gap-2 2k:gap-4">
+						<div className="text-xl 2k:text-2xl text-slate-200">color (red, green, yellow, primary, secondary, accent)</div>
+						<input
+							type="text"
+							className="input w-full"
+							onChange={e =>
+								setAlert(prevState => {
+									return { ...prevState, color: e.target.value };
+								})
+							}
+						/>
+					</div>
+					<div className="flex flex-col gap-2 2k:gap-4">
+						<div className="text-xl 2k:text-2xl text-slate-200">icon (alert, warning)</div>
+						<input
+							type="text"
+							className="input w-full"
+							onChange={e =>
+								setAlert(prevState => {
+									return { ...prevState, icon: e.target.value };
+								})
+							}
+						/>
+					</div>
+					<div className="flex flex-row gap-2 2k:gap-4">
+						<Button text="create" color="btn-primary" icon="upload" size="w-fit" onClick={addSiteAlert} />
+						<Button text="clear" color="btn-error" icon="upload" size="w-fit" onClick={clearAlert} />
+					</div>
 				</div>
 
 				<div className="divider my-10"></div>

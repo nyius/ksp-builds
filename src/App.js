@@ -29,6 +29,7 @@ import 'react-popper-tooltip/dist/styles.css';
 import GridLayout from './components/containers/GridLayout';
 import CenterContainer from './components/containers/CenterContainer';
 import HangarBar from './components/containers/hangarBar/HangarBar';
+import AlertBar from './components/alert/AlertBar';
 
 const SignUp = lazy(() => import('./pages/sign/SignUp'));
 const Login = lazy(() => import('./pages/sign/Login'));
@@ -86,6 +87,7 @@ function App() {
 				<Stars />
 				<div className="planet" style={{ backgroundImage: `url("${backgroundplanet}")` }}>
 					<Navbar />
+					<AlertBar />
 					<CookieConsent flipButtons enableDeclineButton declineButtonText="Decline">
 						This website uses cookies to enhance the user experience.
 					</CookieConsent>

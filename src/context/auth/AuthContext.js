@@ -119,6 +119,29 @@ export const AuthProvider = ({ children }) => {
 		});
 	}, []);
 
+	// Fetch any site alerts
+	useEffect(() => {
+		const fetchSiteAlerts = async () => {
+			try {
+				const data = await getDoc(doc(db, 'kspInfo', 'alert'));
+				const alert = data.data();
+
+				dispatchAuth({
+					type: 'SET_AUTH',
+					payload: { alert, alertLoading: false },
+				});
+			} catch (error) {
+				if (error.message !== 'Failed to get document because the client is offline.') {
+					errorReport(error.message, true, 'fetchSiteAlerts');
+				} else {
+					errorReport(error.message, false, 'fetchSiteAlerts');
+				}
+			}
+		};
+
+		fetchSiteAlerts();
+	}, []);
+
 	// Init state
 	const initialState = {
 		user: null,
@@ -151,6 +174,8 @@ export const AuthProvider = ({ children }) => {
 		convosOpen: false,
 		convosLoading: true,
 		subscribeModal: false,
+		alert: null,
+		alertLoading: true,
 	};
 
 	// Set up the reducer

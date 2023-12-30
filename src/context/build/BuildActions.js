@@ -9,7 +9,7 @@ import { compressAccurately } from 'image-conversion';
 import { auth } from '../../firebase.config';
 import { cloneDeep } from 'lodash';
 import { compressToEncodedURIComponent } from 'lz-string';
-import { convertFromRaw, EditorState } from 'draft-js';
+import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
 //---------------------------------------------------------------------------------------------------//
 import { uploadImage } from '../../utilities/uploadImage';
 import draftJsToPlainText from '../../utilities/draftJsToPlainText';
@@ -37,7 +37,7 @@ import errorReport from '../../utilities/errorReport';
 const useFetchBuild = async id => {
 	const { dispatchBuild } = useBuildContext();
 	const { fetchComments } = useFetchComments();
-	console.log(id);
+
 	useEffect(() => {
 		const fetchBuild = async () => {
 			dispatchBuild({ type: 'LOADING_BUILD', payload: true });
@@ -639,6 +639,11 @@ export const useUploadBuild = () => {
 				const convertThumb = await compressAccurately(build.thumbnail, { size: 150, width: 600 });
 				const thumbURL = await uploadImage(convertThumb, setLoading, auth.currentUser.uid);
 				build.thumbnail = thumbURL;
+			}
+
+			// Check if the user entered a description.
+			if (typeof build.description !== 'string') {
+				build.description = `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`;
 			}
 
 			// Add the build object to the DB

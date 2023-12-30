@@ -56,9 +56,9 @@ const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 -let users change hangar icons/colors
 -when visiting a users page, then back to my own, my hangars shows the other users name
 -fix hangars at bottom of screen not displaying right
--text hangars sidebar overflow scroll
 -custom dropdown
 -convert website to look like app
+-make challenges their own s3 bucket
 Code split everything
 	https://create-react-app.dev/docs/code-splitting/
 useEffect cleanup functions (lesson 154)

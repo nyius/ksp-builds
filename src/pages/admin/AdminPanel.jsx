@@ -551,15 +551,17 @@ function AdminPanel() {
 
 			usersSnap.forEach(user => {
 				const userData = user.data();
-				userData.hangars = userData.folders;
 
-				userData.hangars.map(hangar => {
-					hangar.hangarName = hangar.folderName;
-					delete hangar.folderName;
-				});
+				if (userData.folders) {
+					userData.hangars = userData.folders;
 
-				updateDoc(doc(db, 'users', user.id), { hangars: userData.hangars, folders: deleteField() });
-				updateDoc(doc(db, 'userProfiles', user.id), { hangars: userData.hangars, folders: deleteField() });
+					userData.hangars.map(hangar => {
+						hangar.hangarName = hangar.folderName;
+						delete hangar.folderName;
+					});
+					updateDoc(doc(db, 'users', user.id), { hangars: userData.hangars, folders: deleteField() });
+					updateDoc(doc(db, 'userProfiles', user.id), { hangars: userData.hangars, folders: deleteField() });
+				}
 			});
 
 			toast.success('All users updated!');

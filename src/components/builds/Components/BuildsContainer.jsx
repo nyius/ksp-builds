@@ -10,7 +10,11 @@ function BuildsContainer({ children }) {
 	const { buildsView, forcedView } = useBuildsContext();
 
 	return (
-		<div className={`${buildsView === 'list' || forcedView === 'pinnedList' ? 'flex flex-col gap-5' : ''} ${buildsView === 'grid' && forcedView !== 'pinnedList' ? 'flex flex-wrap gap-10' : ''} justify-center realtive w-full mb-6`}>
+		<div
+			className={`${buildsView === 'list' || forcedView === 'pinnedList' ? 'flex flex-col gap-5 overflow-x-hidden' : ''} ${
+				buildsView === 'grid' && forcedView !== 'pinnedList' ? 'flex flex-wrap gap-10' : ''
+			} justify-center realtive w-full mb-6`}
+		>
 			{children}
 		</div>
 	);

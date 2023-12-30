@@ -37,7 +37,7 @@ import errorReport from '../../utilities/errorReport';
 const useFetchBuild = async id => {
 	const { dispatchBuild } = useBuildContext();
 	const { fetchComments } = useFetchComments();
-
+	console.log(id);
 	useEffect(() => {
 		const fetchBuild = async () => {
 			dispatchBuild({ type: 'LOADING_BUILD', payload: true });

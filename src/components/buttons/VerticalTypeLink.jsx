@@ -128,13 +128,13 @@ function VerticalTypeLink({ text }) {
 			}}
 			id={text}
 		>
-			<div id={text} className="bg-primary w-12 2k:w-20 h-20 2k:h-26 flex items-center justify-center rounded-l-lg 2k:rounded-l-xl">
+			<div id={text} className="bg-primary w-12 2k:w-20 h-16 2k:h-26 flex items-center justify-center rounded-l-lg 2k:rounded-l-xl">
 				{getLinkIcon(text)}
 			</div>
-			<div id={text} className="relative overflow-hidden h-20 2k:h-26 flex flex-row w-full bg-base-400">
+			<div id={text} className="relative overflow-hidden h-16 2k:h-26 flex flex-row w-full bg-base-400">
 				<div
 					id={text}
-					className={`relative rounded-none rounded-r-lg 2k:rounded-r-xl flex flex-row h-20 2k:h-32 hover:bg-violet-700 gap-12 lg:gap-6 2k:gap-16 variable-font-size font-light btn btn-block justify-start ${
+					className={`relative rounded-none rounded-r-lg 2k:rounded-r-xl flex flex-row h-16 2k:h-32 hover:bg-violet-700 gap-12 lg:gap-6 2k:gap-16 variable-font-size font-light btn btn-block justify-start ${
 						typeFilter === text ? 'bg-primary hover:bg-violet-900' : ''
 					}text-slate-300`}
 				>

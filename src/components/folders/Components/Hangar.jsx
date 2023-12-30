@@ -121,7 +121,7 @@ function Hangar({ hangar, editable, type, sidebar }) {
 				id={`hangar-${hangar.id}`}
 				tabIndex={0}
 				className={`hangar text-5xl 2k:text-6xl flex place-content-between cursor-pointer relative p-1 rounded-xl
-				${sidebar ? '!text-[5rem] 2k:!text-[6rem] flex-col w-full py-5 px-7 gap-5' : 'items-center'} 
+				${sidebar ? '!text-[5rem] 2k:!text-[6rem] flex-col w-full py-3 2k:py-5 px-5 2k:px-7 gap-2 2k:gap-5' : 'items-center'} 
 				${hangarView === 'grid' && !sidebar ? `flex-col ${editingHangar && editingHangar.id === hangar.id ? 'h-25 2k:h-32 w-60 2k:w-72' : 'w-[14rem] 2k:w-[17rem] h-[10rem] 2k:h-[11rem]'}` : ''} 
 				${hangarView === 'list' && !sidebar ? `flex-row place-content-between gap-4 2k:gap-6 w-full h-fit pl-10` : ''} 
 				${checkIfHangarOpen(hangar.id) ? 'bg-base-100 border-2 border-dashed border-slate-600' : ''}
@@ -162,7 +162,7 @@ function Hangar({ hangar, editable, type, sidebar }) {
 					}
 				}}
 			>
-				<div className={`flex ${sidebar ? '!gap-2' : ''} ${hangarView === 'list' ? 'flex-row gap-4' : 'flex-col'} items-center`}>
+				<div className={`flex ${sidebar ? '2k:!gap-2' : ''} ${hangarView === 'list' ? 'flex-row gap-4' : 'flex-col'} items-center`}>
 					<AnimatedSaveIcon hangar={hangar} buildAdded={buildAdded} />
 					<AddToHangarCheckbox hangarID={hangar.id} sidebar={sidebar} />
 					<PinHangarCheckbox hangar={hangar} sidebar={sidebar} />
@@ -264,9 +264,9 @@ const SidebarHangarIcon = ({ sidebar, hoverHangar, hangar }) => {
 	return (
 		<>
 			{sidebar && hoverHangar === hangar.id ? (
-				<> {checkIfBuildInHangar(dragBuild, hangar.id, user) ? <HangarMinusIcon className="w-16 h-16 shrink-0" fill="#f23d4c" /> : <HangarPlusIcon className="w-16 h-16 shrink-0" fill="#36d399" />}</>
+				<> {checkIfBuildInHangar(dragBuild, hangar.id, user) ? <HangarMinusIcon className="2k:w-16 w-10 2k:h-16 h-10 shrink-0" fill="#f23d4c" /> : <HangarPlusIcon className="2k:w-16 w-10 2k:h-16 h-10 shrink-0" fill="#36d399" />}</>
 			) : (
-				<HangarIcon className="w-16 h-16 shrink-0" fill="#a6adbb" />
+				<HangarIcon className="2k:w-16 w-10 2k:h-16 h-10 shrink-0" fill="#a6adbb" />
 			)}
 		</>
 	);
@@ -305,7 +305,7 @@ const DisplayBuildsAmount = ({ hangar }) => {
 	const { hangarView } = useHangarContext();
 
 	return (
-		<div className={`flex flex-row items-center justify-center text-lg 2k:text-2xl gap-2 lg:gap-3 text-center ${hangarView === 'list' ? 'pr-10' : ''} `}>
+		<div className={`flex flex-row items-center justify-center text-lg 2k:text-2xl gap-2 lg:gap-3 text-center unselectable ${hangarView === 'list' ? 'pr-10' : ''} `}>
 			<span className="text-center font-bold">{hangar.builds.length}</span> build{hangar.builds.length !== 1 && 's'}
 		</div>
 	);

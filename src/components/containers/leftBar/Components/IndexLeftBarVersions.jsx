@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import LeftBarTitle from '../LeftBarTitle';
 import useFilters from '../../../../context/filters/FiltersActions';
 import { useFiltersContext } from '../../../../context/filters/FiltersContext';
+import Select, { Option } from '../../../selects/Select';
 
 /**
  * Displays the version select dropdown on the left index bar
@@ -9,24 +10,19 @@ import { useFiltersContext } from '../../../../context/filters/FiltersContext';
  */
 function IndexLeftBarVersions() {
 	const { setVersionFilter } = useFilters();
-	const { filtersLoading, kspVersions } = useFiltersContext();
+	const { filtersLoading, kspVersions, versionFilter } = useFiltersContext();
+	const [visible, setVisible] = useState(false);
 
 	return (
 		<>
 			<LeftBarTitle text="KSP Version" />
-			<select id="versionsSelect" onChange={setVersionFilter} className="select select-bordered w-full 2k:select-lg 2k:text-xl mb-6 2k:mb-12">
-				<optgroup>
-					<option value="any">Any</option>
-					{!filtersLoading &&
-						kspVersions.map((version, i) => {
-							return (
-								<option key={i} value={version}>
-									{version} {i === 0 && '(Current)'}
-								</option>
-							);
-						})}
-				</optgroup>
-			</select>
+			<Select id="versionsSelect" selectedOption={versionFilter} visibleState={visible} visibleSetter={setVisible} size="w-full" dropdownCSS="border-1 border-solid border-slate-700">
+				<Option selectedOption={versionFilter} id="any" displayText="Any" handlerFunc={setVersionFilter} />
+				{!filtersLoading &&
+					kspVersions.map((version, i) => {
+						return <Option selectedOption={versionFilter} id={version} key={i} visibleSetter={setVisible} displayText={`${version} ${i === 0 ? '(Current)' : ''}`} handlerFunc={setVersionFilter} />;
+					})}
+			</Select>
 		</>
 	);
 }

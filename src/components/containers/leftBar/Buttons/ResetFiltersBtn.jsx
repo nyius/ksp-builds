@@ -23,7 +23,7 @@ function ResetFiltersBtn() {
 		navigate('/');
 	};
 
-	return <Button icon="reset" text="Reset" onClick={reset} color="bg-base-300" size="w-full" />;
+	return <Button icon="reset" text="Reset" onClick={reset} color="bg-base-300" margin="mt-6 2k:mt-10" size="w-full" />;
 }
 
 export default ResetFiltersBtn;

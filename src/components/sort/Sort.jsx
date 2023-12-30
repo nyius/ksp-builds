@@ -25,11 +25,11 @@ function Sort() {
 
 	return (
 		<Select selectedOption={optionToText(sortBy)} visibleState={visible} visibleSetter={setVisible} selectText="Sort:">
-			<Option displayText="Views" id="views_most" handlerFunc={handleChangeSort} />
-			<Option displayText="Newest" id="date_newest" handlerFunc={handleChangeSort} />
-			<Option displayText="Oldest" id="date_oldest" handlerFunc={handleChangeSort} />
-			<Option displayText="Votes" id="upVotes" handlerFunc={handleChangeSort} />
-			<Option displayText="Comments" id="comments" handlerFunc={handleChangeSort} />
+			<Option selectedOption={sortBy} displayText="Views" id="views_most" handlerFunc={handleChangeSort} />
+			<Option selectedOption={sortBy} displayText="Newest" id="date_newest" handlerFunc={handleChangeSort} />
+			<Option selectedOption={sortBy} displayText="Oldest" id="date_oldest" handlerFunc={handleChangeSort} />
+			<Option selectedOption={sortBy} displayText="Votes" id="upVotes" handlerFunc={handleChangeSort} />
+			<Option selectedOption={sortBy} displayText="Comments" id="comments" handlerFunc={handleChangeSort} />
 		</Select>
 	);
 }

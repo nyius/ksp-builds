@@ -65,7 +65,7 @@ const useFilters = () => {
 			type: 'SET_FILTERS',
 			payload: {
 				filter: 'versionFilter',
-				value: e.target.value,
+				value: e.target.id,
 			},
 		});
 		setCurrentPage(dispatchBuilds, 0);
@@ -80,7 +80,7 @@ const useFilters = () => {
 			type: 'SET_FILTERS',
 			payload: {
 				filter: 'modsFilter',
-				value: e.target.value,
+				value: e.target.id,
 			},
 		});
 		setCurrentPage(dispatchBuilds, 0);

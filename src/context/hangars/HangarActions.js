@@ -483,7 +483,7 @@ export const useSetCurrentHangarOwner = () => {
 	useEffect(() => {
 		if (hangarLocation === 'user') {
 			setCurrentHangarOwner(dispatchHangars, currentUser);
-		} else if (hangarLocation === 'profile' || hangarLocation === 'popup') {
+		} else if (hangarLocation === 'profile' || hangarLocation === 'popup' || hangarLocation === 'upload') {
 			setCurrentHangarOwner(dispatchHangars, user?.username);
 		}
 	}, [hangarLocation, dispatchHangars, currentUser, user]);
@@ -557,6 +557,9 @@ export const useSetPersonalBuildsHangar = (initialState, sidebar) => {
 					setPersonalBuildsHangar(prevState => {
 						return {
 							...prevState,
+							id: 'your-builds',
+							hangarName: 'Your Builds',
+							urlName: '',
 							builds: user.builds,
 						};
 					});

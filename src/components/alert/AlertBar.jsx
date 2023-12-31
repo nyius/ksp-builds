@@ -62,7 +62,7 @@ function AlertBar({ css }) {
 	if (!alertLoading && alert && !hiddenAlert) {
 		return (
 			<div
-				className={`w-full top-[4rem] fixed font-bold z-[100] h-fit ${alert.color === 'green' ? 'text-slate-800' : 'text-white'} px-4 2k:px-8 py-4 2k:py-8 ${css ? css : ''} ${
+				className={`w-full top-[4rem] 2k:top-[6rem] fixed font-bold z-[100] h-fit ${alert.color === 'green' ? 'text-slate-800' : 'text-white'} px-4 2k:px-8 py-4 2k:py-8 ${css ? css : ''} ${
 					alert.color ? getColor(alert.color) : 'bg-yellow-600'
 				} text-xl 2k:text-3xl text-center `}
 			>

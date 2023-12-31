@@ -31,9 +31,9 @@ const fetchBuildFromAWS = async id => {
 		}
 	} catch (error) {
 		if (error.message.includes('network error') || error.message.includes(`NetworkError`)) {
-			errorReport(error.message, false, 'fetchBuildFromAWS', auth?.currentUser ? auth.currentUser : null);
+			errorReport('build id: ' + id + '| message: ' + error.message, false, 'fetchBuildFromAWS', auth?.currentUser ? auth.currentUser : null);
 		} else {
-			errorReport(error.message, true, 'fetchBuildFromAWS', auth?.currentUser ? auth.currentUser : null);
+			errorReport('build id: ' + id + '| message: ' + error.message, true, 'fetchBuildFromAWS', auth?.currentUser ? auth.currentUser : null);
 		}
 	}
 

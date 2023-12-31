@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Hangar from './Hangar';
 import { useHangarContext } from '../../../context/hangars/HangarContext';
 import { useHideOwnHangar, useSetPersonalBuildsHangar } from '../../../context/hangars/HangarActions';

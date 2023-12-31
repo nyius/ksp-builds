@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import useFilters from '../../context/filters/FiltersActions';
+import Select from '../selects/Select';
 import { useFiltersContext } from '../../context/filters/FiltersContext';
-import Select, { Option } from '../selects/Select';
 
 /**
  * Displays the build sorting dropdown
@@ -11,8 +11,6 @@ function Sort() {
 	const { setSortFilter } = useFilters();
 	const { sortBy } = useFiltersContext();
 
-	const [visible, setVisible] = useState(false);
-
 	/**
 	 * Handles user changing sorting
 	 * @param {*} e
@@ -20,17 +18,18 @@ function Sort() {
 	const handleChangeSort = e => {
 		setSortFilter(e);
 		localStorage.setItem('sort', e.target.id);
-		setVisible(false);
 	};
 
+	const { SelectBox, Option } = Select(handleChangeSort, { id: sortBy, text: optionToText(sortBy) });
+
 	return (
-		<Select selectedOption={optionToText(sortBy)} visibleState={visible} visibleSetter={setVisible} selectText="Sort:">
-			<Option selectedOption={sortBy} displayText="Views" id="views_most" handlerFunc={handleChangeSort} />
-			<Option selectedOption={sortBy} displayText="Newest" id="date_newest" handlerFunc={handleChangeSort} />
-			<Option selectedOption={sortBy} displayText="Oldest" id="date_oldest" handlerFunc={handleChangeSort} />
-			<Option selectedOption={sortBy} displayText="Votes" id="upVotes" handlerFunc={handleChangeSort} />
-			<Option selectedOption={sortBy} displayText="Comments" id="comments" handlerFunc={handleChangeSort} />
-		</Select>
+		<SelectBox selectText="Sort:">
+			<Option displayText="Views" id="views_most" />
+			<Option displayText="Newest" id="date_newest" />
+			<Option displayText="Oldest" id="date_oldest" />
+			<Option displayText="Votes" id="upVotes" />
+			<Option displayText="Comments" id="comments" />
+		</SelectBox>
 	);
 }
 

@@ -797,7 +797,7 @@ export const useSetBuildToUpload = buildToUpload => {
 
 /**
  * Handles checking if the current URL contains a challenge. Used for Upload/Edit build page
- * @returns [challengeParam, setChallengeParam]
+ * @returns [challengeParam, setChallengeParam, gettingChallenge]
  */
 export const useGetBuildChallenge = initialState => {
 	const { dispatchBuild, buildToUpload } = useBuildContext();

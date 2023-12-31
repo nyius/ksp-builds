@@ -1,6 +1,7 @@
 import React from 'react';
 import { useBuildContext } from '../../../context/build/BuildContext';
 import { setBuildToUpload } from '../../../context/build/BuildActions';
+import Select from '../../../components/selects/Select';
 
 /**
  * Input the field for the builds visibility
@@ -8,21 +9,24 @@ import { setBuildToUpload } from '../../../context/build/BuildActions';
  */
 function UploadBuildVisibility() {
 	const { dispatchBuild, buildToUpload } = useBuildContext();
+
+	const handleSetVisibility = e => {
+		setBuildToUpload(dispatchBuild, { ...buildToUpload, visibility: e.target.id });
+	};
+
+	const { SelectBox, Option } = Select(handleSetVisibility, { id: buildToUpload?.visibility ? buildToUpload?.visibility : 'Public', text: buildToUpload?.visibility ? buildToUpload?.visibility : 'Public' });
+
 	const options = ['Public', 'Private', 'Unlisted'];
 
 	if (buildToUpload) {
 		return (
 			<div className="flex flex-row items-center gap-6 text-slate-200">
 				<p className="2k:text-2xl">Visibility</p>
-				<select id="visibility" defaultValue={buildToUpload.visibility} onChange={e => setBuildToUpload(dispatchBuild, { ...buildToUpload, visibility: e.target.value })} className="select select-bordered 2k:select-lg 2k:text-2xl max-w-xs">
+				<SelectBox size="w-44">
 					{options.map((visibility, i) => {
-						return (
-							<option key={i} value={visibility}>
-								{visibility}
-							</option>
-						);
+						return <Option key={i} id={visibility} displayText={visibility} />;
 					})}
-				</select>
+				</SelectBox>
 			</div>
 		);
 	}

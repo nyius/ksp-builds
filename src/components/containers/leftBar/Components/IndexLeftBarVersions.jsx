@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import LeftBarTitle from '../LeftBarTitle';
 import useFilters from '../../../../context/filters/FiltersActions';
 import { useFiltersContext } from '../../../../context/filters/FiltersContext';
-import Select, { Option } from '../../../selects/Select';
+import Select from '../../../selects/Select';
 
 /**
  * Displays the version select dropdown on the left index bar
@@ -11,18 +11,23 @@ import Select, { Option } from '../../../selects/Select';
 function IndexLeftBarVersions() {
 	const { setVersionFilter } = useFilters();
 	const { filtersLoading, kspVersions, versionFilter } = useFiltersContext();
-	const [visible, setVisible] = useState(false);
+
+	const handleChangeVersion = e => {
+		setVersionFilter(e);
+	};
+
+	const { SelectBox, Option } = Select(handleChangeVersion, { id: versionFilter, text: versionFilter });
 
 	return (
 		<>
 			<LeftBarTitle text="KSP Version" />
-			<Select id="versionsSelect" selectedOption={versionFilter} visibleState={visible} visibleSetter={setVisible} size="w-full" dropdownCSS="border-1 border-solid border-slate-700">
-				<Option selectedOption={versionFilter} id="any" displayText="Any" handlerFunc={setVersionFilter} />
+			<SelectBox id="versionsSelect" size="w-full" dropdownCSS="border-1 border-solid border-slate-700">
+				<Option id="any" displayText="Any" />
 				{!filtersLoading &&
 					kspVersions.map((version, i) => {
-						return <Option selectedOption={versionFilter} id={version} key={i} visibleSetter={setVisible} displayText={`${version} ${i === 0 ? '(Current)' : ''}`} handlerFunc={setVersionFilter} />;
+						return <Option id={version} key={i} displayText={`${version} ${i === 0 ? '(Current)' : ''}`} />;
 					})}
-			</Select>
+			</SelectBox>
 		</>
 	);
 }

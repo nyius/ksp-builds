@@ -306,7 +306,7 @@ const DisplayBuildsAmount = ({ hangar }) => {
 
 	return (
 		<div className={`flex flex-row items-center justify-center text-lg 2k:text-2xl gap-2 lg:gap-3 text-center unselectable ${hangarView === 'list' ? 'pr-10' : ''} `}>
-			<span className="text-center font-bold">{hangar.builds.length}</span> build{hangar.builds.length !== 1 && 's'}
+			<span className="text-center font-bold">{hangar?.builds?.length}</span> build{hangar?.builds?.length !== 1 && 's'}
 		</div>
 	);
 };

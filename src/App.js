@@ -63,6 +63,10 @@ const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 - add a article feature
 - make the text editor less bad
 - community voting for year end
+- a comment notification should take you to that comment
+- notification icon and profile icon should always show (even if that info hasnt loaded yet)
+- pagination dots for hero
+- make hero perttier
 Code split everything
 	https://create-react-app.dev/docs/code-splitting/
 useEffect cleanup functions (lesson 154)

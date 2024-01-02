@@ -417,7 +417,7 @@ export const useUpdateProfile = () => {
 					setLocalStoredUser(user.uid, user);
 				}
 			}
-			console.log(userUid, user.uid, update);
+
 			await updateDoc(doc(db, 'users', userUid ? userUid : user.uid), update);
 		} catch (error) {
 			errorReport(error.message, true, 'updateUserDb');

@@ -12,13 +12,6 @@ function ResetFiltersBtn() {
 	const navigate = useNavigate();
 
 	const reset = () => {
-		const versionsSelect = document.getElementById('versionsSelect');
-		const modsSelect = document.getElementById('modsSelect');
-		const challengesSelect = document.getElementById('challengesSelect');
-
-		versionsSelect.selectedIndex = 0;
-		modsSelect.selectedIndex = 0;
-		challengesSelect.selectedIndex = 0;
 		resetFilters();
 		navigate('/');
 	};

@@ -92,8 +92,10 @@ export const AuthProvider = ({ children }) => {
 				throw new Error('User does not exist');
 			}
 		} catch (error) {
-			if (window.location.href !== 'https://kspbuilds.com/sign-up' || error.message !== 'User does not exist') {
+			if (window.location.href !== 'https://kspbuilds.com/sign-up') {
 				errorReport(error.message, true, 'getUser');
+			} else if (error.message.includes('User does not exist') || error.message.includes('client is offline')) {
+				errorReport(error.message, false, 'getUser');
 			}
 		}
 	};

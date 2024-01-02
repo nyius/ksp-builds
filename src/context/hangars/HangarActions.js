@@ -144,7 +144,7 @@ export const useAddBuildToHangar = () => {
 
 			if (hangarId) {
 				// Loop over the users existing hangars
-				usersHangars.map(hangar => {
+				usersHangars?.map(hangar => {
 					// check if a hangar contains the build we want to save
 					if (hangar.builds.includes(buildId)) {
 						// See if this hangar is the hangar we want to save to.
@@ -175,7 +175,7 @@ export const useAddBuildToHangar = () => {
 				});
 			} else {
 				// Loop over the users existing hangars
-				usersHangars.map(hangar => {
+				usersHangars?.map(hangar => {
 					// check if a hangar contains the build we want to save
 					if (hangar.builds.includes(buildId)) {
 						// If this existing hangar contains our build, see if we have this hangar selected

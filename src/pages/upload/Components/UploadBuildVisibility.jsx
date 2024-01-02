@@ -24,7 +24,7 @@ function UploadBuildVisibility() {
 				<p className="2k:text-2xl">Visibility</p>
 				<SelectBox size="w-44">
 					{options.map((visibility, i) => {
-						return <Option key={i} id={visibility} displayText={visibility} />;
+						return <Option key={i} id={visibility.toLowerCase()} displayText={visibility} />;
 					})}
 				</SelectBox>
 			</div>

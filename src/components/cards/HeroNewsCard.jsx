@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
 import Button from '../buttons/Button';
-import DefaultChallengeImg from '../../assets/defaultChallenge.png';
 
 /**
  * Displays the article card
@@ -18,7 +17,12 @@ function HeroNewsCard({ article, i }) {
 	return (
 		<>
 			<div className="2xl:w-300 h-full flex flex-col items-center justify-center overflow-hidden z-50">
-				<img src={article?.image ? article?.image : DefaultChallengeImg} alt={article?.title} className="rounded-lg z-50 cursor-pointer" onClick={() => navigate(`/news/${article?.articleId}`)} />
+				<img
+					src={article?.image ? article?.image : 'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/kspbuilds_update_default.png?alt=media&token=daa83171-d7f5-4292-b89c-b15ff06b31c6'}
+					alt={article?.title}
+					className="rounded-lg z-50 cursor-pointer"
+					onClick={() => navigate(`/news/${article?.articleId}`)}
+				/>
 			</div>
 
 			<div className="flex flex-col w-full px-4 justify-center">

@@ -62,6 +62,7 @@ const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 -make admin panel code less doom
 - add a article feature
 - make the text editor less bad
+- community voting for year end
 Code split everything
 	https://create-react-app.dev/docs/code-splitting/
 useEffect cleanup functions (lesson 154)

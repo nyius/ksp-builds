@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import BuildOfTheWeekCard from './BuildOfTheWeekCard';
 import ChallengeCard from './ChallengeCard';
+import HeroNewsCard from './HeroNewsCard';
 import { useNewsContext } from '../../context/news/NewsContext';
 
 let inputTimeout;
@@ -27,7 +28,7 @@ function HeroCard({ cardItem, i }) {
 	if (currentHeroSlide === i) {
 		return (
 			<div className={`relative lg:absolute hero-card h-fit lg:h-full flex flex-col lg:flex-row rounded-lg p-4 gap-4 bg-base-900 left-1/2 -translate-x-1/2 z-50 shadow-xl`}>
-				{cardItem.buildOfTheWeek ? <BuildOfTheWeekCard i={i} buildOfTheWeek={cardItem} /> : <ChallengeCard i={i} challenge={cardItem} />}
+				{cardItem.buildOfTheWeek ? <BuildOfTheWeekCard i={i} buildOfTheWeek={cardItem} /> : <> {cardItem.type === 'challenge' ? <ChallengeCard i={i} challenge={cardItem} /> : <HeroNewsCard i={i} article={cardItem} />}</>}
 			</div>
 		);
 	} else if ((currentHeroSlide === i - 1 || (currentHeroSlide === heroSlidesLength - 1 && i === 0)) && window.innerWidth > 1024) {

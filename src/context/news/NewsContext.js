@@ -13,6 +13,7 @@ export const NewsProvider = ({ children }) => {
 	const initialState = {
 		articles: [],
 		challenges: [],
+		heroArticles: [],
 		streams: [],
 		articlesLoading: true,
 		deletePatchNoteId: null,
@@ -25,7 +26,7 @@ export const NewsProvider = ({ children }) => {
 	useEffect(() => {
 		const fetchNews = async () => {
 			try {
-				//Get News Articles---------------------------------------------------------------------------------------------------//
+				//Get official News Articles---------------------------------------------------------------------------------------------------//
 				const getNewsCommand = new GetObjectCommand({
 					Bucket: process.env.REACT_APP_BUCKET,
 					Key: `kspNews.json`,
@@ -35,7 +36,31 @@ export const NewsProvider = ({ children }) => {
 				let rawNews = await newsResponse.Body.transformToString();
 				let parsedNews = JSON.parse(rawNews);
 
-				//Get Challenges ---------------------------------------------------------------------------------------------------//
+				//Get KSP Builds articles ---------------------------------------------------------------------------------------------------//
+				const articlesCol = collection(db, 'articles');
+				const articlesConstraints = [limit(4)];
+				const articlesQuery = query(articlesCol, ...articlesConstraints);
+				const kspBuildsArticles = await getDocs(articlesQuery);
+
+				kspBuildsArticles.forEach(doc => {
+					const article = doc.data();
+					article.date = createDateFromFirebaseTimestamp(article.date.seconds);
+					parsedNews.push(article);
+				});
+
+				const sortedArticles = parsedNews.sort((a, b) => {
+					let aDate = new Date(a.date);
+					let bDate = new Date(b.date);
+
+					return aDate < bDate ? 1 : -1;
+				});
+
+				sortedArticles.map(article => {
+					article.type = 'article';
+					return article;
+				});
+
+				//Get Official Challenges ---------------------------------------------------------------------------------------------------//
 				const getChallengesCommand = new GetObjectCommand({
 					Bucket: process.env.REACT_APP_BUCKET,
 					Key: `kspChallenges.json`,
@@ -64,9 +89,14 @@ export const NewsProvider = ({ children }) => {
 					return aDate < bDate ? 1 : -1;
 				});
 
+				sortedChallenges.map(challenge => {
+					challenge.type = 'challenge';
+					return challenge;
+				});
+
 				dispatchNews({
 					type: 'SET_NEWS',
-					payload: parsedNews,
+					payload: sortedArticles,
 				});
 				dispatchNews({
 					type: 'SET_CHALLENGES',
@@ -77,7 +107,7 @@ export const NewsProvider = ({ children }) => {
 					payload: false,
 				});
 			} catch (error) {
-				if (error.includes('NetworkError') || error.message === 'Load failed' || error.includes('between the request time')) {
+				if (error.message.includes('NetworkError') || error.message.includes('Load failed') || error.message.includes('between the request time')) {
 					errorReport(error.message, false, 'fetchNews');
 				} else {
 					errorReport(error.message, true, 'fetchNews');

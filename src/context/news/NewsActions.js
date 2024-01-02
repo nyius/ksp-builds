@@ -50,7 +50,21 @@ function useNews() {
 		}
 	};
 
-	return { setNews, setNewsLoading, deleteChallenge };
+	/**
+	 * Handles deleting a article
+	 * @param {*} id
+	 */
+	const deleteArticle = async id => {
+		try {
+			await deleteDoc(doc(db, 'articles', id));
+			toast.success('Deleted article.');
+		} catch (error) {
+			toast.error('Something went wrong deleting that article');
+			errorReport(error.message, false, 'deleteChallenge');
+		}
+	};
+
+	return { setNews, setNewsLoading, deleteChallenge, deleteArticle };
 }
 
 export default useNews;
@@ -113,6 +127,28 @@ export const useGetChallenge = initialState => {
 	}, [challenges]);
 
 	return [challenge, setChallenge];
+};
+
+/**
+ * Gets the current article from our fetched articles array.
+ * @param {*} initialState
+ * @returns [article, setArticle];
+ */
+export const useGetArticle = initialState => {
+	const { articles } = useNewsContext();
+	const [article, setArticle] = useState(initialState);
+	const articleId = useParams().id;
+
+	useEffect(() => {
+		setArticle(() => {
+			const articleArr = articles.filter(article => {
+				if (article.articleId === articleId) return article;
+			});
+			return articleArr[0];
+		});
+	}, [articles]);
+
+	return [article, setArticle];
 };
 
 /**

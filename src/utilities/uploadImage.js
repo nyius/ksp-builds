@@ -75,13 +75,16 @@ export const uploadImage = async (image, setLoadingState, uid) => {
  * @param {function} setLoadingState - a setter state for loading
  * @param {int} imageKb - (optional) - the target KB size for each image
  * @param {int} imageWidth - (optional) - the target width for each image
+ * @param {int} sizeLimitOverride - (optional) - the target width for each image
+ * @param {bool} noCompress - (optional) - true if you dont want to compress the images
  * @returns
  */
-export const uploadImages = async (images, setLoadingState, imageKb, imageWidth) => {
+export const uploadImages = async (images, setLoadingState, imageKb, imageWidth, sizeLimitOverride, noCompress) => {
 	setLoadingState(true);
 
 	for (const image in images) {
-		if (images[image].size > 5242880) {
+		if (images[image].size > (sizeLimitOverride ? sizeLimitOverride : 5242880)) {
+			console.log(images[image].size > sizeLimitOverride);
 			toast.error(`${images[image].name} is too big! Must be smaller than 5mb`);
 			setLoadingState(false);
 			return;
@@ -168,13 +171,23 @@ export const uploadImages = async (images, setLoadingState, imageKb, imageWidth)
 		}
 	};
 
-	const compressedImages = await Promise.all([...images].map(img => compressImg(img)));
+	let imgUrls;
 
-	const imgUrls = await Promise.all([...compressedImages].map(img => storeImage(img))).catch(() => {
-		setLoadingState(false);
-		toast.error('Images not uploaded');
-		return;
-	});
+	if (noCompress) {
+		imgUrls = await Promise.all([...images].map(img => storeImage(img))).catch(() => {
+			setLoadingState(false);
+			toast.error('Images not uploaded');
+			return;
+		});
+	} else {
+		const compressedImages = await Promise.all([...images].map(img => compressImg(img)));
+
+		imgUrls = await Promise.all([...compressedImages].map(img => storeImage(img))).catch(() => {
+			setLoadingState(false);
+			toast.error('Images not uploaded');
+			return;
+		});
+	}
 
 	setLoadingState(false);
 	return imgUrls;

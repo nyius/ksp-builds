@@ -30,6 +30,7 @@ import GridLayout from './components/containers/GridLayout';
 import CenterContainer from './components/containers/CenterContainer';
 import HangarBar from './components/containers/hangarBar/HangarBar';
 import AlertBar from './components/alert/AlertBar';
+import Article from './pages/news/Article';
 
 const SignUp = lazy(() => import('./pages/sign/SignUp'));
 const Login = lazy(() => import('./pages/sign/Login'));
@@ -59,6 +60,8 @@ const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 -convert website to look like app
 -make challenges their own s3 bucket
 -make admin panel code less doom
+- add a article feature
+- make the text editor less bad
 Code split everything
 	https://create-react-app.dev/docs/code-splitting/
 useEffect cleanup functions (lesson 154)
@@ -105,6 +108,7 @@ function App() {
 										<Route exact path="/privacy" element={<Privacy />} />
 										<Route exact path="/terms" element={<Terms />} />
 										<Route exact path="/news" element={<News />} />
+										<Route exact path="/news/:id" element={<Article />} />
 										<Route exact path="/faq" element={<Faq />} />
 										<Route exact path="/sponsor" element={<Sponsor />} />
 										<Route exact path="/contact" element={<Contact />} />

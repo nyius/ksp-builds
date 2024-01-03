@@ -55,34 +55,40 @@ const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 
 /*NOTES
 /*TODO
+Asap---------------------------------------------------
 -let users change hangar icons/colors
+	- just for subscribers? (maybe free gets a few options of icons and no colors)
 -fix hangars at bottom of screen not displaying right
--convert website to look like app
 -make challenges their own s3 bucket
--make admin panel code less doom
-- add a article feature
-- make the text editor less bad
-- community voting for year end
-- a comment notification should take you to that comment
-- notification icon and profile icon should always show (even if that info hasnt loaded yet)
-- pagination dots for hero
-- make hero perttier
+builds in a hanger should have a sort by date added filter
+email notifs for botw
+implement react-popper to replace tooltips and username hover
+Quick share builds (without needing to create a whole build)
+Overwolf
+
+Whenever---------------------------------------------------
+make type searching work for your own builds/visiting a users builds
+- convert website to look like app
 Code split everything
-	https://create-react-app.dev/docs/code-splitting/
+https://create-react-app.dev/docs/code-splitting/
 useEffect cleanup functions (lesson 154)
+competitions/ways to give users accolades/awards
+Mission generation page - would get destroyed by chatGPT charges so maybe in the future
+Google ads
+-subscription tier to turn it off
+
+Later---------------------------------------------------
+- community voting for year end
+Volunteer positions (moderate, write posts, create challenges, etc) - this will include all the features they may need to see/have access to
+t-shirts, merch
+
+Research---------------------------------------------------
+- make the text editor less bad
+pagination allowing user to jump right to a page? might result in a large amount of firebase calls
 Should be able to login with username/password
 	-automatically generate an email auth with the new username (eg steve@kspbuilds.com)
 	-when the user signs in with username, stick @kspbuilds.com to the end and then attempt the email login
-builds in a hanger should have a sort by date added filter
-email notifs for botw
-make type searching work for your own builds/visiting a users builds
-implement react-popper to replace tooltips and username hover
-pagination allowing user to jump right to a page? might result in a large amount of firebase calls
-competitions/ways to give users accolades/awards
-Quick share builds (without needing to create a whole build)
-Volunteer positions (moderate, write posts, create challenges, etc) - this will include all the features they may need to see/have access to
-Mission generation page - would get destroyed by chatGPT charges so maybe in the future
-t-shirts, merch
+	
  */
 
 //---------------------------------------------------------------------------------------------------//

@@ -29,6 +29,8 @@ function CheckCredentials({ type, uid, children }) {
 			return children;
 		} else if (type === 'loggedOut' && !isAuthenticated) {
 			return children;
+		} else {
+			return null;
 		}
 	} else {
 		return null;

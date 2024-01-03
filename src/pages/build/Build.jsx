@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 //---------------------------------------------------------------------------------------------------//
@@ -44,6 +44,39 @@ function Build() {
 	const { fetchedPinnedHangar } = useHangarContext();
 	const location = useLocation();
 	const { id } = useParams();
+	const targetRef = useRef();
+
+	// If there's a comment hash in the URL, wait for the element to load and scroll to it
+	useEffect(() => {
+		const scrollToTarget = () => {
+			if (targetRef.current) {
+				targetRef.current.scrollIntoView({ behavior: 'smooth' });
+			}
+		};
+
+		if (location.hash) {
+			let intervalId;
+			let timeoutId;
+
+			const checkIfElementExists = () => {
+				const targetElement = document.getElementById(location.hash.replace('#', ''));
+				if (targetElement) {
+					targetRef.current = targetElement;
+					clearInterval(intervalId);
+					clearTimeout(timeoutId); // Clear the timeout if the element is found
+					scrollToTarget();
+				}
+			};
+
+			// Set up an interval to check if the element exists
+			intervalId = setInterval(checkIfElementExists, 100);
+
+			// Set up a timeout to stop checking after 10 seconds
+			timeoutId = setTimeout(() => {
+				clearInterval(intervalId);
+			}, 10000);
+		}
+	}, [location.hash]);
 
 	useResetStates();
 

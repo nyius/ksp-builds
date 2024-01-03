@@ -26,7 +26,7 @@ function Notification({ i, notif }) {
 	const handleNavigate = e => {
 		if (e.target.id !== 'userlink') {
 			if (notif.type === 'comment') {
-				navigate(`/build/${notif.buildId}`);
+				navigate(`/build/${notif.buildId}#${notif.commentId}`);
 			}
 			if (notif.type === 'newBuild' || notif.type === 'buildOfTheWeek') {
 				navigate(`/build/${notif.buildId}`);

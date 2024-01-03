@@ -534,7 +534,7 @@ export const useHandleNotifications = () => {
 		try {
 			let newNotifs = [];
 
-			await user.notifications.map(notif => {
+			await user?.notifications?.map(notif => {
 				if (!notif.read) {
 					const updateNotif = async () => {
 						notif.read = true;

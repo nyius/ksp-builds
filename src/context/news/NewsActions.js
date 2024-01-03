@@ -233,6 +233,17 @@ export const prevHeroSlide = dispatchNews => {
 };
 
 /**
+ * Handles going to the next slide in the hero
+ * @param {function} dispatchNews - dispatch function
+ */
+export const setHeroSlide = (dispatchNews, i) => {
+	dispatchNews({
+		type: 'setHeroSlide',
+		payload: i,
+	});
+};
+
+/**
  * Handles setting the id of the patch note to edit in context
  * @param {function} dispatchNews - dispatch function
  * @param {int} length - length of the hero slides

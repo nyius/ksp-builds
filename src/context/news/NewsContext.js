@@ -20,7 +20,7 @@ export const NewsProvider = ({ children }) => {
 		editingPatchNotes: false,
 		streamsLoading: true,
 		currentHeroSlide: 0,
-		heroSlidesLength: 0,
+		heroSlidesLength: 10,
 	};
 
 	useEffect(() => {
@@ -107,7 +107,7 @@ export const NewsProvider = ({ children }) => {
 					payload: false,
 				});
 			} catch (error) {
-				if (error.message.includes('NetworkError') || error.message.includes('Load failed') || error.message.includes('between the request time')) {
+				if (error.message.includes('NetworkError') || error.message.includes('Load failed') || error.message.includes('between the request time') || error.message.includes('network error')) {
 					errorReport(error.message, false, 'fetchNews');
 				} else {
 					errorReport(error.message, true, 'fetchNews');

@@ -55,6 +55,11 @@ const NewsReducer = (state, action) => {
 				...state,
 				currentHeroSlide: state.currentHeroSlide == 0 ? state.heroSlidesLength - 1 : state.currentHeroSlide - 1,
 			};
+		case 'setHeroSlide':
+			return {
+				...state,
+				currentHeroSlide: action.payload,
+			};
 		default:
 			return state;
 	}

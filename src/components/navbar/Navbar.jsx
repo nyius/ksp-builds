@@ -44,10 +44,8 @@ function NavBar() {
 
 				<div className="flex-none gap-3">
 					<DiscordBtn />
-					<CheckCredentials type="user">
-						<Notifications />
-						<UserDropdown />
-					</CheckCredentials>
+					<Notifications />
+					<UserDropdown />
 
 					<CheckCredentials type="loggedOut">
 						<CreateAccountBtn />

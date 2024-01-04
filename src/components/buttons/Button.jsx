@@ -15,6 +15,8 @@ import { Link } from 'react-router-dom';
 import Tier1Badge from '../../assets/badges/tier1/tier1_badge36.png';
 import Tier2Badge from '../../assets/badges/tier2/tier2_badge36.png';
 import Tier3Badge from '../../assets/badges/tier3/tier3_badge36.png';
+import { usePopperTooltip } from 'react-popper-tooltip';
+import TooltipPopup from '../tooltip/TooltipPopup';
 
 const buttonIcon = icon => {
 	if (icon === 'cancel') return <GiCancel />;
@@ -89,30 +91,50 @@ const buttonIcon = icon => {
  * @returns
  */
 function Button({ id, text, onClick, color, size, icon, css, style, position, htmlFor, margin, type, href, target, tabIndex, tooltip }) {
+	const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef, visible } = usePopperTooltip();
+
 	// The button is a label becuase then we can use htmlFor tag to open modals. Not sure if this breaks things but it seems to work fine
 	if (type) {
 		if (type === 'ahref') {
 			return (
-				<div id={id} className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''}`} data-tip={tooltip ? tooltip : ''}>
-					<Link to={href} target={target} className={`btn 2k:btn-lg 2k:text-xl ${style ? style : ''} ${color ? color : ''} ${css ? css : ''} ${size ? size : ''} ${position ? position : ''} ${margin ? margin : ''} `} onClick={onClick}>
+				<>
+					{/* <div id={id} className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''}`} data-tip={tooltip ? tooltip : ''}> */}
+					<Link
+						ref={setTriggerRef}
+						to={href}
+						target={target}
+						className={`btn 2k:btn-lg 2k:text-xl ${style ? style : ''} ${color ? color : ''} ${css ? css : ''} ${size ? size : ''} ${position ? position : ''} ${margin ? margin : ''} `}
+						onClick={onClick}
+					>
 						{icon ? <span className={`text-2xl 2k:text-3xl ${text ? 'mr-4 2k:mr-6' : ''}`}>{buttonIcon(icon)}</span> : null}
 						{text !== '' ? text : null}
 					</Link>
-				</div>
+					{/* </div> */}
+					<TooltipPopup text={tooltip} getArrowProps={getArrowProps} getTooltipProps={getTooltipProps} visible={visible} setTooltipRef={setTooltipRef} />
+				</>
 			);
 		} else {
 			return (
-				<div id={id} className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''}`} data-tip={tooltip ? tooltip : ''}>
-					<button type={type} className={`btn 2k:btn-lg 2k:text-xl ${style ? style : ''} ${color ? color : ''} ${css ? css : ''} ${size ? size : ''} ${position ? position : ''} ${margin ? margin : ''} `} onClick={onClick}>
+				<>
+					{/* <div id={id} className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''}`} data-tip={tooltip ? tooltip : ''}> */}
+					<button
+						ref={setTriggerRef}
+						type={type}
+						className={`btn 2k:btn-lg 2k:text-xl ${style ? style : ''} ${color ? color : ''} ${css ? css : ''} ${size ? size : ''} ${position ? position : ''} ${margin ? margin : ''} `}
+						onClick={onClick}
+					>
 						{icon ? <span className={`text-2xl 2k:text-3xl ${text ? 'mr-4 2k:mr-6' : null}`}>{buttonIcon(icon)}</span> : null}
 						{text !== '' ? text : null}
 					</button>
-				</div>
+					{/* </div> */}
+					<TooltipPopup text={tooltip} getArrowProps={getArrowProps} getTooltipProps={getTooltipProps} visible={visible} setTooltipRef={setTooltipRef} />
+				</>
 			);
 		}
 	} else {
 		return (
-			<div className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''} ${position ? position : ''}`} data-tip={tooltip ? tooltip : ''}>
+			<>
+				{/* <div className={`${tooltip ? 'tooltip' : ''} ${size ? size : ''} ${position ? position : ''}`} data-tip={tooltip ? tooltip : ''}> */}
 				<label
 					id={id}
 					type={type}
@@ -120,11 +142,14 @@ function Button({ id, text, onClick, color, size, icon, css, style, position, ht
 					htmlFor={htmlFor}
 					className={`btn 2k:btn-lg 2k:text-xl ${style ? style : ''} ${color ? color : ''} ${css ? css : ''} ${size ? size : ''} ${position ? position : ''} ${margin ? margin : ''} `}
 					onClick={onClick}
+					ref={setTriggerRef}
 				>
 					{icon ? <span className={`text-2xl 2k:text-3xl ${text ? 'mr-4 2k:mr-6' : ''}`}>{buttonIcon(icon)}</span> : ''}
 					{text !== '' ? text : ''}
 				</label>
-			</div>
+				{/* </div> */}
+				<TooltipPopup text={tooltip} getArrowProps={getArrowProps} getTooltipProps={getTooltipProps} visible={visible} setTooltipRef={setTooltipRef} />
+			</>
 		);
 	}
 }

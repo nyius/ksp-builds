@@ -10,11 +10,7 @@ import { setReport } from '../../context/auth/AuthActions';
 function ReportUserBtn({ userToReport }) {
 	const { dispatchAuth } = useAuthContext();
 
-	return (
-		<div className="tooltip" data-tip="Report">
-			<Button htmlFor="report-modal" color="btn-dark" size="w-full" icon="report" text="Report" onClick={() => setReport(dispatchAuth, 'user', userToReport)} />
-		</div>
-	);
+	return <Button tooltip="Report" htmlFor="report-modal" color="btn-dark" size="w-fit" icon="report" onClick={() => setReport(dispatchAuth, 'user', userToReport)} />;
 }
 
 export default ReportUserBtn;

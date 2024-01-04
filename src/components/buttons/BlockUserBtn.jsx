@@ -11,11 +11,7 @@ function BlockUserBtn({ userToBlock }) {
 	const { user, dispatchAuth } = useAuthContext();
 
 	if (userToBlock && user && user?.username !== userToBlock?.username) {
-		return (
-			<div className="tooltip" data-tip="Block">
-				<Button htmlFor="block-modal" color="btn-error" size="w-full" icon="cancel" text={user?.blockList?.includes(userToBlock.uid) ? 'Unblock' : 'Block'} onClick={() => setUserToBlock(dispatchAuth, userToBlock.uid)} />
-			</div>
-		);
+		return <Button htmlFor="block-modal" color="btn-error" size="w-fit" icon="cancel" tooltip={user?.blockList?.includes(userToBlock.uid) ? 'Unblock' : 'Block'} onClick={() => setUserToBlock(dispatchAuth, userToBlock.uid)} />;
 	}
 }
 

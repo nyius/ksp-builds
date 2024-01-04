@@ -11,7 +11,7 @@ function DeleteBuildAdmin({ style, id, userID }) {
 		if (user?.siteAdmin) {
 			if (style === 'circle') {
 				return (
-					<div className="tooltip tooltip-right" data-tip="Delete Build">
+					<div className="tooltip" data-tip="Delete Build">
 						<button onClick={() => deleteBuild(id, userID)} className="btn btn-circle btn-error btn-sm hover:bg-red-500 right-0 top-0 absolute z-50">
 							X
 						</button>

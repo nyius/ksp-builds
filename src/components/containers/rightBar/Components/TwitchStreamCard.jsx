@@ -1,5 +1,6 @@
 import React from 'react';
 import { usePopperTooltip } from 'react-popper-tooltip';
+import TooltipPopup from '../../../tooltip/TooltipPopup';
 
 /**
  * Displays a card for a streamer
@@ -20,12 +21,7 @@ function TwitchStreamCard({ stream }) {
 				<p className="text-xl 2k:text-2xl text-slate-100 w-5/6 single-line-truncate">{stream.user_name}</p>
 				<div className="w-4 h-4 rounded-full bg-red-500"></div>
 			</a>
-			{visible && (
-				<div ref={setTooltipRef} {...getTooltipProps({ className: 'tooltip-container bg-base-800 !text-slate-100 !border-none !p-3 text-lg 2k:text-xl' })}>
-					{stream.title}
-					<div {...getArrowProps({ className: 'tooltip-arrow' })} />
-				</div>
-			)}
+			<TooltipPopup visible={visible} getArrowProps={getArrowProps} getTooltipProps={getTooltipProps} setTooltipRef={setTooltipRef} text={stream.title} />
 		</>
 	);
 }

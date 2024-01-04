@@ -8,11 +8,7 @@ import Button from '../../../buttons/Button';
  * @returns
  */
 function VisitBtn({ username, text }) {
-	return (
-		<div className="tooltip" data-tip="Visit">
-			<Button text={text} color="btn-primary" size="w-fit" icon="export" type="ahref" href={`/user/${username}`} />
-		</div>
-	);
+	return <Button tooltip="visit" text={text} color="btn-primary" size="w-fit" icon="export" type="ahref" href={`/user/${username}`} />;
 }
 
 export default VisitBtn;

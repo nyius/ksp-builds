@@ -1,5 +1,7 @@
 import React from 'react';
 import { BiComment } from 'react-icons/bi';
+import { usePopperTooltip } from 'react-popper-tooltip';
+import TooltipPopup from '../../../tooltip/TooltipPopup';
 
 /**
  * displays the builds comment count
@@ -7,15 +9,18 @@ import { BiComment } from 'react-icons/bi';
  * @returns
  */
 function BuildCardComments({ commentCount }) {
+	const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef, visible } = usePopperTooltip();
+
 	return (
-		<div className="tooltip" data-tip="Comments">
-			<div className="flex flex-row items-center gap-2">
+		<>
+			<div ref={setTriggerRef} className="flex flex-row items-center gap-2">
 				<p className="text-2xl 2k:text-3xl">
 					<BiComment />
 				</p>
 				<p className="text-lg 2k:text-2xl">{commentCount ? commentCount : 0}</p>
 			</div>
-		</div>
+			<TooltipPopup getArrowProps={getArrowProps} getTooltipProps={getTooltipProps} setTooltipRef={setTooltipRef} visible={visible} text="Comments" />
+		</>
 	);
 }
 

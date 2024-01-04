@@ -16,9 +16,7 @@ function MessageUserBtn({ usersProfile, text }) {
 		return (
 			<>
 				{!userToMessage.blockList?.includes(user?.uid) && (userToMessage.allowPrivateMessaging === true || userToMessage.allowPrivateMessaging === undefined) && (
-					<div className="tooltip" data-tip="Message">
-						<Button text={text} size="w-full" icon="comment" color="btn-primary" onClick={() => fetchConversation(userToMessage)} />
-					</div>
+					<Button tooltip="Message" text={text} size="w-fit" icon="comment" color="btn-primary" onClick={() => fetchConversation(userToMessage)} />
 				)}
 			</>
 		);

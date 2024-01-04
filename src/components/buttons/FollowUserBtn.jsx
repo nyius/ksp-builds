@@ -17,15 +17,14 @@ function FollowUserBtn({ usersProfile, text }) {
 	//---------------------------------------------------------------------------------------------------//
 	if (user && userToFollow && user.uid !== userToFollow.uid) {
 		return (
-			<div className="tooltip" data-tip={`${userToFollow.followers?.includes(user.uid) ? 'Unfollow' : 'Follow'}`}>
-				<Button
-					text={`${text ? (userToFollow.followers?.includes(user.uid) ? 'Unfollow' : 'Follow') : ''}`}
-					size="w-full"
-					icon={`${userToFollow.followers?.includes(user.uid) ? 'fill-heart' : 'outline-heart'}`}
-					color="btn-primary"
-					onClick={() => handleFollowingUser(userToFollow)}
-				/>
-			</div>
+			<Button
+				text={`${text ? (userToFollow.followers?.includes(user.uid) ? 'Unfollow' : 'Follow') : ''}`}
+				tooltip={`${text ? (userToFollow.followers?.includes(user.uid) ? 'Unfollow' : 'Follow') : ''}`}
+				size="w-fit"
+				icon={`${userToFollow.followers?.includes(user.uid) ? 'fill-heart' : 'outline-heart'}`}
+				color="btn-primary"
+				onClick={() => handleFollowingUser(userToFollow)}
+			/>
 		);
 	}
 }

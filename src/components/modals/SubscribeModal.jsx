@@ -9,6 +9,9 @@ import { useAuthContext } from '../../context/auth/AuthContext';
 import { setSubscribeModal } from '../../context/auth/AuthActions';
 import { FaHeart } from 'react-icons/fa';
 import PlanetHeader from '../header/PlanetHeader';
+import T1Badge from '../badges/T1Badge';
+import T2Badge from '../badges/T2Badge';
+import T3Badge from '../badges/T3Badge';
 
 function SubscribeModal() {
 	const { dispatchAuth, user, isAuthenticated, authLoading, newSub, subscribeModal } = useAuthContext();
@@ -46,32 +49,9 @@ function SubscribeModal() {
 										<h4 className="text-xl 2k:text-3xl font-bold text-white mb-10 2k:mb-14">As a KSP Builds Supporter you'll get:</h4>
 										<h4 className="text-xl 2k:text-3xl text-white mb-4 2k:mb-8">• A special badge next to your username</h4>
 										<div className="flex flex-row flex-wrap gap-5 2k:gap-10 mb-10 2k:mb-14 text-xl 2k:text-3xl font-bold rounded-xl p-3 bg-base-600">
-											<div className="tooltip" data-tip="Tier 1 badge">
-												<div className="text-primary flex flex-row gap-2 items-center">
-													Tier 1
-													<span>
-														<img className="w-8 h-8 2k:w-12 2k:h-12" src={Tier1Badge} alt="tier 1 badge" />
-													</span>
-												</div>
-											</div>
-
-											<div className="tooltip" data-tip="Tier 2 badge">
-												<div className="text-secondary flex flex-row gap-2 items-center">
-													Tier 2
-													<span>
-														<img className="w-8 h-8 2k:w-12 2k:h-12" src={Tier2Badge} alt="tier 2 badge" />
-													</span>
-												</div>
-											</div>
-
-											<div className="tooltip" data-tip="Tier 3 badge">
-												<div className="text-accent flex flex-row gap-2 items-center">
-													Tier 3
-													<span>
-														<img className="w-8 h-8 2k:w-12 2k:h-12" src={Tier3Badge} alt="tier 3 badge" />
-													</span>
-												</div>
-											</div>
+											<T1Badge />
+											<T2Badge />
+											<T3Badge />
 										</div>
 										<h4 className="text-xl 2k:text-3xl text-white mb-3 2k:mb-6">
 											• Custom username color - over <span className="font-bold">12</span> presets or any hex value you want

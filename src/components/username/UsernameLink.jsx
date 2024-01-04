@@ -12,57 +12,27 @@ import BlockUserBtn from '../buttons/BlockUserBtn';
 import UserReputation from './Components/UserReputation';
 import UserJoined from './Components/UserJoined';
 import UserUsername from './Components/UserUsername';
-
-let hoverTimer, hoverOutTimer;
-
-const handleHover = setHover => {
-	cancelHoverOutTimer();
-
-	hoverTimer = setTimeout(() => {
-		setHover(true);
-	}, 400);
-};
-
-const handleBlur = (e, setHover) => {
-	if (!e.currentTarget.contains(e.relatedTarget)) {
-		cancelHoverTimer();
-
-		hoverOutTimer = setTimeout(() => {
-			setHover(false);
-		}, 400);
-	}
-};
-
-const cancelHoverTimer = () => {
-	clearTimeout(hoverTimer);
-};
-
-const cancelHoverOutTimer = () => {
-	clearTimeout(hoverOutTimer);
-};
+import { usePopperTooltip } from 'react-popper-tooltip';
 
 /**
  * Displays the users username as a link. Also displays a hover popup menu.
  * @param {string} username
  * @param {string} uid
- * @param {string} hoverPosition - (optional) right, bottom-right, top-left, bottom
  * @param {bool} noHoverUi - (optional) true if you dont want the hover popup to appear
  * @param {bool} color - (optional) - if want to show a custom users color
  * @param {bool} css - (optional) - custom css
  * @returns
  */
-function UsernameLink({ username, uid, hoverPosition, noHoverUi, color, css }) {
+function UsernameLink({ username, uid, noHoverUi, color, css }) {
 	const navigate = useNavigate();
-	const [hover, setHover] = useState(false);
 	const [usersProfile, loadingProfile] = useReturnUserProfile(null, uid);
+	const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef, visible } = usePopperTooltip({ interactive: true, delayShow: 300, delayHide: 300 });
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
 			<div
 				className="dropdown username-link"
-				onMouseEnter={() => handleHover(setHover)}
-				onMouseLeave={e => handleBlur(e, setHover)}
 				onClick={e => {
 					e.stopPropagation();
 					e.preventDefault();
@@ -76,18 +46,15 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color, css }) {
 							className={`text-2xl z-10 2k:text-2xl link link-hover link-accent flex flex-row gap-2 items-center ${css ? css : ''} `}
 							onClick={() => navigate(`/user/${username}`)}
 							style={{ color: `${usersProfile?.customUsernameColor}` }}
+							ref={setTriggerRef}
 						>
 							{username}
 							<UsernameBadges usersProfile={usersProfile} />
 						</div>
 
-						{/* Popup Hover */}
-						{!noHoverUi && hover && usersProfile?.username ? (
-							<div
-								className={`absolute z-100 -top-0 -translate-x-1/3 -translate-y-full ${hoverPosition === 'right' ? '!-translate-x-0' : ''} ${hoverPosition === 'bottom-right' ? '!top-6 !translate-y-0 !-translate-x-0' : ''} ${
-									hoverPosition === 'top-left' ? '!-translate-x-3/4' : ''
-								} ${hoverPosition === 'bottom' ? '!top-6 !translate-y-0' : ''} cursor-auto bg-base-900 p-2 shadow ${color ? color : 'bg-base-100'}  rounded-box w-130 2k:w-160`}
-							>
+						{visible && !noHoverUi && (
+							<div ref={setTooltipRef} {...getTooltipProps({ className: `tooltip-container !text-2xl !2k:text-3xl ${color ? color : 'bg-base-600'} !text-slate-300 !border-none !p-4 min-w-[30rem] ` })}>
+								<div {...getArrowProps({ className: `tooltip-arrow ${color ? color : '!bg-base-600 '}` })} />
 								<div className="flex flex-col p-3 w-full">
 									<div className="flex flex-row gap-3 2k:gap-5 mb-2 items-center">
 										<UserProfilePicture loading={loadingProfile} usersProfile={usersProfile} />
@@ -119,7 +86,7 @@ function UsernameLink({ username, uid, hoverPosition, noHoverUi, color, css }) {
 									</div>
 								</div>
 							</div>
-						) : null}
+						)}
 					</>
 				) : null}
 			</div>

@@ -32,7 +32,7 @@ function BuildOfTheWeekCard({ buildOfTheWeek }) {
 					<div className="flex flex-col w-full items-center">
 						<div className="text-lg 2k:text-xl text-slate-400 flex flex-row gap-3 flex-wrap items-center">
 							Created by
-							<UsernameLink username={buildOfTheWeek.author} uid={buildOfTheWeek.uid} hoverPosition="bottom" />
+							<UsernameLink username={buildOfTheWeek.author} uid={buildOfTheWeek.uid} />
 						</div>
 						<p className="text-lg mb-6 2k:mb-8 2k:text-xl italic text-slate-500 z-10">{createDateFromFirebaseTimestamp(buildOfTheWeek.buildOfTheWeek.seconds)}</p>
 						<div className="flex flex-row flex-wrap gap-4 2k:gap-6">{/* <Button type="ahref" href={`/build/${buildOfTheWeek.id}`} text="View build" icon="right" color="text-white" position="z-50" /> */}</div>

@@ -42,7 +42,7 @@ function Notification({ i, notif }) {
 		<div onClick={handleNavigate} className={`flex flex-col p-4 2k:p-6 rounded-xl border-2 border-solid border-slate-700 cursor-pointer relative hover:bg-slate-800`}>
 			<DeleteNotifBtn i={i} id={notif.id} />
 			<div className="flex flex-row flex-wrap place-content-between mb-2 2k:mb-4">
-				<UsernameLink hoverPosition="bottom-right" username={notif.username} uid={notif.uid} />
+				<UsernameLink username={notif.username} uid={notif.uid} />
 				<NotifTimestamp timestamp={notif?.timestamp} />
 			</div>
 			<p className="text-lg 2k:text-2xl text-slate-400 italic 2k:mb-3">

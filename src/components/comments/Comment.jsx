@@ -27,7 +27,7 @@ function Comment({ comment }) {
 
 			<div id={comment.id} className="flex flex-col gap-4 2k:gap-8 w-full bg-base-100 rounded-b-md p-4 2k:p-8  ">
 				<div className="flex flex-row w-full gap-4 place-content-between">
-					<UsernameLink username={comment.username} uid={comment.uid} hoverPosition="right" css="font-bold" />
+					<UsernameLink username={comment.username} uid={comment.uid} css="font-bold" />
 					<CommentDate timestamp={comment.timestamp} />
 				</div>
 				<div className="text-slate-200">

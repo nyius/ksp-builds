@@ -40,7 +40,7 @@ function BuildCard({ build }) {
 								<BuildCardName name={build.name} />
 
 								<div className="flex flex-col flex-wrap gap-2 place-content-between my-4">
-									<UsernameLink hoverPosition="top" username={build.author} uid={build.uid} />
+									<UsernameLink username={build.author} uid={build.uid} />
 									<BuildCardUploadDate timestamp={build.timestamp} />
 								</div>
 

@@ -93,8 +93,10 @@ function User() {
 										<>
 											<MessageUserBtn text="Message" />
 											<FollowUserBtn text="Follow" />
-											<BlockUserBtn userToBlock={openProfile} />
-											<ReportUserBtn userToReport={openProfile} />
+											<div className="flex flex-row gap-2 2k:gap-4">
+												<BlockUserBtn userToBlock={openProfile} />
+												<ReportUserBtn userToReport={openProfile} />
+											</div>
 										</>
 									) : null}
 								</div>

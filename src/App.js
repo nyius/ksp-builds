@@ -60,6 +60,8 @@ const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 /*NOTES
 /*TODO
 Asap---------------------------------------------------
+- GOING TO PROFILE RIGHT AFTER MAKING ACCOUNT BREAKS createDateFromFirebaseTimestamp "Invalid time value"
+- new users rocket reputation breaks 
 - Make badges/acolades on each user account as an object to load icons/colors/hover etc
 	- giver past BotW winners this badge retroactively
 	- code each accolades conditional function

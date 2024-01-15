@@ -10,7 +10,7 @@ import { createDateFromFirebaseTimestamp } from '../../../utilities/createDateFr
  * @returns
  */
 function ProfileDetails() {
-	const { user, isAuthenticated } = useAuthContext();
+	const { user } = useAuthContext();
 	const { fetchedBuilds } = useBuildsContext();
 
 	//---------------------------------------------------------------------------------------------------//
@@ -18,7 +18,7 @@ function ProfileDetails() {
 		<>
 			<div className="flex flex-row flex-wrap gap-2 2k:gap-4 bg-base-600 w-full justify-center p-2 2k:p-4 rounded-xl">
 				<BuildInfoCard title="Joined">
-					<p className="text-xl 2k:text-3xl text-accent">{createDateFromFirebaseTimestamp(user?.dateCreated?.seconds)}</p>
+					<p className="text-xl 2k:text-3xl text-accent">{user?.dateCreated ? createDateFromFirebaseTimestamp(user?.dateCreated?.seconds) : 'Today'}</p>
 				</BuildInfoCard>
 				<BuildInfoCard title="Uploads">
 					<p className="text-xl 2k:text-3xl text-accent">{fetchedBuilds?.length}</p>

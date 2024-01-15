@@ -26,7 +26,7 @@ export const useGiveAccolade = () => {
 			newAccolade.dateReceived = new Date();
 
 			// Give Accolade ------------------------------------------------------------------------
-			const usersRef = collection(db, 'testUsers');
+			const usersRef = collection(db, 'users');
 			const usersSnap = await getDocs(usersRef);
 
 			usersSnap.forEach(fetchedUser => {
@@ -39,8 +39,8 @@ export const useGiveAccolade = () => {
 					userData.accolades = [newAccolade];
 				}
 
-				updateDoc(doc(db, 'testUsers', userData.id), { accolades: userData.accolades, rocketReputation: increment(accolade.points) });
-				updateDoc(doc(db, 'testUserProfiles', userData.id), { accolades: userData.accolades, rocketReputation: increment(accolade.points) });
+				updateDoc(doc(db, 'users', userData.id), { accolades: userData.accolades, rocketReputation: increment(accolade.points) });
+				updateDoc(doc(db, 'userProfiles', userData.id), { accolades: userData.accolades, rocketReputation: increment(accolade.points) });
 
 				// Notification ------------------------------------------------------------------------
 				const newNotif = cloneDeep(standardNotifications);
@@ -56,10 +56,7 @@ export const useGiveAccolade = () => {
 				delete newNotif.comment;
 				delete newNotif.commentId;
 
-				const userRef = collection(db, 'testUsers', userData.id, 'notifications');
-				addDoc(userRef, newNotif);
-
-				// sendNotification(userData.id, newNotif);
+				sendNotification(userData.id, newNotif);
 			});
 
 			toast.success('Accolades awarded!');
@@ -93,7 +90,7 @@ export const giveAccoladeAndNotify = async (dispatchAuth, accolades, userToGive,
 
 			// Give Accolade ------------------------------------------------------------------------
 			userToGive.accolades.push(newAccolade);
-			updateUserProfilesAndDb(dispatchAuth, { accolades: userToGive.accolades, rocketReputation: increment(accolade.points) }, userToGive);
+			updateUserProfilesAndDb(dispatchAuth, { accolades: userToGive.accolades, rocketReputation: increment(Number(accolade.points)) }, userToGive);
 
 			// Notification ------------------------------------------------------------------------
 			const newNotif = cloneDeep(standardNotifications);

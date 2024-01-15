@@ -31,6 +31,7 @@ import CenterContainer from './components/containers/CenterContainer';
 import HangarBar from './components/containers/hangarBar/HangarBar';
 import AlertBar from './components/alert/AlertBar';
 import Article from './pages/news/Article';
+import ModeratorRoute from './routes/ModeratorRoute';
 
 const SignUp = lazy(() => import('./pages/sign/SignUp'));
 const Login = lazy(() => import('./pages/sign/Login'));
@@ -38,10 +39,13 @@ const OverwolfLogin = lazy(() => import('./pages/sign/OverwolfLogin'));
 const Build = lazy(() => import('./pages/build/Build'));
 const NotFound = lazy(() => import('./pages/notFound/NotFound'));
 const Upload = lazy(() => import('./pages/upload/Upload'));
+const AccoladeDashboard = lazy(() => import('./pages/newAccolade/AccoladeDashboard'));
 const Profile = lazy(() => import('./pages/profile/Profile'));
+const ProfileAccolades = lazy(() => import('./pages/profile/ProfileAccolades'));
 const Privacy = lazy(() => import('./pages/privacy/Privacy'));
 const Terms = lazy(() => import('./pages/terms/Terms'));
 const User = lazy(() => import('./pages/user/User'));
+const UserAccolades = lazy(() => import('./pages/user/UserAccolades'));
 const Settings = lazy(() => import('./pages/settings/Settings'));
 const News = lazy(() => import('./pages/news/News'));
 const Favorites = lazy(() => import('./pages/favorites/Favorites'));
@@ -57,22 +61,42 @@ const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 /*TODO
 Asap---------------------------------------------------
 - Make badges/acolades on each user account as an object to load icons/colors/hover etc
-	{
-		badgeName: "",
-		badgeUrl:"",
-		badgeTooltip: "",
-		dateReceived: ""
-	}
+	- giver past BotW winners this badge retroactively
+	- code each accolades conditional function
+		-create actions for each check
+		- BotW
+		- challenge maestros
+		- comms specialist
+		- cosmic benefactor
+		- cosmic veteran
+		- daily challenge
+		- first contact
+		- galactic initiate
+		- glitch hunter
+		- interstellar pioneer
+		- kerbal engineer
+		- maiden voyager
+		- mission control
+		- omuamua
+		- orbital patron
+		- stellar luminary
+	- recieve multiple of the same accolade should all group together into a 'times received' number on the accolde viewer
+		- selected accolades needs to include the received date for that accolade
+		- then remove the users accolade that has that received date
+	- switch giveAccoladeToAllUsersAndNotify to userProfiles and users instead of test documents
+
+- select box should open scrolled to current selected element
+- 'clear' on comment doesn't actually clear
 -let users change hangar icons/colors
 	- just for subscribers? (maybe free gets a few options of icons and no colors)
 -fix hangars at bottom of screen not displaying right
 -make challenges their own s3 bucket
 -builds in a hanger should have a sort by date added filter
+-profile comment stats
+	- give all users a 'commentCount'
+	- increment it with each comment
 -Quick share builds (without needing to create a whole build)
 -Overwolf
--competitions/ways to give users accolades/awards easily (like chose a badge, give them a title)
-	- birthday (every year) awards
-	- milestone views/download awards
 
 Whenever---------------------------------------------------
 - email notifs for botw
@@ -135,6 +159,7 @@ function App() {
 										<Route exact path="/challenges" element={<Challenges />} />
 										<Route exact path="/patch-notes" element={<PatchNotes />} />
 										<Route exact path="/user/:id" element={<User />} />
+										<Route exact path="/user/:id/accolades" element={<UserAccolades />} />
 										<Route exact path="/user/:id/hangar/:hangarId" element={<User />} />
 										<Route exact path="/build/:id" element={<Build />} />
 										<Route
@@ -194,6 +219,15 @@ function App() {
 										/>
 										<Route
 											exact
+											path="/profile/accolades"
+											element={
+												<PrivateRoute>
+													<ProfileAccolades />
+												</PrivateRoute>
+											}
+										/>
+										<Route
+											exact
 											path="/profile/hangar/:hangarId"
 											element={
 												<PrivateRoute>
@@ -217,6 +251,24 @@ function App() {
 												<AdminRoute>
 													<AdminPanel />
 												</AdminRoute>
+											}
+										/>
+										<Route
+											exact
+											path="/accolade-dashboard"
+											element={
+												<ModeratorRoute>
+													<AccoladeDashboard />
+												</ModeratorRoute>
+											}
+										/>
+										<Route
+											exact
+											path="/accolade-dashboard/:username"
+											element={
+												<ModeratorRoute>
+													<AccoladeDashboard />
+												</ModeratorRoute>
 											}
 										/>
 										<Route path="*" element={<NotFound />} />

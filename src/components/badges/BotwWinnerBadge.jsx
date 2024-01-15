@@ -11,7 +11,7 @@ const BotwWinnerBadge = ({ hideText }) => {
 			<div ref={setTriggerRef} className="text-primary flex flex-row gap-2 items-center">
 				{hideText ? '' : 'Tier 1'}
 				<span>
-					<img className="w-8 h-8 2k:w-12 2k:h-12" src={BotwBadge} alt="Build of the Week Winner" />
+					<img className="w-7 h-7" src={BotwBadge} alt="Build of the Week Winner" />
 				</span>
 			</div>
 			<TooltipPopup text="Build of the Week Winner" visible={visible} getArrowProps={getArrowProps} getTooltipProps={getTooltipProps} setTooltipRef={setTooltipRef} />

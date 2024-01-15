@@ -13,7 +13,7 @@ function UploadBuildMods() {
 		return (
 			<div className="flex flex-row items-center gap-6 text-slate-200">
 				<p className="2k:text-2xl">Uses Mods</p>
-				<input onChange={e => setBuildToUpload(dispatchBuild, { ...buildToUpload, modsUsed: e.target.checked })} defaultChecked={buildToUpload && buildToUpload.modsUsed} type="checkbox" className="checkbox 2k:checkbox-lg" />
+				<input onChange={e => setBuildToUpload(dispatchBuild, { ...buildToUpload, modsUsed: e.target.checked })} defaultChecked={buildToUpload && buildToUpload.modsUsed} type="checkbox" className="checkbox checkbox-accent 2k:checkbox-lg" />
 			</div>
 		);
 	}

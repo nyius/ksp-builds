@@ -1,9 +1,12 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useContext, useEffect, useReducer } from 'react';
 import BuildReducer from './BuildReducer';
+import { useLocation } from 'react-router-dom';
+import { clearBuildToUpload, setBuildToUploadReady } from './BuildActions';
 
 const BuildContext = createContext();
 
 export const BuildProvider = ({ children }) => {
+	const location = useLocation();
 	// Initial state
 	const initialState = {
 		loadingBuild: true,
@@ -22,8 +25,16 @@ export const BuildProvider = ({ children }) => {
 		resetTextEditor: '',
 		buildOfTheWeek: null,
 		buildToUpload: null,
+		buildToUploadReady: false,
 		dragBuild: null,
 	};
+
+	useEffect(() => {
+		if (!location.pathname.includes('upload')) {
+			clearBuildToUpload(dispatchBuild);
+			setBuildToUploadReady(dispatchBuild, false);
+		}
+	}, [location]);
 
 	const [state, dispatchBuild] = useReducer(BuildReducer, initialState);
 

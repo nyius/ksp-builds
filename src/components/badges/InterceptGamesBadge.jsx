@@ -8,10 +8,10 @@ const InterceptGamesBadge = ({ hideText, size }) => {
 
 	return (
 		<>
-			<div ref={setTriggerRef} className="text-primary flex flex-row gap-2 items-center">
+			<div ref={setTriggerRef} className="text-primary flex flex-row gap-2 shrink-0 items-center">
 				{hideText ? '' : 'Official KSP2 Developer'}
 				<span>
-					<img className={`${size ? size : 'w-8 h-8 2k:w-12 2k:h-12'}`} src={Intercept_Logo} alt="tier 1 badge" />
+					<img className={`${size ? size : 'w-7 h-7'}`} src={Intercept_Logo} alt="tier 1 badge" />
 				</span>
 			</div>
 			<TooltipPopup text="Official KSP2 Developer" visible={visible} getArrowProps={getArrowProps} getTooltipProps={getTooltipProps} setTooltipRef={setTooltipRef} />

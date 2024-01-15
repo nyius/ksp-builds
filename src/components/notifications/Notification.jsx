@@ -6,6 +6,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import NotifTimestamp from './Components/NotifTimestamp';
 import DeleteNotifBtn from './Buttons/DeleteNotifBtn';
 import NotifBuildImage from './Components/NotifBuildImage';
+import NotifAccoladeIcon from './Components/NotifAccoladeIcon';
 
 /**
  * Displays a notification
@@ -17,7 +18,7 @@ function Notification({ i, notif }) {
 	const navigate = useNavigate();
 	let editorState;
 
-	if (notif.type === 'message' || notif.type === 'welcome' || notif.type === 'update' || notif.type === 'buildOfTheWeek') editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(notif.message)));
+	if (notif.type === 'message' || notif.type === 'welcome' || notif.type === 'update' || notif.type === 'buildOfTheWeek' || notif.type === 'accolade') editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(notif.message)));
 	if (notif.type === 'reply' || notif.type === 'comment') editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(notif.comment)));
 
 	/**
@@ -33,6 +34,9 @@ function Notification({ i, notif }) {
 			}
 			if (notif.type === 'reply') {
 				navigate(`/build/${notif.buildId}#${notif.commentId}`);
+			}
+			if (notif.type === 'accolade') {
+				navigate(`/profile/accolades`);
 			}
 		}
 	};
@@ -53,9 +57,11 @@ function Notification({ i, notif }) {
 				{notif.type === 'update' && 'KSP Builds update!'}
 				{notif.type === 'challenge' && 'New challenge!'}
 				{notif.type === 'buildOfTheWeek' && "Congratulations, you're the Build of the Week Winner!"}
+				{notif.type === 'accolade' && "You've unlocked a new accolade!"}
 				{notif.type === 'newBuild' && <>{notif.username} uploaded a new craft! Check it out</>}
 			</p>
 			<NotifBuildImage notif={notif} />
+			<NotifAccoladeIcon notif={notif} />
 			<Editor editorState={editorState} readOnly={true} toolbarHidden={true} />
 		</div>
 	);

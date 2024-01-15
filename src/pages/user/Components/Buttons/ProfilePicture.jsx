@@ -9,8 +9,8 @@ function ProfilePicture() {
 	const { openProfile } = useAuthContext();
 
 	return (
-		<div className="avatar mb-4 self-center">
-			<div className="rounded-full w-44 ring ring-primary ring-offset-base-100 ring-offset-4">
+		<div className="avatar mb-4 w-fit">
+			<div className="rounded-full h-44 w-44 ring ring-primary ring-offset-base-100 ring-offset-4">
 				<img src={openProfile.profilePicture} alt="" />
 			</div>
 		</div>

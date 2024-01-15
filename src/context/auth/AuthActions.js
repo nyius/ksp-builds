@@ -6,11 +6,11 @@ import { auth } from '../../firebase.config';
 import { cloneDeep } from 'lodash';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
-import { checkMatchingEmails, fetchUserProfileFromServer, sendNotification } from './AuthUtils';
+import { checkMatchingEmails, fetchUserProfileFromServer, sendNotification, updateUserDb } from './AuthUtils';
 //---------------------------------------------------------------------------------------------------//
 import { useAuthContext } from './AuthContext';
 import { useBuildContext } from '../build/BuildContext';
-import { updateWeeklyUpvoted } from './AuthUtils';
+import { updateWeeklyUpvoted, updateUserProfiles, updateUserProfilesAndDb } from './AuthUtils';
 //---------------------------------------------------------------------------------------------------//
 import standardUser from '../../utilities/standardUser';
 import standardNotifications from '../../utilities/standardNotifications';
@@ -21,6 +21,8 @@ import { checkLocalUserAge, getUserFromLocalStorage, setLocalStoredUser } from '
 import { useEffect, useState } from 'react';
 import { createDateFromFirebaseTimestamp } from '../../utilities/createDateFromFirebaseTimestamp';
 import errorReport from '../../utilities/errorReport';
+import { useAccoladesContext } from '../accolades/AccoladesContext';
+import { giveAccoladeAndNotify } from '../../hooks/useGiveAccolade';
 
 const useAuth = () => {
 	const { dispatchAuth } = useAuthContext();
@@ -244,8 +246,7 @@ export const useFetchUser = () => {
  * @returns
  */
 export const useHandleVoting = () => {
-	const { user, isAuthenticated } = useAuthContext();
-	const { updateUserDb, updateUserProfilesAndDb } = useUpdateProfile();
+	const { user, isAuthenticated, dispatchAuth } = useAuthContext();
 
 	/**
 	 * Handles updating the users voting on the server. Updates the builds vote count and the current users voted
@@ -264,9 +265,9 @@ export const useHandleVoting = () => {
 					const index = newUpVotes.indexOf(build.id);
 					newUpVotes.splice(index, 1);
 
-					await updateUserDb({ upVotes: newUpVotes });
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1), lastModified: serverTimestamp() });
-					await updateUserProfilesAndDb({ rocketReputation: increment(-1) }, build.uid);
+					await updateUserDb(dispatchAuth, { upVotes: newUpVotes }, user); // update the current user with new votes
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { upVotes: (build.upVotes -= 1), lastModified: serverTimestamp() }); // give the build the update
+					await updateUserProfilesAndDb(dispatchAuth, { rocketReputation: increment(-1) }, build.uid); // Take away the author rocket reputation
 					await updateWeeklyUpvoted(build.id, 'remove', user.uid);
 				} else {
 					// If you clicked upvote and you dont have it upvoted
@@ -287,9 +288,9 @@ export const useHandleVoting = () => {
 						buildUpdates.downVotes = build.downVotes -= 1;
 					}
 
-					await updateUserDb(usersUpdates);
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), buildUpdates);
-					await updateUserProfilesAndDb(buildAuthorUpdates, build.uid);
+					await updateUserDb(dispatchAuth, usersUpdates, user); // update the current user with new votes
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), buildUpdates); // give the build the update
+					await updateUserProfilesAndDb(dispatchAuth, buildAuthorUpdates, build.uid); // give the author rocket reputation
 				}
 			}
 
@@ -299,9 +300,9 @@ export const useHandleVoting = () => {
 					const index = newDownVotes.indexOf(build.id);
 					newDownVotes.splice(index, 1);
 
-					await updateUserDb({ downVotes: newDownVotes });
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1), lastModified: serverTimestamp() });
-					await updateUserProfilesAndDb({ rocketReputation: increment(1) }, build.uid);
+					await updateUserDb(dispatchAuth, { downVotes: newDownVotes }, user); // update the current user with new votes
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), { downVotes: (build.downVotes -= 1), lastModified: serverTimestamp() }); // give the build the update
+					await updateUserProfilesAndDb(dispatchAuth, { rocketReputation: increment(1) }, build.uid); // give the author rocket reputation
 				} else {
 					// If you clicked downvote and you dont have it down voted
 					newDownVotes.push(build.id);
@@ -321,9 +322,9 @@ export const useHandleVoting = () => {
 						buildUpdates.upVotes = build.upVotes -= 1;
 					}
 
-					await updateUserDb(usersUpdates);
-					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), buildUpdates);
-					await updateUserProfilesAndDb(buildAuthorUpdates, build.uid);
+					await updateUserDb(dispatchAuth, usersUpdates, user); // update the current user with new votes
+					await updateDoc(doc(db, process.env.REACT_APP_BUILDSDB, build.id), buildUpdates); // give the build the update
+					await updateUserProfilesAndDb(dispatchAuth, buildAuthorUpdates, build.uid); // Take away the author rocket reputation
 				}
 			}
 		} catch (error) {
@@ -334,20 +335,34 @@ export const useHandleVoting = () => {
 
 	return { handleVoting };
 };
+
 /**
  * Hook with functions for updating a users profile
  * @returns
  */
 export const useUpdateProfile = () => {
 	const { user, dispatchAuth, editingEmail, verifyEditedEmail } = useAuthContext();
+	const { fetchedAccolades } = useAccoladesContext();
+
 	/**
 	 * Handles updating the users profile picture on the server and context
 	 * @param {*} profilePicture
 	 */
 	const updateUserProfilePic = async profilePicture => {
 		try {
-			updateUserProfilesAndDb({ profilePicture, lastModified: serverTimestamp() });
+			await updateUserProfilesAndDb(dispatchAuth, { profilePicture, lastModified: serverTimestamp() }, user);
 			updateUserState(dispatchAuth, { profilePicture });
+
+			// Check if user has accolade for changing profile picture (id is aqlLHMkr2rQDRAYTAJ71). If not, give it to them
+			const hasProfilePictureAccolade = user.accolades?.some(accolade => accolade.id === 'aqlLHMkr2rQDRAYTAJ71');
+
+			if (!hasProfilePictureAccolade) {
+				let accoladeToGive;
+				accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'aqlLHMkr2rQDRAYTAJ71'); // change portrait accolade
+
+				await giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], user);
+			}
+
 			toast.success('Profile Picture updated!');
 		} catch (error) {
 			errorReport(error.message, true, 'updateUserProfilePic');
@@ -361,7 +376,7 @@ export const useUpdateProfile = () => {
 	 */
 	const updateUserBio = async bio => {
 		try {
-			updateUserProfilesAndDb({ bio, lastModified: serverTimestamp() });
+			await updateUserProfilesAndDb(dispatchAuth, { bio, lastModified: serverTimestamp() }, user);
 			updateUserState(dispatchAuth, { bio });
 			toast.success('Bio updated!');
 		} catch (error) {
@@ -381,7 +396,7 @@ export const useUpdateProfile = () => {
 				return;
 			}
 			updateEmail(auth.currentUser, editingEmail);
-			updateUserDb({ email: editingEmail, lastModified: serverTimestamp() });
+			updateUserDb(dispatchAuth, { email: editingEmail, lastModified: serverTimestamp() }, user);
 			updateUserState(dispatchAuth, { email: editingEmail });
 			toast.success('Email updated!');
 		} catch (error) {
@@ -390,70 +405,7 @@ export const useUpdateProfile = () => {
 		}
 	};
 
-	/**
-	 * Handles updating the user on the DB. Also updates state
-	 * @param {obj} update - The object with updates
-	 * @param {string} userUid - The uid of the user to update. If null, uses logged in user
-	 */
-	const updateUserDb = async (update, userUid) => {
-		try {
-			if (!userUid) {
-				if (update.rocketReputation?.wa) {
-					update.rocketReputation = user.rocketReputation += update.rocketReputation.wa;
-					updateUserState(dispatchAuth, { ...update });
-					setLocalStoredUser(user.uid, user);
-				} else {
-					updateUserState(dispatchAuth, { ...update });
-					setLocalStoredUser(user.uid, user);
-				}
-			}
-			if (userUid && userUid === user.uid) {
-				if (update.rocketReputation?.wa) {
-					update.rocketReputation = user.rocketReputation += update.rocketReputation.wa;
-					updateUserState(dispatchAuth, { ...update });
-					setLocalStoredUser(user.uid, user);
-				} else {
-					updateUserState(dispatchAuth, { ...update });
-					setLocalStoredUser(user.uid, user);
-				}
-			}
-
-			await updateDoc(doc(db, 'users', userUid ? userUid : user.uid), update);
-		} catch (error) {
-			errorReport(error.message, true, 'updateUserDb');
-			toast.error('Something went wrong. Please try again');
-		}
-	};
-
-	/**
-	 * handles updating a users public profile
-	 * @param {obj} update - the object with updates
-	 * @param {string} userUid - The uid of the user to update. If null, uses logged in user
-	 */
-	const updateUserProfiles = async (update, userUid) => {
-		try {
-			await updateDoc(doc(db, 'userProfiles', userUid ? userUid : user.uid), update);
-		} catch (error) {
-			errorReport(error.message, true, 'updateUserProfiles');
-		}
-	};
-
-	/**
-	 * Handles updating a users DB and userProfile at the same time.
-	 * Also Updates the user state
-	 * @param {obj} update - Takes in the update
-	 * @param {string} userUid - The uid of the user to update. If null, uses logged in user
-	 */
-	const updateUserProfilesAndDb = async (update, userUid) => {
-		try {
-			await updateUserDb(update, userUid ? userUid : user.uid);
-			await updateUserProfiles(update, userUid ? userUid : user.uid);
-		} catch (error) {
-			errorReport(error.message, true, 'updateUserProfilesAndDb');
-		}
-	};
-
-	return { updateUserProfilePic, updateUserBio, updateUserDb, updateUserProfilesAndDb, updateUserEmail };
+	return { updateUserProfilePic, updateUserBio, updateUserEmail };
 };
 
 /**
@@ -772,7 +724,7 @@ export const useSendMessage = () => {
 				conversation.username = messageTab.username;
 				messageToSend.timestamp = new Date();
 
-				conversation.messaages = [messageToSend];
+				conversation.messages = [messageToSend];
 
 				setConvoTab(dispatchAuth, conversation);
 			}
@@ -798,7 +750,7 @@ export const useFetchConversation = () => {
 	 */
 	const fetchConversation = userProfile => {
 		try {
-			const conversationBox = document.getElementById('conversationBox');
+			// const conversationBox = document.getElementById('conversationBox');
 
 			let foundConvo = null;
 			conversations?.map(convo => {
@@ -808,7 +760,6 @@ export const useFetchConversation = () => {
 			if (foundConvo) {
 				setConvosOpen(dispatchAuth, true);
 				setConvoTab(dispatchAuth, foundConvo);
-				conversationBox.classList.add('dropdown-open');
 			} else {
 				// If we didnt find the convo in our current list, check the database for an existing one
 				let foundConvo;
@@ -874,7 +825,6 @@ export const useFetchConversation = () => {
 							payload: foundConvo,
 						});
 						setConvoTab(dispatchAuth, foundConvo);
-						conversationBox.classList.add('dropdown-open');
 					} else {
 						setConvosOpen(dispatchAuth, true);
 						setConvoTab(dispatchAuth, {
@@ -885,7 +835,6 @@ export const useFetchConversation = () => {
 							username: userProfile.username,
 							id: null,
 						});
-						conversationBox.classList.add('dropdown-open');
 					}
 				});
 			}
@@ -994,7 +943,6 @@ export const useSetUserToMessage = (initialState, usersProfile) => {
  */
 export const useHandleFavoriting = () => {
 	const { user, dispatchAuth } = useAuthContext();
-	const { updateUserDb } = useUpdateProfile();
 
 	/**
 	 * Handles a user favoriting a build
@@ -1010,11 +958,11 @@ export const useHandleFavoriting = () => {
 				newFavorites.splice(index, 1);
 
 				setUserfavorites(dispatchAuth, newFavorites);
-				updateUserDb({ favorites: newFavorites });
+				await updateUserDb(dispatchAuth, { favorites: newFavorites }, user);
 			} else {
 				newFavorites.push(buildId);
 				setUserfavorites(dispatchAuth, newFavorites);
-				updateUserDb({ favorites: newFavorites });
+				await updateUserDb(dispatchAuth, { favorites: newFavorites }, user);
 			}
 		} catch (error) {
 			errorReport(error.message, true, 'handleFavoriting');
@@ -1029,8 +977,7 @@ export const useHandleFavoriting = () => {
  * @returns
  */
 export const useBlockUser = () => {
-	const { user, dispatchAuth, userToBlock } = useAuthContext();
-	const { updateUserProfilesAndDb } = useUpdateProfile();
+	const { user, dispatchAuth, messageTab, conversations, userToBlock } = useAuthContext();
 
 	/**
 	 * Handles blocking a user.
@@ -1044,20 +991,61 @@ export const useBlockUser = () => {
 			if (user.blockList) {
 				newBlockList = [...user.blockList];
 
+				// If we have this user blocked, unblock it
 				if (user.blockList.includes(userToBlock)) {
 					const index = newBlockList.indexOf(userToBlock);
 					newBlockList.splice(index, 1);
 
-					updateUserProfilesAndDb({ blockList: newBlockList, lastModified: serverTimestamp() });
+					updateUserProfilesAndDb(dispatchAuth, { blockList: newBlockList, lastModified: serverTimestamp() }, user);
 					toast.success('User unblocked.');
 				} else {
+					// if we dont have this user blocked, block them
 					newBlockList.push(userToBlock);
-					updateUserProfilesAndDb({ blockList: newBlockList, lastModified: serverTimestamp() });
+					updateUserProfilesAndDb(dispatchAuth, { blockList: newBlockList, lastModified: serverTimestamp() }, user);
+
+					// update the context by removing any conversations from this user
+					const convos = conversations.filter(convo => {
+						if (convo.otherUser === userToBlock) {
+							convo.unsubscribe();
+						}
+						return convo.otherUser !== userToBlock;
+					});
+					// remove it from the conversations list
+					dispatchAuth({
+						type: 'SET_CONVOS',
+						payload: convos,
+					});
+
+					// set message tab
+					if (messageTab?.otherUser === userToBlock) {
+						setConvoTab(dispatchAuth, null);
+					}
+
 					toast.success('User blocked.');
 				}
 			} else {
 				newBlockList = [userToBlock];
-				updateUserProfilesAndDb({ blockList: newBlockList, lastModified: serverTimestamp() });
+				updateUserProfilesAndDb(dispatchAuth, { blockList: newBlockList, lastModified: serverTimestamp() }, user);
+
+				// update the context by removing any conversations from this user
+				const convos = conversations.filter(convo => {
+					if (convo.otherUser === userToBlock) {
+						convo.unsubscribe();
+					}
+					return convo.otherUser !== userToBlock;
+				});
+
+				// remove it from the conversations list
+				dispatchAuth({
+					type: 'SET_CONVOS',
+					payload: convos,
+				});
+
+				// set message tab
+				if (messageTab?.otherUser === userToBlock) {
+					setConvoTab(dispatchAuth, null);
+				}
+
 				toast.success('User blocked.');
 			}
 
@@ -1568,5 +1556,18 @@ export const setSubscribeModal = (dispatchAuth, value) => {
 		payload: {
 			subscribeModal: value,
 		},
+	});
+};
+
+/**
+ * handles setting if we are confirming giving a user an accolade
+ * @param {function} dispatchAuth - the dispatch function
+ * @param {bool} accolade - the accolade to give
+ * @param {bool} username - the username to give it to
+ */
+export const setConfirmGiveAccolade = (dispatchAuth, accolade, username) => {
+	dispatchAuth({
+		type: 'CONFIRM_GIVE_ACCOLADE',
+		payload: { accolade, username },
 	});
 };

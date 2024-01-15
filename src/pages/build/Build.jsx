@@ -132,7 +132,6 @@ function Build() {
 					</div>
 
 					<BuildInfo />
-					<OldBuildWarning />
 
 					<BuildName />
 

@@ -36,9 +36,9 @@ function ProfilePicture() {
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
-			<div className="indicator">
+			<div className="indicator self-center">
 				<div className="avatar">
-					<div className="rounded-full w-44 ring ring-primary ring-offset-base-100 ring-offset-4">{uploadingProfilePhoto ? <Spinner2 /> : <img src={user.profilePicture} alt="" />}</div>
+					<div className="rounded-full w-35 h-35  2k:h-44 2k:w-44 ring ring-primary ring-offset-base-100 ring-offset-4">{uploadingProfilePhoto ? <Spinner2 /> : <img src={user.profilePicture} alt="" />}</div>
 				</div>
 				<label ref={setTriggerRef} htmlFor="profile-picture-upload" className="indicator-item indicator-bottom text-3xl cursor-pointer rounded-full p-4 bg-base-600">
 					<AiFillCamera />

@@ -3,7 +3,7 @@ import { useBuildContext } from '../../context/build/BuildContext';
 
 /**
  * Checks credentials (type) and retuns children if credentials are met
- * @param {string} type - user, admin, buildOwner, favorite, subscriber, notSubscribed, commentOwner, loggedOut
+ * @param {string} type - user, admin, buildOwner, moderator, favorite, subscriber, notSubscribed, commentOwner, loggedOut
  * @param {string} uid - (optional) UID to check against (is current user === UID)
  * @param {*} children
  * @returns
@@ -16,6 +16,8 @@ function CheckCredentials({ type, uid, children }) {
 		if (type === 'user' && user && (isAuthenticated || user.siteAdmin)) {
 			return children;
 		} else if (type === 'admin' && user && user?.siteAdmin) {
+			return children;
+		} else if (type === 'moderator' && user && (user?.moderator || user?.siteAdmin)) {
 			return children;
 		} else if (type === 'buildOwner' && user && !loadingBuild && (user?.uid === loadedBuild.uid || user?.siteAdmin)) {
 			return children;

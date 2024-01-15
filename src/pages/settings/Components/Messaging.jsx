@@ -2,10 +2,10 @@ import React from 'react';
 import { toast } from 'react-toastify';
 import { useAuthContext } from '../../../context/auth/AuthContext';
 import { useUpdateProfile } from '../../../context/auth/AuthActions';
+import { updateUserProfilesAndDb } from '../../../context/auth/AuthUtils';
 
 function Messaging() {
-	const { user } = useAuthContext();
-	const { updateUserProfilesAndDb } = useUpdateProfile();
+	const { user, dispatchAuth } = useAuthContext();
 
 	/**
 	 * Listens for changes to messaging settings
@@ -13,14 +13,15 @@ function Messaging() {
 	 */
 	const handleMessagingChange = e => {
 		if (user.allowPrivateMessaging !== undefined) {
-			updateUserProfilesAndDb({ allowPrivateMessaging: !user.allowPrivateMessaging });
+			updateUserProfilesAndDb(dispatchAuth, { allowPrivateMessaging: !user.allowPrivateMessaging }, user);
 			toast.success('Saved');
 		} else {
-			updateUserProfilesAndDb({ allowPrivateMessaging: false });
+			updateUserProfilesAndDb(dispatchAuth, { allowPrivateMessaging: false }, user);
 			toast.success('Saved');
 		}
 	};
 
+	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
 			<div className="flex flex-col gap-2 2k:gap-4">

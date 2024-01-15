@@ -40,7 +40,7 @@ function CreatePatchNote() {
 			<p className="text-2xl 2k:text-4xl text-slate-200">Notif</p>
 			<TextEditor setState={setPatchNotesNotif} />
 			<p className="text-2xl 2k:text-4xl text-slate-200">Patch Note</p>
-			<TextEditor setState={setPatchNotes} />
+			<TextEditor characterLimit={3000} setState={setPatchNotes} />
 			<Button text="create" color="btn-primary" icon="upload" size="w-fit" onClick={uploadPatchNote} />
 		</SectionContainer>
 	);

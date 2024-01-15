@@ -5,6 +5,8 @@ import { db } from '../../firebase.config';
 import { compressAccurately } from 'image-conversion';
 import { uploadImage } from '../../utilities/uploadImage';
 import errorReport from '../../utilities/errorReport';
+import { updateUserState } from './AuthActions';
+import { setLocalStoredUser } from '../../utilities/userLocalStorage';
 
 /**
  * Updates server when a user has 'read' a new message
@@ -231,4 +233,60 @@ export const validateEmail = email => {
 		return true;
 	}
 	return false;
+};
+
+/**
+ * handles updating a users public profile
+ * @param {obj} update - the object with updates
+ * @param {obj} user - The object of the user (if current user) to update or the UID if not.
+ */
+export const updateUserProfiles = async (update, user) => {
+	try {
+		await updateDoc(doc(db, 'userProfiles', user.uid ? user.uid : user), update);
+	} catch (error) {
+		errorReport(error.message, true, 'updateUserProfiles');
+	}
+};
+
+/**
+ * Handles updating the user on the DB. Also updates state
+ * @param {obj} dispatchAuth -auth dispatch to update context
+ * @param {obj} update - The object with updates
+ * @param {obj/string} user - The object of the user (if current user) to update or the UID if not.
+ */
+export const updateUserDb = async (dispatchAuth, update, user) => {
+	try {
+		if (typeof user === 'object') {
+			if (update.rocketReputation?.wa) {
+				update.rocketReputation = user.rocketReputation += update.rocketReputation.wa;
+				updateUserState(dispatchAuth, { ...update });
+				setLocalStoredUser(user.uid, user);
+			} else {
+				updateUserState(dispatchAuth, { ...update });
+				setLocalStoredUser(user.uid, user);
+			}
+		}
+
+		await updateDoc(doc(db, 'users', user.uid ? user.uid : user), update);
+	} catch (error) {
+		errorReport(error.message, true, 'updateUserDb');
+		throw new Error(error);
+	}
+};
+
+/**
+ * Handles updating a users DB and userProfile at the same time.
+ * Also Updates the user state
+ * @param {function} dispatchAuth - Dispatch updater
+ * @param {obj} update - Takes in the update
+ * @param {obj} user - The user to update
+ */
+export const updateUserProfilesAndDb = async (dispatchAuth, update, user) => {
+	try {
+		await updateUserDb(dispatchAuth, update, user);
+		await updateUserProfiles(update, user);
+	} catch (error) {
+		errorReport(error.message, true, 'updateUserProfilesAndDb');
+		throw new Error(error);
+	}
 };

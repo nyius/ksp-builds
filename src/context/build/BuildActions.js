@@ -22,7 +22,7 @@ import { useBuildContext } from './BuildContext';
 import { useBuildsContext } from '../builds/BuildsContext';
 import { useAuthContext } from '../auth/AuthContext';
 import { useUpdateProfile, useHandleVoting, useFetchUser } from '../auth/AuthActions';
-import { sendNotification } from '../auth/AuthUtils';
+import { sendNotification, updateUserProfilesAndDb } from '../auth/AuthUtils';
 import { useFiltersContext } from '../filters/FiltersContext';
 import { updateDownloadCount, updateViewCount, makeBuildReadyToUpload, searchBuilds, setLocalStoredBuild, getBuildFromLocalStorage, checkLocalBuildAge, deleteBuildFromLocalStorage } from './BuildUtils';
 import { useAddBuildToHangar } from '../hangars/HangarActions';
@@ -596,8 +596,7 @@ export const useDeleteBuild = () => {
 export const useUploadBuild = () => {
 	const { addBuildToHangar } = useAddBuildToHangar();
 	const { dispatchBuild } = useBuildContext();
-	const { user } = useAuthContext();
-	const { updateUserProfilesAndDb } = useUpdateProfile();
+	const { user, dispatchAuth } = useAuthContext();
 	const { dispatchBuilds } = useBuildsContext();
 	const { kspVersions } = useFiltersContext();
 	const { handleVoting } = useHandleVoting();
@@ -651,12 +650,9 @@ export const useUploadBuild = () => {
 				throw new Error('Error from build setDoc', err);
 			});
 
-			// add it to the users 'userProfile' db
-			await updateUserProfilesAndDb({ builds: [...user.builds, buildId] });
+			await updateUserProfilesAndDb(dispatchAuth, { builds: [...user.builds, buildId] }, user); // add it to the users 'userProfile' db
 
-			// Get the document so we can grab its timestamp
-			const ref = doc(db, process.env.REACT_APP_BUILDSDB, buildId);
-			const data = await getDoc(ref);
+			const data = await getDoc(doc(db, process.env.REACT_APP_BUILDSDB, buildId)); // Get the new build so we can grab its timestamp
 
 			// If our build was created correctly
 			if (data.exists()) {
@@ -789,9 +785,11 @@ export const useFetchBuildAuthorProfile = () => {
  */
 export const useSetBuildToUpload = buildToUpload => {
 	const { dispatchBuild } = useBuildContext();
+	useGetBuildChallenge();
 
 	useEffect(() => {
 		setBuildToUpload(dispatchBuild, buildToUpload);
+		setBuildToUploadReady(dispatchBuild, true);
 	}, []);
 };
 
@@ -800,14 +798,14 @@ export const useSetBuildToUpload = buildToUpload => {
  * @returns [challengeParam, setChallengeParam, gettingChallenge]
  */
 export const useGetBuildChallenge = initialState => {
-	const { dispatchBuild, buildToUpload } = useBuildContext();
+	const { dispatchBuild, buildToUpload, buildToUploadReady } = useBuildContext();
 	const { challenges, articlesLoading } = useNewsContext();
 	const challengeParams = useParams().id;
 	const [challengeParam, setChallengeParam] = useState(initialState);
 
 	useEffect(() => {
 		// Check if the user came here from clicking a 'submit build for ___ challenge' button.
-		if (challengeParams && buildToUpload) {
+		if (challengeParams && buildToUpload?.visibility && buildToUploadReady) {
 			if (!articlesLoading && challengeParams.includes('challenge=')) {
 				const challengeId = challengeParams.replace('challenge=', '');
 				const challenge = challenges.filter(challenge => {
@@ -815,13 +813,13 @@ export const useGetBuildChallenge = initialState => {
 				});
 				if (challenge.length > 0) {
 					setBuildToUpload(dispatchBuild, { ...buildToUpload, forChallenge: challengeId, challengeTitle: challenge[0].title });
-					setChallengeParam(challengeId);
+					setChallengeParam(challenge[0]);
 				} else {
 					console.log(`Couldnt find that challenge`);
 				}
 			}
 		}
-	}, [articlesLoading, challengeParams]);
+	}, [articlesLoading, challengeParams, buildToUploadReady]);
 
 	return [challengeParam, setChallengeParam];
 };
@@ -1030,6 +1028,29 @@ export const setBuildToUpload = (dispatchBuild, build) => {
 	dispatchBuild({
 		type: 'SET_BUILD',
 		payload: { buildToUpload: { ...build } },
+	});
+};
+
+/**
+ * Handles clearing the build to upload
+ * @param {function} dispatchBuild - The dispatch function
+ */
+export const clearBuildToUpload = dispatchBuild => {
+	dispatchBuild({
+		type: 'SET_BUILD',
+		payload: { buildToUpload: null },
+	});
+};
+
+/**
+ * Handles setting if the current build to upload is loaded (this is purely for the challenge parameter)
+ * @param {function} dispatchBuild - The dispatch function
+ * @param {obj} bool
+ */
+export const setBuildToUploadReady = (dispatchBuild, bool) => {
+	dispatchBuild({
+		type: 'SET_BUILD',
+		payload: { buildToUploadReady: bool },
 	});
 };
 

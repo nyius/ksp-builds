@@ -1,7 +1,7 @@
 import React from 'react';
 import { GiCancel, GiPeaks } from 'react-icons/gi';
 import { ImCloudUpload } from 'react-icons/im';
-import { FaSave, FaUserAstronaut, FaCheckSquare, FaRegSquare, FaHome, FaList, FaDiscord, FaGithub } from 'react-icons/fa';
+import { FaSave, FaUserAstronaut, FaCheckSquare, FaRegSquare, FaHome, FaList, FaDiscord, FaGithub, FaTrophy } from 'react-icons/fa';
 import { FiLogOut, FiShare2 } from 'react-icons/fi';
 import { TiExport, TiPlusOutline } from 'react-icons/ti';
 import { RiDeleteBin2Fill, RiEditFill, RiLoginCircleLine } from 'react-icons/ri';
@@ -44,6 +44,7 @@ const buttonIcon = icon => {
 	if (icon === 'right2') return <BsCaretRightFill />;
 	if (icon === 'up2') return <BsCaretUpFill />;
 	if (icon === 'email') return <MdEmail />;
+	if (icon === 'trophy') return <FaTrophy />;
 	if (icon === 'head') return <FaUserAstronaut />;
 	if (icon === 'fill-pin') return <AiFillPushpin />;
 	if (icon === 'checked') return <FaCheckSquare />;

@@ -19,6 +19,12 @@ function MobileHamburger() {
 				<CheckCredentials type="notSubscribed">
 					<MobileBtn text="Subscribe" htmlFor="subscribe-modal" icon="outline-star" />
 				</CheckCredentials>
+				<CheckCredentials type="admin">
+					<MobileBtn text="Admin Panel" href="/admin-panel" icon="settings" />
+				</CheckCredentials>
+				<CheckCredentials type="moderator">
+					<MobileBtn text="Accolades" href="/accolade-dashboard" icon="trophy" />
+				</CheckCredentials>
 				<MobileBtn text="Upload" href="/upload" icon="plus" />
 				<MobileBtn text="Challenges" href="/challenges" icon="mountain" />
 				<MobileBtn text="F.A.Q" href="/faq" icon="help" />

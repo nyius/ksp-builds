@@ -15,10 +15,6 @@ import ReportsAndErrors from './components/ReportsAndErrors/ReportsAndErrors';
 import CreateArticle from './components/CreateArticle';
 
 function AdminPanel() {
-	const handleCollapse = e => {
-		localStorage.setItem(e.target.id, e.target.value);
-	};
-
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>

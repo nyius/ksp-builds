@@ -58,6 +58,14 @@ const BuildReducer = (state, action) => {
 				...state,
 				buildOfTheWeek: action.payload,
 			};
+		case 'SET_UPLOAD_CHALLENGE':
+			return {
+				...state,
+				buildToUpload: {
+					...state.buildToUpload,
+					...action.payload,
+				},
+			};
 		case 'SET_LOADED_RAW_BUILD':
 			return {
 				...state,

@@ -11,7 +11,7 @@ const fetchAllUsersConvos = async usersConvos => {
 		let fetchedConvos = [];
 
 		await Promise.all(
-			usersConvos.map(async convo => {
+			usersConvos?.map(async convo => {
 				let fetchedConvoRef = await getDoc(doc(db, 'conversations', convo.id));
 
 				if (fetchedConvoRef.exists()) {
@@ -27,9 +27,9 @@ const fetchAllUsersConvos = async usersConvos => {
 					const userFetch = await getDoc(doc(db, 'userProfiles', userToFetch));
 					const userData = userFetch.data();
 					let blocked;
-					if (userData?.blockList?.includes(auth.currentUser.uid)) blocked = true;
-					fetchedConvoData.userProfilePic = userData.profilePicture;
-					fetchedConvoData.username = userData.username;
+					if (userData?.blockList?.includes(auth.currentUser.uid)) blocked = true; // check if the other user has us blocked (so we can't send them a message)
+					fetchedConvoData.userProfilePic = userData?.profilePicture;
+					fetchedConvoData.username = userData?.username;
 					fetchedConvoData.uid = userFetch.id;
 					fetchedConvoData.otherUser = userToFetch;
 					fetchedConvoData.messages = [];

@@ -272,6 +272,12 @@ const AuthReducer = (state, action) => {
 					conversations: conversationsCloneNew,
 				};
 			}
+		case 'CONFIRM_GIVE_ACCOLADE':
+			return {
+				...state,
+				giveAccolade: action.payload.accolade,
+				giveAccoladeUser: action.payload.username,
+			};
 		default:
 			return state;
 	}

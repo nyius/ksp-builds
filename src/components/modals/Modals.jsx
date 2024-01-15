@@ -13,6 +13,7 @@ import AddBuildToHangarModal from './AddBuildToHangarModal';
 import DeleteHangarModal from './DeleteHangarModal';
 import WhatIsHangarModal from './WhatIsHangarModal';
 import HangarLimitModal from './HangarLimitModal';
+import AccoladeViewerModal from './AccoladeViewerModal';
 
 /**
  * Stores (mostly) all modals
@@ -35,6 +36,7 @@ function Modals() {
 			<AddBuildToHangarModal />
 			<WhatIsHangarModal />
 			<HangarLimitModal />
+			<AccoladeViewerModal />
 		</>
 	);
 }

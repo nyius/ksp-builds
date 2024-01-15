@@ -4,6 +4,7 @@ import checkIfJson from '../utilities/checkIfJson';
 
 /**
  * Creates draft JS formatted content.
+ * @param {*} initialState - the initial state
  * @param {*} rawDraftJs - the raw draft js to convert to draft JS compatible content
  * @returns [draftJS, setDraftJS]
  */

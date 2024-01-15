@@ -18,6 +18,7 @@ const standardUser = {
 	downVotes: [],
 	builds: [],
 	rocketReputation: 0,
+	commentCount: 0,
 };
 
 export default standardUser;

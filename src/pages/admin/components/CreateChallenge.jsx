@@ -67,6 +67,7 @@ function CreateChallenge() {
 		}
 	};
 
+	//---------------------------------------------------------------------------------------------------//
 	return (
 		<SectionContainer css="!flex-col gap-4" sectionName="Create Challenge">
 			<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Create New Challenge</p>

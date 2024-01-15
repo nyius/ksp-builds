@@ -14,7 +14,6 @@ const subscribeToUsersMessages = async dispatchAuth => {
 			querySnapshot.docChanges().forEach(change => {
 				if (change.type === 'added') {
 					let newIncomingConvo = change.doc.data();
-
 					dispatchAuth({
 						type: 'INCOMING_NEW_CONVO',
 						payload: newIncomingConvo,

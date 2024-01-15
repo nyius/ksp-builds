@@ -134,7 +134,7 @@ function VerticalTypeLink({ text }) {
 			<div id={text} className="relative overflow-hidden h-16 2k:h-26 flex flex-row w-full bg-base-400">
 				<div
 					id={text}
-					className={`relative rounded-none rounded-r-lg 2k:rounded-r-xl flex flex-row h-16 2k:h-32 hover:bg-violet-700 gap-12 lg:gap-6 2k:gap-16 variable-font-size font-light btn btn-block justify-start ${
+					className={`relative rounded-none rounded-r-lg 2k:rounded-r-xl flex flex-row h-16 2k:h-32 hover:bg-violet-700 gap-12 lg:gap-6 2k:gap-16 text-sm 2k:text-lg font-light btn btn-block justify-start ${
 						typeFilter === text ? 'bg-primary hover:bg-violet-900' : ''
 					}text-slate-300`}
 				>

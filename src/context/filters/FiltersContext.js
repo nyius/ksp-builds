@@ -20,11 +20,11 @@ export const FiltersProvider = ({ children }) => {
 
 				dispatchBuildFilters({
 					type: 'SET_KSP_VERSIONS',
-					payload: kspInfo.versions,
+					payload: kspInfo?.versions,
 				});
 				dispatchBuildFilters({
 					type: 'SET_KSP_CHALLENGES',
-					payload: kspInfo.challenges,
+					payload: kspInfo?.challenges,
 				});
 				setFiltersLoading(false);
 			} catch (error) {

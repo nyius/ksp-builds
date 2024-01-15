@@ -11,11 +11,12 @@ import checkIfJson from '../../utilities/checkIfJson';
  * @param {setter} setState - the state to update with the entered text
  * @param {int} i Takes in an 'i' num if this is used inside of a map, so we know which element to edit
  * @param {string} text
+ * @param {string} characterLimit - default 1000
  * @returns
  */
 const TextEditor = state => {
 	// Handles sending the markup back to the parent
-	const { setState, i, text } = state;
+	const { setState, i, text, characterLimit = 1000 } = state;
 	const { dispatchBuild, editingBuild, editingComment, resetTextEditor, buildOfTheWeek } = useBuildContext();
 	const { editingBio } = useAuthContext();
 	const emptyState = `{"blocks":[{"key":"87rfs","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}`;
@@ -41,15 +42,24 @@ const TextEditor = state => {
 			}
 		}
 		if (text) {
-			return EditorState.createWithContent(convertFromRaw(JSON.parse(text)));
+			if (checkIfJson(text)) {
+				return EditorState.createWithContent(convertFromRaw(JSON.parse(text)));
+			} else {
+				return EditorState.createWithContent(ContentState.createFromText(text));
+			}
 		}
 		return EditorState.createWithContent(convertFromRaw(JSON.parse(emptyState)));
 	});
 
 	// Handles the user typing
 	const handleEditorChange = state => {
-		setEditorState(state);
-		convertContentToJson();
+		const contentState = state.getCurrentContent();
+		const currentText = contentState.getPlainText();
+
+		if (currentText?.length <= characterLimit) {
+			setEditorState(state);
+			convertContentToJson();
+		}
 	};
 
 	// Reser the text editor
@@ -75,9 +85,12 @@ const TextEditor = state => {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<>
+		<div className="flex flex-col gap-3">
 			<Editor wrapperClassName="text-editor" editorClassName="editor-text-area" toolbarClassName="editor-toolbar" editorState={editorState} onEditorStateChange={handleEditorChange} toolbar={{}} />
-		</>
+			<div className="text-xl 2k:text-2xl">
+				<span className={`${editorState?.getCurrentContent()?.getPlainText()?.length >= characterLimit ? 'text-error' : ''}`}>{editorState?.getCurrentContent()?.getPlainText()?.length}</span> / {characterLimit}
+			</div>
+		</div>
 	);
 };
 

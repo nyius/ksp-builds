@@ -13,6 +13,8 @@ import TextInput from '../input/TextInput';
 import { uploadProfilePicture } from '../../context/auth/AuthUtils';
 import Regex from 'regex-username';
 import errorReport from '../../utilities/errorReport';
+import { useAccoladesContext } from '../../context/accolades/AccoladesContext';
+import { giveAccoladeAndNotify } from '../../hooks/useGiveAccolade';
 
 function NewAccountModal() {
 	const navigate = useNavigate();
@@ -21,6 +23,7 @@ function NewAccountModal() {
 	const [newProfilePicture, setNewProfilePicture] = useState(Astrobiff);
 
 	const { user, newSignup, dispatchAuth } = useAuthContext();
+	const { fetchedAccolades } = useAccoladesContext();
 	const { updateUserProfilePic } = useUpdateProfile();
 	const newAccountModal = document.querySelector('#new-account-modal');
 
@@ -75,6 +78,7 @@ function NewAccountModal() {
 					errorReport('That username already exists! Try another one.', false, 'checkIfUserExists');
 					toast.error('That username already exists! Try another one.');
 				} else {
+					navigate('/');
 					const updateUser = {
 						username,
 						builds: [],
@@ -95,6 +99,12 @@ function NewAccountModal() {
 							throw new Error(err);
 						});
 
+					let accoladesToGive = [];
+					accoladesToGive.push(fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'RfgfouMmCHT0VW74nNHF')[0]); // signed up in KSPB first year accolade
+					accoladesToGive.push(fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'gzpChXKaG16yuo6p6lJs')[0]); // made an account
+
+					await giveAccoladeAndNotify(dispatchAuth, accoladesToGive, user);
+
 					const newUsername = {
 						uid: user.uid,
 					};
@@ -104,8 +114,6 @@ function NewAccountModal() {
 
 					// Update the userProfiles DB. This is for visiting a users page so we don't have to pull all sensitive data
 					await updateDoc(doc(db, 'userProfiles', user.uid), updateUser);
-
-					navigate('/');
 				}
 			} catch (error) {
 				errorReport(error.message, true, 'checkIfUserExists');
@@ -121,37 +129,34 @@ function NewAccountModal() {
 	 * @param {*} e
 	 */
 	const handleNewProfilePhoto = async e => {
-		await uploadProfilePicture(e, setUploadingImage, user.uid)
-			.then(url => {
-				setNewProfilePicture(url);
-				updateUserProfilePic(url);
-				setUploadingImage(false);
-			})
-			.catch(err => {
-				errorReport(err.message, true, 'handleNewProfilePhoto');
-				toast.error('Something went wrong');
-				setUploadingImage(false);
-			});
+		try {
+			await uploadProfilePicture(e, setUploadingImage, user.uid)
+				.then(url => {
+					setNewProfilePicture(url);
+					updateUserProfilePic(url);
+					setUploadingImage(false);
+
+					let accoladeToGive;
+					accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'aqlLHMkr2rQDRAYTAJ71'); // changed portrait accolade
+
+					giveAccoladeAndNotify(dispatchAuth, accoladeToGive[0], user);
+				})
+				.catch(err => {
+					errorReport(err.message, true, 'handleNewProfilePhoto');
+					toast.error('Something went wrong');
+					setUploadingImage(false);
+				});
+		} catch (error) {
+			errorReport(error, true, 'handleNewProfilePhoto - New Account Modal');
+		}
 	};
 
-	// Check when we get a new account setup, so we can show/hide the modal to enter a new username ------------------------------------------------------------------------------------//
-	useEffect(() => {
-		if (newSignup) {
-			if (newAccountModal) {
-				newAccountModal.checked = true;
-			}
-		} else {
-			if (newAccountModal) {
-				newAccountModal.checked = false;
-			}
-		}
-	}, [newSignup, newAccountModal]);
-
+	if (!newSignup) return;
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
 			{/* New  Account */}
-			<input type="checkbox" id="new-account-modal" className="modal-toggle" />
+			<input type="checkbox" defaultChecked="true" id="new-account-modal" className="modal-toggle" />
 			<div className="modal">
 				<div className="modal-box">
 					<div className="font-bold alert dot-bg text-xl 2k:text-3xl mb-4 text-slate-200">

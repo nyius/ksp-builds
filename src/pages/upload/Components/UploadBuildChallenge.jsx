@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useBuildContext } from '../../../context/build/BuildContext';
 import { setBuildToUpload, useGetBuildChallenge } from '../../../context/build/BuildActions';
 import { useNewsContext } from '../../../context/news/NewsContext';
@@ -11,7 +11,7 @@ import Select from '../../../components/selects/Select';
 function UploadBuildChallenge() {
 	const { dispatchBuild, buildToUpload } = useBuildContext();
 	const { challenges, articlesLoading } = useNewsContext();
-	const [challengeParam] = useGetBuildChallenge(null);
+	// const [challengeParam] = useGetBuildChallenge(null);
 
 	/**
 	 * Handles setting the KSP version
@@ -25,7 +25,15 @@ function UploadBuildChallenge() {
 		setBuildToUpload(dispatchBuild, { ...buildToUpload, forChallenge: e.target.id === 'none' ? false : e.target.id, challengeTitle: challenge.length > 0 ? challenge[0].title : null });
 	};
 
-	const { SelectBox, Option } = Select(setChallenge, { id: buildToUpload.challengeTitle ? buildToUpload.challengeTitle : 'none', text: buildToUpload.challengeTitle ? buildToUpload.challengeTitle : 'None' });
+	const { SelectBox, Option } = Select(
+		setChallenge,
+		{
+			id: buildToUpload?.forChallenge,
+			text: buildToUpload?.challengeTitle,
+		},
+		true
+	);
+
 	//---------------------------------------------------------------------------------------------------//
 	if (buildToUpload) {
 		return (

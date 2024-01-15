@@ -13,6 +13,7 @@ import UserReputation from './Components/UserReputation';
 import UserJoined from './Components/UserJoined';
 import UserUsername from './Components/UserUsername';
 import { usePopperTooltip } from 'react-popper-tooltip';
+import GiveAccoladeBtn from '../buttons/GiveAccoladeBtn';
 
 /**
  * Displays the users username as a link. Also displays a hover popup menu.
@@ -32,7 +33,7 @@ function UsernameLink({ username, uid, noHoverUi, color, css }) {
 	return (
 		<>
 			<div
-				className="dropdown username-link"
+				className="dropdown username-link h-8"
 				onClick={e => {
 					e.stopPropagation();
 					e.preventDefault();
@@ -43,7 +44,7 @@ function UsernameLink({ username, uid, noHoverUi, color, css }) {
 						{/* Username */}
 						<div
 							id="userlink"
-							className={`text-2xl z-10 2k:text-2xl link link-hover link-accent flex flex-row gap-2 items-center ${css ? css : ''} `}
+							className={`text-2xl z-10 2k:text-3xl link link-hover link-accent flex flex-row gap-2 items-center ${css ? css : ''} `}
 							onClick={() => navigate(`/user/${username}`)}
 							style={{ color: `${usersProfile?.customUsernameColor}` }}
 							ref={setTriggerRef}
@@ -78,6 +79,7 @@ function UsernameLink({ username, uid, noHoverUi, color, css }) {
 											<MessageUserBtn usersProfile={usersProfile} />
 											<VisitBtn username={username} />
 											<FollowUserBtn usersProfile={usersProfile} />
+											<GiveAccoladeBtn username={username} />
 										</div>
 										<div className="flex flex-row items-center flex-wrap gap-2 2k:gap-4 w-full">
 											<ReportUserBtn userToReport={usersProfile} />

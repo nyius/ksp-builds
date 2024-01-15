@@ -8,10 +8,10 @@ const T1Badge = ({ hideText }) => {
 
 	return (
 		<>
-			<div ref={setTriggerRef} className="text-primary flex flex-row gap-2 items-center">
+			<div ref={setTriggerRef} className="text-primary flex flex-row gap-2 shrink-0 items-center">
 				{hideText ? '' : 'Tier 1'}
 				<span>
-					<img className="w-8 h-8 2k:w-12 2k:h-12" src={Tier1Badge} alt="tier 1 badge" />
+					<img className="w-7 h-7" src={Tier1Badge} alt="tier 1 badge" />
 				</span>
 			</div>
 			<TooltipPopup text="Tier 1" visible={visible} getArrowProps={getArrowProps} getTooltipProps={getTooltipProps} setTooltipRef={setTooltipRef} />

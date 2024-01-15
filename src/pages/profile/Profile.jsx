@@ -19,6 +19,7 @@ import ProfileInfo from './Components/ProfileInfo';
 import ProfileDetails from './Components/ProfileDetails';
 import FetchAmount from '../../components/fetchAmount/FetchAmount';
 import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
+import AccoladesPreview from './Components/AccoladesPreview';
 
 /**
  * Displays the users own profile
@@ -26,7 +27,7 @@ import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
  */
 function Profile() {
 	const { openedHangar } = useHangarContext();
-	const { user, authLoading, isAuthenticated } = useAuthContext();
+	const { user, authLoading, isAuthenticated, editingBio } = useAuthContext();
 	const navigate = useNavigate();
 
 	useResetFilters();
@@ -57,12 +58,15 @@ function Profile() {
 			<MiddleContainer color="none">
 				<PlanetHeader text="Profile" />
 
-				<div className="flex flex-col gap-20 mb-10 bg-base-400 border-2 border-dashed border-slate-700 rounded-xl p-6 2k:p-12">
-					<div className="flex flex-col md:flex-row gap-20 items-center">
-						<ProfilePicture />
-						<ProfileInfo />
+				<div className={`flex flex-col lg:flex-row w-full mb-10 gap-10 2k:gap-14 ${editingBio ? 'h-full' : 'lg:h-[35rem] 2k:h-[60rem]'}`}>
+					<div className="flex flex-col w-full h-full gap-3 2k:gap-5 bg-base-400 rounded-xl p-6 2k:p-12">
+						<div className="flex flex-col h-3/4 md:flex-row gap-20">
+							<ProfilePicture />
+							<ProfileInfo />
+						</div>
+						<ProfileDetails />
 					</div>
-					<ProfileDetails />
+					<AccoladesPreview />
 				</div>
 
 				<h2 className="text-xl 2k:text-3xl font-bold text-slate-100 mb-4 pixel-font">Your Hangars</h2>

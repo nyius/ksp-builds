@@ -75,16 +75,16 @@ function SignUp() {
 						<form className="w-full flex flex-col self-center" action="">
 							{/* Emails */}
 							<p className="text-xl 2k:text-3xl text-slate-200">Email</p>
-							<TextInput onChange={handleFieldChange} type="email" id="email" placeholder="Enter email" required={true} color="text-white" margin="mb-2" />
+							<TextInput size="w-full" onChange={handleFieldChange} type="email" id="email" placeholder="Enter email" required={true} color="text-white" margin="mb-2" />
 
-							<TextInput onChange={handleFieldChange} type="email" id="emailVerify" placeholder="Re-enter email" required={true} color="text-white" margin="mb-2" />
+							<TextInput size="w-full" onChange={handleFieldChange} type="email" id="emailVerify" placeholder="Re-enter email" required={true} color="text-white" margin="mb-2" />
 							{newUser.email && newUser.emailVerify && !emailError ? <>{checkMatchingEmails(newUser.email, newUser.emailVerify) ? <p className="text-xl 2k:text-2xl italic text-emerald-500">Emails match!</p> : null}</> : null}
 							{emailError ? <p className="text-xl 2k:text-2xl italic text-red-500">{emailError}</p> : null}
 
 							{/* Password */}
 							<p className="text-xl 2k:text-3xl text-slate-200 mt-6 2k:mt-10">Password</p>
-							<TextInput onChange={handleFieldChange} type="password" id="password" placeholder="Enter password" required={true} color="text-white" margin="mb-2" />
-							<TextInput onChange={handleFieldChange} type="password" id="passwordVerify" placeholder="Confirm password" required={true} color="text-white" margin="mb-2" />
+							<TextInput size="w-full" onChange={handleFieldChange} type="password" id="password" placeholder="Enter password" required={true} color="text-white" margin="mb-2" />
+							<TextInput size="w-full" onChange={handleFieldChange} type="password" id="passwordVerify" placeholder="Confirm password" required={true} color="text-white" margin="mb-2" />
 							{passwordError ? <p className="text-xl 2k:text-2xl italic text-red-500">{passwordError}</p> : null}
 
 							{accountExists ? (

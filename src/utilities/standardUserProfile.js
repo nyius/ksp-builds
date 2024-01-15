@@ -10,6 +10,7 @@ const standardUserProfile = {
 	followers: [],
 	lastModified: serverTimestamp(),
 	rocketReputation: 0,
+	accolades: [],
 };
 
 export default standardUserProfile;

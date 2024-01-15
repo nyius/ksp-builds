@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect, useReducer, useContext } from 'react';
-import { cloneDeep } from 'lodash';
 import AuthReducer from './AuthReducer';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../../firebase.config';
@@ -39,7 +38,6 @@ export const AuthProvider = ({ children }) => {
 
 				// if the user exists but they dont have a username, must be a new account so prompt for a new one
 				if (!user.username) {
-					errorReport('No username!', false, 'blockUser');
 					dispatchAuth({ type: 'SET_NEW_SIGNUP', payload: true });
 					setAuthLoading(false);
 				}
@@ -52,9 +50,9 @@ export const AuthProvider = ({ children }) => {
 
 				let usersConvos = await fetchAllUserMessages();
 				let fetchedConvos = await fetchAllUsersConvos(usersConvos);
-
+				const filteredConvos = fetchedConvos.filter(convo => !user?.blockList?.includes(convo.otherUser));
 				await Promise.all(
-					fetchedConvos.map(async convoDoc => {
+					filteredConvos.map(async convoDoc => {
 						await fetchConvosMessages(convoDoc, dispatchAuth);
 					})
 				);
@@ -85,7 +83,7 @@ export const AuthProvider = ({ children }) => {
 
 				dispatchAuth({
 					type: 'SET_CONVOS',
-					payload: fetchedConvos,
+					payload: filteredConvos,
 				});
 			} else {
 				setAuthLoading(false);
@@ -187,35 +185,44 @@ export const AuthProvider = ({ children }) => {
 	useEffect(() => {
 		if (state.newConvo) {
 			let fetchedNewConvo;
+
 			const fetchNewConvo = async () => {
 				const newConvoData = await getDoc(doc(db, 'conversations', state.newConvo.id));
-
 				if (newConvoData.exists()) {
 					fetchedNewConvo = newConvoData.data();
 					fetchedNewConvo.id = state.newConvo.id;
 
-					// Fetch the other users profile
-					const userToFetch = fetchedNewConvo.users.filter(user => {
-						return user !== auth.currentUser.uid;
-					})[0];
+					const otherUser = fetchedNewConvo.users.filter(user => user !== auth.currentUser.uid)[0];
 
-					const userFetch = await getDoc(doc(db, 'userProfiles', userToFetch));
-					const userData = userFetch.data();
+					// Check if we have the other user in this conversation blocked
+					if (!state.user?.blockList?.includes(otherUser)) {
+						// Fetch the other users profile
+						const userToFetch = fetchedNewConvo.users.filter(user => {
+							return user !== auth.currentUser.uid;
+						})[0];
 
-					fetchedNewConvo.userProfilePic = userData.profilePicture;
-					fetchedNewConvo.username = userData.username;
-					fetchedNewConvo.uid = userToFetch;
-					fetchedNewConvo.newMessage = true;
-					fetchedNewConvo.messages = [];
+						const userFetch = await getDoc(doc(db, 'userProfiles', userToFetch));
+						const userData = userFetch.data();
 
-					// Subscribe to the conversations messages so we can listen to  any new messages
-					fetchedNewConvo.unsubscribe = await subscribeToConvo(fetchedNewConvo.id, dispatchAuth);
+						fetchedNewConvo.userProfilePic = userData.profilePicture;
+						fetchedNewConvo.username = userData.username;
+						fetchedNewConvo.uid = userToFetch;
+						fetchedNewConvo.newMessage = true;
+						fetchedNewConvo.messages = [];
+
+						// Subscribe to the conversations messages so we can listen to  any new messages
+						fetchedNewConvo.unsubscribe = await subscribeToConvo(fetchedNewConvo.id, dispatchAuth);
+					} else {
+						fetchedNewConvo = 'blocked';
+					}
 
 					return fetchedNewConvo;
 				}
 			};
 			fetchNewConvo().then(fetchedNewConvo => {
-				dispatchAuth({ type: 'NEW_CONVO', payload: fetchedNewConvo });
+				if (fetchedNewConvo !== 'blocked') {
+					dispatchAuth({ type: 'NEW_CONVO', payload: fetchedNewConvo });
+				}
 			});
 		}
 	}, [state.newConvo]);

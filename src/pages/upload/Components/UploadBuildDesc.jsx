@@ -16,7 +16,7 @@ function UploadBuildDesc() {
 
 	return (
 		<div className="flex flex-row gap-2 items-center w-full mb-10 2k:mb-20">
-			<TextEditor text={description} setState={setDescription} />
+			<TextEditor text={description} setState={setDescription} characterLimit={3000} />
 		</div>
 	);
 }

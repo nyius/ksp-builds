@@ -6,6 +6,8 @@ import { v4 as uuidv4 } from 'uuid';
 import standardUser from '../../../../utilities/standardUser';
 import standardUserProfile from '../../../../utilities/standardUserProfile';
 import Button from '../../../../components/buttons/Button';
+import { cloneDeep } from 'lodash';
+import standardNotifications from '../../../../utilities/standardNotifications';
 
 function AddTestUsers() {
 	/**
@@ -16,12 +18,17 @@ function AddTestUsers() {
 			for (let i = 0; i < 10; i++) {
 				let newUser = { ...standardUser };
 				let newUserProfile = { ...standardUserProfile };
-				let newUsername = uuidv4().slice(0, 10);
+				let newUsername = uuidv4().slice(0, 10).replace('-', '');
 				let newId = uuidv4().slice(0, 10);
 				let folderName = uuidv4().slice(0, 10);
 				let buildNum = uuidv4().slice(0, 10);
 				let folderID = uuidv4().slice(0, 10);
 				let folderUrlName = uuidv4().slice(0, 10);
+				let notification = cloneDeep(standardNotifications);
+				const notifId = uuidv4().slice(0, 20);
+				const firstDoc = {
+					id: 'first',
+				};
 
 				newUser.username = newUsername;
 				newUserProfile.username = newUsername;
@@ -31,8 +38,10 @@ function AddTestUsers() {
 				newUser.folders = [{ builds: [buildNum], folderName, id: folderID, urlName: folderUrlName }];
 				newUserProfile.folders = [{ builds: [buildNum], folderName, id: folderID, urlName: folderUrlName }];
 
-				await setDoc(doc(db, 'testUsers', newId), newUser);
-				await setDoc(doc(db, 'testUserProfiles', newId), newUserProfile);
+				setDoc(doc(db, 'testUsers', newId), newUser);
+				setDoc(doc(db, 'testUsers', newId, 'notifications', notifId), notification);
+				setDoc(doc(db, 'testUsers', newId, 'messages', 'first'), firstDoc);
+				setDoc(doc(db, 'testUserProfiles', newId), newUserProfile);
 			}
 		} catch (error) {
 			console.log(error);
@@ -40,9 +49,10 @@ function AddTestUsers() {
 		}
 	};
 
+	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="flex flex-col gap-4 place-content-between">
-			<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Add 10 Test Users</p>
+		<div className="flex flex-row items-center gap-4">
+			<p className="text-2xl 2k:text-3xl text-slate-200 font-bold">Add 10 Test Users</p>
 			<Button color="btn-primary" text="Add" onClick={addTestUsers} />
 		</div>
 	);

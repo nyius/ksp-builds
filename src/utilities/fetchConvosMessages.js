@@ -6,6 +6,7 @@ import errorReport from './errorReport';
 /**
  * Fetches all messages from a conversation
  * @param {*} convo
+ * @param {*} dispatchAuth
  */
 const fetchConvosMessages = async (convo, dispatchAuth) => {
 	try {

@@ -37,7 +37,7 @@ function MessageInput() {
 
 	if (messageTab && convosOpen) {
 		return (
-			<ul className="w-full sm:w-180 menu dropdown-content rounded-xl p-5 bg-base-900 !fixed !bottom-12 2k:!bottom-16 right-2 z-101">
+			<ul className="w-full sm:w-180 menu dropdown-content rounded-xl p-5 bg-base-900 !fixed !bottom-12 2k:!bottom-16 right-2 z-[52]">
 				{!messageTab.blocked && !user?.blockList?.includes(messageTab.otherUser) ? (
 					<input autoComplete="off" onKeyDown={handleSendMessage} id="sendMessageBox" type="text" placeholder="enter message" className="input w-full text-xl 2k:text-3xl" onChange={e => setMessage(e.target.value)} />
 				) : (

@@ -10,8 +10,8 @@ function Username() {
 	const { openProfile } = useAuthContext();
 
 	return (
-		<p className="text-xl 2k:text-3xl text-white">
-			<span className="text-slate-500 2k:text-2xl italic">Username: </span> <UsernameLink noHoverUi={true} username={openProfile.username} uid={openProfile.uid} />
+		<p className="font-black">
+			<UsernameLink css="!text-2xl 2k:!text-3xl" noHoverUi={true} username={openProfile.username} uid={openProfile.uid} />
 		</p>
 	);
 }

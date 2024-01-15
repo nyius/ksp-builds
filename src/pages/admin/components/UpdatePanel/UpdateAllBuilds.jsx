@@ -42,9 +42,10 @@ function UpdateAllBuilds() {
 		}
 	};
 
+	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="flex flex-col gap-4 place-content-between">
-			<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Upate all Builds</p>
+		<div className="flex flex-row items-center gap-4">
+			<p className="text-2xl 2k:text-3xl text-slate-200 font-bold">Upate all Builds</p>
 			<Button color="btn-primary" text="Update" onClick={updateAllBuilds} />
 		</div>
 	);

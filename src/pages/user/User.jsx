@@ -28,6 +28,7 @@ import UserDetails from './Components/UserDetails';
 import BuildsViewBtn from '../../components/buttons/BuildsViewBtn';
 import { useHangarContext } from '../../context/hangars/HangarContext';
 import { useBuildsContext } from '../../context/builds/BuildsContext';
+import AccoladesPreview from './Components/AccoladesPreview';
 
 /**
  * The page to display a user
@@ -79,35 +80,36 @@ function User() {
 	if (!fetchingProfile && openProfile) {
 		return (
 			<>
-				<Helmet title={openProfile.username} pageLink={`https://kspbuilds.com/profile/${openProfile.uid}`} description={`Public KSP Builds profile for ${openProfile.username}. View their builds, send a message, and more.`} />
+				<Helmet title={openProfile.username} pageLink={`https://kspbuilds.com/user/${openProfile.username}`} description={`Public KSP Builds profile for ${openProfile.username}. View their builds, send a message, and more.`} />
 
 				<MiddleContainer color="none">
 					<DeleteAccountBtn />
-					<div className="flex flex-col relative gap-14 items-center mb-10 bg-base-400 rounded-xl p-6 2k:p-12">
-						<div className="flex flex-col gap-14 w-full">
-							<div className="flex flex-col md:flex-row gap-14 w-full items-center">
-								<div className="flex flex-col gap-3 2k:gap-4 w-full md:w-1/4">
+
+					<div className="flex flex-col lg:flex-row w-full mb-10 gap-10 2k:gap-14 lg:h-[35rem] 2k:h-[60rem] ">
+						<div className="flex flex-col w-full gap-3 2k:gap-5 bg-base-400 rounded-xl p-6 2k:p-12">
+							<div className="flex flex-col h-3/4 gap-10 2k:gap-14">
+								<div className="flex flex-row gap-10 2k:gap-14 items-center h-3/4">
 									<ProfilePicture />
-
-									{!authLoading && isAuthenticated && user?.uid !== openProfile.uid ? (
-										<>
-											<MessageUserBtn text="Message" />
-											<FollowUserBtn text="Follow" />
-											<div className="flex flex-row gap-2 2k:gap-4">
-												<BlockUserBtn userToBlock={openProfile} />
-												<ReportUserBtn userToReport={openProfile} />
-											</div>
-										</>
-									) : null}
+									<div className="flex flex-col gap-3 2k:gap-6 w-full md:w-3/4 h-full">
+										<Username />
+										<UserBio />
+									</div>
 								</div>
 
-								<div className="flex flex-col gap-3 2k:gap-6 w-full md:w-3/4">
-									<Username />
-									<UserBio />
-								</div>
+								{!authLoading && isAuthenticated && user?.uid !== openProfile.uid ? (
+									<div className="flex flex-row gap-2 2k:gap-4 items-center h-1/4">
+										<MessageUserBtn text="Message" />
+										<FollowUserBtn text="Follow" />
+										<div className="flex flex-row gap-2 2k:gap-4">
+											<BlockUserBtn userToBlock={openProfile} />
+											<ReportUserBtn userToReport={openProfile} />
+										</div>
+									</div>
+								) : null}
 							</div>
 							<UserDetails />
 						</div>
+						<AccoladesPreview />
 					</div>
 
 					{/* hangars */}

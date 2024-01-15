@@ -28,21 +28,23 @@ function Stats() {
 
 	return (
 		<SectionContainer sectionName="Stats">
-			{statsLoading ? (
-				<Spinner2 />
-			) : (
-				<>
-					<div className="flex flex-col gap-4 2k:gap-8 p-4 2k:p-8">
-						<div className="text-2xl 2k:text-4xl text-slate-400 font-bold">USERS</div>
-						<div className="text-2xl 2k:text-4xl ">{stats.users}</div>
-					</div>
-					<div className="divider divider-horizontal"></div>
-					<div className="flex flex-col gap-4 2k:gap-8 p-4 2k:p-8">
-						<div className="text-2xl 2k:text-4xl text-slate-400 font-bold">BUILDS</div>
-						<div className="text-2xl 2k:text-4xl ">{stats.builds}</div>
-					</div>
-				</>
-			)}
+			<flex className="flex flex-row">
+				{statsLoading ? (
+					<Spinner2 />
+				) : (
+					<>
+						<div className="flex flex-col gap-4 2k:gap-8 p-4 2k:p-8">
+							<div className="text-2xl 2k:text-4xl text-slate-400 font-bold">USERS</div>
+							<div className="text-2xl 2k:text-4xl ">{stats.users}</div>
+						</div>
+						<div className="divider divider-horizontal"></div>
+						<div className="flex flex-col gap-4 2k:gap-8 p-4 2k:p-8">
+							<div className="text-2xl 2k:text-4xl text-slate-400 font-bold">BUILDS</div>
+							<div className="text-2xl 2k:text-4xl ">{stats.builds}</div>
+						</div>
+					</>
+				)}
+			</flex>
 		</SectionContainer>
 	);
 }

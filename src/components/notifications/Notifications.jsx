@@ -16,13 +16,13 @@ function Notifications() {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div className="dropdown dropdown-end">
-			<div className="indicator">
-				<NewNotificationIcon />
-				<NotificationsIcon />
-			</div>
+		<>
 			{isAuthenticated && user?.notifications ? (
-				<>
+				<div className="dropdown dropdown-end">
+					<div className="indicator">
+						<NewNotificationIcon />
+						<NotificationsIcon />
+					</div>
 					<ul tabIndex={4} className="mt-3 shadow dropdown-content gap-2 bg-base-900 rounded-box notifications h-fit overflow-auto flex-nowrap relative scrollbar">
 						<div className="w-full h-20 flex flex-row items-center justify-center bg-primary text-xl 2k:text-3xl text-white font-bold p-3 2k:p-6">Notifications</div>
 						<DeleteAllNotifsBtn />
@@ -41,9 +41,9 @@ function Notifications() {
 							</>
 						)}
 					</ul>
-				</>
+				</div>
 			) : null}
-		</div>
+		</>
 	);
 }
 

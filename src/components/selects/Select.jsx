@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Arrows from '../../assets/up-down-arrows.svg';
+import { usePopperTooltip } from 'react-popper-tooltip';
+import TooltipPopup from '../tooltip/TooltipPopup';
 
 /**
  * Component for the select box
  * @param {obj} onClick - handles what happens when a item is clicked
  * @param {obj} defaultOption - {id: "", text:""} - the id of the default element and the text to display
+ * @param {bool} showTooltip - whether or not to show the tooptip of the current selected option
  * @returns
  */
-function Select(onClick, defaultOption) {
-	const [visible, setVisible] = useState(false);
+function Select(onClick, defaultOption, showTooltip) {
+	const [dropdownVisible, setDropdownVisible] = useState(false);
 	const [selectedOption, setSelectedOption] = useState(defaultOption ? defaultOption : { id: '', text: '' });
 
 	/**
@@ -23,7 +26,7 @@ function Select(onClick, defaultOption) {
 				id={id}
 				onClick={e => {
 					onClick(e);
-					setVisible(false);
+					setDropdownVisible(false);
 					setSelectedOption({ id: id, text: displayText });
 				}}
 				className={`text-xl 2k:text-2xl text-slate-300 rounded-xl hover:bg-base-100 hover:border-r-4 border-solid border-primary ${selectedOption.id === id ? 'bg-base-100' : ''} p-4 cursor-pointer`}
@@ -42,6 +45,7 @@ function Select(onClick, defaultOption) {
 	 */
 	const SelectBox = ({ children, selectText, size, dropdownCSS }) => {
 		const divRef = useRef(null);
+		const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef, visible } = usePopperTooltip({ placement: 'top' });
 
 		// Listener for clicking outside of the dropdown
 		useEffect(() => {
@@ -61,30 +65,34 @@ function Select(onClick, defaultOption) {
 		const handleClickOutside = event => {
 			if (divRef.current && !divRef.current.contains(event.target)) {
 				// Clicked outside of the div, set the state to false
-				setVisible(false);
+				setDropdownVisible(false);
 			}
 		};
 
+		//---------------------------------------------------------------------------------------------------//
 		return (
-			<div className="relative">
-				<div
-					className={`rounded-xl ${size ? size : 'w-66'} bg-base-200 flex flex-row items-center hover:bg-base-300 place-content-between border-1 border-solid border-slate-700 text-xl 2k:text-2xl py-4 px-5 text-slate-200 cursor-pointer`}
-					onClick={() => setVisible(!visible)}
-				>
-					<div className="unselectable truncate">
-						{selectText} {selectedOption.text ? selectedOption.text : defaultOption.text}
+			<>
+				<div className="relative" ref={setTriggerRef}>
+					<div
+						className={`rounded-xl ${size ? size : 'w-66'} bg-base-200 flex flex-row items-center hover:bg-base-300 place-content-between border-1 border-solid border-slate-700 text-xl 2k:text-2xl py-4 px-5 text-slate-200 cursor-pointer`}
+						onClick={() => setDropdownVisible(!dropdownVisible)}
+					>
+						<div className="unselectable truncate">
+							{selectText} {selectedOption.text ? selectedOption.text : defaultOption.text}
+						</div>
+						<img className="text-slate-200 h-5 2k:h-7" src={Arrows}></img>
 					</div>
-					<img className="text-slate-200 h-5 2k:h-7" src={Arrows}></img>
-				</div>
 
-				{visible ? (
-					<div id="sort-dropdown" ref={divRef} className={`absolute z-110 max-h-[60rem] overflow-auto scrollbar p-6 flex flex-col gap-2 b-0 ${size ? size : 'w-66'} ${dropdownCSS ? dropdownCSS : ''} bg-base-500 rounded-xl`}>
-						{children}
-					</div>
-				) : (
-					''
-				)}
-			</div>
+					{dropdownVisible ? (
+						<div id="sort-dropdown" ref={divRef} className={`absolute z-110 max-h-[60rem] overflow-auto scrollbar p-6 flex flex-col gap-2 b-0 ${size ? size : 'w-66'} ${dropdownCSS ? dropdownCSS : ''} bg-base-500 rounded-xl`}>
+							{children}
+						</div>
+					) : (
+						''
+					)}
+				</div>
+				{showTooltip ? <TooltipPopup text={selectedOption.text ? selectedOption.text : defaultOption.text} getArrowProps={getArrowProps} visible={visible} getTooltipProps={getTooltipProps} setTooltipRef={setTooltipRef} /> : ''}
+			</>
 		);
 	};
 	return { Option, SelectBox };

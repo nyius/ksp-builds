@@ -87,6 +87,7 @@ function CreateArticle() {
 		}
 	};
 
+	//---------------------------------------------------------------------------------------------------//
 	return (
 		<SectionContainer sectionName="Create Article" css="!flex-col gap-6">
 			<p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Create New Article</p>

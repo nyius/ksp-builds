@@ -33,7 +33,7 @@ function Conversation() {
 					</Fragment>
 				);
 			})}
-			<div ref={messagesEndRef} />
+			<div className="pb-6" ref={messagesEndRef} />
 		</div>
 	);
 }

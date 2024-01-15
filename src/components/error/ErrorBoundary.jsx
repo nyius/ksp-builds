@@ -47,7 +47,7 @@ const ErrorBoundary = ({ children }) => {
 
 					<div className="divider"></div>
 
-					<Button text="Return Home" icon="home" color="btn-primary" />
+					<Button text="Reload" icon="home" color="btn-primary" onClick={() => window.location.reload()} />
 					<img className="w-1/2" src={PlanetExplosion} alt="Crashed Spaceship" />
 				</div>
 			</MiddleContainer>

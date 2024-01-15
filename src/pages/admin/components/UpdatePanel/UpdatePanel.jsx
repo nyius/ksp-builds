@@ -6,33 +6,27 @@ import UpdateAllAmazonS3StorageItems from './UpdateAllAmazonS3StorageItems';
 import UpdateUser from './UpdateUser';
 import AddTestUsers from './AddTestUsers';
 import SectionContainer from '../SectionContainer';
+import RemoveTestUsers from './RemoveTestUsers';
 
 function UpdatePanel() {
 	return (
-		<SectionContainer css="!gap-8" sectionName="Update Panel">
-			<NewVersion />
+		<SectionContainer sectionName="Update Panel">
+			<div className="flex flex-col gap-8">
+				<NewVersion />
 
-			<div className="divider divider-horizontal"></div>
+				<UpdateAllUsers />
 
-			<UpdateAllUsers />
+				<UpdateAllBuilds />
 
-			<div className="divider divider-horizontal"></div>
+				<UpdateAllAmazonS3StorageItems />
 
-			<UpdateAllBuilds />
+				<UpdateUser />
 
-			<div className="divider divider-horizontal"></div>
+				<AddTestUsers />
 
-			<UpdateAllAmazonS3StorageItems />
+				<RemoveTestUsers />
 
-			<div className="divider divider-horizontal"></div>
-
-			<UpdateUser />
-
-			<div className="divider divider-horizontal"></div>
-
-			<AddTestUsers />
-
-			{/* <div className="flex flex-col gap-4 place-content-between">
+				{/* <div className="flex flex-col gap-4 place-content-between">
                 <p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Verify Twitter</p>
                 <Button color="btn-primary" text="Verify Twitter" onClick={verifyTwitter} />
             </div>
@@ -43,6 +37,7 @@ function UpdatePanel() {
                 <p className="text-2xl 2k:text-4xl text-slate-200 font-bold">Tweet</p>
                 <Button color="btn-primary" text="Tweet" onClick={tweet} />
             </div> */}
+			</div>
 		</SectionContainer>
 	);
 }

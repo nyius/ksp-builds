@@ -12,7 +12,7 @@ function MessageUserBtn({ usersProfile, text }) {
 	const { fetchConversation } = useFetchConversation();
 	const [userToMessage] = useSetUserToMessage(null, usersProfile);
 
-	if (user && userToMessage && user.uid !== userToMessage.uid && !user.blockList.includes(userToMessage.uid)) {
+	if (user && userToMessage && user.uid !== userToMessage.uid && !user?.blockList?.includes(userToMessage.uid)) {
 		return (
 			<>
 				{!userToMessage.blockList?.includes(user?.uid) && (userToMessage.allowPrivateMessaging === true || userToMessage.allowPrivateMessaging === undefined) && (

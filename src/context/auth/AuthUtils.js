@@ -1,4 +1,4 @@
-import { updateDoc, doc, serverTimestamp, collection, addDoc, deleteDoc, getDocs, query, getDoc, setDoc, where } from 'firebase/firestore';
+import { updateDoc, doc, serverTimestamp, collection, addDoc, deleteDoc, getDocs, query, getDoc, setDoc, where, increment } from 'firebase/firestore';
 import { deleteUser, getAuth } from 'firebase/auth';
 import { toast } from 'react-toastify';
 import { db } from '../../firebase.config';
@@ -58,13 +58,20 @@ export const sendNotification = async (uid, notification) => {
  * @param {string} uid - uid of the user to delete
  * @param {string} currentUserUid - uid of the current user
  */
-export const deleteUserAccount = async (uid, currentUserUid) => {
+export const deleteUserAccount = async (uid, currentUserUid, dispatchAuth) => {
 	try {
 		// Delete the notifications
 		const notifQuery = query(collection(db, 'users', uid, 'notifications'));
 		const notifQuerySnapshot = await getDocs(notifQuery);
 		notifQuerySnapshot.forEach(notif => {
 			deleteDoc(doc(db, 'users', uid, 'notifications', notif.id));
+		});
+
+		// Delete the messages
+		const messagesQuery = query(collection(db, 'users', uid, 'messages'));
+		const messagesQuerySnapshot = await getDocs(messagesQuery);
+		messagesQuerySnapshot.forEach(notif => {
+			deleteDoc(doc(db, 'users', uid, 'messages', notif.id));
 		});
 
 		const userRef = await getDoc(doc(db, 'users', uid));
@@ -80,14 +87,16 @@ export const deleteUserAccount = async (uid, currentUserUid) => {
 		const userAuth = getAuth();
 
 		if (uid === currentUserUid) {
+			dispatchAuth({
+				type: 'LOGOUT',
+				payload: null,
+			});
 			await deleteUser(uid);
 		} else {
 			await setDoc(doc(db, 'BlockList', uid), { timestamp: serverTimestamp() });
 		}
 
-		const statsData = await getDoc(doc(db, 'adminPanel', 'stats'));
-		const stats = statsData.data();
-		await updateDoc(doc(db, 'adminPanel', 'stats'), { users: (stats.users -= 1) });
+		await updateDoc(doc(db, 'adminPanel', 'stats'), { users: increment(-1) });
 
 		toast.success('Account Deleted.');
 	} catch (error) {

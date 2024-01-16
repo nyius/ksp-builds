@@ -17,7 +17,7 @@ const searchIndex = searchClient.initIndex('builds');
 
 /**
  * Hook with functions for fetching builds
- * @returns
+ * @returns {fetchBuilds, fetchBuildsById, fetchMoreBuilds}
  */
 const useBuilds = () => {
 	const { dispatchBuilds, currentPage, storedBuilds, fetchAmount } = useBuildsContext();
@@ -25,7 +25,7 @@ const useBuilds = () => {
 	const { filterBuilds } = useFilters();
 
 	/**
-	 * Fetches builds from the DB. Takes in an array of build ids to fetch. if no IDs specified, grabs all builds based on filters
+	 * Fetches builds from the DB. grabs all builds based on filters
 	 */
 	const fetchBuilds = async () => {
 		try {

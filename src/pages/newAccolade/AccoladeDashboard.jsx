@@ -10,11 +10,12 @@ import { deleteAccolade } from '../../context/accolades/AccoladesActions';
 import { useAccoladesContext } from '../../context/accolades/AccoladesContext';
 import GiveAccoladeToAllUsers from './Components/GiveAccoladeToAllUsers';
 import Button from '../../components/buttons/Button';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, doc, getDocs, increment, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { toast } from 'react-toastify';
 import { giveAccoladeAndNotify } from '../../hooks/useGiveAccolade';
 import { useAuthContext } from '../../context/auth/AuthContext';
+import { updateUserProfilesAndDb } from '../../context/auth/AuthUtils';
 
 /**
  * Accolade dashboard page
@@ -38,17 +39,26 @@ function AccoladeDashboard() {
 	 */
 	const giveSpecificAccolade = async () => {
 		try {
-			const usersSnap = await getDocs(collection(db, 'users'));
-			let accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'RHDbo0YPe0Sfm8KxBBFx'); // Build of the Week accolade
+			const buildsSnap = await getDocs(collection(db, 'builds'));
 
-			usersSnap.forEach(user => {
-				const userData = user.data();
-				userData.uid = user.id;
-
-				if (userData.buildOfTheWeekWinner) {
-					giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], userData);
+			buildsSnap.forEach(build => {
+				const buildData = build.data();
+				if (buildData.forChallenge) {
+					updateUserProfilesAndDb(dispatchAuth, { challengesCompleted: increment(1) }, buildData.uid);
 				}
 			});
+
+			// const usersSnap = await getDocs(collection(db, 'users'));
+			// let accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'RHDbo0YPe0Sfm8KxBBFx'); // Build of the Week accolade
+
+			// usersSnap.forEach(user => {
+			// 	const userData = user.data();
+			// 	userData.uid = user.id;
+
+			// 	if (userData.buildOfTheWeekWinner) {
+			// 		giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], userData);
+			// 	}
+			// });
 
 			toast.success('All users updated!');
 		} catch (error) {
@@ -62,7 +72,7 @@ function AccoladeDashboard() {
 		<MiddleContainer>
 			<PlanetHeader text="Accolade Dashboard" />
 			<div className="w-full flex flex-col gap-12 2k:gap-16">
-				<Button text="Give backend accolade" icon="save" size="w-fit" onClick={giveSpecificAccolade} color="btn-primary" />
+				<Button text="Give backend accolade || ONLY PUSH IF NYIUS" icon="save" size="w-fit" onClick={giveSpecificAccolade} color="btn-primary" />
 				<NewAccolade />
 
 				<ExistingAccolade selectedAccolade={selectedAccolade} setSelectedAccolade={setSelectedAccolade} />

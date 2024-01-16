@@ -1,14 +1,18 @@
-import React, { useEffect, useState, useReducer, createContext, useContext } from 'react';
+import React, { useEffect, useReducer, createContext, useContext } from 'react';
 import { AccoladesReducer } from './AccoladesReducer';
 import errorReport from '../../utilities/errorReport';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { useAuthContext } from '../auth/AuthContext';
+import { cloneDeep } from 'lodash';
+import { setLocalStoredBuild } from '../build/BuildUtils';
+import { checkAndAwardAccoladeGroup, checkIfUserHasAccolade } from './AccoladesUtils';
+import { giveAccoladeAndNotify } from '../../hooks/useGiveAccolade';
 
 const AccoladesContext = createContext();
 
 export const AccoladesProvider = ({ children }) => {
-	const { user, authLoading } = useAuthContext();
+	const { user, authLoading, dispatchAuth } = useAuthContext();
 
 	const initialState = {
 		loadingAccolades: true,
@@ -16,8 +20,10 @@ export const AccoladesProvider = ({ children }) => {
 		accoladeViewer: null,
 		totalAccoladeCount: 0,
 		totalAccoladePoints: 0,
+		checkedChallengeMaestro: false,
 	};
 
+	// Get accolades
 	useEffect(() => {
 		const getAccoladesContext = async () => {
 			try {
@@ -93,6 +99,75 @@ export const AccoladesProvider = ({ children }) => {
 
 		getAccoladesContext();
 	}, [user, authLoading]);
+
+	// Check for Challenge Maestro accolade
+	useEffect(() => {
+		const fetchBuilds = async () => {
+			try {
+				if (!authLoading && user) {
+					if (state.checkedChallengeMaestro) return;
+					if (user.builds?.length > 0) {
+						let challengeCount = 0;
+						// Fetche the users builds
+						const buildsToFetch = cloneDeep(user.builds);
+						const batches = [];
+
+						// because firestore only allows query 'in' by groups of 10, we have to break it up into chunks of 10
+						// by using splice, we alter the original input 'buildsToFetchCopy' arr by removing 10 at a time
+						while (buildsToFetch.length) {
+							const batch = buildsToFetch.splice(0, 10);
+							let q = query(collection(db, 'testBuilds'), where('id', 'in', batch));
+							// this gets all of the docs from our query, then loops over them and returns the raw data to our array
+							batches.push(getDocs(q).then(res => res.docs.map(res => res.data())));
+						}
+
+						const fetchedBuilds = await Promise.all(batches);
+						const builds = fetchedBuilds.flat();
+
+						builds.map(build => {
+							setLocalStoredBuild(build);
+							if (build.forChallenge) challengeCount++;
+						});
+
+						// Challenge Maestro ----------------------------------------------------------------
+						checkAndAwardAccoladeGroup(
+							dispatchAuth,
+							user,
+							state.fetchedAccolades,
+							{
+								diamond: {
+									id: 'hkmi5u9Me12NeBh7ZjZr',
+									minPoints: 100,
+								},
+								platinum: {
+									id: '5DMFGdgBgM2HRo1deR1o',
+									minPoints: 50,
+								},
+								gold: {
+									id: 'Z6FKY0D8KHhxz3i5o0iG',
+									minPoints: 20,
+								},
+								silver: {
+									id: 'I9R402v2sBDfqIAleG11',
+									minPoints: 10,
+								},
+							},
+							challengeCount
+						);
+
+						dispatchAccolades({
+							type: 'SET_ACCOLADES',
+							payload: { checkedChallengeMaestro: true },
+						});
+					}
+				}
+			} catch (error) {
+				errorReport(error, true, 'fetchBuilds - accoaldes Context');
+			}
+		};
+
+		fetchBuilds();
+	}, [authLoading]);
 
 	const [state, dispatchAccolades] = useReducer(AccoladesReducer, initialState);
 

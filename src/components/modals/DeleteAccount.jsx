@@ -7,14 +7,14 @@ import { deleteUserAccount } from '../../context/auth/AuthUtils';
 
 function DeleteAccount() {
 	const navigate = useNavigate();
-	const { authLoading, user, accountToDelete, isAuthenticated } = useAuthContext();
+	const { authLoading, user, accountToDelete, isAuthenticated, dispatchAuth } = useAuthContext();
 
 	/**
 	 * Handles a user starting the login process
 	 * @returns
 	 */
 	const handleDeleteUser = async () => {
-		await deleteUserAccount(accountToDelete, user.uid);
+		await deleteUserAccount(accountToDelete, user.uid, dispatchAuth);
 		navigate('/');
 	};
 
@@ -34,7 +34,7 @@ function DeleteAccount() {
 						</div>
 						<div className="flex flex-wrap gap-4 2k:gap-8 justify-center align-center mt-2 w-full">
 							<Button text="Cancel" color="btn-success" htmlFor="delete-account-modal" />
-							<Button text="Delete" color="btn-error" onClick={handleDeleteUser} />
+							<Button text="Delete" color="btn-error" onClick={handleDeleteUser} htmlFor="delete-account-modal" />
 						</div>
 					</div>
 				</div>

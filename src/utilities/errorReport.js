@@ -19,7 +19,7 @@ const errorReport = (error, sendToServer, func) => {
 
 	console.error(errorReport);
 
-	if (sendToServer) {
+	if (sendToServer && !errorReport.url.includes('localhost')) {
 		sendErrorToServer(errorReport);
 	}
 };

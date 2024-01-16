@@ -1242,19 +1242,19 @@ export const useCheckMinSubscriptionTier = () => {
 	const checkMinSubscriptionTier = minTier => {
 		if (isAuthenticated) {
 			if (minTier === 1) {
-				if (user.subscribed === 'tier1' || user.subscribed === 'tier2' || user.subscribed === 'tier3') {
+				if (user?.subscribed === 'tier1' || user?.subscribed === 'tier2' || user?.subscribed === 'tier3') {
 					return true;
 				} else {
 					return false;
 				}
 			} else if (minTier === 2) {
-				if (user.subscribed === 'tier2' || user.subscribed === 'tier3') {
+				if (user?.subscribed === 'tier2' || user?.subscribed === 'tier3') {
 					return true;
 				} else {
 					return false;
 				}
 			} else if (minTier === 3) {
-				if (user.subscribed === 'tier3') {
+				if (user?.subscribed === 'tier3') {
 					return true;
 				} else {
 					return false;

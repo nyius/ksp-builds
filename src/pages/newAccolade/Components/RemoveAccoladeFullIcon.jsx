@@ -25,9 +25,9 @@ function RemoveAccoladeFullIcon({ accolade, selectedAccolades, setSelectedAccola
 	const handleSelectAccolade = e => {
 		setSelectedAccolades(prevState => {
 			const newState = cloneDeep(prevState);
-			const foundAccolade = newState.filter(filterAccolade => filterAccolade.dateReceived.seconds === accolade.dateReceived.seconds);
+			const foundAccolade = newState.filter(filterAccolade => filterAccolade.dateReceived.seconds + filterAccolade.dateReceived.nanoseconds === accolade.dateReceived.seconds + accolade.dateReceived.nanoseconds);
 			if (foundAccolade.length > 0) {
-				const index = newState.findIndex(accoladeIndex => accoladeIndex.dateReceived.seconds === accolade.dateReceived.seconds);
+				const index = newState.findIndex(accoladeIndex => accoladeIndex.dateReceived.seconds + accoladeIndex.dateReceived.nanoseconds === accolade.dateReceived.seconds + accolade.dateReceived.nanoseconds);
 				newState.splice(index, 1);
 				return newState;
 			} else {
@@ -41,7 +41,7 @@ function RemoveAccoladeFullIcon({ accolade, selectedAccolades, setSelectedAccola
 	 * @returns
 	 */
 	const checkIfAccoladeSelected = () => {
-		const foundAccolade = selectedAccolades.filter(filterAccolade => filterAccolade.dateReceived.seconds === accolade.dateReceived.seconds);
+		const foundAccolade = selectedAccolades.filter(filterAccolade => filterAccolade.dateReceived.seconds + filterAccolade.dateReceived.nanoseconds === accolade.dateReceived.seconds + accolade.dateReceived.nanoseconds);
 		if (foundAccolade.length > 0) {
 			return true;
 		} else {

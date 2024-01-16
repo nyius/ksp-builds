@@ -64,12 +64,12 @@ export const AuthProvider = ({ children }) => {
 				const unsubUserSnap = onSnapshot(doc(db, 'users', auth.currentUser.uid), userListenData => {
 					const userChanged = userListenData.data();
 
-					if (!user.subscribed && userChanged.subscribed) {
+					if (!user?.subscribed && userChanged?.subscribed) {
 						console.log('User subscribed.');
 						dispatchAuth({
 							type: 'UPDATE_USER',
 							payload: {
-								subscribed: userChanged.subscribed,
+								subscribed: userChanged?.subscribed,
 							},
 						});
 						dispatchAuth({

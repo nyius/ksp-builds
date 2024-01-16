@@ -30,8 +30,8 @@ export const checkAndAwardAccoladeGroup = async (dispatchAuth, user, fetchedAcco
 		for (const tier in accoladesToGive) {
 			if (usersCurrentPoints >= accoladesToGive[tier].minPoints) {
 				if (!checkIfUserHasAccolade(accoladesToGive[tier].id, user.accolades)) {
-					let accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === accoladesToGive.diamond.id);
-					await giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], user); // diamond accolade
+					let accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === accoladesToGive[tier].id);
+					await giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], user);
 				}
 			}
 		}

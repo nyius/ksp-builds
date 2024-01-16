@@ -151,6 +151,10 @@ export const AccoladesProvider = ({ children }) => {
 									id: 'I9R402v2sBDfqIAleG11',
 									minPoints: 10,
 								},
+								bronze: {
+									id: 'f7mDVMAa2aGNE5MYrU6x',
+									minPoints: 1,
+								},
 							},
 							challengeCount
 						);

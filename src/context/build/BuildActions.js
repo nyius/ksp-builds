@@ -704,7 +704,7 @@ export const useUploadBuild = () => {
 					throw new Error('Error from handle voting', err);
 				});
 
-				// Give all of the following users a notification
+				// Give all of the users that are following the uploader a notification
 				// Handle nofitications
 				if (build.visibility === 'public' && process.env.REACT_APP_ENV !== 'DEV') {
 					const newNotif = { ...standardNotifications };

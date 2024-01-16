@@ -11,6 +11,10 @@ const standardUserProfile = {
 	lastModified: serverTimestamp(),
 	rocketReputation: 0,
 	accolades: [],
+	commentCount: 0,
+	challengesCompleted: 0,
+	dailyChallengesCompleted: 0,
+	dailyVisits: 0,
 };
 
 export default standardUserProfile;

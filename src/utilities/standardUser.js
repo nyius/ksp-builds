@@ -19,6 +19,10 @@ const standardUser = {
 	builds: [],
 	rocketReputation: 0,
 	commentCount: 0,
+	challengesCompleted: 0,
+	dailyChallengesCompleted: 0,
+	totalDownloads: 0,
+	dailyVisits: 0,
 };
 
 export default standardUser;

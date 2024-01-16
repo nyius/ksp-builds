@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, where, getDocs, serverTimestamp, getDocsFromCache, getDocFromCache } from 'firebase/firestore';
+import { doc, getDoc, addDoc, collection, updateDoc, deleteDoc, query, setDoc, where, getDocs, serverTimestamp, getDocsFromCache, getDocFromCache, increment } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
@@ -729,6 +729,11 @@ export const useUploadBuild = () => {
 
 				// Add the build to the users hangars (if they selected to)
 				await addBuildToHangar(newId);
+
+				// If its for a challenge, increase the users 'challenge' submitted count
+				if (build.forChallenge) {
+					await updateUserProfilesAndDb(dispatchAuth, { challengesCompleted: increment(1) }, user);
+				}
 
 				toast.success('Build created!');
 

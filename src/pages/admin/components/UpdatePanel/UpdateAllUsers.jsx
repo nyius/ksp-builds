@@ -16,11 +16,8 @@ function UpdateAllUsers() {
 			usersSnap.forEach(user => {
 				const userData = user.data();
 
-				if (userData.subscribed) {
-					console.log(userData);
-					// updateDoc(doc(db, 'users', user.id), { hangars: userData.hangars, folders: deleteField() });
-					// updateDoc(doc(db, 'userProfiles', user.id), { hangars: userData.hangars, folders: deleteField() });
-				}
+				updateDoc(doc(db, 'users', user.id), { commentCount: 0, challengesCompleted: 0, dailyChallengesCompleted: 0, dailyVisits: 0 });
+				updateDoc(doc(db, 'userProfiles', user.id), { commentCount: 0, challengesCompleted: 0, dailyChallengesCompleted: 0, dailyVisits: 0 });
 			});
 
 			toast.success('All users updated!');
@@ -29,9 +26,10 @@ function UpdateAllUsers() {
 		}
 	};
 
+	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="flex flex-row items-center gap-4">
-			<p className="text-2xl 2k:text-3xl text-slate-200 font-bold">Upate all Users</p>
+			<p className="text-2xl 2k:text-3xl text-slate-200 font-bold">Upate all Users!</p>
 			<Button color="btn-primary" text="Update" onClick={updateAllUsers} />
 		</div>
 	);

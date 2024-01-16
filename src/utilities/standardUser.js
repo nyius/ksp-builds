@@ -21,7 +21,6 @@ const standardUser = {
 	commentCount: 0,
 	challengesCompleted: 0,
 	dailyChallengesCompleted: 0,
-	totalDownloads: 0,
 	dailyVisits: 0,
 };
 

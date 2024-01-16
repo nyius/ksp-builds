@@ -28,6 +28,8 @@ import { updateDownloadCount, updateViewCount, makeBuildReadyToUpload, searchBui
 import { useAddBuildToHangar } from '../hangars/HangarActions';
 import { useNewsContext } from '../news/NewsContext';
 import errorReport from '../../utilities/errorReport';
+import { useAccoladesContext } from '../accolades/AccoladesContext';
+import { giveAccoladeAndNotify } from '../../hooks/useGiveAccolade';
 //---------------------------------------------------------------------------------------------------//
 
 /**
@@ -167,7 +169,9 @@ export const useFetchComments = () => {
  */
 export const useMakeBuildOfTheWeek = () => {
 	const { buildOfTheWeek } = useBuildContext();
-	const { user } = useAuthContext();
+	const { fetchedAccolades } = useAccoladesContext();
+	const { user, dispatchAuth } = useAuthContext();
+	const { fetchUsersProfile, checkIfUserInContext } = useFetchUser();
 
 	/**
 	 * handles making a build the build of the week
@@ -201,6 +205,18 @@ export const useMakeBuildOfTheWeek = () => {
 			delete newNotif.commentId;
 
 			await sendNotification(buildOfTheWeek.uid, newNotif);
+
+			// Give the user an accoalde
+			let accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'RHDbo0YPe0Sfm8KxBBFx'); // Build of the Week accolade
+			let foundProfile = checkIfUserInContext(buildOfTheWeek.uid);
+			if (!foundProfile) {
+				fetchUsersProfile(buildOfTheWeek.uid).then(fetchedUser => {
+					foundProfile = fetchedUser;
+				});
+			}
+			if (foundProfile) {
+				await giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], foundProfile);
+			}
 
 			// Update the author to have 'build of the week' badge
 			await updateDoc(doc(db, 'users', buildOfTheWeek.uid), { buildOfTheWeekWinner: true });

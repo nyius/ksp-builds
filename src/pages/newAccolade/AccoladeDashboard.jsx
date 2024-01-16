@@ -9,13 +9,20 @@ import ExistingAccolade from './Components/ExistingAccolade';
 import { deleteAccolade } from '../../context/accolades/AccoladesActions';
 import { useAccoladesContext } from '../../context/accolades/AccoladesContext';
 import GiveAccoladeToAllUsers from './Components/GiveAccoladeToAllUsers';
+import Button from '../../components/buttons/Button';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../firebase.config';
+import { toast } from 'react-toastify';
+import { giveAccoladeAndNotify } from '../../hooks/useGiveAccolade';
+import { useAuthContext } from '../../context/auth/AuthContext';
 
 /**
  * Accolade dashboard page
  * @returns
  */
 function AccoladeDashboard() {
-	const { dispatchAccolades } = useAccoladesContext();
+	const { dispatchAccolades, fetchedAccolades } = useAccoladesContext();
+	const { dispatchAuth } = useAuthContext();
 	const [selectedAccolade, setSelectedAccolade] = useState(null);
 	const [deleteSuccess, setDeleteSuccess] = useState(null);
 
@@ -26,11 +33,36 @@ function AccoladeDashboard() {
 		}
 	}, [deleteSuccess]);
 
+	/**
+	 *
+	 */
+	const giveSpecificAccolade = async () => {
+		try {
+			const usersSnap = await getDocs(collection(db, 'users'));
+			let accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'RHDbo0YPe0Sfm8KxBBFx'); // Build of the Week accolade
+
+			usersSnap.forEach(user => {
+				const userData = user.data();
+				userData.uid = user.id;
+
+				if (userData.buildOfTheWeekWinner) {
+					giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], userData);
+				}
+			});
+
+			toast.success('All users updated!');
+		} catch (error) {
+			console.log(error);
+			toast.error('Something went wrong');
+		}
+	};
+
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<MiddleContainer>
 			<PlanetHeader text="Accolade Dashboard" />
 			<div className="w-full flex flex-col gap-12 2k:gap-16">
+				<Button text="Give backend accolade" icon="save" size="w-fit" onClick={giveSpecificAccolade} color="btn-primary" />
 				<NewAccolade />
 
 				<ExistingAccolade selectedAccolade={selectedAccolade} setSelectedAccolade={setSelectedAccolade} />

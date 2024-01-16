@@ -61,10 +61,9 @@ const Sponsor = lazy(() => import('./pages/sponsor/Sponsor'));
 /*TODO
 Asap---------------------------------------------------
 - Make badges/acolades on each user account as an object to load icons/colors/hover etc
-	- giver past BotW winners this badge retroactively
+	- accolades builds fetch should localStore the last fetched time and only fetch again after X minutes
 	- code each accolades conditional function
 		-create actions for each check
-		- challenge maestros
 		- comms specialist
 		- cosmic benefactor
 		- cosmic veteran

@@ -21,6 +21,7 @@ export const AccoladesProvider = ({ children }) => {
 		totalAccoladeCount: 0,
 		totalAccoladePoints: 0,
 		checkedChallengeMaestro: false,
+		fetchedUsersBuilds: [],
 	};
 
 	// Get accolades
@@ -100,14 +101,13 @@ export const AccoladesProvider = ({ children }) => {
 		getAccoladesContext();
 	}, [user, authLoading]);
 
-	// Check for Challenge Maestro accolade
+	// Fetch this users builds -----------------------------------------------------------
 	useEffect(() => {
 		const fetchBuilds = async () => {
 			try {
 				if (!authLoading && user) {
 					if (state.checkedChallengeMaestro) return;
 					if (user.builds?.length > 0) {
-						let challengeCount = 0;
 						// Fetche the users builds
 						const buildsToFetch = cloneDeep(user.builds);
 						const batches = [];
@@ -116,7 +116,7 @@ export const AccoladesProvider = ({ children }) => {
 						// by using splice, we alter the original input 'buildsToFetchCopy' arr by removing 10 at a time
 						while (buildsToFetch.length) {
 							const batch = buildsToFetch.splice(0, 10);
-							let q = query(collection(db, 'testBuilds'), where('id', 'in', batch));
+							let q = query(collection(db, 'builds'), where('id', 'in', batch));
 							// this gets all of the docs from our query, then loops over them and returns the raw data to our array
 							batches.push(getDocs(q).then(res => res.docs.map(res => res.data())));
 						}
@@ -124,44 +124,9 @@ export const AccoladesProvider = ({ children }) => {
 						const fetchedBuilds = await Promise.all(batches);
 						const builds = fetchedBuilds.flat();
 
-						builds.map(build => {
-							setLocalStoredBuild(build);
-							if (build.forChallenge) challengeCount++;
-						});
-
-						// Challenge Maestro ----------------------------------------------------------------
-						checkAndAwardAccoladeGroup(
-							dispatchAuth,
-							user,
-							state.fetchedAccolades,
-							{
-								diamond: {
-									id: 'hkmi5u9Me12NeBh7ZjZr',
-									minPoints: 100,
-								},
-								platinum: {
-									id: '5DMFGdgBgM2HRo1deR1o',
-									minPoints: 50,
-								},
-								gold: {
-									id: 'Z6FKY0D8KHhxz3i5o0iG',
-									minPoints: 20,
-								},
-								silver: {
-									id: 'I9R402v2sBDfqIAleG11',
-									minPoints: 10,
-								},
-								bronze: {
-									id: 'f7mDVMAa2aGNE5MYrU6x',
-									minPoints: 1,
-								},
-							},
-							challengeCount
-						);
-
 						dispatchAccolades({
 							type: 'SET_ACCOLADES',
-							payload: { checkedChallengeMaestro: true },
+							payload: { fetchedUsersBuilds: builds },
 						});
 					}
 				}
@@ -174,6 +139,53 @@ export const AccoladesProvider = ({ children }) => {
 	}, [authLoading]);
 
 	const [state, dispatchAccolades] = useReducer(AccoladesReducer, initialState);
+
+	// Check for Challenge Maestro accolade
+	useEffect(() => {
+		if (state.fetchedUsersBuilds.length > 0) {
+			let challengeCount = 0;
+
+			state.fetchedUsersBuilds.map(build => {
+				setLocalStoredBuild(build);
+				if (build.forChallenge) challengeCount++;
+			});
+
+			// Challenge Maestro ----------------------------------------------------------------
+			checkAndAwardAccoladeGroup(
+				dispatchAuth,
+				user,
+				state.fetchedAccolades,
+				{
+					diamond: {
+						id: 'hkmi5u9Me12NeBh7ZjZr',
+						minPoints: 100,
+					},
+					platinum: {
+						id: '5DMFGdgBgM2HRo1deR1o',
+						minPoints: 50,
+					},
+					gold: {
+						id: 'Z6FKY0D8KHhxz3i5o0iG',
+						minPoints: 20,
+					},
+					silver: {
+						id: 'I9R402v2sBDfqIAleG11',
+						minPoints: 10,
+					},
+					bronze: {
+						id: 'f7mDVMAa2aGNE5MYrU6x',
+						minPoints: 1,
+					},
+				},
+				challengeCount
+			);
+
+			dispatchAccolades({
+				type: 'SET_ACCOLADES',
+				payload: { checkedChallengeMaestro: true },
+			});
+		}
+	}, [state.fetchedUsersBuilds]);
 
 	return <AccoladesContext.Provider value={{ ...state, dispatchAccolades }}>{children}</AccoladesContext.Provider>;
 };

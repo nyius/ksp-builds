@@ -41,12 +41,14 @@ function AccoladeDashboard() {
 		try {
 			const buildsSnap = await getDocs(collection(db, 'builds'));
 
+			const comments = [];
 			buildsSnap.forEach(build => {
-				const buildData = build.data();
-				if (buildData.forChallenge) {
-					updateUserProfilesAndDb(dispatchAuth, { challengesCompleted: increment(1) }, buildData.uid);
-				}
+				comments.push(getDocs(collection(db, 'builds', build.id, 'comments')).then(res => res.docs.map(res => res.data())));
 			});
+			// const buildData = build.data();
+			// 	if (buildData.forChallenge) {
+			// 		updateUserProfilesAndDb(dispatchAuth, { challengesCompleted: increment(1) }, buildData.uid);
+			// 	}
 
 			// const usersSnap = await getDocs(collection(db, 'users'));
 			// let accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'RHDbo0YPe0Sfm8KxBBFx'); // Build of the Week accolade
@@ -59,6 +61,12 @@ function AccoladeDashboard() {
 			// 		giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], userData);
 			// 	}
 			// });
+
+			const fetchedComments = await Promise.all(comments);
+			const allComments = fetchedComments.flat();
+			allComments.map(comment => {
+				updateUserProfilesAndDb(dispatchAuth, { commentCount: increment(1) }, comment.uid);
+			});
 
 			toast.success('All users updated!');
 		} catch (error) {

@@ -21,6 +21,7 @@ export const AccoladesProvider = ({ children }) => {
 		totalAccoladeCount: 0,
 		totalAccoladePoints: 0,
 		checkedChallengeMaestro: false,
+		checkedCommsSpecialist: false,
 		fetchedUsersBuilds: [],
 	};
 
@@ -140,9 +141,9 @@ export const AccoladesProvider = ({ children }) => {
 
 	const [state, dispatchAccolades] = useReducer(AccoladesReducer, initialState);
 
-	// Check for Challenge Maestro accolade
+	// Check for Challenge Maestro accolade -----------------------------------------------------------
 	useEffect(() => {
-		if (state.fetchedUsersBuilds.length > 0) {
+		if (state.fetchedUsersBuilds.length > 0 && !state.checkedChallengeMaestro) {
 			let challengeCount = 0;
 
 			state.fetchedUsersBuilds.map(build => {
@@ -180,12 +181,53 @@ export const AccoladesProvider = ({ children }) => {
 				challengeCount
 			);
 
+			console.log(`wieuhws`);
+
 			dispatchAccolades({
 				type: 'SET_ACCOLADES',
 				payload: { checkedChallengeMaestro: true },
 			});
 		}
 	}, [state.fetchedUsersBuilds]);
+
+	// Check for Comms Specialist accolade -----------------------------------------------------------
+	useEffect(() => {
+		if (!authLoading && user && !state.checkedCommsSpecialist) {
+			checkAndAwardAccoladeGroup(
+				dispatchAuth,
+				user,
+				state.fetchedAccolades,
+				{
+					diamond: {
+						id: 'SlDf64uN2xGWPeUVLDZy',
+						minPoints: 500,
+					},
+					platinum: {
+						id: '4vgkWwaPaeF4lCfgVYOf',
+						minPoints: 100,
+					},
+					gold: {
+						id: 'Vq1bSHi2wqLRZWMghjJP',
+						minPoints: 50,
+					},
+					silver: {
+						id: 'vV0w05JmlNuvrgAcjglq',
+						minPoints: 20,
+					},
+					bronze: {
+						id: 'eCKqKKulTnYnFM3Vzu7q',
+						minPoints: 10,
+					},
+				},
+				user.commentCount
+			);
+
+			dispatchAccolades({
+				type: 'SET_ACCOLADES',
+				payload: { checkedCommsSpecialist: true },
+			});
+		}
+	}, [user, authLoading]);
 
 	return <AccoladesContext.Provider value={{ ...state, dispatchAccolades }}>{children}</AccoladesContext.Provider>;
 };

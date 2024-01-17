@@ -50,9 +50,9 @@ export const AuthProvider = ({ children }) => {
 
 				let usersConvos = await fetchAllUserMessages();
 				let fetchedConvos = await fetchAllUsersConvos(usersConvos);
-				const filteredConvos = fetchedConvos.filter(convo => !user?.blockList?.includes(convo.otherUser));
+				const filteredConvos = fetchedConvos?.filter(convo => !user?.blockList?.includes(convo.otherUser));
 				await Promise.all(
-					filteredConvos.map(async convoDoc => {
+					filteredConvos?.map(async convoDoc => {
 						await fetchConvosMessages(convoDoc, dispatchAuth);
 					})
 				);
@@ -90,10 +90,10 @@ export const AuthProvider = ({ children }) => {
 				throw new Error('User does not exist');
 			}
 		} catch (error) {
-			if (window.location.href !== 'https://kspbuilds.com/sign-up') {
-				errorReport(error.message, true, 'getUser');
-			} else if (error.message.includes('User does not exist') || error.message.includes('client is offline')) {
+			if (error.message.includes('User does not exist') || error.message.includes('client is offline')) {
 				errorReport(error.message, false, 'getUser');
+			} else if (window.location.href !== 'https://kspbuilds.com/sign-up') {
+				errorReport(error.message, true, 'getUser');
 			}
 		}
 	};

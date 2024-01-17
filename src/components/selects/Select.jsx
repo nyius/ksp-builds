@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Arrows from '../../assets/up-down-arrows.svg';
 import { usePopperTooltip } from 'react-popper-tooltip';
 import TooltipPopup from '../tooltip/TooltipPopup';
+import { useScrollToElement } from '../../hooks/ScrollToElement';
 
 /**
  * Component for the select box
@@ -47,6 +48,16 @@ function Select(onClick, defaultOption, showTooltip) {
 		const divRef = useRef(null);
 		const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef, visible } = usePopperTooltip({ placement: 'top' });
 
+		useEffect(() => {
+			// Scroll to the selected option when it changes
+			if (divRef.current && selectedOption.id) {
+				const selectedOptionElement = divRef.current.querySelector(`#${checkIfIdStartsWithNumAndReturn(selectedOption.id)}`);
+				if (selectedOptionElement) {
+					selectedOptionElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+				}
+			}
+		}, [selectedOption]);
+
 		// Listener for clicking outside of the dropdown
 		useEffect(() => {
 			// Attach the event listener when the component mounts
@@ -84,7 +95,7 @@ function Select(onClick, defaultOption, showTooltip) {
 					</div>
 
 					{dropdownVisible ? (
-						<div id="sort-dropdown" ref={divRef} className={`absolute z-110 max-h-[60rem] overflow-auto scrollbar p-6 flex flex-col gap-2 b-0 ${size ? size : 'w-66'} ${dropdownCSS ? dropdownCSS : ''} bg-base-500 rounded-xl`}>
+						<div ref={divRef} className={`absolute z-110 max-h-[60rem] overflow-auto scrollbar p-6 flex flex-col gap-2 b-0 ${size ? size : 'w-66'} ${dropdownCSS ? dropdownCSS : ''} bg-base-500 rounded-xl`}>
 							{children}
 						</div>
 					) : (
@@ -99,3 +110,19 @@ function Select(onClick, defaultOption, showTooltip) {
 }
 
 export default Select;
+
+/**
+ * Becuase ids shouldn't start with nums, but sometimes do, we need to check for that and return the proper querySelector comapitble ID
+ * @param {string} id
+ * @returns
+ */
+const checkIfIdStartsWithNumAndReturn = id => {
+	// Check if the id starts with a number
+	if (/^\d/.test(id)) {
+		// Escape the first character with \\ if it's a number
+		return `\\3${id.charAt(0)} ${id.slice(1)}`;
+	}
+
+	// Return the original id if it doesn't start with a number
+	return id;
+};

@@ -27,18 +27,18 @@ function ModeratorRoute({ children }) {
 					}
 				};
 				checkUserForAdmin();
+			} else if (user?.moderator) {
+				const checkUserForMod = async () => {
+					const data = await getDoc(doc(db, 'moderators', user.uid));
+					if (data.exists()) {
+						setVerify(true);
+						setLoading(false);
+					} else {
+						setLoading(false);
+					}
+				};
 
-				if (!verify) {
-					const checkUserForMod = async () => {
-						const data = await getDoc(doc(db, 'moderators', user.uid));
-						if (data.exists()) {
-							setVerify(true);
-							setLoading(false);
-						} else {
-							setLoading(false);
-						}
-					};
-				}
+				checkUserForMod();
 			} else {
 				setLoading(false);
 			}

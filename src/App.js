@@ -64,10 +64,8 @@ Asap---------------------------------------------------
 	- accolades builds fetch should localStore the last fetched time and only fetch again after X minutes
 	- code each accolades conditional function
 		-create actions for each check
-		- comms specialist
-		- cosmic benefactor
 		- cosmic veteran
-		- daily challenge
+		- daily challenge - Cant do this until daily challenges are implemented
 		- first contact
 		- galactic initiate
 		- glitch hunter

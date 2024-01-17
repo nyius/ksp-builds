@@ -181,8 +181,6 @@ export const AccoladesProvider = ({ children }) => {
 				challengeCount
 			);
 
-			console.log(`wieuhws`);
-
 			dispatchAccolades({
 				type: 'SET_ACCOLADES',
 				payload: { checkedChallengeMaestro: true },

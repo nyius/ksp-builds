@@ -238,7 +238,7 @@ export const useMakeBuildOfTheWeek = () => {
  */
 export const useComment = () => {
 	const { dispatchBuild, comments, comment, loadedBuild, replyingComment } = useBuildContext();
-	const { user } = useAuthContext();
+	const { user, dispatchAuth } = useAuthContext();
 
 	/**
 	 * Handles adding a new comment

@@ -311,6 +311,8 @@ export const useComment = () => {
 				newComment.timestamp = data.timestamp;
 			}
 
+			await updateUserProfilesAndDb(dispatchAuth, { commentCount: increment(1) }, user.uid);
+
 			toast.success('Commented!');
 
 			dispatchBuild({

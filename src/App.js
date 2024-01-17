@@ -81,7 +81,6 @@ Asap---------------------------------------------------
 		- then remove the users accolade that has that received date
 	- switch giveAccoladeToAllUsersAndNotify to userProfiles and users instead of test documents
 
-- select box should open scrolled to current selected element
 - 'clear' on comment doesn't actually clear
 -let users change hangar icons/colors
 	- just for subscribers? (maybe free gets a few options of icons and no colors)

@@ -10,7 +10,7 @@ import { deleteAccolade } from '../../context/accolades/AccoladesActions';
 import { useAccoladesContext } from '../../context/accolades/AccoladesContext';
 import GiveAccoladeToAllUsers from './Components/GiveAccoladeToAllUsers';
 import Button from '../../components/buttons/Button';
-import { collection, doc, getDocs, increment, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, increment, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import { toast } from 'react-toastify';
 import { giveAccoladeAndNotify } from '../../hooks/useGiveAccolade';
@@ -39,12 +39,37 @@ function AccoladeDashboard() {
 	 */
 	const giveSpecificAccolade = async () => {
 		try {
-			const buildsSnap = await getDocs(collection(db, 'builds'));
+			const conversationsSnap = await getDocs(collection(db, 'conversations'));
 
 			const comments = [];
-			buildsSnap.forEach(build => {
-				comments.push(getDocs(collection(db, 'builds', build.id, 'comments')).then(res => res.docs.map(res => res.data())));
+			let fetchedUsers = {};
+			conversationsSnap.forEach(convo => {
+				const convoData = convo.data();
+				convoData.users.map(convoUser => {
+					fetchedUsers[convoUser] = convoUser;
+				});
 			});
+
+			for (const user in fetchedUsers) {
+				const fetchConvoUserAndAwardAccolade = async () => {
+					const fetchedUser = await getDoc(doc(db, 'users', user));
+
+					if (fetchedUser.exists()) {
+						let fetchedUserData = fetchedUser.data();
+						fetchedUserData.uid = fetchedUser.id;
+
+						const hasFirstMessageAccolade = fetchedUserData.accolades?.some(accolade => accolade.id === 'hEDpFNMcNob1thXKTcxN');
+
+						if (!hasFirstMessageAccolade) {
+							let accoladeToGive;
+							accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'hEDpFNMcNob1thXKTcxN'); // first contact accoalde
+							await giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], fetchedUserData);
+						}
+					}
+				};
+
+				fetchConvoUserAndAwardAccolade();
+			}
 			// const buildData = build.data();
 			// 	if (buildData.forChallenge) {
 			// 		updateUserProfilesAndDb(dispatchAuth, { challengesCompleted: increment(1) }, buildData.uid);
@@ -62,11 +87,12 @@ function AccoladeDashboard() {
 			// 	}
 			// });
 
-			const fetchedComments = await Promise.all(comments);
-			const allComments = fetchedComments.flat();
-			allComments.map(comment => {
-				updateUserProfilesAndDb(dispatchAuth, { commentCount: increment(1) }, comment.uid);
-			});
+			// comments.push(getDocs(collection(db, 'builds', build.id, 'comments')).then(res => res.docs.map(res => res.data())));
+			// const fetchedComments = await Promise.all(comments);
+			// const allComments = fetchedComments.flat();
+			// allComments.map(comment => {
+			// 	updateUserProfilesAndDb(dispatchAuth, { commentCount: increment(1) }, comment.uid);
+			// });
 
 			toast.success('All users updated!');
 		} catch (error) {

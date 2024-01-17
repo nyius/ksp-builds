@@ -23,6 +23,7 @@ import { createDateFromFirebaseTimestamp } from '../../utilities/createDateFromF
 import errorReport from '../../utilities/errorReport';
 import { useAccoladesContext } from '../accolades/AccoladesContext';
 import { giveAccoladeAndNotify } from '../../hooks/useGiveAccolade';
+import UserAccolades from '../../pages/user/UserAccolades';
 
 const useAuth = () => {
 	const { dispatchAuth } = useAuthContext();
@@ -643,6 +644,8 @@ export const useSubmitReport = () => {
  */
 export const useSendMessage = () => {
 	const { user, dispatchAuth, messageTab } = useAuthContext();
+	const { fetchedAccolades } = useAccoladesContext();
+
 	/**
 	 * Handles sending a message to a user
 	 * @param {string} message - the message to send
@@ -727,6 +730,15 @@ export const useSendMessage = () => {
 				conversation.messages = [messageToSend];
 
 				setConvoTab(dispatchAuth, conversation);
+			}
+			// Check if user has accolade for first message picture (id is hEDpFNMcNob1thXKTcxN). If not, give it to them
+			const hasFirstMessageAccolade = user.accolades?.some(accolade => accolade.id === 'hEDpFNMcNob1thXKTcxN');
+
+			if (!hasFirstMessageAccolade) {
+				let accoladeToGive;
+				accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'hEDpFNMcNob1thXKTcxN'); // change portrait accolade
+
+				await giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], user);
 			}
 		} catch (error) {
 			toast.error('Something went wrong. Please try again');

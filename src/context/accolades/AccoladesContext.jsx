@@ -21,6 +21,7 @@ export const AccoladesProvider = ({ children }) => {
 		totalAccoladeCount: 0,
 		totalAccoladePoints: 0,
 		checkedChallengeMaestro: false,
+		checkedInterstellarPioneer: false,
 		checkedCommsSpecialist: false,
 		fetchedUsersBuilds: [],
 	};
@@ -184,6 +185,52 @@ export const AccoladesProvider = ({ children }) => {
 			dispatchAccolades({
 				type: 'SET_ACCOLADES',
 				payload: { checkedChallengeMaestro: true },
+			});
+		}
+	}, [state.fetchedUsersBuilds]);
+
+	// Check for Interstellar Pioneer accolade -----------------------------------------------------------
+	useEffect(() => {
+		if (state.fetchedUsersBuilds.length > 0 && !state.checkedInterstellarPioneer) {
+			let downloadCount = 0;
+
+			state.fetchedUsersBuilds.map(build => {
+				downloadCount += build.downloads;
+			});
+
+			// Interstellar Pioneer ----------------------------------------------------------------
+			checkAndAwardAccoladeGroup(
+				dispatchAuth,
+				user,
+				state.fetchedAccolades,
+				{
+					diamond: {
+						id: 'UljELFOPPQClPNTGX5Vn',
+						minPoints: 1000000,
+					},
+					platinum: {
+						id: 'i9yjd2K1Nx9wX0NmHzaZ',
+						minPoints: 100000,
+					},
+					gold: {
+						id: 'LNi7hrijVuql5POjgTWd',
+						minPoints: 10000,
+					},
+					silver: {
+						id: 'aP5VOgE6T3QFamBymWc7',
+						minPoints: 1000,
+					},
+					bronze: {
+						id: 'GQao2IKDeCaR4nvakXxc',
+						minPoints: 100,
+					},
+				},
+				downloadCount
+			);
+
+			dispatchAccolades({
+				type: 'SET_ACCOLADES',
+				payload: { checkedInterstellarPioneer: true },
 			});
 		}
 	}, [state.fetchedUsersBuilds]);

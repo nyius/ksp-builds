@@ -111,7 +111,11 @@ export const BuildsProvider = ({ children }) => {
 					payload: buildSnapData,
 				});
 			} catch (error) {
-				errorReport(error.message, true, 'fetchServerBuild');
+				if (error.includes('offline')) {
+					errorReport(error.message, false, 'fetchServerBuild');
+				} else {
+					errorReport(error.message, true, 'fetchServerBuild');
+				}
 				dispatchBuilds({
 					type: 'SET_LOADING_BUILD_OF_THE_WEEK',
 					payload: false,

@@ -39,15 +39,12 @@ function AccoladeDashboard() {
 	 */
 	const giveSpecificAccolade = async () => {
 		try {
-			const conversationsSnap = await getDocs(collection(db, 'conversations'));
+			const buildsSnap = await getDocs(collection(db, 'builds'));
 
-			const comments = [];
 			let fetchedUsers = {};
-			conversationsSnap.forEach(convo => {
-				const convoData = convo.data();
-				convoData.users.map(convoUser => {
-					fetchedUsers[convoUser] = convoUser;
-				});
+			buildsSnap.forEach(build => {
+				const buildData = build.data();
+				fetchedUsers[buildData.uid] = buildData.uid;
 			});
 
 			for (const user in fetchedUsers) {
@@ -58,11 +55,11 @@ function AccoladeDashboard() {
 						let fetchedUserData = fetchedUser.data();
 						fetchedUserData.uid = fetchedUser.id;
 
-						const hasFirstMessageAccolade = fetchedUserData.accolades?.some(accolade => accolade.id === 'hEDpFNMcNob1thXKTcxN');
+						const hasMaidenVoyagerAccolade = fetchedUserData.accolades?.some(accolade => accolade.id === 'YdT1ACrDyAtGE0cfraAn');
 
-						if (!hasFirstMessageAccolade) {
+						if (!hasMaidenVoyagerAccolade) {
 							let accoladeToGive;
-							accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'hEDpFNMcNob1thXKTcxN'); // first contact accoalde
+							accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'YdT1ACrDyAtGE0cfraAn'); // first contact accoalde
 							await giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], fetchedUserData);
 						}
 					}

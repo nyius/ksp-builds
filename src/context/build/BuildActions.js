@@ -613,6 +613,7 @@ export const useDeleteBuild = () => {
  */
 export const useUploadBuild = () => {
 	const { addBuildToHangar } = useAddBuildToHangar();
+	const { fetchedAccolades } = useAccoladesContext();
 	const { dispatchBuild } = useBuildContext();
 	const { user, dispatchAuth } = useAuthContext();
 	const { dispatchBuilds } = useBuildsContext();
@@ -735,6 +736,16 @@ export const useUploadBuild = () => {
 				// If its for a challenge, increase the users 'challenge' submitted count
 				if (build.forChallenge) {
 					await updateUserProfilesAndDb(dispatchAuth, { challengesCompleted: increment(1) }, user);
+				}
+
+				// Check if this is the users first upload (and give them an accolade if it is)
+				const hasFirstUploadAccolade = user.accolades?.some(accolade => accolade.id === 'YdT1ACrDyAtGE0cfraAn');
+
+				if (!hasFirstUploadAccolade) {
+					let accoladeToGive;
+					accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'YdT1ACrDyAtGE0cfraAn'); // first upload accolade
+
+					await giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], user);
 				}
 
 				toast.success('Build created!');

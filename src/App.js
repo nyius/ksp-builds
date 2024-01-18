@@ -66,10 +66,6 @@ Asap---------------------------------------------------
 		-create actions for each check
 		- cosmic veteran
 		- daily challenge - Cant do this until daily challenges are implemented
-		- first contact
-		- galactic initiate
-		- glitch hunter
-		- interstellar pioneer
 		- kerbal engineer
 		- maiden voyager
 		- mission control
@@ -80,6 +76,9 @@ Asap---------------------------------------------------
 		- selected accolades needs to include the received date for that accolade
 		- then remove the users accolade that has that received date
 	- switch giveAccoladeToAllUsersAndNotify to userProfiles and users instead of test documents
+	- accolade for first download (thats not from the current user)
+	- accolade for first comment 
+	- accolade for first hangar
 
 - 'clear' on comment doesn't actually clear
 -let users change hangar icons/colors
@@ -110,6 +109,8 @@ Volunteer positions (moderate, write posts, create challenges, etc) - this will 
 t-shirts, merch
 
 Research---------------------------------------------------
+- Subscribe to notifications collection so we get updated notifs right away
+	- in the same vein, when a user gets an accolade they should see it in the notifications
 - make the text editor less bad
 pagination allowing user to jump right to a page? might result in a large amount of firebase calls
 Should be able to login with username/password

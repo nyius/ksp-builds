@@ -30,6 +30,7 @@ import { useNewsContext } from '../news/NewsContext';
 import errorReport from '../../utilities/errorReport';
 import { useAccoladesContext } from '../accolades/AccoladesContext';
 import { giveAccoladeAndNotify } from '../../hooks/useGiveAccolade';
+import { checkAndAwardAccoladeGroup } from '../accolades/AccoladesUtils';
 //---------------------------------------------------------------------------------------------------//
 
 /**
@@ -707,7 +708,7 @@ export const useUploadBuild = () => {
 					throw new Error('Error from handle voting', err);
 				});
 
-				// Give all of the users that are following the uploader a notification
+				// Give all of the users that are following the uploader a notification --------------------------------------------------------------------------------------------------------
 				// Handle nofitications
 				if (build.visibility === 'public' && process.env.REACT_APP_ENV !== 'DEV') {
 					const newNotif = { ...standardNotifications };
@@ -730,15 +731,15 @@ export const useUploadBuild = () => {
 					}
 				}
 
-				// Add the build to the users hangars (if they selected to)
+				// Add the build to the users hangars (if they selected to) --------------------------------------------------------------------------------------------------------
 				await addBuildToHangar(newId);
 
-				// If its for a challenge, increase the users 'challenge' submitted count
+				// If its for a challenge, increase the users 'challenge' submitted count --------------------------------------------------------------------------------------------------------
 				if (build.forChallenge) {
 					await updateUserProfilesAndDb(dispatchAuth, { challengesCompleted: increment(1) }, user);
 				}
 
-				// Check if this is the users first upload (and give them an accolade if it is)
+				// Check if this is the users first upload (and give them an accolade if it is) --------------------------------------------------------------------------------------------------------
 				const hasFirstUploadAccolade = user.accolades?.some(accolade => accolade.id === 'YdT1ACrDyAtGE0cfraAn');
 
 				if (!hasFirstUploadAccolade) {
@@ -747,6 +748,36 @@ export const useUploadBuild = () => {
 
 					await giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], user);
 				}
+
+				// Check how many builds they have for Kerbal Engineer Accolade --------------------------------------------------------------------------------------------------------
+				checkAndAwardAccoladeGroup(
+					dispatchAuth,
+					user,
+					fetchedAccolades,
+					{
+						diamond: {
+							id: '4taBSe5XQpLnekwOzywg',
+							minPoints: 50,
+						},
+						platinum: {
+							id: 'Fx1ZDwMTqqDsFWxZa0XC',
+							minPoints: 40,
+						},
+						gold: {
+							id: 'JAi1AC9FmDjEFs9ZtGNA',
+							minPoints: 30,
+						},
+						silver: {
+							id: 'DoGHYVMglrGXOb5NNLCN',
+							minPoints: 20,
+						},
+						bronze: {
+							id: 'h6WZjITG8BZRXV8T2MAt',
+							minPoints: 10,
+						},
+					},
+					user.builds.length + 1
+				);
 
 				toast.success('Build created!');
 

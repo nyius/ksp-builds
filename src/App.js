@@ -67,7 +67,6 @@ Asap---------------------------------------------------
 		- cosmic veteran
 		- daily challenge - Cant do this until daily challenges are implemented
 		- kerbal engineer
-		- maiden voyager
 		- mission control
 		- omuamua
 		- orbital patron

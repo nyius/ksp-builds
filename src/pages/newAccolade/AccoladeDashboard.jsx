@@ -16,6 +16,7 @@ import { toast } from 'react-toastify';
 import { giveAccoladeAndNotify } from '../../hooks/useGiveAccolade';
 import { useAuthContext } from '../../context/auth/AuthContext';
 import { updateUserProfilesAndDb } from '../../context/auth/AuthUtils';
+import { checkAndAwardAccoladeGroup } from '../../context/accolades/AccoladesUtils';
 
 /**
  * Accolade dashboard page
@@ -39,50 +40,79 @@ function AccoladeDashboard() {
 	 */
 	const giveSpecificAccolade = async () => {
 		try {
-			const buildsSnap = await getDocs(collection(db, 'builds'));
+			const usersSnap = await getDocs(collection(db, 'users'));
 
-			let fetchedUsers = {};
-			buildsSnap.forEach(build => {
-				const buildData = build.data();
-				fetchedUsers[buildData.uid] = buildData.uid;
-			});
+			// let fetchedUsers = {};
+			// usersSnap.forEach(user => {
+			// 	const buildData = user.data();
+			// 	fetchedUsers[buildData.uid] = buildData.uid;
+			// });
 
-			for (const user in fetchedUsers) {
-				const fetchConvoUserAndAwardAccolade = async () => {
-					const fetchedUser = await getDoc(doc(db, 'users', user));
+			// for (const user in fetchedUsers) {
+			// 	const fetchConvoUserAndAwardAccolade = async () => {
+			// 		const fetchedUser = await getDoc(doc(db, 'users', user));
 
-					if (fetchedUser.exists()) {
-						let fetchedUserData = fetchedUser.data();
-						fetchedUserData.uid = fetchedUser.id;
+			// 		if (fetchedUser.exists()) {
+			// 			let fetchedUserData = fetchedUser.data();
+			// 			fetchedUserData.uid = fetchedUser.id;
 
-						const hasMaidenVoyagerAccolade = fetchedUserData.accolades?.some(accolade => accolade.id === 'YdT1ACrDyAtGE0cfraAn');
+			// 			const hasMaidenVoyagerAccolade = fetchedUserData.accolades?.some(accolade => accolade.id === 'YdT1ACrDyAtGE0cfraAn');
 
-						if (!hasMaidenVoyagerAccolade) {
-							let accoladeToGive;
-							accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'YdT1ACrDyAtGE0cfraAn'); // first contact accoalde
-							await giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], fetchedUserData);
-						}
-					}
-				};
+			// 			if (!hasMaidenVoyagerAccolade) {
+			// 				let accoladeToGive;
+			// 				accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'YdT1ACrDyAtGE0cfraAn'); // first contact accoalde
+			// 				await giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], fetchedUserData);
+			// 			}
+			// 		}
+			// 	};
 
-				fetchConvoUserAndAwardAccolade();
-			}
+			// 	fetchConvoUserAndAwardAccolade();
+			// }
 			// const buildData = build.data();
 			// 	if (buildData.forChallenge) {
 			// 		updateUserProfilesAndDb(dispatchAuth, { challengesCompleted: increment(1) }, buildData.uid);
 			// 	}
 
-			// const usersSnap = await getDocs(collection(db, 'users'));
 			// let accoladeToGive = fetchedAccolades?.filter(fetchedAccolade => fetchedAccolade.id === 'RHDbo0YPe0Sfm8KxBBFx'); // Build of the Week accolade
 
-			// usersSnap.forEach(user => {
-			// 	const userData = user.data();
-			// 	userData.uid = user.id;
+			usersSnap.forEach(user => {
+				const userData = user.data();
+				userData.uid = user.id;
 
-			// 	if (userData.buildOfTheWeekWinner) {
-			// 		giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], userData);
-			// 	}
-			// });
+				// if (userData.buildOfTheWeekWinner) {
+				// 	giveAccoladeAndNotify(dispatchAuth, [accoladeToGive[0]], userData);
+				// }
+				if (userData.builds) {
+					checkAndAwardAccoladeGroup(
+						dispatchAuth,
+						userData,
+						fetchedAccolades,
+						{
+							diamond: {
+								id: '4taBSe5XQpLnekwOzywg',
+								minPoints: 50,
+							},
+							platinum: {
+								id: 'Fx1ZDwMTqqDsFWxZa0XC',
+								minPoints: 40,
+							},
+							gold: {
+								id: 'JAi1AC9FmDjEFs9ZtGNA',
+								minPoints: 30,
+							},
+							silver: {
+								id: 'DoGHYVMglrGXOb5NNLCN',
+								minPoints: 20,
+							},
+							bronze: {
+								id: 'h6WZjITG8BZRXV8T2MAt',
+								minPoints: 10,
+							},
+						},
+						userData.builds?.length
+					);
+				}
+			});
 
 			// comments.push(getDocs(collection(db, 'builds', build.id, 'comments')).then(res => res.docs.map(res => res.data())));
 			// const fetchedComments = await Promise.all(comments);

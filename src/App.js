@@ -66,8 +66,7 @@ Asap---------------------------------------------------
 		-create actions for each check
 		- cosmic veteran
 		- daily challenge - Cant do this until daily challenges are implemented
-		- kerbal engineer
-		- mission control
+		- mission control - Cant do this until daily challenges are implemented
 		- omuamua
 		- orbital patron
 		- stellar luminary

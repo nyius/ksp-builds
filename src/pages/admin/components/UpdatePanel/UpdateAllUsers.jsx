@@ -1,6 +1,6 @@
 import React from 'react';
 import { toast } from 'react-toastify';
-import { doc, collection, getDocs, updateDoc, deleteField } from 'firebase/firestore';
+import { doc, collection, getDocs, updateDoc, deleteField, serverTimestamp, increment } from 'firebase/firestore';
 import { db } from '../../../../firebase.config';
 import Button from '../../../../components/buttons/Button';
 
@@ -16,8 +16,8 @@ function UpdateAllUsers() {
 			usersSnap.forEach(user => {
 				const userData = user.data();
 
-				updateDoc(doc(db, 'users', user.id), { commentCount: 0, challengesCompleted: 0, dailyChallengesCompleted: 0, dailyVisits: 0 });
-				updateDoc(doc(db, 'userProfiles', user.id), { commentCount: 0, challengesCompleted: 0, dailyChallengesCompleted: 0, dailyVisits: 0 });
+				updateDoc(doc(db, 'users', user.id), { lastVisit: serverTimestamp(), dailyVisits: increment(1) });
+				updateDoc(doc(db, 'userProfiles', user.id), { lastVisit: serverTimestamp(), dailyVisits: increment(1) });
 			});
 
 			toast.success('All users updated!');

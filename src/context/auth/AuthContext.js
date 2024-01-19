@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useReducer, useContext } fro
 import AuthReducer from './AuthReducer';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '../../firebase.config';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, increment, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import fetchNotifications from '../../utilities/fetchNotifcations';
 import fetchAllUserMessages from '../../utilities/fetchAllUserMessages';
 import fetchAllUsersConvos from '../../utilities/fetchAllUsersConvos';
@@ -11,6 +11,8 @@ import subscribeToUsersMessages from '../../utilities/subscribeToUsersMessages';
 import subscribeToConvo from '../../utilities/subscribeToConvo';
 import { checkLocalBuildAge } from '../build/BuildUtils';
 import errorReport from '../../utilities/errorReport';
+import isMoreThanOneDayOlder from '../../utilities/isMoreThanOneDayOlder';
+import { updateUserProfilesAndDb } from './AuthUtils';
 
 const AuthContext = createContext();
 
@@ -244,6 +246,18 @@ export const AuthProvider = ({ children }) => {
 			}
 		}
 	}, []);
+
+	// Log once a day website visit
+	useEffect(() => {
+		if (!authLoading && state.user) {
+			if (state.user.lastVisit?.seconds) {
+				const isOlder = isMoreThanOneDayOlder(state.user.lastVisit?.seconds);
+				if (isOlder) {
+					updateUserProfilesAndDb(dispatchAuth, { lastVisit: serverTimestamp(), dailyVisits: increment(1) }, state.user);
+				}
+			}
+		}
+	}, [authLoading, state.user]);
 
 	return <AuthContext.Provider value={{ ...state, dispatchAuth, authLoading }}>{children}</AuthContext.Provider>;
 };

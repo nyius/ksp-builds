@@ -1,3 +1,5 @@
+import { serverTimestamp } from 'firebase/firestore';
+
 const standardUser = {
 	type: 'user',
 	name: '',
@@ -22,6 +24,7 @@ const standardUser = {
 	challengesCompleted: 0,
 	dailyChallengesCompleted: 0,
 	dailyVisits: 0,
+	lastVisit: serverTimestamp(),
 };
 
 export default standardUser;

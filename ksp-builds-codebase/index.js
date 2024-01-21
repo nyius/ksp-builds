@@ -914,6 +914,32 @@ exports.fetchLiveKspStreams = functions.pubsub.schedule('every 1 minutes').onRun
 });
 
 /**
+ * Gets live ksp streams for KSP 1 and KSP 2
+ */
+exports.checkAccountBirthdays = functions.pubsub.schedule('0 0 * * *').onRun(async (req, res) => {
+	try {
+		const today = new Date();
+		const todayMonth = today.getUTCMonth() + 1; // Months are zero-indexed
+		const todayDay = today.getUTCDate();
+
+		// Query users with the same birth month and day
+		const usersSnapshot = await firestore.collection('users').where('accountBirthMonth', '==', todayMonth).where('accountBirthDay', '==', todayDay).get();
+
+		// Give awards or take the desired action for each user
+		usersSnapshot.forEach(userDoc => {
+			const userData = userDoc.data();
+			// Give the user an award or take the desired action
+			console.log(`Happy Birthday, ${userData.username}! You've received an award.`);
+			// Add logic here to give an award
+		});
+	} catch (error) {
+		functions.logger.log(error);
+		res.status(404).send(`Something went wrong fetching streams ${error}`);
+	}
+});
+
+//--------------------------------------------------------------------------------------------------//---------------------------------------------------------------------------------------------------//
+/**
  * Handles scraping the KSP website for patch notes
  * @returns
  */

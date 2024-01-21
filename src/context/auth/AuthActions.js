@@ -43,10 +43,15 @@ const useAuth = () => {
 			let userProfile = cloneDeep(standardUserProfile);
 			const createdAt = serverTimestamp();
 			const notifId = uuidv4().slice(0, 20);
+			const today = new Date();
+			const todayMonth = today.getUTCMonth() + 1; // Months are zero-indexed
+			const todayDay = today.getUTCDate();
 
 			user.name = name;
 			user.email = email;
 			user.dateCreated = createdAt;
+			user.accountBirthMonth = todayMonth;
+			user.accountBirthDay = todayDay;
 
 			notification.type = 'welcome';
 			notification.username = 'nyius';
@@ -58,6 +63,8 @@ const useAuth = () => {
 				'{"blocks":[{"key":"87rfs","text":"Welcome to KSP Builds! Please feel free to reach out with any questions/comments/ideas, and fly safe!","type":"unstyled","depth":0,"inlineStyleRanges":[{"offset":0,"length":94,"style":"fontsize-14"}],"entityRanges":[],"data":{}}],"entityMap":{}}';
 
 			userProfile.dateCreated = createdAt;
+			userProfile.accountBirthMonth = todayMonth;
+			userProfile.accountBirthDay = todayDay;
 
 			const firstDoc = {
 				id: 'first',

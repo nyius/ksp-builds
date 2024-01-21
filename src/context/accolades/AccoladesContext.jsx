@@ -23,6 +23,7 @@ export const AccoladesProvider = ({ children }) => {
 		checkedChallengeMaestro: false,
 		checkedInterstellarPioneer: false,
 		checkedCommsSpecialist: false,
+		checkedOmuamua: false,
 		fetchedUsersBuilds: [],
 	};
 
@@ -270,6 +271,45 @@ export const AccoladesProvider = ({ children }) => {
 			dispatchAccolades({
 				type: 'SET_ACCOLADES',
 				payload: { checkedCommsSpecialist: true },
+			});
+		}
+	}, [user, authLoading]);
+
+	// Check for Omuamua accolade -----------------------------------------------------------
+	useEffect(() => {
+		if (!authLoading && user && !state.checkedOmuamua) {
+			checkAndAwardAccoladeGroup(
+				dispatchAuth,
+				user,
+				state.fetchedAccolades,
+				{
+					diamond: {
+						id: 'OKiOy3nv4LSpIfwXHHDv',
+						minPoints: 365,
+					},
+					platinum: {
+						id: 'FIuQ9COHD6DGMqoi7E8g',
+						minPoints: 100,
+					},
+					gold: {
+						id: 'OQBrueUFbym5bCiCOjOE',
+						minPoints: 50,
+					},
+					silver: {
+						id: 'EzBcLhKOrTpMFMcU3zX1',
+						minPoints: 20,
+					},
+					bronze: {
+						id: 'NryPxVLYYTVrZBiIwk4v',
+						minPoints: 10,
+					},
+				},
+				user.dailyVisits
+			);
+
+			dispatchAccolades({
+				type: 'SET_ACCOLADES',
+				payload: { checkedOmuamua: true },
 			});
 		}
 	}, [user, authLoading]);

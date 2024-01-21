@@ -67,7 +67,6 @@ Asap---------------------------------------------------
 		- cosmic veteran
 		- daily challenge - Cant do this until daily challenges are implemented
 		- mission control - Cant do this until daily challenges are implemented
-		- omuamua
 		- orbital patron
 		- stellar luminary
 	- recieve multiple of the same accolade should all group together into a 'times received' number on the accolde viewer

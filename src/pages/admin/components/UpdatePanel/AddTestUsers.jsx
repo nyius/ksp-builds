@@ -29,11 +29,18 @@ function AddTestUsers() {
 				const firstDoc = {
 					id: 'first',
 				};
+				const today = new Date();
+				const todayMonth = today.getUTCMonth() + 1; // Months are zero-indexed
+				const todayDay = today.getUTCDate();
 
 				newUser.username = newUsername;
 				newUserProfile.username = newUsername;
 				newUser.dateCreated = serverTimestamp();
+				newUser.accountBirthMonth = todayMonth;
+				newUser.accountBirthDay = todayDay;
 				newUserProfile.dateCreated = serverTimestamp();
+				newUserProfile.accountBirthMonth = todayMonth;
+				newUserProfile.accountBirthDay = todayDay;
 
 				newUser.folders = [{ builds: [buildNum], folderName, id: folderID, urlName: folderUrlName }];
 				newUserProfile.folders = [{ builds: [buildNum], folderName, id: folderID, urlName: folderUrlName }];
@@ -43,6 +50,8 @@ function AddTestUsers() {
 				setDoc(doc(db, 'testUsers', newId, 'messages', 'first'), firstDoc);
 				setDoc(doc(db, 'testUserProfiles', newId), newUserProfile);
 			}
+
+			toast.success('Accounts Created');
 		} catch (error) {
 			console.log(error);
 			toast.error('Something went wrong');

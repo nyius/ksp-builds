@@ -9,7 +9,7 @@ export const AccoladesReducer = (state, action) => {
 		case 'SET_FETCHED_ACCOLADES':
 			return { ...state, fetchedAccolades: action.payload };
 		case 'SET_ACCOLADE_VIEWER':
-			return { ...state, accoladeViewer: action.payload };
+			return { ...state, accoladeViewer: action.payload.accolade, accoladeViewerUserAccolades: action.payload.usersAccolades };
 		case 'SET_TOTAL_ACCOLADE_COUNT':
 			return { ...state, totalAccoladeCount: action.payload };
 		case 'SET_TOTAL_ACCOLADE_POINTS':

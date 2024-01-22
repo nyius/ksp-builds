@@ -18,6 +18,7 @@ export const AccoladesProvider = ({ children }) => {
 		loadingAccolades: true,
 		fetchedAccolades: [],
 		accoladeViewer: null,
+		accoladeViewerUserAccolades: null,
 		totalAccoladeCount: 0,
 		totalAccoladePoints: 0,
 		checkedChallengeMaestro: false,

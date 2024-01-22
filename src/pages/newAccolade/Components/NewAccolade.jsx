@@ -174,8 +174,8 @@ function NewAccolade() {
 				<div className="text-2xl 2k:text-3xl text-slate-200 h-fit font-bold border-b-1 text-center border-solid border-slate-700 mb-6 2k:mb-10">Medium</div>
 				<div className="text-2xl 2k:text-3xl text-slate-200 h-fit font-bold border-b-1 text-center border-solid border-slate-700 mb-6 2k:mb-10">Full</div>
 
-				<AccoladeLight type="unlocked" accolade={accolade} size="w-8 h-8" />
-				<AccoladeLight type="unlocked" accolade={accolade} size="w-16 h-16" />
+				<AccoladeLight locked="unlocked" accolade={accolade} size="w-8 h-8" />
+				<AccoladeLight locked="unlocked" accolade={accolade} size="w-16 h-16" />
 				<AccoladeFull accolade={accolade} description={description} />
 			</div>
 		</AccoladeSectionContainer>

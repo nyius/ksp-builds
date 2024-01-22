@@ -135,8 +135,8 @@ function ExistingAccolade({ selectedAccolade, setSelectedAccolade }) {
 
 				{selectedAccolade ? (
 					<>
-						<AccoladeLight type="unlocked" accolade={selectedAccolade} size="w-8 h-8" />
-						<AccoladeLight type="unlocked" accolade={selectedAccolade} size="w-16 h-16" />
+						<AccoladeLight locked="unlocked" accolade={selectedAccolade} size="w-8 h-8" />
+						<AccoladeLight locked="unlocked" accolade={selectedAccolade} size="w-16 h-16" />
 						<AccoladeFull accolade={selectedAccolade} />
 					</>
 				) : (

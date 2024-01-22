@@ -39,11 +39,12 @@ export const updateAccolade = (dispatchAccolades, accolade) => {
 /**
  * Handles setting the accolade to view in the accolades viewer modal
  * @param {*} dispatchAccolades
- * @param {*} accolade
+ * @param {obj} accolade
+ * @param {arr} usersAccolades - all of the accolades of this type that the user has
  */
-export const setAccoladeViewer = (dispatchAccolades, accolade) => {
+export const setAccoladeViewer = (dispatchAccolades, accolade, usersAccolades) => {
 	dispatchAccolades({
 		type: 'SET_ACCOLADE_VIEWER',
-		payload: accolade,
+		payload: { accolade, usersAccolades },
 	});
 };

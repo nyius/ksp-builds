@@ -14,6 +14,7 @@ import { createDateFromFirebaseTimestamp } from '../../utilities/createDateFromF
 function AccoladeFull({ accolade, description, remove }) {
 	const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef, visible } = usePopperTooltip();
 
+	//---------------------------------------------------------------------------------------------------//
 	return (
 		<div className="flex flex-col w-full gap-3 2k:gap-5 bg-base-200 rounded-xl p-4 justify-center items-center">
 			<div className="text-2xl 2k:text-3xl text-slate-200 font-bold">{accolade?.name}</div>
@@ -24,11 +25,8 @@ function AccoladeFull({ accolade, description, remove }) {
 				</>
 			) : null}
 
-			<div className="flex flex-row w-full place-content-between items-center">
-				<div className="text-xl 2k:text-2xl text-slate-500 italic self-start">{accolade.dateReceived?.seconds && createDateFromFirebaseTimestamp(accolade.dateReceived.seconds)}</div>
-				<div className="text-xl 2k:text-2xl text-slate-400">
-					+ <span className="font-bold">{accolade.points}</span> points
-				</div>
+			<div className="text-xl 2k:text-2xl text-right w-full text-slate-400">
+				+ <span className="font-bold">{accolade.points}</span> points
 			</div>
 			{description ? (
 				<>{description && typeof description !== 'object' ? <Editor editorState={EditorState.createWithContent(convertFromRaw(JSON.parse(description)))} readOnly={true} toolbarHidden={true} /> : ''}</>

@@ -16,8 +16,15 @@ function UpdateAllUsers() {
 			usersSnap.forEach(user => {
 				const userData = user.data();
 
-				updateDoc(doc(db, 'users', user.id), { lastVisit: serverTimestamp(), dailyVisits: increment(1) });
-				updateDoc(doc(db, 'userProfiles', user.id), { lastVisit: serverTimestamp(), dailyVisits: increment(1) });
+				if (userData.dateCreated?.seconds) {
+					const accountBirthdayMs = userData.dateCreated?.seconds * 1000;
+					const birthdate = new Date(accountBirthdayMs);
+					const accountMonth = birthdate.getUTCMonth() + 1; // Months are zero-indexed
+					const accountDay = birthdate.getUTCDate();
+
+					updateDoc(doc(db, 'users', user.id), { accountBirthMonth: accountMonth, accountBirthDay: accountDay });
+					updateDoc(doc(db, 'userProfiles', user.id), { accountBirthMonth: accountMonth, accountBirthDay: accountDay });
+				}
 			});
 
 			toast.success('All users updated!');

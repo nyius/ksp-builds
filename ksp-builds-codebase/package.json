@@ -25,6 +25,7 @@
 		"firebase-functions": "^4.2.0",
 		"googleapis": "^118.0.0",
 		"http": "^0.0.1-security",
+		"lodash": "^4.17.21",
 		"nodemon": "^2.0.21",
 		"openai": "^3.2.1",
 		"passport": "^0.7.0",

@@ -23,6 +23,7 @@ export const AccoladesProvider = ({ children }) => {
 		checkedChallengeMaestro: false,
 		checkedInterstellarPioneer: false,
 		checkedCommsSpecialist: false,
+		checkedStellarLuminary: false,
 		checkedOmuamua: false,
 		fetchedUsersBuilds: [],
 	};
@@ -186,6 +187,52 @@ export const AccoladesProvider = ({ children }) => {
 			dispatchAccolades({
 				type: 'SET_ACCOLADES',
 				payload: { checkedChallengeMaestro: true },
+			});
+		}
+	}, [state.fetchedUsersBuilds]);
+
+	// Check for Stellar Lumindary accolade -----------------------------------------------------------
+	useEffect(() => {
+		if (state.fetchedUsersBuilds.length > 0 && !state.checkedStellarLuminary) {
+			let viewCount = 0;
+
+			state.fetchedUsersBuilds.map(build => {
+				viewCount += build.views;
+			});
+
+			// Challenge Maestro ----------------------------------------------------------------
+			checkAndAwardAccoladeGroup(
+				dispatchAuth,
+				user,
+				state.fetchedAccolades,
+				{
+					diamond: {
+						id: 'YrrDviRWSPsV5kOhQN2R',
+						minPoints: 1000000,
+					},
+					platinum: {
+						id: 'D8ymDlEAIEsrHBmQ6Yvt',
+						minPoints: 100000,
+					},
+					gold: {
+						id: 'KEYYp9fGBrr5oKlctHw1',
+						minPoints: 10000,
+					},
+					silver: {
+						id: 'yvt0PCcktrSKyrfTrsMu',
+						minPoints: 1000,
+					},
+					bronze: {
+						id: 'bqLWTQjhgxoHmVV4El0x',
+						minPoints: 100,
+					},
+				},
+				viewCount
+			);
+
+			dispatchAccolades({
+				type: 'SET_ACCOLADES',
+				payload: { checkedStellarLuminary: true },
 			});
 		}
 	}, [state.fetchedUsersBuilds]);

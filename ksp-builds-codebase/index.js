@@ -12,8 +12,11 @@ const { firebase } = require('googleapis/build/src/apis/firebase');
 const Parser = require('rss-parser');
 let parser = new Parser();
 //Stripe -------------------------------------------------------------------------------------------------------------------------------------------------//
+// const stripe = require('stripe')(process.env.REACT_APP_STRIPE_SECRET_TEST);
 const stripe = require('stripe')(process.env.REACT_APP_STRIPE_SECRET);
+// const endpointSecret = process.env.REACT_APP_STRIPE_SUCCESS_ENDPOINT_DEV;
 const endpointSecret = process.env.REACT_APP_STRIPE_SUCCESS_ENDPOINT_PROD;
+
 // const endpointSecret = 'whsec_ba90833eb62f59831b3b58cd308b311dbeee87a326899886ccdeb196e450e96d';
 
 // For Google Login ------------------------------------------------------------------------------------------------------------------------------------------ //
@@ -31,6 +34,7 @@ function initialRequest() {
 }
 initialRequest();
 
+// Google Login server (for overwolf login)-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 const PROTOCOL = process.env.PROTOCOL || 'http',
 	PORT = parseInt(process.env.PORT || 3002),
 	RETURN_HOST = process.env.RETURN_HOST || `localhost:${PORT}`,
@@ -787,6 +791,62 @@ exports.handleStripePayments = functions.https.onRequest(async (req, res) => {
 						stripeCustomerID: checkoutObj.customer,
 						lastModified: admin.firestore.FieldValue.serverTimestamp(),
 					});
+
+					// Award the user the 'Orbital Patron' accolade if this is their first subscription
+					await userProfileRef.get().then(docSnap => {
+						if (!docSnap.exists) {
+							throw new functions.https.HttpsError(`Couldn't find this subscribed user ${checkoutObj.client_reference_id}? uhoh`);
+						}
+						const userData = docSnap.data();
+
+						let foundAccolade = false;
+						for (let i = 0; i < userData.accolades?.length; i++) {
+							if (userData.accolades[i].id === 'GicgbMukzMxCgbeiyrui') {
+								// orbital patron accolade
+								foundAccolade = true;
+								break;
+							}
+						}
+
+						if (!foundAccolade) {
+							// Give Accolade
+							let newAccolade = {};
+							newAccolade.id = 'GicgbMukzMxCgbeiyrui'; // orbital patron accolade
+							newAccolade.dateReceived = new Date();
+							userData.accolades.push(newAccolade);
+
+							let userRR = Number(userData.rocketReputation);
+							userRR += 200;
+
+							// Notification ------------------------------------------------------------------------
+							const newNotif = {
+								type: '',
+								username: '',
+								uid: '',
+								timestamp: '',
+								read: false,
+								profilePicture: '',
+								message: '',
+							};
+
+							newNotif.type = 'accolade';
+							newNotif.message = `{\"blocks\":[{\"key\":\"5mft5\",\"text\":\"Orbital Patron\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":14,\"style\":\"BOLD\"},{\"offset\":0,\"length\":14,\"style\":\"fontsize-16\"}],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}`;
+							newNotif.uid = 'ZyVrojY9BZU5ixp09LftOd240LH3';
+							newNotif.username = 'nyius';
+							newNotif.profilePicture =
+								'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/images%2FZyVrojY9BZU5ixp09LftOd240LH3-selfie.png-9d4dfce8-3c29-41b1-8e64-4c4a3ec4c440?alt=media&token=5825b603-893c-4471-accc-65ada96b06f9';
+							newNotif.timestamp = new Date();
+							newNotif.image = 'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/images%2FZyVrojY9BZU5ixp09LftOd240LH3-63fc06bb-9685-4292-be57-ccba2dd0e37f?alt=media&token=60de80d8-6942-46e5-a8ec-dec2da77cc23';
+
+							admin.firestore().doc(`users/${docSnap.id}`).update({ accolades: userData.accolades, rocketReputation: userRR });
+							admin.firestore().doc(`userProfiles/${docSnap.id}`).update({ accolades: userData.accolades, rocketReputation: userRR });
+
+							// Notification -------------
+							admin.firestore().collection(`users/${docSnap.id}/notifications`).add(newNotif);
+
+							functions.logger.log(`Awarded ${checkoutObj.client_reference_id} orbital patron accolade`);
+						}
+					});
 				}
 				break;
 			case 'customer.subscription.deleted':
@@ -914,7 +974,7 @@ exports.fetchLiveKspStreams = functions.pubsub.schedule('every 1 minutes').onRun
 });
 
 /**
- * Gets live ksp streams for KSP 1 and KSP 2
+ * Checks accounts for account-birthdays and awards them an accolade if thats the case
  */
 exports.checkAccountBirthdays = functions.pubsub.schedule('0 0 * * *').onRun(async (req, res) => {
 	try {
@@ -923,15 +983,48 @@ exports.checkAccountBirthdays = functions.pubsub.schedule('0 0 * * *').onRun(asy
 		const todayDay = today.getUTCDate();
 
 		// Query users with the same birth month and day
-		const usersSnapshot = await firestore.collection('users').where('accountBirthMonth', '==', todayMonth).where('accountBirthDay', '==', todayDay).get();
+		// const usersSnapshot = await admin.firestore().collection('users').where('accountBirthMonth', '==', todayMonth).where('accountBirthDay', '==', todayDay).get();
+		const usersSnapshot = await admin.firestore().collection('users').where('accountBirthMonth', '==', todayMonth).where('accountBirthDay', '==', todayDay).get();
 
-		// Give awards or take the desired action for each user
+		// Notification ------------------------------------------------------------------------
+		const newNotif = {
+			type: '',
+			username: '',
+			uid: '',
+			timestamp: '',
+			read: false,
+			profilePicture: '',
+			message: '',
+		};
+
+		newNotif.type = 'accolade';
+		newNotif.message = `{\"blocks\":[{\"key\":\"5mft5\",\"text\":\"Cosmic Veteran\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":14,\"style\":\"BOLD\"},{\"offset\":0,\"length\":14,\"style\":\"fontsize-16\"}],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}`;
+		newNotif.uid = 'ZyVrojY9BZU5ixp09LftOd240LH3';
+		newNotif.username = 'nyius';
+		newNotif.profilePicture = 'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/images%2FZyVrojY9BZU5ixp09LftOd240LH3-selfie.png-9d4dfce8-3c29-41b1-8e64-4c4a3ec4c440?alt=media&token=5825b603-893c-4471-accc-65ada96b06f9';
+		newNotif.timestamp = new Date();
+		newNotif.image = 'https://firebasestorage.googleapis.com/v0/b/kspbuilds.appspot.com/o/images%2FZyVrojY9BZU5ixp09LftOd240LH3-5615a0d5-85bc-47b1-b456-bec24180503f?alt=media&token=947600f3-dcfb-4e1e-a8ca-bf33a6e85dcc';
+
+		// Give Accolade
+		let newAccolade = {};
+		newAccolade.id = 'ndAiK07AT9yTunqswwLs'; // Cosmic veteran accolade
+		newAccolade.dateReceived = new Date();
+
+		// Give account birthday accolade to each user
 		usersSnapshot.forEach(userDoc => {
 			const userData = userDoc.data();
-			// Give the user an award or take the desired action
-			console.log(`Happy Birthday, ${userData.username}! You've received an award.`);
-			// Add logic here to give an award
+			userData.accolades.push(newAccolade);
+			let userRR = Number(userData.rocketReputation);
+			userRR += 50;
+
+			admin.firestore().doc(`users/${userDoc.id}`).update({ accolades: userData.accolades, rocketReputation: userRR });
+			admin.firestore().doc(`userProfiles/${userDoc.id}`).update({ accolades: userData.accolades, rocketReputation: userRR });
+
+			// Notification -------------
+			admin.firestore().collection(`users/${userDoc.id}/notifications`).add(newNotif);
+			functions.logger.log(`Happy account birthday ${userDoc.id}`);
 		});
+		functions.logger.log(`Finished checking account birthdays`);
 	} catch (error) {
 		functions.logger.log(error);
 		res.status(404).send(`Something went wrong fetching streams ${error}`);

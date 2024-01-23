@@ -8,8 +8,8 @@ import React from 'react';
  */
 function BuildInfoCard({ title, children }) {
 	return (
-		<div className="flex flex-col gap-2 2k:gap-5 bg-base-400 p-2 lg:p-4 2k:p-6 items-center justify-center rounded-lg">
-			<p className="text-lg xl:text-2xl 2k:text-3xl text-slate-200">{title}</p>
+		<div className="flex flex-col gap-2 2k:gap-3 bg-base-400 p-2 lg:p-3 2k:p-5 items-center justify-center rounded-lg">
+			<p className="text-lg xl:text-xl 2k:text-2xl text-slate-200">{title}</p>
 			{children}
 		</div>
 	);

@@ -18,13 +18,16 @@ function UserDetails() {
 			{/* User Details */}
 			<div className="flex flex-row flex-wrap gap-2 2k:gap-4 bg-base-600 w-full h-1/4 justify-center p-2 2k:p-4 rounded-xl">
 				<BuildInfoCard title="Joined">
-					<p className="text-xl 2k:text-3xl text-accent">{createDateFromFirebaseTimestamp(openProfile?.dateCreated?.seconds)}</p>
+					<p className="text-xl 2k:text-3xl text-accent font-bold">{createDateFromFirebaseTimestamp(openProfile?.dateCreated?.seconds)}</p>
 				</BuildInfoCard>
 				<BuildInfoCard title="Uploads">
-					<p className="text-xl 2k:text-3xl text-accent">{fetchedBuilds.length}</p>
+					<p className="text-xl 2k:text-3xl text-accent font-bold">{fetchedBuilds.length}</p>
 				</BuildInfoCard>
 				<BuildInfoCard title="Rocket Reputation">
-					<p className="text-xl 2k:text-3xl text-accent">{openProfile.rocketReputation}</p>
+					<p className="text-xl 2k:text-3xl text-accent font-bold">{openProfile.rocketReputation}</p>
+				</BuildInfoCard>
+				<BuildInfoCard title="Comments">
+					<p className="text-xl 2k:text-2xl text-accent font-bold">{openProfile.commentCount}</p>
 				</BuildInfoCard>
 			</div>
 		</>

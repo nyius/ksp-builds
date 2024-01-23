@@ -75,14 +75,12 @@ Asap---------------------------------------------------
 -fix hangars at bottom of screen not displaying right
 -make challenges their own s3 bucket
 -builds in a hanger should have a sort by date added filter
--profile comment stats
-	- give all users a 'commentCount'
-	- increment it with each comment
 -Quick share builds (without needing to create a whole build)
 -Overwolf
 
 Whenever---------------------------------------------------
 - email notifs for botw
+-clicking a delete notification button takes you to that notif location - unintended
 - make type searching work for your own builds/visiting a users builds
 - convert website to look like app
 -Code split everything

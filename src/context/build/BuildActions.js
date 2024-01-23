@@ -344,6 +344,17 @@ export const useComment = () => {
 		});
 	};
 
+	const clearComment = () => {
+		dispatchBuild({
+			type: 'SET_BUILD',
+			payload: {
+				comment: '',
+				replyingComment: null,
+				resetTextEditor: true,
+			},
+		});
+	};
+
 	/**
 	 * handles deleting a comment
 	 * @param {string} commentId - id of the comment to delete
@@ -386,7 +397,7 @@ export const useComment = () => {
 		}
 	};
 
-	return { addComment, setComment, deleteComment };
+	return { addComment, setComment, deleteComment, clearComment };
 };
 
 /**

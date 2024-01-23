@@ -10,14 +10,14 @@ import { useBuildContext } from '../../../../context/build/BuildContext';
  */
 function ClearCommentButton() {
 	const { dispatchBuild } = useBuildContext();
-	const { setComment } = useComment();
+	const { clearComment } = useComment();
 
 	/**
 	 * Handles clearing the comment contents/replying context
 	 */
 	const handleClearComment = () => {
 		setReplyingComment(dispatchBuild, null);
-		setComment(null);
+		clearComment();
 	};
 
 	return <Button onClick={handleClearComment} color="bg-base-900" text="Clear" size="w-fit" css="2k:mb-10" icon="cancel" />;

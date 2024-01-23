@@ -66,15 +66,10 @@ Asap---------------------------------------------------
 		-create actions for each check
 		- daily challenge - Cant do this until daily challenges are implemented
 		- mission control - Cant do this until daily challenges are implemented
-	- recieve multiple of the same accolade should all group together into a 'times received' number on the accolde viewer
-		- selected accolades needs to include the received date for that accolade
-		- then remove the users accolade that has that received date
-	- switch giveAccoladeToAllUsersAndNotify to userProfiles and users instead of test documents
 	- accolade for first download (thats not from the current user)
 	- accolade for first comment 
 	- accolade for first hangar
 
-- 'clear' on comment doesn't actually clear
 -let users change hangar icons/colors
 	- just for subscribers? (maybe free gets a few options of icons and no colors)
 -fix hangars at bottom of screen not displaying right

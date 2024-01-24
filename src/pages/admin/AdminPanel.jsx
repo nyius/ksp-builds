@@ -13,6 +13,7 @@ import CreateChallenge from './components/CreateChallenge';
 import CreatePatchNote from './components/CreatePatchNote';
 import ReportsAndErrors from './components/ReportsAndErrors/ReportsAndErrors';
 import CreateArticle from './components/CreateArticle';
+import SendNotificationToUser from './components/SendNotificationToUser';
 
 function AdminPanel() {
 	//---------------------------------------------------------------------------------------------------//
@@ -28,6 +29,8 @@ function AdminPanel() {
 				<UpdatePanel />
 
 				<SendSiteNotification />
+
+				<SendNotificationToUser />
 
 				<CreateAlert />
 

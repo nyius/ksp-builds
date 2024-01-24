@@ -80,7 +80,6 @@ Asap---------------------------------------------------
 
 Whenever---------------------------------------------------
 - email notifs for botw
--clicking a delete notification button takes you to that notif location - unintended
 - make type searching work for your own builds/visiting a users builds
 - convert website to look like app
 -Code split everything
@@ -96,8 +95,6 @@ Volunteer positions (moderate, write posts, create challenges, etc) - this will 
 t-shirts, merch
 
 Research---------------------------------------------------
-- Subscribe to notifications collection so we get updated notifs right away
-	- in the same vein, when a user gets an accolade they should see it in the notifications
 - make the text editor less bad
 pagination allowing user to jump right to a page? might result in a large amount of firebase calls
 Should be able to login with username/password

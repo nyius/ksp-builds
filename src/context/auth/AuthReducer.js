@@ -278,6 +278,13 @@ const AuthReducer = (state, action) => {
 				giveAccolade: action.payload.accolade,
 				giveAccoladeUser: action.payload.username,
 			};
+		case 'NEW_NOTIFICATION':
+			const getUserForNotif = cloneDeep(state.user);
+			const getUserForNotifUpdate = Object.assign(getUserForNotif, { notifications: [action.payload, ...getUserForNotif.notifications] });
+			return {
+				...state,
+				user: getUserForNotifUpdate,
+			};
 		default:
 			return state;
 	}

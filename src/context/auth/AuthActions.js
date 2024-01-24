@@ -499,6 +499,7 @@ export const useHandleNotifications = () => {
 					const updateNotif = async () => {
 						notif.read = true;
 						newNotifs.push(notif);
+						console.log(notif);
 						await updateDoc(doc(db, 'users', user.uid, 'notifications', notif.id), notif);
 					};
 

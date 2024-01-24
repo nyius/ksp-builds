@@ -13,6 +13,7 @@ import { checkLocalBuildAge } from '../build/BuildUtils';
 import errorReport from '../../utilities/errorReport';
 import isMoreThanOneDayOlder from '../../utilities/isMoreThanOneDayOlder';
 import { updateUserProfilesAndDb } from './AuthUtils';
+import subscribeToUsersNotifications from '../../utilities/subscribeToUsersNotifications';
 
 const AuthContext = createContext();
 
@@ -61,6 +62,7 @@ export const AuthProvider = ({ children }) => {
 
 				// Listen to current users messages to know if we get a new one -------------------------------------------------------------------------------------------------------------------------------------------------
 				await subscribeToUsersMessages(dispatchAuth);
+				await subscribeToUsersNotifications(dispatchAuth);
 
 				// Listen to current user -----------------------------------------
 				const unsubUserSnap = onSnapshot(doc(db, 'users', auth.currentUser.uid), userListenData => {

@@ -25,6 +25,7 @@ function Notification({ i, notif }) {
 	 * handles navigating to a notification
 	 */
 	const handleNavigate = e => {
+		if (e.target.id === 'deleteBtn') return;
 		if (e.target.id !== 'userlink') {
 			if (notif.type === 'comment') {
 				navigate(`/build/${notif.buildId}#${notif.commentId}`);
@@ -43,7 +44,7 @@ function Notification({ i, notif }) {
 
 	//---------------------------------------------------------------------------------------------------//
 	return (
-		<div onClick={handleNavigate} className={`flex flex-col p-4 2k:p-6 rounded-xl border-2 border-solid border-slate-700 cursor-pointer relative hover:bg-slate-800`}>
+		<div key={i + '-id'} onClick={handleNavigate} className={`flex flex-col p-4 2k:p-6 rounded-xl border-2 border-solid border-slate-700 cursor-pointer relative hover:bg-slate-800`}>
 			<DeleteNotifBtn i={i} id={notif.id} />
 			<div className="flex flex-row flex-wrap place-content-between mb-2 2k:mb-4">
 				<UsernameLink username={notif.username} uid={notif.uid} />

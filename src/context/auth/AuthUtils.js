@@ -1,7 +1,7 @@
 import { updateDoc, doc, serverTimestamp, collection, addDoc, deleteDoc, getDocs, query, getDoc, setDoc, where, increment } from 'firebase/firestore';
 import { deleteUser, getAuth } from 'firebase/auth';
 import { toast } from 'react-toastify';
-import { db } from '../../firebase.config';
+import { auth, db } from '../../firebase.config';
 import { compressAccurately } from 'image-conversion';
 import { uploadImage } from '../../utilities/uploadImage';
 import errorReport from '../../utilities/errorReport';
@@ -97,6 +97,7 @@ export const deleteUserAccount = async (uid, currentUserUid, dispatchAuth) => {
 		}
 
 		await updateDoc(doc(db, 'adminPanel', 'stats'), { users: increment(-1) });
+		auth.signOut();
 
 		toast.success('Account Deleted.');
 	} catch (error) {

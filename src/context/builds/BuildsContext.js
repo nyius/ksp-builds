@@ -111,7 +111,7 @@ export const BuildsProvider = ({ children }) => {
 					payload: buildSnapData,
 				});
 			} catch (error) {
-				if (error.includes('offline')) {
+				if (error.message.includes('offline')) {
 					errorReport(error.message, false, 'fetchServerBuild');
 				} else {
 					errorReport(error.message, true, 'fetchServerBuild');

@@ -60,6 +60,25 @@ const NewsReducer = (state, action) => {
 				...state,
 				currentHeroSlide: action.payload,
 			};
+		case 'FETCH_MORE_CHALLENGES':
+			return {
+				...state,
+			};
+		case 'SET_CHALLENGE_CHUNKS':
+			return {
+				...state,
+				challengeChunks: action.payload,
+			};
+		case 'SET_LAST_FETCHED_CHALLENGE_CHUNK':
+			return {
+				...state,
+				lastChallengeChunkFetched: action.payload,
+			};
+		case 'SET_CHALLENGES_TOTAL':
+			return {
+				...state,
+				challengesLength: action.payload,
+			};
 		default:
 			return state;
 	}

@@ -21,8 +21,12 @@ export const NewsProvider = ({ children }) => {
 		streamsLoading: true,
 		currentHeroSlide: 0,
 		heroSlidesLength: 10,
+		challengeChunks: [],
+		lastChallengeChunkFetched: 0,
+		challengesLength: 0,
 	};
 
+	// News
 	useEffect(() => {
 		const fetchNews = async () => {
 			try {
@@ -60,16 +64,122 @@ export const NewsProvider = ({ children }) => {
 					return article;
 				});
 
-				//Get Official Challenges ---------------------------------------------------------------------------------------------------//
-				const getChallengesCommand = new GetObjectCommand({
-					Bucket: process.env.REACT_APP_BUCKET,
-					Key: `kspChallenges.json`,
+				dispatchNews({
+					type: 'SET_NEWS',
+					payload: sortedArticles,
 				});
 
-				let challengesResponse = await s3Client.send(getChallengesCommand);
-				let rawChallenges = await challengesResponse.Body.transformToString();
-				let parsedChalleges = JSON.parse(rawChallenges);
+				dispatchNews({
+					type: 'SET_ARTICLES_LOADING',
+					payload: false,
+				});
+			} catch (error) {
+				if (error.message.includes('NetworkError') || error.message.includes('Load failed') || error.message.includes('between the request time') || error.message.includes('network error')) {
+					errorReport(error.message, false, 'fetchNews');
+				} else {
+					errorReport(error.message, true, 'fetchNews');
+				}
+				dispatchNews({
+					type: 'SET_ARTICLES_LOADING',
+					payload: false,
+				});
+			}
+		};
+		fetchNews();
+	}, []);
 
+	// Challenges
+	useEffect(() => {
+		const fetchChallenges = async () => {
+			try {
+				const getChallengeMapCommand = new GetObjectCommand({
+					Bucket: process.env.REACT_APP_CHALLENGE_BUCKET,
+					Key: `challenges-map.json`,
+				});
+
+				let challengeMapRes = await s3Client.send(getChallengeMapCommand);
+				let challengeMapRaw = await challengeMapRes.Body.transformToString();
+				let challengeMap = JSON.parse(challengeMapRaw);
+				let challengesToFetch = [];
+				let localChallenges = [];
+				let fetchedChallenges = [];
+
+				/**
+				 * Break up our challenges into blocks of 20 for fetching
+				 * @param {*} array
+				 * @param {*} chunkSize
+				 * @returns
+				 */
+				const chunkArray = (array, chunkSize) => {
+					const result = [];
+
+					for (let i = 0; i < array.length; i += chunkSize) {
+						result.push(array.slice(i, i + chunkSize));
+					}
+
+					return result;
+				};
+
+				const challengeChunks = chunkArray(challengeMap, 20);
+
+				challengeChunks[0].map(challenge => {
+					const localChallenge = localStorage.getItem(challenge.articleId);
+
+					if (localChallenge) {
+						localChallenges.push(JSON.parse(localChallenge));
+					} else {
+						challengesToFetch.push(challenge);
+					}
+				});
+
+				if (challengesToFetch.length > 0) {
+					await Promise.all(
+						challengesToFetch.map(async challenge => {
+							const getChallengeCommand = new GetObjectCommand({
+								Bucket: process.env.REACT_APP_CHALLENGE_BUCKET,
+								Key: `${challenge.articleId}.json`,
+							});
+
+							let challengeResponse = await s3Client.send(getChallengeCommand);
+							let rawChallenge = await challengeResponse.Body.transformToString();
+							let parsedChallege = JSON.parse(rawChallenge);
+							fetchedChallenges.push(parsedChallege);
+
+							localStorage.setItem(parsedChallege.articleId, JSON.stringify(parsedChallege));
+						})
+					);
+				}
+
+				const sortedChallenges = [...localChallenges, ...fetchedChallenges];
+
+				sortedChallenges.sort((a, b) => {
+					let aDate = new Date(a.date);
+					let bDate = new Date(b.date);
+					return bDate.getTime() - aDate.getTime();
+				});
+
+				dispatchNews({
+					type: 'SET_CHALLENGES',
+					payload: sortedChallenges,
+				});
+
+				dispatchNews({
+					type: 'SET_CHALLENGE_CHUNKS',
+					payload: challengeChunks,
+				});
+
+				dispatchNews({
+					type: 'SET_LAST_FETCHED_CHALLENGE_CHUNK',
+					payload: 0,
+				});
+
+				dispatchNews({
+					type: 'SET_CHALLENGES_TOTAL',
+					payload: challengeMap.length,
+				});
+
+				return;
+				/*
 				//Get KSP Builds Challenges ---------------------------------------------------------------------------------------------------//
 				const challengesColl = collection(db, 'challenges');
 				const constraints = [limit(4)];
@@ -94,33 +204,16 @@ export const NewsProvider = ({ children }) => {
 					return challenge;
 				});
 
-				dispatchNews({
-					type: 'SET_NEWS',
-					payload: sortedArticles,
-				});
-				dispatchNews({
-					type: 'SET_CHALLENGES',
-					payload: sortedChallenges,
-				});
-				dispatchNews({
-					type: 'SET_ARTICLES_LOADING',
-					payload: false,
-				});
+
+				*/
 			} catch (error) {
-				if (error.message.includes('NetworkError') || error.message.includes('Load failed') || error.message.includes('between the request time') || error.message.includes('network error')) {
-					errorReport(error.message, false, 'fetchNews');
-				} else {
-					errorReport(error.message, true, 'fetchNews');
-				}
-				dispatchNews({
-					type: 'SET_ARTICLES_LOADING',
-					payload: false,
-				});
+				errorReport(error, true, 'fetchChallenges');
 			}
 		};
-		fetchNews();
+		fetchChallenges();
 	}, []);
 
+	// live Streams
 	useEffect(() => {
 		const fetchLiveStreams = async () => {
 			try {

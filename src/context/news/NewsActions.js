@@ -8,6 +8,8 @@ import { useParams } from 'react-router-dom';
 import { convertFromRaw, EditorState } from 'draft-js';
 import { fetchPatchNotes } from './NewsUtils';
 import errorReport from '../../utilities/errorReport';
+import { s3Client } from '../../S3.config';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
 
 /**
  * News actions
@@ -185,6 +187,71 @@ export const useFetchPatchNotes = () => {
 	}, []);
 
 	return [patchNotes, loading];
+};
+
+/**
+ * Handles fetching more challenges
+ * @returns
+ */
+export const useFetchMoreChallenges = () => {
+	const { challengeChunks, lastChallengeChunkFetched, challenges, dispatchNews } = useNewsContext();
+
+	/**
+	 * Handles fetching the next batch of challenges
+	 * @param {function} dispatchNews - dispatch function
+	 */
+	const fetchMoreChallenges = async () => {
+		let localChallenges = [];
+		let fetchedChallenges = [];
+		let challengesToFetch = [];
+
+		challengeChunks[lastChallengeChunkFetched + 1].map(challenge => {
+			const localChallenge = localStorage.getItem(challenge.articleId);
+
+			if (localChallenge) {
+				localChallenges.push(JSON.parse(localChallenge));
+			} else {
+				challengesToFetch.push(challenge);
+			}
+		});
+
+		if (challengesToFetch.length > 0) {
+			await Promise.all(
+				challengesToFetch.map(async challenge => {
+					const getChallengeCommand = new GetObjectCommand({
+						Bucket: process.env.REACT_APP_CHALLENGE_BUCKET,
+						Key: `${challenge.articleId}.json`,
+					});
+
+					let challengeResponse = await s3Client.send(getChallengeCommand);
+					let rawChallenge = await challengeResponse.Body.transformToString();
+					let parsedChallege = JSON.parse(rawChallenge);
+					fetchedChallenges.push(parsedChallege);
+
+					localStorage.setItem(parsedChallege.articleId, JSON.stringify(parsedChallege));
+				})
+			);
+		}
+
+		const sortedChallenges = [...localChallenges, ...fetchedChallenges, ...challenges];
+
+		sortedChallenges.sort((a, b) => {
+			let aDate = new Date(a.date);
+			let bDate = new Date(b.date);
+			return bDate.getTime() - aDate.getTime();
+		});
+
+		dispatchNews({
+			type: 'SET_CHALLENGES',
+			payload: sortedChallenges,
+		});
+		dispatchNews({
+			type: 'SET_LAST_FETCHED_CHALLENGE_CHUNK',
+			payload: lastChallengeChunkFetched + 1,
+		});
+	};
+
+	return { fetchMoreChallenges };
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//

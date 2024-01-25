@@ -26,6 +26,7 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const session = require('express-session');
+const { cloneDeep } = require('lodash');
 
 //This eliminates retry even on wake (surprisingly)
 function initialRequest() {
@@ -273,7 +274,7 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 			return bDate - aDate;
 		});
 
-		// Fetch the existing challenges/articles ---------------------------------------------------------------------------------------------------//
+		// Fetch the existing challenges/articles ----------------------------------------------------------------------------------------------------------------------------------//
 		const getNewsCommand = new GetObjectCommand({
 			Bucket: process.env.REACT_APP_BUCKET,
 			Key: `kspNews.json`,
@@ -301,7 +302,7 @@ exports.scrapeNews = functions.pubsub.schedule('0 * * * *').onRun(async context 
 
 		await s3Client.send(command);
 
-		// Fetch existing challenges ---------------------------------------------------------------------------------------------------//
+		// Fetch existing challenges -------------------------------------------------------------------------------------------------------------------------------------------//
 		const getChallengesCommand = new GetObjectCommand({
 			Bucket: process.env.REACT_APP_BUCKET,
 			Key: `kspChallenges.json`,
@@ -412,39 +413,221 @@ exports.scrapeNewsManual = functions.https.onRequest(async context => {
 	}
 });
 
-// Gets the challenges manually
-exports.scrapeChallengesManual = functions.https.onRequest(async context => {
+// Gets the challenges
+exports.scrapeChallenges = functions.pubsub.schedule('0 * * * *').onRun(async context => {
+	// exports.scrapeChallenges = functions.https.onRequest(async context => {
 	try {
-		const newChallenges = await scrapeKspChallenges();
-		functions.logger.log(newChallenges);
+		const challengesData = await scrapeKspChallenges();
 
-		const getChallengesCommand = new GetObjectCommand({
-			Bucket: process.env.REACT_APP_BUCKET,
-			Key: `kspChallenges.json`,
+		// CLEAR CHALLENGE-MAP ------------------------------------------------------------------------------//
+		// const challengeList = new PutObjectCommand({
+		// 	Bucket: process.env.REACT_APP_CHALLENGE_BUCKET,
+		// 	Key: 'challenges-map.json',
+		// 	Body: JSON.stringify([]),
+		// 	ContentEncoding: 'base64',
+		// 	ContentType: 'application/json',
+		// 	ACL: 'public-read',
+		// });
+
+		// await s3Client.send(challengeList);
+
+		// return;
+		//---------------------------------------------------------------------------------------------------//
+
+		const getChallengeMapCommand = new GetObjectCommand({
+			Bucket: process.env.REACT_APP_CHALLENGE_BUCKET,
+			Key: 'challenges-map.json',
 		});
+		let challengeMapResponse = await s3Client.send(getChallengeMapCommand);
+		functions.logger.log(`Got challenge map`);
+		let challengeMapJson = await challengeMapResponse.Body.transformToString();
+		let challengeMap = JSON.parse(challengeMapJson);
+		let newChallenge = false;
 
-		let challengesResponse = await s3Client.send(getChallengesCommand);
-		let rawChallenges = await challengesResponse.Body.transformToString();
-		let fetchedExistingChallenges = JSON.parse(rawChallenges);
+		await Promise.all(
+			challengesData.map(async challenge => {
+				if (challengeMap.some(mapChallenge => mapChallenge.articleId === challenge.articleId)) {
+					// If we have this challenge, do nothing
+				} else {
+					functions.logger.log(`New Challenge`);
+					/**
+					 * Add the challenge to the DB
+					 */
+					const addNewChallenge = async () => {
+						try {
+							// no challenge exists
+							const challengesCommand = new PutObjectCommand({
+								Bucket: process.env.REACT_APP_CHALLENGE_BUCKET,
+								Key: `${challenge.articleId}.json`,
+								Body: JSON.stringify(challenge),
+								ContentEncoding: 'base64',
+								ContentType: 'application/json',
+								ACL: 'public-read',
+							});
 
-		const filteredChallenges = newChallenges.filter(newChallenge =>
-			fetchedExistingChallenges.some(({ title }) => {
-				return title !== newChallenge.title;
+							await s3Client.send(challengesCommand);
+							functions.logger.log(`New Challenge`);
+
+							const challengeItem = cloneDeep(challenge);
+							delete challengeItem.title;
+							delete challengeItem.content;
+							delete challengeItem.contentSnippet;
+							delete challengeItem.url;
+							delete challengeItem.image;
+
+							challengeMap.push(challengeItem);
+							newChallenge = true;
+
+							return challenge;
+						} catch (error) {
+							functions.logger.log(error);
+						}
+					};
+
+					await addNewChallenge();
+				}
 			})
 		);
 
-		let scrapedChallenges = [...filteredChallenges, ...newChallenges];
+		// If we have a new challenge, update the challenge map ---------------------------------------------------------------------------------------
+		if (newChallenge) {
+			functions.logger.log(challengeMap);
+			challengeMap.sort((a, b) => {
+				let aDate = new Date(a.date);
+				let bDate = new Date(b.date);
+				return bDate.getTime() - aDate.getTime();
+			});
 
-		const challengesCommand = new PutObjectCommand({
-			Bucket: process.env.REACT_APP_BUCKET,
-			Key: `kspChallenges.json`,
-			Body: JSON.stringify(scrapedChallenges),
+			const challengeList = new PutObjectCommand({
+				Bucket: process.env.REACT_APP_CHALLENGE_BUCKET,
+				Key: 'challenges-map.json',
+				Body: JSON.stringify(challengeMap),
+				ContentEncoding: 'base64',
+				ContentType: 'application/json',
+				ACL: 'public-read',
+			});
+
+			await s3Client.send(challengeList);
+		}
+
+		return {
+			status: 'success',
+			message: 'Did the thing',
+		};
+	} catch (error) {
+		console.log(error);
+	}
+});
+
+// Gets the challenges manually
+exports.scrapeChallengesManual = functions.https.onRequest(async context => {
+	try {
+		// const newChallenges = await scrapeKspChallenges();
+
+		// const getChallengesCommand = new GetObjectCommand({
+		// 	Bucket: process.env.REACT_APP_BUCKET,
+		// 	Key: `kspChallenges.json`,
+		// });
+
+		// let challengesResponse = await s3Client.send(getChallengesCommand);
+		// let rawChallenges = await challengesResponse.Body.transformToString();
+		// let fetchedExistingChallenges = JSON.parse(rawChallenges);
+
+		// const filteredChallenges = newChallenges.filter(newChallenge =>
+		// 	fetchedExistingChallenges.some(({ title }) => {
+		// 		return title !== newChallenge.title;
+		// 	})
+		// );
+
+		// let scrapedChallenges = [...filteredChallenges, ...newChallenges];
+		/*
+		newChallenges.map(challenge => {
+			const checkForExistingArticle = async () => {
+				try {
+					const getChallengeCommand = new GetObjectCommand({
+						Bucket: process.env.REACT_APP_CHALLENGE_BUCKET,
+						Key: challenge.articleId,
+					});
+
+					let challengeResponse = await s3Client.send(getChallengeCommand);
+
+					return challengeResponse;
+				} catch (error) {
+					throw new Error(error);
+				}
+			};
+
+			checkForExistingArticle()
+				.then(existingChallenge => {
+					// Found exsiting challenge - don't add it to the db
+				})
+				.catch(error => {
+					const addNewChallenge = async () => {
+						try {
+							// no challenge exists
+							const challengesCommand = new PutObjectCommand({
+								Bucket: process.env.REACT_APP_CHALLENGE_BUCKET,
+								Key: challenge.articleId,
+								Body: JSON.stringify(challenge),
+								ContentEncoding: 'base64',
+								ContentType: 'application/json',
+								ACL: 'public-read',
+							});
+
+							await s3Client.send(challengesCommand);
+
+							// Update the register
+						} catch (error) {
+							functions.logger.log(error);
+						}
+					};
+
+					addNewChallenge();
+				});
+		});
+		*/
+
+		// Create the initial challenges list ---------------------------------------------------------------------------------------------------//
+		/*
+		let challenges = [];
+		newChallenges.map(challenge => {
+			delete challenge.title;
+			delete challenge.content;
+			delete challenge.contentSnippet;
+			delete challenge.url;
+			delete challenge.image;
+			challenges.push(challenge);
+		});
+
+		challenges.sort((a, b) => {
+			let aDate = new Date(a.date);
+			let bDate = new Date(b.date);
+			return bDate.getTime() - aDate.getTime();
+		});
+
+		const challengeList = new PutObjectCommand({
+			Bucket: process.env.REACT_APP_CHALLENGE_BUCKET,
+			Key: 'challenges-map',
+			Body: JSON.stringify(challenges),
 			ContentEncoding: 'base64',
 			ContentType: 'application/json',
 			ACL: 'public-read',
 		});
 
-		await s3Client.send(challengesCommand);
+		await s3Client.send(challengeList);
+		*/
+
+		const challenge = { articleId: 'test', date: new Date() };
+		const test = new PutObjectCommand({
+			Bucket: process.env.REACT_APP_CHALLENGE_BUCKET,
+			Key: 'test',
+			Body: JSON.stringify(challenge),
+			ContentEncoding: 'base64',
+			ContentType: 'application/json',
+			ACL: 'public-read',
+		});
+
+		await s3Client.send(test);
 	} catch (error) {
 		functions.logger.log(error);
 	}

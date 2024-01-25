@@ -73,12 +73,14 @@ Asap---------------------------------------------------
 -let users change hangar icons/colors
 	- just for subscribers? (maybe free gets a few options of icons and no colors)
 -fix hangars at bottom of screen not displaying right
--make challenges their own s3 bucket
 -builds in a hanger should have a sort by date added filter
 -Quick share builds (without needing to create a whole build)
 -Overwolf
 
 Whenever---------------------------------------------------
+- local store notifs
+- local store challenges/news
+	- maybe have a master list of notifs/challenges that gets pulled first, checks for any new ones that arent in local store, and grabs only those from the server
 - email notifs for botw
 - make type searching work for your own builds/visiting a users builds
 - convert website to look like app

@@ -1,13 +1,16 @@
 import React from 'react';
 import { useNewsContext } from '../../../context/news/NewsContext';
 import ChallengeCard from './ChallengeCard';
+import Button from '../../../components/buttons/Button';
+import { useFetchMoreChallenges } from '../../../context/news/NewsActions';
 
 /**
  * Displays a list of challenges on the Challenge Page
  * @returns
  */
 function ChallengesList() {
-	const { challenges } = useNewsContext();
+	const { challenges, challengesLength } = useNewsContext();
+	const { fetchMoreChallenges } = useFetchMoreChallenges();
 
 	return (
 		<>
@@ -18,6 +21,7 @@ function ChallengesList() {
 					})}
 				</div>
 			) : null}
+			{challengesLength !== challenges.length ? <Button color="btn-primary" text="Load More" icon="plus" onClick={fetchMoreChallenges} /> : ''}
 		</>
 	);
 }

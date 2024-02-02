@@ -15,7 +15,7 @@ function ChallengesList() {
 	return (
 		<>
 			{challenges ? (
-				<div className="flex flex-row flex-wrap">
+				<div className="flex flex-row flex-wrap gap-3">
 					{challenges.map((challenge, i) => {
 						return <ChallengeCard i={i} key={challenge.articleId} challenge={challenge} />;
 					})}

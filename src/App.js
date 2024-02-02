@@ -98,6 +98,8 @@ t-shirts, merch
 
 Research---------------------------------------------------
 - make the text editor less bad
+- pressing ctrl+v anywhere ont he website should check if youre pasting a craft file and take you to the upload page with it auto filled
+- get ai to summaraize challenges better for readibility and
 pagination allowing user to jump right to a page? might result in a large amount of firebase calls
 Should be able to login with username/password
 	-automatically generate an email auth with the new username (eg steve@kspbuilds.com)

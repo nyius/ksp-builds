@@ -16,11 +16,11 @@ import CreateArticle from './components/CreateArticle';
 import SendNotificationToUser from './components/SendNotificationToUser';
 
 function AdminPanel() {
+	// Joram is pretty
 	//---------------------------------------------------------------------------------------------------//
 	return (
 		<>
 			<Helmet title="Admin Panel" pageLink="https://kspbuilds.com/admin-panel" description="Admin Panel for KSP Builds" />
-
 			<MiddleContainer>
 				<PlanetHeader text="Admin" />
 

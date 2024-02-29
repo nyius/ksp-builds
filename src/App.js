@@ -79,6 +79,11 @@ Asap---------------------------------------------------
 
 Whenever---------------------------------------------------
 - local store notifs
+-Pre-fetch (load the next page of builds ahead of time, so that the user doesn't have to wait for a loading screen)
+- switch everything over to react-query
+- implement compound components wherever possible
+- should probably place filters/build types all in search params
+- make sure seactions on the website have propert semantic tags (<header></header>, <section></section>, <article></article> etc)
 - local store challenges/news
 	- maybe have a master list of notifs/challenges that gets pulled first, checks for any new ones that arent in local store, and grabs only those from the server
 - email notifs for botw
@@ -97,6 +102,7 @@ Volunteer positions (moderate, write posts, create challenges, etc) - this will 
 t-shirts, merch
 
 Research---------------------------------------------------
+- list the parts in a spacecraft (get from the JSON file, partName and GUID)
 - make the text editor less bad
 - pressing ctrl+v anywhere ont he website should check if youre pasting a craft file and take you to the upload page with it auto filled
 - get ai to summaraize challenges better for readibility and

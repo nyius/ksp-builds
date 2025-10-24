@@ -81,5 +81,8 @@
 		"babel-register": "^6.26.0",
 		"postcss": "^8.4.21",
 		"tailwindcss": "^3.2.7"
+	},
+	"engines": {
+		"node": "22.x"
 	}
 }

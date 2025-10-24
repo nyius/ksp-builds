@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Switch } from 'react-router-dom';
+import YoutubeDesktopLogin from '../pages/ytDesktopLogin/YoutubeDesktopLogin';
 
 function App() {
 	return (
@@ -68,6 +69,7 @@ function App() {
 					}
 				/>
 				<Route path="*" element={<NotFound />} />
+				<Route exact path="/yt-desktop-login" element={<YoutubeDesktopLogin />} />
 			</Switch>
 		</BrowserRouter>
 	);

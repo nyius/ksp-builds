@@ -113,6 +113,13 @@ Should be able to login with username/password
 	
  */
 
+const data = {
+	amazon: 'url',
+	kindle: 'url',
+};
+
+console.log(JSON.stringify(data));
+
 //---------------------------------------------------------------------------------------------------//
 function App() {
 	return (

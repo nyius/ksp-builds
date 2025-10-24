@@ -8,3 +8,4 @@ export const s3Client = new S3Client({
 		secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
 	},
 });
+console.log(process.env.REACT_APP_AWS_ACCESS_KEY_ID);

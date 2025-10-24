@@ -26,6 +26,7 @@
 		"image-conversion": "^2.1.1",
 		"lodash": "^4.17.21",
 		"lz-string": "^1.5.0",
+		"node-gyp": "^11.5.0",
 		"node-sass": "^7.0.3",
 		"react": "^18.2.0",
 		"react-color": "^2.19.3",
